@@ -1,7 +1,7 @@
 import AuthVisual from "../AuthVisual";
-import LoginForm from "./LoginForm";
+import LoginForm from "./RegisterForm";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <div className="w-full h-screen grid grid-cols-[1fr_640px]">
       <AuthVisual />
