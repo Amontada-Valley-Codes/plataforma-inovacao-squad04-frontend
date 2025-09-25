@@ -51,6 +51,11 @@ import HorizontaLDots from "./horizontal-dots.svg";
 import ChatIcon from "./chat.svg";
 import MoreDotIcon from "./more-dot.svg";
 import BellIcon from "./bell.svg";
+import ClipboardDocumentListIcon from "./clipboard-document-list.svg"
+import HistoryIcon from "./history.svg"
+import HomeIcon from "./home.svg"
+import RocketLaunchIcon from "./rocket-launch.svg"
+import BuildingOffice2Icon from "./building-office-2.svg"
 
 export {
   DownloadIcon,
@@ -74,6 +79,7 @@ export {
   ArrowRightIcon,
   GroupIcon,
   BoxIconLine,
+  RocketLaunchIcon,
   ShootingStarIcon,
   DollarLineIcon,
   TrashBinIcon,
@@ -106,4 +112,8 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
+  ClipboardDocumentListIcon,
+  HistoryIcon,
+  HomeIcon,
+  BuildingOffice2Icon
 };
