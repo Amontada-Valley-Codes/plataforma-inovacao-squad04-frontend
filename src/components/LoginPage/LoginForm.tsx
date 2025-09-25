@@ -1,8 +1,29 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { User, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !senha) {
+      setError("Preencha e-mail e senha.");
+      return;
+    }
+    if (!email.includes("@")) {
+      setError("E-mail inválido.");
+      return;
+    }
+    setError("");
+    console.log("✅ Login enviado:", { email, senha });
+  };
+
   return (
     <div
       className="flex flex-col justify-center items-center 
@@ -19,11 +40,13 @@ export default function LoginForm() {
         />
       </div>
       <h1 className="font-semibold text-[34px] text-white mb-4">Login</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="relative w-[300px] mb-6">
           <input
             type="text"
             placeholder="E-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="block bg-white hover:bg-gray-100 hover:shadow-lg w-full rounded-3xl pl-12 p-3 cursor-pointer
             placeholder:text-lg placeholder-[#6B7280] focus:outline-none transition-all duration-300 ease-in-out"
           />
@@ -36,6 +59,8 @@ export default function LoginForm() {
           <input
             type="password"
             placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
             className="block bg-white hover:bg-gray-100 hover:shadow-lg w-[300px] rounded-3xl pl-12 p-3 cursor-pointer 
             placeholder:text-lg placeholder-[#6B7280] focus:outline-none transition-all duration-300 ease-in-out"
           />
@@ -44,6 +69,7 @@ export default function LoginForm() {
             color="#6B7280"
           />
         </div>
+        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
         <div className="w-[300px] text-center mb-5">
           <Link
             href={"#"}
@@ -72,6 +98,7 @@ export default function LoginForm() {
         </div>
         <div className="w-[300px] mb-6">
           <button
+            type="submit"
             className="w-full bg-linear-to-r hover:scale-[102.5%] from-[#0C0869] from-5% cursor-pointer
             to-[#15358D] rounded-3xl p-[10px] shadow text-2xl font-semibold text-white transition-all duration-300 ease-in-out"
           >
