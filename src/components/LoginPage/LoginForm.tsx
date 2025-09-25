@@ -58,7 +58,7 @@ export default function LoginForm() {
           <p className="text-base text-[#D2F5FB] font-light">
             Não possui cadastro?
             <Link
-              href={"#"}
+              href={"/register"}
               className="relative text-white font-normal cursor-pointer
               after:content-[''] after:absolute after:left-0 after:-bottom-0.5
               after:h-[1.5px] after:w-full after:bg-white
