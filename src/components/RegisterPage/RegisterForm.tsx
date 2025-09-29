@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { User, Mail, LockKeyhole, Phone } from "lucide-react";
+import { User, Mail, LockKeyhole, Phone, EyeIcon } from "lucide-react";
 import Link from "next/link";
+import { EyeCloseIcon } from "@/icons";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,9 @@ export default function RegisterForm() {
   });
 
   const [error, setError] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const formatTelefone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
@@ -76,6 +80,8 @@ export default function RegisterForm() {
         className="flex flex-col items-center w-[300px]"
         onSubmit={handleSubmit}
       >
+
+        {/* Full name */}
         <div className="relative w-full mb-4">
           <input
             type="text"
@@ -87,6 +93,7 @@ export default function RegisterForm() {
           <User className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
 
+        {/* Phone */}
         <div className="relative w-full mb-4">
           <input
             type="tel"
@@ -100,6 +107,7 @@ export default function RegisterForm() {
           <Phone className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
 
+        {/* Email */}
         <div className="relative w-full mb-4">
           <input
             type="email"
@@ -112,41 +120,62 @@ export default function RegisterForm() {
           />
           <Mail className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
-
+          
+        {/* Password */}
         <div className="relative w-full mb-4">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Senha"
             value={formData.senha}
             onChange={(e) =>
               setFormData({ ...formData, senha: e.target.value })
             }
-            className="w-full bg-white rounded-full pl-12 pr-4 py-3 shadow-sm"
+            className="w-full bg-white rounded-full pl-12 pr-10 py-3 shadow-sm"
           />
           <LockKeyhole
             className="absolute top-3 left-4"
             color="#6B7280"
             size={20}
           />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            {showPassword ? (
+              <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
+            ) : (
+              <EyeCloseIcon size={20} className="text-gray-500 dark:text-gray-400" />
+            )}
+          </span>
         </div>
 
+        {/* Repeat password */}
         <div className="relative w-full mb-4">
           <input
-            type="password"
+            type={showRepeatPassword ? "text" : "password"}
             placeholder="Repetir senha"
             value={formData.repetirSenha}
             onChange={(e) =>
               setFormData({ ...formData, repetirSenha: e.target.value })
             }
-            className="w-full bg-white rounded-full pl-12 pr-4 py-3 shadow-sm"
+            className="w-full bg-white rounded-full pl-12 pr-10 py-3 shadow-sm"
           />
           <LockKeyhole
             className="absolute top-3 left-4"
             color="#6B7280"
             size={20}
           />
+          <span
+            onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            {showRepeatPassword ? (
+              <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
+            ) : (
+              <EyeCloseIcon size={20} className="text-gray-500 dark:text-gray-400" />
+            )}
+          </span>
         </div>
-
         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
         <div className="w-[300px] text-center mb-5">

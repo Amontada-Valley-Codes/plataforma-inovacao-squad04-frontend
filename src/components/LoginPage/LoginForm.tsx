@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { User, LockKeyhole } from "lucide-react";
+import { User, LockKeyhole, EyeIcon } from "lucide-react";
 import Link from "next/link";
+import { EyeCloseIcon } from "@/icons";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,11 @@ export default function LoginForm() {
     setError("");
     console.log("✅ Login enviado:", { email, senha });
   };
+
+  const handleClicker = (e: any) => {
+    setSenha(e.target.value)
+    setShowPassword(!showPassword)
+  }
 
   return (
     <div
@@ -41,6 +48,8 @@ export default function LoginForm() {
       </div>
       <h1 className="font-semibold text-[34px] text-white mb-4">Login</h1>
       <form onSubmit={handleSubmit}>
+
+        {/* Email */}
         <div className="relative w-[300px] mb-6">
           <input
             type="text"
@@ -55,9 +64,11 @@ export default function LoginForm() {
             color="#6B7280"
           />
         </div>
+
+        {/* Password */}
         <div className="relative w-[300px] mb-5">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
@@ -68,6 +79,18 @@ export default function LoginForm() {
             className="absolute top-3 left-3.5 pointer-events-none"
             color="#6B7280"
           />
+          
+          {/* Botão de mostrar/ocultar senha */}
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            {showPassword ? (
+              <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
+            ) : (
+              <EyeCloseIcon size={20} className="text-gray-500 dark:text-gray-400" />
+            )}
+          </span>
         </div>
         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
         <div className="w-[300px] text-center mb-5">
