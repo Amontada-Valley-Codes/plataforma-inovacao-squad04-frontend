@@ -25,7 +25,7 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <HomeIcon />,
-    name: "Início",
+    name: "Inicio",
     subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
