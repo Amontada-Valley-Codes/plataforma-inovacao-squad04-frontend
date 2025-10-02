@@ -1,4 +1,5 @@
 "use client";
+import AddColaboratorForm from "@/components/AddColaboratorForm";
 import AddUsersButton from "@/components/AddUsersButton";
 import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import NotificationDropdown from "@/components/header/NotificationDropdown";
@@ -166,7 +167,6 @@ const AppHeader: React.FC = () => {
           </div>
 
           <AddUsersButton/>
-
           {/* <!-- User Area --> */}
           <UserDropdown /> 
     
