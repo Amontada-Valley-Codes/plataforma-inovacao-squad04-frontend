@@ -7,13 +7,13 @@ import { useSidebar } from "../context/SidebarContext";
 import {
   GridIcon,
   HorizontaLDots,
-  UserIcon,
   ClipboardDocumentListIcon,
   HistoryIcon,
   HomeIcon,
   RocketLaunchIcon,
   BuildingOffice2Icon
 } from "../icons/index";
+import { SquareKanban } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -24,14 +24,9 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <HomeIcon />,
-    name: "Inicio",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  },
-  {
-    icon: <HomeIcon />,
-    name: "Início",
-    path: "/profile",
+    icon: <SquareKanban />,
+    name: "Kanban",
+    path: "/kanban",
   },
   {
     icon: <GridIcon />,   
