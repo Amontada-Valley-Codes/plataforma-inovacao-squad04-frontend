@@ -35,13 +35,12 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
 
 
             <div className="space-y-3">
-
               <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 h-12 dark:border-gray-800 dark:bg-gray-900">
                 <Mail className="text-[#98A2B3] mr-2" size={18} />
                 <input
                   type="email"
                   placeholder="Email do colaborador"
-                  className="w-full bg-transparent text-sm outline-none text-[#344054] placeholder:text-[#98A2B3]"
+                  className="w-full bg-transparent text-sm outline-none text-[#d8d8d8] placeholder:text-[#98A2B3]"
                 />
               </div>
 
