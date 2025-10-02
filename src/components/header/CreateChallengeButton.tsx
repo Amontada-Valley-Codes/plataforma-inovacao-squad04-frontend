@@ -1,6 +1,6 @@
 'use client'
 
-import DefaultModal from "../challenge/RegisterChallengeForm";
+import RegisterChallengeForm from "../challenge/RegisterChallengeForm";
 import { useModal } from "@/hooks/useModal";
 
 export default function CreateChallengeButton() {
@@ -17,7 +17,7 @@ export default function CreateChallengeButton() {
           Criar Desafio
       </button>
 
-      <DefaultModal isOpen={isOpen} onClose={closeModal} />
+      <RegisterChallengeForm isOpen={isOpen} onClose={closeModal} />
     </div>
   );
 }
