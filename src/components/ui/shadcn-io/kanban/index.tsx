@@ -53,7 +53,7 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
     <div
       className={cn(
         'flex w-[280px] flex-col rounded-[8px] flex-shrink-0', 
-        'bg-[#15358D] text-xs shadow-sm',
+        'bg-[#15358D] dark:bg-[#1a2844] text-xs shadow-sm border border-gray-200 dark:border-gray-800',
         className
       )}
       ref={setNodeRef}
@@ -92,7 +92,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
     <div style={style} {...attributes} ref={setNodeRef}>
       <Card
         className={cn(
-          'gap-4 rounded-[8px] bg-[#fff] p-3 shadow-sm',
+          'gap-4 rounded-[8px] bg-[#fff] p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900',
           className
         )}
       >

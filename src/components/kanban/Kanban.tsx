@@ -105,16 +105,16 @@ const KanbanPage = () => {
                       
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex flex-col">
-                          <p className="m-0 flex-1 font-semibold text-[#0B2B70] text-base">
+                          <p className="m-0 flex-1 font-semibold text-[#0B2B70] text-base dark:text-blue-800">
                             {feature.name}
                           </p>
                           <div className='flex gap-1 mt-1'>
-                            <p className='flex items-center gap-1 m-0 font-semibold text-neutral-700 text-[12px]'>
-                              <Tag size={14} className='text-white fill-neutral-700'/>
+                            <p className='flex items-center gap-1 m-0 font-semibold dark:text-[#ced3db] text-neutral-700 text-[12px]'>
+                              <Tag size={14} className='text-white dark:text-[#ced3db] fill-neutral-700'/>
                               {feature.category}
                             </p>
                           </div>
-                          <p className="flex items-center gap-1 m-0 font-semibold text-[#666] text-[12px] mt-1">
+                          <p className="flex items-center gap-1 m-0 font-semibold text-[#666] dark:text-[#ced3db] text-[12px] mt-1">
                             <CalendarClock size={14}/>
                             {shortDateFormatter.format(feature.startAt)} -{' '}
                             {dateFormatter.format(feature.endAt)}
@@ -126,7 +126,7 @@ const KanbanPage = () => {
                         <div className='flex items-center justify-end'>
                           <button
                             className="flex w-1/3 justify-center px-2 py-1 
-                            rounded-[8px] bg-[#0B2B70] text-white font-semibold
+                            rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
                             text-[12px] cursor-pointer"
                             onClick={() => handleApproveAndMove(feature.id)}
                           >
