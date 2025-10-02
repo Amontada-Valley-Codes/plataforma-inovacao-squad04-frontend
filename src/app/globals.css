@@ -3,6 +3,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
 @theme {
   --font-*: initial;
   --font-outfit: Outfit, sans-serif;
