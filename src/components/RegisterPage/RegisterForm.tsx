@@ -88,7 +88,7 @@ export default function RegisterForm() {
             placeholder="Nome Completo"
             value={formData.nome}
             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-            className="w-full bg-white rounded-full pl-12 pr-4 py-3 shadow-sm"
+            className="w-full bg-white text-black rounded-full pl-12 pr-4 py-3 shadow-sm"
           />
           <User className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
@@ -102,7 +102,7 @@ export default function RegisterForm() {
             onChange={(e) =>
               setFormData({ ...formData, telefone: formatTelefone(e.target.value) })
             }
-            className="w-full bg-white rounded-full pl-12 pr-4 py-3 shadow-sm"
+            className="w-full bg-white text-black rounded-full pl-12 pr-4 py-3 shadow-sm"
           />
           <Phone className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
@@ -116,7 +116,7 @@ export default function RegisterForm() {
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            className="w-full bg-white rounded-full pl-12 pr-4 py-3 shadow-sm"
+            className="w-full bg-white text-black rounded-full pl-12 pr-4 py-3 shadow-sm"
           />
           <Mail className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
@@ -130,7 +130,7 @@ export default function RegisterForm() {
             onChange={(e) =>
               setFormData({ ...formData, senha: e.target.value })
             }
-            className="w-full bg-white rounded-full pl-12 pr-10 py-3 shadow-sm"
+            className="w-full bg-white text-black rounded-full pl-12 pr-10 py-3 shadow-sm"
           />
           <LockKeyhole
             className="absolute top-3 left-4"
@@ -158,7 +158,7 @@ export default function RegisterForm() {
             onChange={(e) =>
               setFormData({ ...formData, repetirSenha: e.target.value })
             }
-            className="w-full bg-white rounded-full pl-12 pr-10 py-3 shadow-sm"
+            className="w-full bg-white text-black rounded-full pl-12 pr-10 py-3 shadow-sm"
           />
           <LockKeyhole
             className="absolute top-3 left-4"

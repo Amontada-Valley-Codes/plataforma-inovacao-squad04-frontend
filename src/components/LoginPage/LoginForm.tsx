@@ -56,7 +56,7 @@ export default function LoginForm() {
             placeholder="E-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block bg-white hover:bg-gray-100 hover:shadow-lg w-full rounded-3xl pl-12 p-3 cursor-pointer
+            className="block bg-white text-black hover:bg-gray-100 hover:shadow-lg w-full rounded-3xl pl-12 p-3 cursor-pointer
             placeholder:text-lg placeholder-[#6B7280] focus:outline-none transition-all duration-300 ease-in-out"
           />
           <User
@@ -72,7 +72,7 @@ export default function LoginForm() {
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="block bg-white hover:bg-gray-100 hover:shadow-lg w-[300px] rounded-3xl pl-12 p-3 cursor-pointer 
+            className="block bg-white text-black hover:bg-gray-100 hover:shadow-lg w-[300px] rounded-3xl pl-12 p-3 cursor-pointer 
             placeholder:text-lg placeholder-[#6B7280] focus:outline-none transition-all duration-300 ease-in-out"
           />
           <LockKeyhole
