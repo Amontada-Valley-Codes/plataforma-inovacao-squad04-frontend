@@ -8,7 +8,7 @@ import {
   FaMapMarkedAlt,
 } from "react-icons/fa";
 
-export default function CompaniesPage() {
+export default function CompaniesProfile() {
   return (
     <div className="flex">
       <div className="w-full rounded-2xl shadow-md overflow-hidden bg-white dark:bg-gray-900">

@@ -1,9 +1,9 @@
-import CompaniesPage from "@/components/companies/CompaniesCard";
+import CompanieCard from "@/components/companies/CompanieCard";
 
 export default function companies() {
   return(
     <div>
-      <CompaniesPage/>
+      <CompanieCard/>
     </div>
   );
 }
