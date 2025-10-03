@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { X, Building2, SlidersHorizontal, Menu, CalendarDays, Mail, ChevronDown, User } from "lucide-react";
+import { X, Building2, SlidersHorizontal, Menu, CalendarDays, Mail, ChevronDown, User, Github } from "lucide-react";
 import { Modal } from "../ui/modal";
 
 type Props = {
@@ -114,28 +114,37 @@ export default function AddStartupForm( { onClose, isOpen }: Props) {
 
                 {/* Pitch */}
                 <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 py-2 dark:border-gray-800 dark:bg-gray-900 cursor-pointer">
-                  <input
-                    type="text"
-                    placeholder="Pitch"
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
+                  <label className="w-full text-sm text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] cursor-pointer">
+                    <span className="text-[#98A2B3]">Pitch (vídeo)</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          console.log("Vídeo selecionado:", e.target.files[0].name);
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
 
                 {/* Email */}
                 <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 py-2 dark:border-gray-800 dark:bg-gray-900 cursor-pointer">
                   <Mail className="text-[#98A2B3] mr-2" size={18} />
                   <input
-                    type="text"
+                    type="email"
                     placeholder="E-mail"
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
 
                 {/* Links úteis */}
-                <div className="flex items-center justify-center bg-[#E5E7EB] rounded-lg border border-[#D1D5DB] px-3 py-2 dark:border-gray-800 dark:bg-gray-700 cursor-pointer">
+                <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 py-2 dark:border-gray-800 dark:bg-gray-900 cursor-pointer">
+                  <Github className="text-[#98A2B3] mr-2" size={18} />
                   <input
                     type="text"
-                    placeholder="Links Úteis"
+                    placeholder="GitHub"
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
