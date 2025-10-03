@@ -1,4 +1,4 @@
-import { Building2, CalendarDays, ChevronDown, Mail, Menu, SlidersHorizontal, User, UserPlus, X } from "lucide-react";
+import {ChevronDown, Mail, User, X } from "lucide-react";
 import { Modal } from "./ui/modal";
 import { useState } from "react";
 
@@ -45,7 +45,7 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
               </div>
 
               <div className="relative flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 h-12 dark:border-gray-800 dark:bg-gray-900">
-                <Mail className="text-[#98A2B3] mr-2" size={18} />
+                <User className="text-[#98A2B3] mr-2" size={18} />
                 <select
                   onFocus={() => setIsFuncOpen(true)}
                   onBlur={() => setIsFuncOpen(false)}

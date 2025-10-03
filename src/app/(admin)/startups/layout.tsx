@@ -4,7 +4,7 @@ export default function ChallengeLayout({ children }: { children: React.ReactNod
   return (
     <>
       <div>
-        <ChallengeFilter IsChallenge/>
+        <ChallengeFilter isStartup/>
       </div>
 
       <div className="flex-1 p-2">

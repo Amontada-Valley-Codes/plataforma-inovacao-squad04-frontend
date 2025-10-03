@@ -131,7 +131,7 @@ export default function RegisterChallengeForm( { onClose, isOpen }: Props) {
                     transition-colors ease-in-out dark:text-[#ced3db]
                     hover:bg-[#0f2a6d]"
                 >
-                Adicionar Empresa
+                Adicionar Desafio
                 </button>
             </div>
           </div>

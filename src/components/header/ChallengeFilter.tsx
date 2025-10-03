@@ -3,8 +3,14 @@
 import { ChevronDown, CircleCheckBig, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import CreateChallengeButton from "./CreateChallengeButton";
+import RegisterStartupBtn from "../startup/RegisterStartupButton";
 
-export default function ChallengeFilter() {
+type Props = {
+  isStartup?: boolean
+  IsChallenge?: boolean
+}
+
+export default function ChallengeFilter({ IsChallenge, isStartup }: Props) {
 
   const [isSetorOpen, setSetorIsOpen] = useState(false);
   const [isStatusOpen, setStatusIsOpen] = useState(false);
@@ -74,7 +80,13 @@ export default function ChallengeFilter() {
       </div>
 
       <div>
-        <CreateChallengeButton/>
+        {IsChallenge && (
+          <CreateChallengeButton/>
+        )}
+
+        {isStartup && (
+          <RegisterStartupBtn/>
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import {
   FaClipboardList,
 } from "react-icons/fa";
 
-export default function StartupPage() {
+export default function StartupProfile() {
   return (
     <div className="flex">
       <div className="w-full rounded-2xl shadow-md overflow-hidden bg-white dark:bg-gray-900">
