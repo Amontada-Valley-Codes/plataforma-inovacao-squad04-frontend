@@ -1,8 +1,8 @@
 "use client";
 import { Tag, Calendar, Eye, EyeOff, MoreHorizontal } from "lucide-react";
+import { challengesData } from "@/mocks/ChallengeData";
 
 export default function ChallengeCard() {  
-
 
   const getStatusColor = (status: string) => {
       switch (status) {
@@ -16,82 +16,6 @@ export default function ChallengeCard() {
           return "bg-gray-400"; 
       }
     };
-
-  type Challenge = {
-    ChallengeTitle: string,
-    Author: string,
-    Category: string,
-    Status: string,
-    Date: string,
-    Visibility: string,
-  }
-
-  const challengesData: Challenge[] = [
-    {
-      ChallengeTitle: "Build a Todo App",
-      Author: "Eduardo Albuquerque",
-      Category: "Front-End",
-      Status: "Completed",
-      Date: "2025-09-17",
-      Visibility: "Public",
-    },
-    {
-      ChallengeTitle: "API RESTful com NestJS",
-      Author: "João Silva",
-      Category: "Back-End",
-      Status: "In Progress",
-      Date: "2025-09-12",
-      Visibility: "Private",
-    },
-    {
-      ChallengeTitle: "UI Dashboard com Tailwind",
-      Author: "Maria Souza",
-      Category: "Design/UI",
-      Status: "Pending",
-      Date: "2025-09-01",
-      Visibility: "Public",
-    },
-    {
-      ChallengeTitle: "Mobile App React Native",
-      Author: "Carlos Lima",
-      Category: "Mobile",
-      Status: "Completed",
-      Date: "2025-08-28",
-      Visibility: "Private",
-    },
-    {
-      ChallengeTitle: "GraphQL API",
-      Author: "Ana Paula",
-      Category: "Back-End",
-      Status: "Pending",
-      Date: "2025-09-05",
-      Visibility: "Public",
-    },
-    {
-      ChallengeTitle: "Landing Page HTML/CSS",
-      Author: "Rafael Santos",
-      Category: "Front-End",
-      Status: "In Progress",
-      Date: "2025-09-10",
-      Visibility: "Public",
-    },
-    {
-      ChallengeTitle: "E-commerce Fullstack",
-      Author: "Luiza Martins",
-      Category: "Fullstack",
-      Status: "Completed",
-      Date: "2025-08-20",
-      Visibility: "Private",
-    },
-    {
-      ChallengeTitle: "Chat App Socket.io",
-      Author: "Bruno Costa",
-      Category: "Back-End",
-      Status: "In Progress",
-      Date: "2025-09-14",
-      Visibility: "Public",
-    }
-  ];
 
   return (
     <div className="grid grid-cols-4 gap-6 w-full p-4">
