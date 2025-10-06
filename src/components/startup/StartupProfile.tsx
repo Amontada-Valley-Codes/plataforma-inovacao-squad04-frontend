@@ -30,8 +30,10 @@ export default function StartupProfile({ isOpen, onClose, data }: Props) {
                 <FaRegImage className="text-gray-600 dark:text-[#ced3db] text-xl" />
               </div>
 
-              <div className="absolute right-10 top-6 w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center shadow-md hover:bg-gray-200 dark:hover:bg-gray-600 transition">
-                <button onClick={onClose}>
+              <div>
+                <button
+                  className="absolute right-10 top-6 w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center shadow-md hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                  onClick={onClose}>
                   <X
                     className="text-gray-400 hover:text-gray-600 transition duration-400 hover:scale-[1.05] active:scale-[0.98]"
                     size={20}
