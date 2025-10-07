@@ -36,11 +36,11 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
   // ADMIN (ecossistema global)
   if (role === "admin") {
     return [
-      { icon: <GridIcon />,                  name: "Dashboard", path: "/" },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",  path: "/challenges" },
-      { icon: <RocketLaunchIcon />,          name: "Startups",  path: "/startups" },
-      { icon: <BuildingOffice2Icon />,       name: "Empresas",  path: "/companies" },
-      { icon: <HistoryIcon />,               name: "Histórico", path: "/history" },
+      { icon: <GridIcon />,                  name: "Dashboard", path: "/admin/dashboard" },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",  path: "/admin/challenges" },
+      { icon: <RocketLaunchIcon />,          name: "Startups",  path: "/admin/startups" },
+      { icon: <BuildingOffice2Icon />,       name: "Empresas",  path: "/admin/companies" },
+      { icon: <HistoryIcon />,               name: "Histórico", path: "/admin/history" },
     ];
   }
 
