@@ -9,7 +9,6 @@ import {
   HorizontaLDots,
   ClipboardDocumentListIcon,
   HistoryIcon,
-  HomeIcon,
   RocketLaunchIcon,
   BuildingOffice2Icon
 } from "../icons/index";
