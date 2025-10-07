@@ -26,7 +26,7 @@ type NavItem = {
 
 /** TODO: trocar por contexto real de autenticação quando ligar ao backend */
 function getCurrentRole(): Role {
-  return "gestor"; // "gestor" | "avaliador" | "usuario"
+  return "admin"; // "admin" | "gestor" | "avaliador" | "usuario"
 }
 
 /** Builder: monta menu por papel + URL atual */

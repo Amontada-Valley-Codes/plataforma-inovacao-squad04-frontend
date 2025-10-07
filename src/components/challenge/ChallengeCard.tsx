@@ -49,22 +49,24 @@ export default function ChallengeCard() {
               {challenge.Status}
             </div>
 
-            <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-              <Calendar size={16} /> {challenge.Date}
-            </div>
-          </div>
+            <div className="grid grid-cols-2 items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
+              <div className="flex items-center gap-1">
+                <Calendar size={16} />
+                <span>{challenge.Date}</span>
+              </div>
 
-          {/* Footer */}
-          <div className="flex justify-end mt-4 text-gray-600 dark:text-[#ced3db]">
-            {challenge.Visibility === "Public" ? (
-              <span title="Publico">
-                <Eye size={18} />
-              </span>
-            ) : (
-              <span title="Privado">
-                <EyeOff size={18} />
-              </span>
-            )}
+              <div className="flex justify-end">
+                {challenge.Visibility === "Public" ? (
+                  <span title="Público">
+                    <Eye size={18} />
+                  </span>
+                ) : (
+                  <span title="Privado">
+                    <EyeOff size={18} />
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       ))}
