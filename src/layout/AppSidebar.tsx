@@ -26,7 +26,7 @@ type NavItem = {
 
 /** TODO: trocar por contexto real de autenticação quando ligar ao backend */
 function getCurrentRole(): Role {
-  return "admin"; // "gestor" | "avaliador" | "usuario"
+  return "gestor"; // "gestor" | "avaliador" | "usuario"
 }
 
 /** Builder: monta menu por papel + URL atual */
@@ -50,7 +50,7 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
       return [
         { icon: <GridIcon />,                  name: "Feed",           path: "/user/meus-desafios" },
         { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/user/empresa" },
-        { icon: <HistoryIcon />,               name: "Histórico", path: "/user/history" },
+        { icon: <HistoryIcon />,               name: "Histórico", path: "/user/historico" },
       ];
     }
     // gestor/avaliador sem companyId: menu mínimo
@@ -62,22 +62,22 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
 
   if (role === "gestor") {
     return [
-      { icon: <GridIcon />,                  name: "Dashboard",   path: `${base}/&{company}/dashboard` },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/&{company}/desafios` },
-      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/&{company}/kanban` },
-      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/&{company}/empresa" },
-      { icon: <HistoryIcon />,               name: "Histórico", path: "/&{company}/history" },
-      { icon: <RocketLaunchIcon />,          name: "Conexões",    path: `${base}/&{company}/conexoes` },
-      { icon: <BuildingOffice2Icon />,       name: "Utilizadores",path: `${base}/&{company}/usuarios` },
+      { icon: <GridIcon />,                  name: "Dashboard",   path: `${base}/dashboard` },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/desafios` },
+      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/kanban` },
+      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: `${base}/empresa` },
+      { icon: <HistoryIcon />,               name: "Histórico", path: `${base}/history` },
+      { icon: <RocketLaunchIcon />,          name: "Conexões",    path: `${base}/conexoes` },
+      { icon: <BuildingOffice2Icon />,       name: "Utilizadores",path: `${base}/usuarios` },
     ];
   }
 
   if (role === "avaliador") {
     return [
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/&{company}/desafios` },
-      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/&{company}/kanban` },
-      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/&{company}/empresa" },
-      { icon: <HistoryIcon />,               name: "Histórico", path: "//history" },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/desafios` },
+      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/kanban` },
+      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: `${base}/empresa` },
+      { icon: <HistoryIcon />,               name: "Histórico", path:  `${base}/history` },
     ];
   }
 
@@ -195,7 +195,10 @@ const AppSidebar: React.FC = () => {
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // active por path exato; se quiser por seção, troque por pathname.startsWith(path)
-  const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback(
+    (path: string) => pathname === path || pathname.startsWith(path + "/"),
+    [pathname]
+  );
 
   useEffect(() => {
     if (openSubmenu !== null) {
