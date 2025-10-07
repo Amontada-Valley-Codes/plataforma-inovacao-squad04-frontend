@@ -174,7 +174,6 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                   >
                     <option value="">Estágio de Maturidade</option>
                     <option value="ideacao">Ideação</option>
-                    <option value="validacao">Validação</option>
                     <option value="tracao">Tração</option>
                     <option value="expansao">Expansão</option>
                     <option value="consolidacao">Consolidação</option>
