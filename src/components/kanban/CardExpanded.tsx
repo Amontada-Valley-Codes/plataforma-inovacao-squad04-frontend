@@ -87,7 +87,19 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
               />
             )}
             {currentColumnName === "Pré-Triagem" && (
-              <CardPreScreeningContent featureId={cardData.id} handleApproveAndMove={handleApproveAndMove}/>
+              <CardExpandedLayout mainContent={
+                  <CardPreScreeningContent 
+                    challangeTitle={cardData.name} 
+                    category={cardData.category}
+                    description={cardData.description}
+                    featureId={cardData.id} 
+                    handleApproveAndMove={handleApproveAndMove}
+                  />
+                }
+                commentsContent={
+                  <CommentsPanel sections={preScreeningCommentSections}/>
+                }
+              />
             )}
             {currentColumnName === "Triagem Detalhada" && (
               <CardDetailedScreeningContent featureId={cardData.id} handleApproveAndMove={handleApproveAndMove}/>
