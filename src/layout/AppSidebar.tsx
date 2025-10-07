@@ -24,9 +24,13 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-/** TODO: trocar por contexto real de autenticação quando ligar ao backend */
+/** TODO: trocar por contexto real de autenticação quando ligar ao backend
+ *  Mock simples: permite trocar o papel pelo localStorage ('role' = 'gestor' | 'avaliador' | 'admin' | 'usuario')
+ */
 function getCurrentRole(): Role {
-  return "gestor"; // "gestor" | "avaliador" | "usuario"
+  if (typeof window === "undefined") return "admin";
+  const r = window.localStorage.getItem("role") as Role | null;
+  return (r ?? "admin") as Role; // padrão: avaliador
 }
 
 /** Builder: monta menu por papel + URL atual */
@@ -48,12 +52,12 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
   if (!companyId) {
     if (role === "usuario") {
       return [
-        { icon: <GridIcon />,                  name: "Feed",           path: "/user/meus-desafios" },
-        { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/user/empresa" },
-        { icon: <HistoryIcon />,               name: "Histórico", path: "/user/historico" },
+        { icon: <GridIcon />,            name: "Feed",          path: "/user/meus-desafios" },
+        { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+        { icon: <HistoryIcon />,         name: "Histórico",     path: "/user/historico" },
       ];
     }
-    // gestor/avaliador sem companyId: menu mínimo
+    // gestor/avaliador sem companyId: menu mínimo (podes ajustar conforme tua navegação)
     return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
@@ -62,22 +66,23 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
 
   if (role === "gestor") {
     return [
-      { icon: <GridIcon />,                  name: "Dashboard",   path: `${base}/dashboard` },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/desafios` },
-      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/kanban` },
-      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: `${base}/empresa` },
-      { icon: <HistoryIcon />,               name: "Histórico", path: `${base}/history` },
-      { icon: <RocketLaunchIcon />,          name: "Conexões",    path: `${base}/conexoes` },
-      { icon: <BuildingOffice2Icon />,       name: "Utilizadores",path: `${base}/usuarios` },
+      { icon: <GridIcon />,                  name: "Dashboard",     path: `${base}/dashboard` },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
+      { icon: <SquareKanban />,              name: "Funil",         path: `${base}/kanban` },
+      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <HistoryIcon />,               name: "Histórico",     path: `${base}/history` },
+      { icon: <RocketLaunchIcon />,          name: "Conexões",      path: `${base}/conexoes` },
+      { icon: <BuildingOffice2Icon />,       name: "Utilizadores",  path: `${base}/usuarios` },
     ];
   }
 
   if (role === "avaliador") {
+    // 🔒 sem Dashboard para avaliador; “Desafios” é a home dele
     return [
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/desafios` },
-      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/kanban` },
-      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: `${base}/empresa` },
-      { icon: <HistoryIcon />,               name: "Histórico", path:  `${base}/history` },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
+      { icon: <SquareKanban />,              name: "Funil",         path: `${base}/kanban` },
+      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <HistoryIcon />,               name: "Histórico",     path: `${base}/history` },
     ];
   }
 
@@ -97,27 +102,16 @@ const AppSidebar: React.FC = () => {
   // monta menu conforme papel + URL
   const navItems = useMemo(() => buildNavItems(role, pathname), [role, pathname]);
 
-  const renderMenuItems = (
-    items: NavItem[],
-    menuType: "main"
-  ) => (
+  const renderMenuItems = (items: NavItem[], menuType: "main") => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => (
         <li key={`${nav.name}-${index}`}>
           {nav.path && (
             <Link
               href={nav.path}
-              className={`menu-item group ${
-                isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-              }`}
+              className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"}`}
             >
-              <span
-                className={`${
-                  isActive(nav.path)
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
-                }`}
-              >
+              <span className={`${isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"}`}>
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
@@ -125,11 +119,10 @@ const AppSidebar: React.FC = () => {
               )}
             </Link>
           )}
+          {/* submenu (se vier a usar) */}
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
-              ref={(el) => {
-                subMenuRefs.current[`${menuType}-${index}`] = el;
-              }}
+              ref={(el) => { subMenuRefs.current[`${menuType}-${index}`] = el; }}
               className="overflow-hidden transition-all duration-300"
               style={{
                 height:
@@ -144,31 +137,21 @@ const AppSidebar: React.FC = () => {
                     <Link
                       href={subItem.path}
                       className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
+                        isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
                       }`}
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            className={`${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"} menu-dropdown-badge`}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            className={`${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"} menu-dropdown-badge`}
                           >
                             pro
                           </span>
@@ -185,16 +168,11 @@ const AppSidebar: React.FC = () => {
     </ul>
   );
 
-  const [openSubmenu, setOpenSubmenu] = useState<{
-    type: "main" | "others";
-    index: number;
-  } | null>(null);
-  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
-    {}
-  );
+  const [openSubmenu, setOpenSubmenu] = useState<{ type: "main"; index: number } | null>(null);
+  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // active por path exato; se quiser por seção, troque por pathname.startsWith(path)
+  // ativo por path exato ou filho
   const isActive = useCallback(
     (path: string) => pathname === path || pathname.startsWith(path + "/"),
     [pathname]
@@ -204,47 +182,28 @@ const AppSidebar: React.FC = () => {
     if (openSubmenu !== null) {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
       if (subMenuRefs.current[key]) {
-        setSubMenuHeight((prevHeights) => ({
-          ...prevHeights,
+        setSubMenuHeight((prev) => ({
+          ...prev,
           [key]: subMenuRefs.current[key]?.scrollHeight || 0,
         }));
       }
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
-    setOpenSubmenu((prevOpenSubmenu) => {
-      if (
-        prevOpenSubmenu &&
-        prevOpenSubmenu.type === menuType &&
-        prevOpenSubmenu.index === index
-      ) {
-        return null;
-      }
-      return { type: menuType, index };
-    });
+  const handleSubmenuToggle = (index: number, menuType: "main") => {
+    setOpenSubmenu((prev) => (prev && prev.type === menuType && prev.index === index ? null : { type: menuType, index }));
   };
 
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#15358d] dark:bg-gray-900 dark:border-gray-800 text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 rounded-r-2xl
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
-        }
+        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div
-        className={`py-8 flex  ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
-        }`}
-      >
+      <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"}`}>
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
@@ -254,13 +213,16 @@ const AppSidebar: React.FC = () => {
                 alt="Logo"
                 width={85}
                 height={40}
+                priority
               />
+              {/* opcional: se tiveres a versão dark */}
               <Image
                 className="hidden dark:block"
-                src="/images/logo/ninna-logo.svg"
+                src="/images/logo/logo-dark.svg"
                 alt="Logo"
                 width={85}
                 height={40}
+                priority
               />
             </>
           ) : (
@@ -269,26 +231,22 @@ const AppSidebar: React.FC = () => {
               alt="Logo"
               width={32}
               height={32}
+              priority
             />
           )}
         </Link>
       </div>
+
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-white ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  ""
-                ) : (
-                  <HorizontaLDots />
-                )}
+                {isExpanded || isHovered || isMobileOpen ? "" : <HorizontaLDots />}
               </h2>
 
               {/* MENU DINÂMICO */}
