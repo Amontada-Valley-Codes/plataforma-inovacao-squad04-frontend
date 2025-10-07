@@ -40,7 +40,7 @@ export default function LoginForm() {
     >
       <div className="relative w-[135px] h-[101px] mb-6">
         <Image
-          src={"/images/ninna-logo.svg"}
+          src={"/images/logo/ninna-logo.svg"}
           alt="ninna-logo"
           fill
           className="object-cover"

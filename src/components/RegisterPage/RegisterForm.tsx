@@ -67,7 +67,7 @@ export default function RegisterForm() {
     >
       <div className="relative w-[140px] h-[90px] mb-6">
         <Image
-          src={"/images/ninna-logo.svg"}
+          src={"/images/logo/ninna-logo.svg"}
           alt="ninna-logo"
           fill
           className="object-contain"
