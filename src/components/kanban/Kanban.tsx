@@ -10,14 +10,16 @@ import {
 } from '@/components/ui/shadcn-io/kanban';
 import { useState } from 'react';
 import { CalendarClock, Tag, Send } from 'lucide-react';
+import CardExpanded from './CardExpanded';
+import ForwardButton from './ForwardButton';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const columns = [
   { id: faker.string.uuid(), name: 'Desafios' },
   { id: faker.string.uuid(), name: 'Pré-Triagem' },
-  { id: faker.string.uuid(), name: 'Ideação' },
   { id: faker.string.uuid(), name: 'Triagem Detalhada' },
+  { id: faker.string.uuid(), name: 'Ideação' },
   { id: faker.string.uuid(), name: 'Experimentação' },
 ];
 
@@ -29,7 +31,7 @@ const users = Array.from({ length: 4 })
     image: faker.image.avatar(),
   }));
 
-type Feature = {
+export type Feature = {
     id: string;
     name: string;
     category: string;
@@ -48,7 +50,10 @@ const exampleFeatures: Feature[] = Array.from({ length: 6 })
     category: faker.commerce.department(),
     startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
     endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
-    description: faker.hacker.phrase(),
+    description: faker.lorem.paragraph({
+      min: 5,
+      max: 8,
+    }),
     column: columns[0].id,
     owner: faker.helpers.arrayElement(users),
   }));
@@ -66,7 +71,9 @@ const shortDateFormatter = new Intl.DateTimeFormat('pt-BR', {
 const KanbanPage = () => {
   const [features, setFeatures] = useState(exampleFeatures);
 
-  const handleApproveAndMove = (featureId: string) => {
+  const [expandedCard, setExpandedCard] = useState<Feature | null>(null)
+
+  const handleApproveAndMove = (featureId: string | undefined) => {
     const featureToMove = features.find(f => f.id === featureId);
     if (!featureToMove) return;
 
@@ -78,6 +85,7 @@ const KanbanPage = () => {
       const otherFeatures = features.filter(f => f.id !== featureId);
       const newFeatures = [updatedFeature, ...otherFeatures];
       setFeatures(newFeatures);
+      setExpandedCard(updatedFeature)
     }
   };
 
@@ -101,7 +109,10 @@ const KanbanPage = () => {
                     name={feature.name}
                     column={column.id}
                   >
-                    <div className="flex flex-col gap-3">
+                    <div 
+                      className="flex flex-col gap-3"
+                      onClick={() => setExpandedCard(feature)}
+                    >
                       
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex flex-col">
@@ -124,16 +135,16 @@ const KanbanPage = () => {
                       
                       {!isLastColumn && (
                         <div className='flex items-center justify-end'>
-                          <button
-                            className="flex w-1/3 justify-center px-2 py-1 
-                            rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
-                            text-[12px] cursor-pointer"
-                            onClick={() => handleApproveAndMove(feature.id)}
-                          >
-                            Avançar
-                          </button>
+                          <ForwardButton className="w-25" featureId={feature.id} handleApproveAndMove={handleApproveAndMove}/>
                         </div>
                       )}
+                      <CardExpanded
+                        isOpen={!!expandedCard}
+                        onClose={() => setExpandedCard(null)}
+                        cardData={expandedCard}
+                        columns={columns}
+                        handleApproveAndMove={handleApproveAndMove}
+                      />
                     </div>
                   </KanbanCard>
                 )}
