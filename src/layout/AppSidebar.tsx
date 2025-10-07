@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState,useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -13,6 +13,9 @@ import {
   BuildingOffice2Icon
 } from "../icons/index";
 import { SquareKanban } from "lucide-react";
+import { extractCompanyIdFromPath } from "@/lib/utils";
+
+type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
 type NavItem = {
   name: string;
@@ -21,81 +24,86 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-const navItems: NavItem[] = [
-  {
-    icon: <SquareKanban />,
-    name: "Kanban",
-    path: "/kanban",
-  },
-  {
-    icon: <GridIcon />,   
-    name: "Dashboard",
-    path: "/",
-  },
-  { 
-    icon: <ClipboardDocumentListIcon />,
-    name: "Desafios",
-    path: "/challenges",
-  },
-  {
-    icon: <RocketLaunchIcon />,
-    name: "Startups",
-    path: "/startups",
-  },
-  {
-    icon: <BuildingOffice2Icon />,
-    name: "Empresas",
-    path: "/companies",
-  },
-  {
-    icon: <HistoryIcon />,
-    name: "Histórico",
-    path: "/history",
-  },
-];
+/** TODO: trocar por contexto real de autenticação quando ligar ao backend */
+function getCurrentRole(): Role {
+  return "admin"; // "gestor" | "avaliador" | "usuario"
+}
 
-// const othersItems: NavItem[] = [
-//   {
-//     icon: <PieChartIcon />,
-//     name: "Charts",
-//     subItems: [
-//       { name: "Line Chart", path: "/line-chart", pro: false },
-//       { name: "Bar Chart", path: "/bar-chart", pro: false },
-//     ],
-//   },
-//   {
-//     icon: <BoxCubeIcon />,
-//     name: "UI Elements",
-//     subItems: [
-//       { name: "Alerts", path: "/alerts", pro: false },
-//       { name: "Avatar", path: "/avatars", pro: false },
-//       { name: "Badge", path: "/badge", pro: false },
-//       { name: "Buttons", path: "/buttons", pro: false },
-//       { name: "Images", path: "/images", pro: false },
-//       { name: "Videos", path: "/videos", pro: false },
-//     ],
-//   },
-//   {
-//     icon: <PlugInIcon />,
-//     name: "Authentication",
-//     subItems: [
-//       { name: "Sign In", path: "/signin", pro: false },
-//       { name: "Sign Up", path: "/signup", pro: false },
-//     ],
-//   },
-// ];
+/** Builder: monta menu por papel + URL atual */
+function buildNavItems(role: Role, pathname: string): NavItem[] {
+  const companyId = extractCompanyIdFromPath(pathname);
+
+  // ADMIN (ecossistema global)
+  if (role === "admin") {
+    return [
+      { icon: <GridIcon />,                  name: "Dashboard", path: "/" },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",  path: "/challenges" },
+      { icon: <RocketLaunchIcon />,          name: "Startups",  path: "/startups" },
+      { icon: <BuildingOffice2Icon />,       name: "Empresas",  path: "/companies" },
+      { icon: <HistoryIcon />,               name: "Histórico", path: "/history" },
+    ];
+  }
+
+  // Fora do contexto de empresa
+  if (!companyId) {
+    if (role === "usuario") {
+      return [
+        { icon: <GridIcon />,                  name: "Feed",           path: "/user/meus-desafios" },
+        { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/user/empresa" },
+        { icon: <HistoryIcon />,               name: "Histórico", path: "/user/history" },
+      ];
+    }
+    // gestor/avaliador sem companyId: menu mínimo
+    return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
+  }
+
+  // Dentro de /company/:companyId/...
+  const base = `/company/${companyId}`;
+
+  if (role === "gestor") {
+    return [
+      { icon: <GridIcon />,                  name: "Dashboard",   path: `${base}/&{company}/dashboard` },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/&{company}/desafios` },
+      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/&{company}/kanban` },
+      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/&{company}/empresa" },
+      { icon: <HistoryIcon />,               name: "Histórico", path: "/&{company}/history" },
+      { icon: <RocketLaunchIcon />,          name: "Conexões",    path: `${base}/&{company}/conexoes` },
+      { icon: <BuildingOffice2Icon />,       name: "Utilizadores",path: `${base}/&{company}/usuarios` },
+    ];
+  }
+
+  if (role === "avaliador") {
+    return [
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios",    path: `${base}/&{company}/desafios` },
+      { icon: <SquareKanban />,              name: "Funil",       path: `${base}/&{company}/kanban` },
+      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa",  path: "/&{company}/empresa" },
+      { icon: <HistoryIcon />,               name: "Histórico", path: "//history" },
+    ];
+  }
+
+  // USUÁRIO (empresa)
+  return [
+    { icon: <BuildingOffice2Icon />,       name: "Empresa",       path: `${base}` },
+    { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
+    { icon: <ClipboardDocumentListIcon />, name: "Meus Desafios", path: `/user/meus-desafios` },
+  ];
+}
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const role = getCurrentRole();
+
+  // monta menu conforme papel + URL
+  const navItems = useMemo(() => buildNavItems(role, pathname), [role, pathname]);
 
   const renderMenuItems = (
-    navItems: NavItem[],
+    items: NavItem[],
     menuType: "main"
   ) => (
     <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
-        <li key={nav.name}>
+      {items.map((nav, index) => (
+        <li key={`${nav.name}-${index}`}>
           {nav.path && (
             <Link
               href={nav.path}
@@ -186,37 +194,10 @@ const AppSidebar: React.FC = () => {
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
-
-  // useEffect(() => {
-  //   // Check if the current path matches any submenu item
-  //   let submenuMatched = false;
-  //   ["main", "others"].forEach((menuType) => {
-  //     const items = menuType === "main" ? navItems : othersItems;
-  //     items.forEach((nav, index) => {
-  //       if (nav.subItems) {
-  //         nav.subItems.forEach((subItem) => {
-  //           if (isActive(subItem.path)) {
-  //             setOpenSubmenu({
-  //               type: menuType as "main" | "others",
-  //               index,
-  //             });
-  //             submenuMatched = true;
-  //           }
-  //         });
-  //       }
-  //     });
-  //   });
-
-  //   // If no submenu item matches, close the open submenu
-  //   if (!submenuMatched) {
-  //     setOpenSubmenu(null);
-  //   }
-  // }, [pathname,isActive]);
+  // active por path exato; se quiser por seção, troque por pathname.startsWith(path)
+  const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
-    // Set the height of the submenu items when the submenu is opened
     if (openSubmenu !== null) {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
       if (subMenuRefs.current[key]) {
@@ -306,25 +287,10 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
+
+              {/* MENU DINÂMICO */}
               {renderMenuItems(navItems, "main")}
             </div>
-
-            {/* <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-white ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
-            </div> */}
           </div>
         </nav>
       </div>
