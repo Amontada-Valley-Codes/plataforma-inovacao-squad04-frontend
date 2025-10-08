@@ -28,9 +28,9 @@ type NavItem = {
  *  Mock simples: permite trocar o papel pelo localStorage ('role' = 'gestor' | 'avaliador' | 'admin' | 'usuario')
  */
 function getCurrentRole(): Role {
-  if (typeof window === "undefined") return "admin";
+  if (typeof window === "undefined") return "avaliador";
   const r = window.localStorage.getItem("role") as Role | null;
-  return (r ?? "gestor") as Role; // padrão: avaliador
+  return (r ?? "avaliador") as Role; // padrão: avaliador
 }
 
 /** Builder: monta menu por papel + URL atual */
