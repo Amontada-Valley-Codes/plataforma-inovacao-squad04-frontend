@@ -1,15 +1,14 @@
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 
-export default function CompanyChallenges({
-  params,
-}: {
-  params: { companyId: string };
-}) {
-  const { companyId } = params; // já é síncrono
+type PageProps = { params: Promise<{ companyId: string }> };
+
+export default async function CompanyChallenges({ params }: PageProps) {
+  const { companyId } = await params; // ✅ agora é assíncrono
+  const companyIdNum = Number(companyId);
 
   return (
     <div>
-      <ChallengeCard companyId={Number(companyId)} isAdminView />
+      <ChallengeCard companyId={companyIdNum} isAdminView />
     </div>
   );
 }
