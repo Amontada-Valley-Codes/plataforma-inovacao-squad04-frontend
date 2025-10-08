@@ -4,5 +4,5 @@
 export async function getUserRole(): Promise<"gestor" | "avaliador" | "admin"> {
     // Aqui podes trocar manualmente para testar:
     // return "gestor";
-    return "admin";
+    return "gestor";
 }

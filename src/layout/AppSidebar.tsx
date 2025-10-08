@@ -30,7 +30,7 @@ type NavItem = {
 function getCurrentRole(): Role {
   if (typeof window === "undefined") return "admin";
   const r = window.localStorage.getItem("role") as Role | null;
-  return (r ?? "admin") as Role; // padrão: avaliador
+  return (r ?? "gestor") as Role; // padrão: avaliador
 }
 
 /** Builder: monta menu por papel + URL atual */
@@ -70,9 +70,9 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
       { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
       { icon: <SquareKanban />,              name: "Funil",         path: `${base}/kanban` },
       { icon: <BuildingOffice2Icon />,       name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <RocketLaunchIcon />,          name: "Startups",      path: `${base}/startups` },  
       { icon: <HistoryIcon />,               name: "Histórico",     path: `${base}/history` },
-      { icon: <RocketLaunchIcon />,          name: "Conexões",      path: `${base}/conexoes` },
-      { icon: <BuildingOffice2Icon />,       name: "Utilizadores",  path: `${base}/usuarios` },
+      { icon: <BuildingOffice2Icon />,       name: "Usuarios",      path: `${base}/usuarios` },
     ];
   }
 
