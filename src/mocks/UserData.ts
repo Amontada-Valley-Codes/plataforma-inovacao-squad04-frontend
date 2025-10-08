@@ -25,14 +25,14 @@ export type Role = "admin" | "gestor" | "avaliador" | "usuario";
         companyId: 2,
     },
     {
-        id: 2,
+        id: 3,
         nome: "Eduardo",
         email: "admin@email.com",
         role: "admin",
         companyId: 2,
     },
     {
-        id: 2,
+        id: 4,
         nome: "Joao",
         email: "admin@email.com",
         role: "avaliador",
