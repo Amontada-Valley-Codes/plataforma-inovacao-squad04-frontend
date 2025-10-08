@@ -5,13 +5,11 @@ import { redirect } from "next/navigation";
 
 export default async function AdminStartupsPage() {
   const role = await getUserRole();
-  if (role !== "admin" && role !== "gestor") {
-    redirect("/");
-  }
+  if (role !== "admin" && role !== "gestor") redirect("/");
 
   return (
-    <div>
-      <StartupCard role={role} /> {/* ✅ passa a prop exigida */}
+    <div className="p-4">
+      <StartupCard role={role} />
     </div>
   );
 }

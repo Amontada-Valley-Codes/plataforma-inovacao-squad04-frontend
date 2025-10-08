@@ -1,4 +1,3 @@
-// src/app/user/meus-desafios/page.tsx
 "use client";
 
 import React from "react";
@@ -13,17 +12,20 @@ export default function MeusDesafiosPage() {
         (async () => {
         const me = await getCurrentUser();
         setAuthorName(me.name);
-        setCompanyId(me.empresaId);
+        // suporta companyId OU empresaId no mock
+        const cid = (me as any).companyId ?? (me as any).empresaId;
+        setCompanyId(typeof cid === "number" ? cid : undefined);
         })();
     }, []);
 
+    // opcional: placeholder enquanto carrega
+    if (!authorName) {
+        return <div className="p-4 text-sm text-gray-500">Carregando seus desafios…</div>;
+    }
+
     return (
         <div className="p-2">
-        <ChallengeCard
-            onlyMine
-            authorName={authorName}     // pode omitir, que o Card busca do auth; deixei explícito
-            companyId={companyId}
-        />
+        <ChallengeCard onlyMine authorName={authorName} companyId={companyId} />
         </div>
     );
 }

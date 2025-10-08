@@ -8,7 +8,7 @@ import { X } from "lucide-react";
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  data: Startup | null
+  data: Startup;
 }
 
 export default function StartupProfile({ isOpen, onClose, data }: Props) {

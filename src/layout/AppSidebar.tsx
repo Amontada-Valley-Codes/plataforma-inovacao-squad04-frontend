@@ -24,6 +24,14 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
+/* ✅ NOVO: helper para anexar a query atual (?role=..., ?userId=..., etc.) */
+function appendSearch(path: string, search: string) {
+  if (!search) return path;
+  const hasQuery = path.includes("?");
+  const sep = hasQuery ? "&" : "?";
+  return `${path}${sep}${search.replace(/^\?/, "")}`;
+}
+
 /** Hook para ler a role atual via URL, localStorage ou mock */
 function useCurrentRole(): Role {
   const [role, setRole] = useState<Role>("usuario");
@@ -120,6 +128,14 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
   const role = useCurrentRole();
 
+  // ✅ NOVO: guarda o search atual (?role=..., ?userId=..., etc.)
+  const [searchSuffix, setSearchSuffix] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSearchSuffix(window.location.search || "");
+    }
+  }, [pathname]);
+
   // monta menu conforme papel + URL
   const navItems = useMemo(() => buildNavItems(role, pathname), [role, pathname]);
 
@@ -138,16 +154,11 @@ const AppSidebar: React.FC = () => {
         <li key={`${nav.name}-${index}`}>
           {nav.path && (
             <Link
-              href={nav.path}
-              className={`menu-item group ${
-                isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-              }`}
+              /* ✅ NOVO: preserva a query atual nos links do menu */
+              href={appendSearch(nav.path, searchSuffix)}
+              className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"}`}
             >
-              <span
-                className={`${
-                  isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"
-                }`}
-              >
+              <span className={`${isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"}`}>
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
@@ -173,11 +184,10 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      href={subItem.path}
+                      /* ✅ NOVO: preserva a query também nos subitens */
+                      href={appendSearch(subItem.path, searchSuffix)}
                       className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
+                        isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
                       }`}
                     >
                       {subItem.name}
@@ -185,9 +195,7 @@ const AppSidebar: React.FC = () => {
                         {subItem.new && (
                           <span
                             className={`${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
+                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
                             } menu-dropdown-badge`}
                           >
                             new
@@ -196,9 +204,7 @@ const AppSidebar: React.FC = () => {
                         {subItem.pro && (
                           <span
                             className={`${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
+                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
                             } menu-dropdown-badge`}
                           >
                             pro
@@ -238,9 +244,7 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 flex ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
-        }`}
+        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"}`}
       >
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
@@ -263,13 +267,7 @@ const AppSidebar: React.FC = () => {
               />
             </>
           ) : (
-            <Image
-              src="/images/logo/ninna-logo.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-              priority
-            />
+            <Image src="/images/logo/ninna-logo.svg" alt="Logo" width={32} height={32} priority />
           )}
         </Link>
       </div>

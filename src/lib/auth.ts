@@ -1,16 +1,22 @@
-// src/lib/auth.ts
-// Mock simples para testar roles e usuário localmente
-import { usersData } from "@/mocks/UserData"; // importa teu novo mock
+import { usersData } from "@/mocks/UserData";
+import type { User } from "@/mocks/UserData";
 
-// Pega o usuário logado (podes trocar o índice para testar)
-const currentUser = usersData[0]; // ← aqui simulas quem está logado
+export async function getCurrentUser(): Promise<User> {
+    if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const idParam = params.get("userId");
 
-// Mantém a tua função original, só adiciona o tipo "usuario"
-export async function getUserRole(): Promise<"gestor" | "avaliador" | "admin" | "usuario"> {
-    return currentUser.role;
+        if (idParam) {
+        const user = usersData.find(u => u.id === Number(idParam));
+        if (user) return user;
+        }
+    }
+
+    // fallback
+    return usersData[1];
 }
 
-// Nova função: retorna os dados completos do usuário logado
-export async function getCurrentUser() {
-    return currentUser;
-}
+    export async function getUserRole(): Promise<User["role"]> {
+    const user = await getCurrentUser();
+    return user.role;
+    }

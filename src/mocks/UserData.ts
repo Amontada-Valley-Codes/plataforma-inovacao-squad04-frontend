@@ -19,7 +19,7 @@ export type User = {
         id: 2,
         name: "Eduardo Albuquerque",
         email: "eduardo@techwave.com",
-        role: "gestor",
+        role: "admin",
         empresaId: 1,
     },
     {
@@ -27,6 +27,14 @@ export type User = {
         name: "João Silva",
         email: "joao@techwave.com",
         role: "avaliador",
+        empresaId: 1,
+    },
+
+    {
+        id: 4,
+        name: "Maria Souza",
+        email: "MariaSouza@techwave.com",
+        role: "gestor",
         empresaId: 1,
     },
 ];

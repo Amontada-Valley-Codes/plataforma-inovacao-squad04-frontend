@@ -3,24 +3,36 @@
 import React from "react";
 import { Tag, Calendar, Eye, EyeOff, MoreHorizontal } from "lucide-react";
 import { challengesData } from "@/mocks/ChallengeData";
-import { getCurrentUser } from "@/lib/auth";
 
-type Props = {
-  companyId?: number;          // agora number
-  isAdminView?: boolean;
-  onlyMine?: boolean;
-  authorName?: string;         // opcional (override)
-};
+/** Status/Visibility livres para manter compat com teu mock */
+type Status = "Completed" | "In Progress" | "Pending" | string;
+type Visibility = "Public" | "Private" | string;
 
 type Challenge = {
   id: number;
   ChallengeTitle: string;
   Author: string;
   Category: string;
-  Status: "Completed" | "In Progress" | "Pending" | string;
+  Status: Status;
   Date: string;
-  Visibility: "Public" | "Private" | string;
+  Visibility: Visibility;
+  companyId?: number;   // <- importante para filtros por empresa
+  startupId?: number;   // <- opcional se quiseres filtrar por startup depois
+};
+
+type Role = "admin" | "gestor" | "avaliador" | "usuario";
+
+type Props = {
+  /** Filtro da rota de empresa (ex.: /company/[companyId]/desafios) */
   companyId?: number;
+  /** Mostrar tudo (inclusive privados) — típico de admin/gestor no contexto da empresa */
+  isAdminView?: boolean;
+  /** Mostrar apenas os desafios do autor (usado em /user/meus-desafios) */
+  onlyMine?: boolean;
+  /** Nome do autor “logado” (passado pela page) */
+  authorName?: string;
+  /** Empresa do usuário viewer (passado pela page quando onlyMine=true) */
+  viewerCompanyId?: number;
 };
 
 export default function ChallengeCard({
@@ -28,10 +40,11 @@ export default function ChallengeCard({
   isAdminView = false,
   onlyMine = false,
   authorName,
+  viewerCompanyId,
 }: Props) {
   const data: Challenge[] = challengesData as Challenge[];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: Status) => {
     switch (status) {
       case "Completed":
         return "bg-emerald-400";
@@ -44,52 +57,40 @@ export default function ChallengeCard({
     }
   };
 
-  const [filtered, setFiltered] = React.useState<Challenge[]>([]);
+  const filtered = React.useMemo(() => {
+    let base = data;
 
-  React.useEffect(() => {
-    const run = async () => {
-      let base = data;
+    // 1) Se vier companyId da rota, filtra por empresa
+    if (typeof companyId === "number") {
+      base = base.filter((c) => c.companyId === companyId);
+    }
 
-      // Filtra por empresa se vier companyId
-      if (typeof companyId === "number") {
-        base = base.filter((c) => c.companyId === companyId);
+    // 2) ADMIN/GESTOR (isAdminView): vê tudo (público/privado) dentro do escopo acima
+    if (isAdminView) {
+      return base;
+    }
+
+    // 3) onlyMine: mostra apenas os desafios do autor no contexto da empresa do viewer (se houver)
+    if (onlyMine) {
+      const nameToUse = authorName?.trim();
+      if (!nameToUse) {
+        // sem authorName não dá pra filtrar "meus"
+        return [];
       }
+      const inCompany = (c: Challenge) =>
+        typeof viewerCompanyId === "number" ? c.companyId === viewerCompanyId : true;
 
-      if (isAdminView) {
-        // Admin/gestor: vê tudo da empresa (público e privado)
-        setFiltered(base);
-        return;
-      }
+      return base.filter((c) => c.Author === nameToUse && inCompany(c));
+    }
 
-      if (onlyMine) {
-        // Usuário comum: vê APENAS o que é dele (público/privado), e dentro da empresa se companyId foi informado
-        const me = await getCurrentUser();
-        const nameToUse = authorName ?? me.name;
-        const companyToUse = typeof companyId === "number" ? companyId : me.empresaId;
-
-        const mine = base.filter((c) => {
-          const isMine = c.Author === nameToUse;
-          const inCompany =
-            typeof companyToUse === "number" ? c.companyId === companyToUse : true;
-          return isMine && inCompany;
-        });
-
-        setFiltered(mine);
-        return;
-      }
-
-      // Fallback: apenas públicos (e da empresa se informada)
-      setFiltered(base.filter((c) => c.Visibility === "Public"));
-    };
-
-    run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyId, isAdminView, onlyMine, authorName]);
+    // 4) fallback: apenas públicos (respeitando o companyId, se veio)
+    return base.filter((c) => c.Visibility === "Public");
+  }, [data, companyId, isAdminView, onlyMine, authorName, viewerCompanyId]);
 
   if (!filtered.length) {
     return (
       <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
-        Ainda não submeteste nenhum desafio.
+        Ainda não há desafios para exibir.
       </div>
     );
   }
