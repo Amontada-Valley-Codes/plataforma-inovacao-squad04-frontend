@@ -1,15 +1,15 @@
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 
-export default async function CompanyChallenges({
+export default function CompanyChallenges({
   params,
 }: {
-  params: Promise<{ companyId: string }>;
+  params: { companyId: string };
 }) {
-  const { companyId } = await params; 
+  const { companyId } = params; // já é síncrono
 
   return (
     <div>
-      <ChallengeCard companyId={companyId} isAdminView />
+      <ChallengeCard companyId={Number(companyId)} isAdminView />
     </div>
   );
 }
