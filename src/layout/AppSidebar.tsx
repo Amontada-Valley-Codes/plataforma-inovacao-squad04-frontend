@@ -10,7 +10,7 @@ import {
   ClipboardDocumentListIcon,
   HistoryIcon,
   RocketLaunchIcon,
-  BuildingOffice2Icon
+  BuildingOffice2Icon,
 } from "../icons/index";
 import { SquareKanban } from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
@@ -24,13 +24,43 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-/** TODO: trocar por contexto real de autenticação quando ligar ao backend
- *  Mock simples: permite trocar o papel pelo localStorage ('role' = 'gestor' | 'avaliador' | 'admin' | 'usuario')
- */
-function getCurrentRole(): Role {
-  if (typeof window === "undefined") return "avaliador";
-  const r = window.localStorage.getItem("role") as Role | null;
-  return (r ?? "avaliador") as Role; // padrão: avaliador
+/* ✅ NOVO: helper para anexar a query atual (?role=..., ?userId=..., etc.) */
+function appendSearch(path: string, search: string) {
+  if (!search) return path;
+  const hasQuery = path.includes("?");
+  const sep = hasQuery ? "&" : "?";
+  return `${path}${sep}${search.replace(/^\?/, "")}`;
+}
+
+/** Hook para ler a role atual via URL, localStorage ou mock */
+function useCurrentRole(): Role {
+  const [role, setRole] = useState<Role>("usuario");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // 1️⃣ tenta pegar da URL (?role=gestor)
+    const params = new URLSearchParams(window.location.search);
+    const urlRole = params.get("role") as Role | null;
+
+    if (urlRole && ["admin", "gestor", "avaliador", "usuario"].includes(urlRole)) {
+      localStorage.setItem("role", urlRole);
+      setRole(urlRole);
+      return;
+    }
+
+    // 2️⃣ tenta pegar do localStorage
+    const stored = localStorage.getItem("role") as Role | null;
+    if (stored) {
+      setRole(stored);
+      return;
+    }
+
+    // 3️⃣ fallback: padrão = usuario
+    setRole("usuario");
+  }, []);
+
+  return role;
 }
 
 /** Builder: monta menu por papel + URL atual */
@@ -40,11 +70,11 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
   // ADMIN (ecossistema global)
   if (role === "admin") {
     return [
-      { icon: <GridIcon />,                  name: "Dashboard", path: "/admin/dashboard" },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",  path: "/admin/challenges" },
-      { icon: <RocketLaunchIcon />,          name: "Startups",  path: "/admin/startups" },
-      { icon: <BuildingOffice2Icon />,       name: "Empresas",  path: "/admin/companies" },
-      { icon: <HistoryIcon />,               name: "Histórico", path: "/admin/history" },
+      { icon: <GridIcon />, name: "Dashboard", path: "/admin/dashboard" },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: "/admin/challenges" },
+      { icon: <RocketLaunchIcon />, name: "Startups", path: "/admin/startups" },
+      { icon: <BuildingOffice2Icon />, name: "Empresas", path: "/admin/companies" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/admin/history" },
     ];
   }
 
@@ -52,12 +82,12 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
   if (!companyId) {
     if (role === "usuario") {
       return [
-        { icon: <GridIcon />,            name: "Feed",          path: "/user/meus-desafios" },
+        { icon: <GridIcon />, name: "Meus Desafios", path: "/user/meus-desafios" },
         { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
-        { icon: <HistoryIcon />,         name: "Histórico",     path: "/user/historico" },
+        { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
       ];
     }
-    // gestor/avaliador sem companyId: menu mínimo (podes ajustar conforme tua navegação)
+    // gestor/avaliador sem empresa
     return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
@@ -66,30 +96,29 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
 
   if (role === "gestor") {
     return [
-      { icon: <GridIcon />,                  name: "Dashboard",     path: `${base}/dashboard` },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
-      { icon: <SquareKanban />,              name: "Funil",         path: `${base}/kanban` },
-      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa", path: `${base}/empresa` },
-      { icon: <RocketLaunchIcon />,          name: "Startups",      path: `${base}/startups` },  
-      { icon: <HistoryIcon />,               name: "Histórico",     path: `${base}/history` },
-      { icon: <BuildingOffice2Icon />,       name: "Usuarios",      path: `${base}/usuarios` },
+      { icon: <GridIcon />, name: "Dashboard", path: `${base}/dashboard` },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
+      { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <RocketLaunchIcon />, name: "Startups", path: `${base}/startups` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
+      { icon: <BuildingOffice2Icon />, name: "Usuários", path: `${base}/usuarios` },
     ];
   }
 
   if (role === "avaliador") {
-    // 🔒 sem Dashboard para avaliador; “Desafios” é a home dele
     return [
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
-      { icon: <SquareKanban />,              name: "Funil",         path: `${base}/kanban` },
-      { icon: <BuildingOffice2Icon />,       name: "Minha Empresa", path: `${base}/empresa` },
-      { icon: <HistoryIcon />,               name: "Histórico",     path: `${base}/history` },
+      { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
+      { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
     ];
   }
 
   // USUÁRIO (empresa)
   return [
-    { icon: <BuildingOffice2Icon />,       name: "Empresa",       path: `${base}` },
-    { icon: <ClipboardDocumentListIcon />, name: "Desafios",      path: `${base}/desafios` },
+    { icon: <BuildingOffice2Icon />, name: "Empresa", path: `${base}` },
+    { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
     { icon: <ClipboardDocumentListIcon />, name: "Meus Desafios", path: `/user/meus-desafios` },
   ];
 }
@@ -97,10 +126,27 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
-  const role = getCurrentRole();
+  const role = useCurrentRole();
+
+  // ✅ NOVO: guarda o search atual (?role=..., ?userId=..., etc.)
+  const [searchSuffix, setSearchSuffix] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSearchSuffix(window.location.search || "");
+    }
+  }, [pathname]);
 
   // monta menu conforme papel + URL
   const navItems = useMemo(() => buildNavItems(role, pathname), [role, pathname]);
+
+  const [openSubmenu, setOpenSubmenu] = useState<{ type: "main"; index: number } | null>(null);
+  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
+  const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const isActive = useCallback(
+    (path: string) => pathname === path || pathname.startsWith(path + "/"),
+    [pathname]
+  );
 
   const renderMenuItems = (items: NavItem[], menuType: "main") => (
     <ul className="flex flex-col gap-4">
@@ -108,21 +154,24 @@ const AppSidebar: React.FC = () => {
         <li key={`${nav.name}-${index}`}>
           {nav.path && (
             <Link
-              href={nav.path}
+              /* ✅ NOVO: preserva a query atual nos links do menu */
+              href={appendSearch(nav.path, searchSuffix)}
               className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"}`}
             >
               <span className={`${isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"}`}>
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className={`menu-item-text`}>{nav.name}</span>
+                <span className="menu-item-text">{nav.name}</span>
               )}
             </Link>
           )}
-          {/* submenu (se vier a usar) */}
+
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
-              ref={(el) => { subMenuRefs.current[`${menuType}-${index}`] = el; }}
+              ref={(el) => {
+                subMenuRefs.current[`${menuType}-${index}`] = el;
+              }}
               className="overflow-hidden transition-all duration-300"
               style={{
                 height:
@@ -135,7 +184,8 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      href={subItem.path}
+                      /* ✅ NOVO: preserva a query também nos subitens */
+                      href={appendSearch(subItem.path, searchSuffix)}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
                       }`}
@@ -144,14 +194,18 @@ const AppSidebar: React.FC = () => {
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"} menu-dropdown-badge`}
+                            className={`${
+                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                            } menu-dropdown-badge`}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`${isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"} menu-dropdown-badge`}
+                            className={`${
+                              isActive(subItem.path) ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"
+                            } menu-dropdown-badge`}
                           >
                             pro
                           </span>
@@ -168,16 +222,6 @@ const AppSidebar: React.FC = () => {
     </ul>
   );
 
-  const [openSubmenu, setOpenSubmenu] = useState<{ type: "main"; index: number } | null>(null);
-  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
-  const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  // ativo por path exato ou filho
-  const isActive = useCallback(
-    (path: string) => pathname === path || pathname.startsWith(path + "/"),
-    [pathname]
-  );
-
   useEffect(() => {
     if (openSubmenu !== null) {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
@@ -190,10 +234,6 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: "main") => {
-    setOpenSubmenu((prev) => (prev && prev.type === menuType && prev.index === index ? null : { type: menuType, index }));
-  };
-
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#15358d] dark:bg-gray-900 dark:border-gray-800 text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 rounded-r-2xl
@@ -203,7 +243,9 @@ const AppSidebar: React.FC = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"}`}>
+      <div
+        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"}`}
+      >
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
@@ -215,7 +257,6 @@ const AppSidebar: React.FC = () => {
                 height={40}
                 priority
               />
-              {/* opcional: se tiveres a versão dark */}
               <Image
                 className="hidden dark:block"
                 src="/images/logo/logo-dark.svg"
@@ -226,13 +267,7 @@ const AppSidebar: React.FC = () => {
               />
             </>
           ) : (
-            <Image
-              src="/images/logo/ninna-logo.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-              priority
-            />
+            <Image src="/images/logo/ninna-logo.svg" alt="Logo" width={32} height={32} priority />
           )}
         </Link>
       </div>

@@ -10,14 +10,11 @@ import DemographicCard from "@/components/ecommerce/DemographicCard";
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 import { getUserRole } from "@/lib/auth";
 
-// Exemplo simples: substitui por tua lógica real de autenticação
-// deve retornar "gestor" | "avaliador" | etc.
-
-// 👇 note que params agora é Promise<...>
+// Next 15: params é Promise
 type PageProps = { params: Promise<{ companyId: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { companyId } = await params; // ✅ aguarda antes de usar
+  const { companyId } = await params;
   const companyName = `Empresa ${companyId}`;
   return {
     title: `${companyName} • Dashboard`,
@@ -26,29 +23,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CompanyDashboardPage({ params }: PageProps) {
-  const { companyId } = await params; // ✅ aguarda antes de usar
-  const role = await getUserRole(); // 🔐 obtém o cargo do usuário logado
+  const { companyId } = await params;
+  const id = Number(companyId);              // ✅ garante número
+  const role = await getUserRole();
 
-  // 🔸 Se for avaliador, mostra apenas os desafios da própria empresa
   if (role === "avaliador") {
     return (
       <div className="space-y-4">
         <div className="text-sm text-muted-foreground">
-          Empresa / <span className="font-medium">{companyId}</span> /{" "}
+          Empresa / <span className="font-medium">{id}</span> /{" "}
           <span className="font-semibold">Desafios</span>
         </div>
 
-        <ChallengeCard companyId={companyId} isAdminView />
+        <ChallengeCard companyId={id} isAdminView /> {/* ✅ passa número */}
       </div>
     );
   }
 
-  // 🔹 Caso contrário (gestor ou admin), mostra o dashboard completo
   return (
     <div className="space-y-4">
-      {/* breadcrumb opcional */}
       <div className="text-sm text-muted-foreground">
-        Empresa / <span className="font-medium">{companyId}</span> /{" "}
+        Empresa / <span className="font-medium">{id}</span> /{" "}
         <span className="font-semibold">Dashboard</span>
       </div>
 
