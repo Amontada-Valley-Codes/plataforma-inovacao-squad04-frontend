@@ -1,40 +1,28 @@
 // src/mocks/UserData.ts
+export type Role = "admin" | "gestor" | "avaliador" | "usuario";
+
 export type User = {
-    id: number;
-    name: string;
-    email: string;
-    role: "usuario" | "gestor" | "avaliador" | "admin";
-    empresaId?: number;
-    };
+  id: number;
+  nome: string;
+  email: string;
+  role: Role;
+  companyId: number; // agora tipado "certinho"
+};
 
-    export const usersData: User[] = [
-    {
-        id: 1,
-        name: "Lara",
-        email: "lara@example.com",
-        role: "usuario",
-        empresaId: 2,
-    },
-    {
-        id: 2,
-        name: "Eduardo Albuquerque",
-        email: "eduardo@techwave.com",
-        role: "admin",
-        empresaId: 1,
-    },
-    {
-        id: 3,
-        name: "João Silva",
-        email: "joao@techwave.com",
-        role: "avaliador",
-        empresaId: 1,
-    },
-
-    {
-        id: 4,
-        name: "Maria Souza",
-        email: "MariaSouza@techwave.com",
-        role: "gestor",
-        empresaId: 1,
-    },
+export const usersData: User[] = [
+  {
+    id: 1,
+    nome: "Isaac Silva",
+    email: "isaac@email.com",
+    role: "usuario",
+    companyId: 1,
+  },
+  {
+    id: 2,
+    nome: "Admin",
+    email: "admin@email.com",
+    role: "admin",
+    companyId: 2,
+  },
+  // ...outros usuários (se quiser)
 ];

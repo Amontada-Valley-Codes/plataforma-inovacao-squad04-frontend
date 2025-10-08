@@ -1,22 +1,18 @@
-import { usersData } from "@/mocks/UserData";
-import type { User } from "@/mocks/UserData";
+// src/lib/auth.ts
+import { usersData, type Role, type User } from "@/mocks/UserData";
 
-export async function getCurrentUser(): Promise<User> {
-    if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search);
-        const idParam = params.get("userId");
+// Simulação de usuário logado (troque o índice para testar)
+const currentUser: User = usersData[0];
 
-        if (idParam) {
-        const user = usersData.find(u => u.id === Number(idParam));
-        if (user) return user;
-        }
-    }
-
-    // fallback
-    return usersData[1];
+export async function getUserRole(): Promise<Role> {
+  return currentUser.role;
 }
 
-    export async function getUserRole(): Promise<User["role"]> {
-    const user = await getCurrentUser();
-    return user.role;
-    }
+export async function getCurrentUser(): Promise<User> {
+  return currentUser;
+}
+
+// (Opcional) helper se quiser usar em outros lugares
+export async function getUserCompanyId(): Promise<number> {
+  return currentUser.companyId;
+}
