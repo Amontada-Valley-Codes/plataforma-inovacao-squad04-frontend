@@ -13,7 +13,7 @@ export const challengesData: Challenge[] = [
   {
     id: 1,
     ChallengeTitle: "Build a Todo App",
-    Author: "Eduardo Albuquerque",
+    Author: "Lara",
     Category: "Front-End",
     Status: "Completed",
     Date: "2025-09-17",

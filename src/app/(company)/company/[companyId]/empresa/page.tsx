@@ -9,7 +9,9 @@ export default async function CompanyEmpresaPage({ params }: PageProps) {
     const { companyId } = await params;
     const role = await getUserRole();
 
+    if (role !== "gestor" && role !== "admin") {
+        redirect("/"); 
+    }
 
-    // Filtra pela empresa e abre diretamente o perfil (sem lista)
     return <CompanieCard companyId={companyId} autoOpen />;
 }

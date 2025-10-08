@@ -5,14 +5,14 @@ import { usersData, type Role, type User } from "@/mocks/UserData";
 const currentUser: User = usersData[0];
 
 export async function getUserRole(): Promise<Role> {
-  return currentUser.role;
+    return currentUser.role;
 }
 
 export async function getCurrentUser(): Promise<User> {
-  return currentUser;
+    return currentUser;
 }
 
 // (Opcional) helper se quiser usar em outros lugares
 export async function getUserCompanyId(): Promise<number> {
-  return currentUser.companyId;
+    return currentUser.companyId;
 }
