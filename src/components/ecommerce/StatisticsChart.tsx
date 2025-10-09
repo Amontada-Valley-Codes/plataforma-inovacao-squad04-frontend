@@ -10,7 +10,7 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-export default function StatisticsChart() {
+export default function EvolutionChart() {
   const options: ApexOptions = {
     legend: {
       show: false, // Hide legend
@@ -28,7 +28,7 @@ export default function StatisticsChart() {
     },
     stroke: {
       curve: "straight", // Define the line style (straight, smooth, or step)
-      width: [2, 2], // Line width for each dataset
+      width: [5, 5], // Line width for each dataset
     },
 
     fill: {
@@ -71,17 +71,17 @@ export default function StatisticsChart() {
       type: "category", // Category-based x-axis
       categories: [
         "Jan",
-        "Feb",
+        "Fev",
         "Mar",
-        "Apr",
-        "May",
+        "Abr",
+        "Mar",
         "Jun",
         "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
+        "Ago",
+        "Set",
+        "Out",
         "Nov",
-        "Dec",
+        "Dez",
       ],
       axisBorder: {
         show: false, // Hide x-axis border
@@ -111,12 +111,8 @@ export default function StatisticsChart() {
 
   const series = [
     {
-      name: "Sales",
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
-    },
-    {
-      name: "Revenue",
-      data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+      name: "Participação",
+      data: [160, 165, 170, 170, 175, 180, 190, 205, 210, 230, 235, 240],
     },
   ];
   return (
@@ -124,11 +120,8 @@ export default function StatisticsChart() {
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
         <div className="w-full">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Statistics
+            Evolução de participação
           </h3>
-          <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-            Target you’ve set for each month
-          </p>
         </div>
         <div className="flex items-start w-full gap-3 sm:justify-end">
           <ChartTab />
