@@ -15,7 +15,8 @@ import {
 import { SquareKanban } from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
 
-type Role = "admin" | "gestor" | "avaliador" | "usuario";
+/** Papéis suportados */
+type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 type NavItem = {
   name: string;
@@ -24,7 +25,7 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-/* ✅ NOVO: helper para anexar a query atual (?role=..., ?userId=..., etc.) */
+/* Preserva a query atual (?role=..., ?userId=..., etc.) */
 function appendSearch(path: string, search: string) {
   if (!search) return path;
   const hasQuery = path.includes("?");
@@ -32,38 +33,36 @@ function appendSearch(path: string, search: string) {
   return `${path}${sep}${search.replace(/^\?/, "")}`;
 }
 
-/** Hook para ler a role atual via URL, localStorage ou mock */
+/** Lê a role via URL (?role=...), localStorage ou fallback */
 function useCurrentRole(): Role {
   const [role, setRole] = useState<Role>("usuario");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1️⃣ tenta pegar da URL (?role=gestor)
+    const allowed: Role[] = ["admin", "gestor", "avaliador", "usuario", "startup"];
     const params = new URLSearchParams(window.location.search);
     const urlRole = params.get("role") as Role | null;
 
-    if (urlRole && ["admin", "gestor", "avaliador", "usuario"].includes(urlRole)) {
+    if (urlRole && allowed.includes(urlRole)) {
       localStorage.setItem("role", urlRole);
       setRole(urlRole);
       return;
     }
 
-    // 2️⃣ tenta pegar do localStorage
     const stored = localStorage.getItem("role") as Role | null;
-    if (stored) {
+    if (stored && allowed.includes(stored)) {
       setRole(stored);
       return;
     }
 
-    // 3️⃣ fallback: padrão = usuario
     setRole("usuario");
   }, []);
 
   return role;
 }
 
-/** Builder: monta menu por papel + URL atual */
+/** Monta o menu conforme papel + URL atual */
 function buildNavItems(role: Role, pathname: string): NavItem[] {
   const companyId = extractCompanyIdFromPath(pathname);
 
@@ -78,7 +77,16 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
     ];
   }
 
-  // Fora do contexto de empresa
+  // STARTUP (global, fora de /company)
+  if (!companyId && role === "startup") {
+    return [
+      { icon: <GridIcon />, name: "Desafios Públicos", path: "/startup/desafios" },
+      { icon: <RocketLaunchIcon />, name: "Startup", path: "/startup" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
+    ];
+  }
+
+  // Fora do contexto de empresa para os demais papéis
   if (!companyId) {
     if (role === "usuario") {
       return [
@@ -87,7 +95,7 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
         { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
       ];
     }
-    // gestor/avaliador sem empresa
+    // gestor/avaliador sem empresa → seleção de empresas
     return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
@@ -115,7 +123,7 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
     ];
   }
 
-  // USUÁRIO (empresa)
+  // USUÁRIO (submitter) dentro da empresa
   return [
     { icon: <BuildingOffice2Icon />, name: "Empresa", path: `${base}` },
     { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
@@ -128,7 +136,7 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
   const role = useCurrentRole();
 
-  // ✅ NOVO: guarda o search atual (?role=..., ?userId=..., etc.)
+  // guarda o search atual (?role=..., ?userId=..., etc.)
   const [searchSuffix, setSearchSuffix] = useState("");
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -154,7 +162,6 @@ const AppSidebar: React.FC = () => {
         <li key={`${nav.name}-${index}`}>
           {nav.path && (
             <Link
-              /* ✅ NOVO: preserva a query atual nos links do menu */
               href={appendSearch(nav.path, searchSuffix)}
               className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"}`}
             >
@@ -184,7 +191,6 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      /* ✅ NOVO: preserva a query também nos subitens */
                       href={appendSearch(subItem.path, searchSuffix)}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"
@@ -243,28 +249,12 @@ const AppSidebar: React.FC = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div
-        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"}`}
-      >
+      <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"}`}>
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <Image
-                className="dark:hidden"
-                src="/images/logo/ninna-logo.svg"
-                alt="Logo"
-                width={85}
-                height={40}
-                priority
-              />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={85}
-                height={40}
-                priority
-              />
+              <Image className="dark:hidden" src="/images/logo/ninna-logo.svg" alt="Logo" width={85} height={40} priority />
+              <Image className="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width={85} height={40} priority />
             </>
           ) : (
             <Image src="/images/logo/ninna-logo.svg" alt="Logo" width={32} height={32} priority />
