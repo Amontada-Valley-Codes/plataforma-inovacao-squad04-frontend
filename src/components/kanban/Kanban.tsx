@@ -51,8 +51,8 @@ const exampleFeatures: Feature[] = Array.from({ length: 6 })
     startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
     endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
     description: faker.lorem.paragraph({
-      min: 5,
-      max: 8,
+      min: 3,
+      max: 5,
     }),
     column: columns[0].id,
     owner: faker.helpers.arrayElement(users),
