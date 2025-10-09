@@ -102,7 +102,20 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
               />
             )}
             {currentColumnName === "Triagem Detalhada" && (
-              <CardDetailedScreeningContent featureId={cardData.id} handleApproveAndMove={handleApproveAndMove}/>
+              <CardExpandedLayout
+                mainContent={
+                  <CardDetailedScreeningContent
+                    challangeTitle={cardData.name}
+                    category={cardData.category}
+                    description={cardData.description}
+                    featureId={cardData.id}
+                    handleApproveAndMove={handleApproveAndMove}
+                  />
+                }
+                commentsContent={
+                  <CommentsPanel sections={detailedScreeningCommentSections}/>
+                }
+              />
             )}
             {currentColumnName === "Ideação" && (
               <CardIdeationContent featureId={cardData.id} handleApproveAndMove={handleApproveAndMove}/>
