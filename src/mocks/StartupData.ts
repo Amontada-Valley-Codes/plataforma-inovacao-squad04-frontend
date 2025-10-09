@@ -1,3 +1,4 @@
+// mocks/StartupData.ts
 export type Startup = {
   id: number;
   nome: string;
@@ -10,6 +11,7 @@ export type Startup = {
   logo: string;
   gestor: string;
   tecnologias: string;
+  companyId: number; // ✅ novo
 };
 
 export const StartupData: Startup[] = [
@@ -26,6 +28,7 @@ export const StartupData: Startup[] = [
     logo: "/logos/techwave.png",
     gestor: "Marcos Silva",
     tecnologias: "Python, TensorFlow, Node.js, AWS",
+    companyId: 1, // ✅ vincula à empresa 1
   },
   {
     id: 2,
@@ -40,6 +43,7 @@ export const StartupData: Startup[] = [
     logo: "/logos/ecolife.png",
     gestor: "Laura Fernandes",
     tecnologias: "React, Firebase, IoT, Power BI",
+    companyId: 1, // ✅ mesma empresa
   },
   {
     id: 3,
@@ -54,5 +58,6 @@ export const StartupData: Startup[] = [
     logo: "/logos/mediconnect.png",
     gestor: "Ana Ribeiro",
     tecnologias: "Next.js, TypeScript, PostgreSQL, Docker",
+    companyId: 2, // ✅ outra empresa
   },
 ];

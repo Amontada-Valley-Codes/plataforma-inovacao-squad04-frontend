@@ -7,62 +7,68 @@ import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
 import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import RecentOrders from "@/components/ecommerce/RecentOrders";
 import DemographicCard from "@/components/ecommerce/DemographicCard";
+import ChallengeCard from "@/components/challenge/ChallengeCard";
+import { getUserRole } from "@/lib/auth";
 
-type PageProps = { params: { companyId: string } };
+// Next 15: params é Promise
+type PageProps = { params: Promise<{ companyId: string }> };
 
-// (Opcional) se tiveres como resolver o nome da empresa pelo ID, usa aqui
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { companyId } = params;
-    const companyName = `Empresa ${companyId}`; // placeholder; depois busca na API
-    return {
-        title: `${companyName} • Dashboard`,
-        description: `Painel da ${companyName} no Ninna Hub`,
-    };
+  const { companyId } = await params;
+  const companyName = `Empresa ${companyId}`;
+  return {
+    title: `${companyName} • Dashboard`,
+    description: `Painel da ${companyName} no Ninna Hub`,
+  };
 }
 
-export default function CompanyDashboardPage({ params }: PageProps) {
-    const { companyId } = params;
+export default async function CompanyDashboardPage({ params }: PageProps) {
+  const { companyId } = await params;
+  const id = Number(companyId);              // ✅ garante número
+  const role = await getUserRole();
 
-    // Se quiser exibir um header/breadcrumb simples:
-    // (pode mover isso pro AppHeader depois)
+  if (role === "avaliador") {
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <div>
-                    <nav className="text-sm text-muted-foreground">
-                        <span>Company</span> <span className="mx-1">/</span>
-                        <span className="font-medium text-foreground">{companyId}</span> <span className="mx-1">/</span>
-                        <span className="font-semibold">Dashboard</span>
-                    </nav>
-                    <h1 className="mt-1 text-xl font-semibold">Visão geral</h1>
-                </div>
-                {/* Placeholder para seletor de empresa / ações */}
-                {/* <CompanySwitcher /> */}
-            </div>
-
-            <div className="grid grid-cols-12 gap-4 md:gap-6">
-                <div className="col-span-12 space-y-6 xl:col-span-7">
-                    {/* No futuro: <EcommerceMetrics companyId={companyId} /> */}
-                    <EcommerceMetrics />
-                    <MonthlySalesChart />
-                </div>
-
-                <div className="col-span-12 xl:col-span-5">
-                    <MonthlyTarget />
-                </div>
-
-                <div className="col-span-12">
-                    <StatisticsChart />
-                </div>
-
-                <div className="col-span-12 xl:col-span-5">
-                    <DemographicCard />
-                </div>
-
-                <div className="col-span-12 xl:col-span-7">
-                    <RecentOrders />
-                </div>
-            </div>
+      <div className="space-y-4">
+        <div className="text-sm text-muted-foreground">
+          Empresa / <span className="font-medium">{id}</span> /{" "}
+          <span className="font-semibold">Desafios</span>
         </div>
+
+        <ChallengeCard companyId={id} isAdminView /> {/* ✅ passa número */}
+      </div>
     );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="text-sm text-muted-foreground">
+        Empresa / <span className="font-medium">{id}</span> /{" "}
+        <span className="font-semibold">Dashboard</span>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4 md:gap-6">
+        <div className="col-span-12 space-y-6 xl:col-span-7">
+          <EcommerceMetrics />
+          <MonthlySalesChart />
+        </div>
+
+        <div className="col-span-12 xl:col-span-5">
+          <MonthlyTarget />
+        </div>
+
+        <div className="col-span-12">
+          <StatisticsChart />
+        </div>
+
+        <div className="col-span-12 xl:col-span-5">
+          <DemographicCard />
+        </div>
+
+        <div className="col-span-12 xl:col-span-7">
+          <RecentOrders />
+        </div>
+      </div>
+    </div>
+  );
 }

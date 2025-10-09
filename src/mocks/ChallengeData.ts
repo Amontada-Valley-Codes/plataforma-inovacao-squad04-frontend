@@ -13,7 +13,7 @@ export const challengesData: Challenge[] = [
   {
     id: 1,
     ChallengeTitle: "Build a Todo App",
-    Author: "Eduardo Albuquerque",
+    Author: "Lara",
     Category: "Front-End",
     Status: "Completed",
     Date: "2025-09-17",
@@ -90,4 +90,16 @@ export const challengesData: Challenge[] = [
     Visibility: "Public",
     companyId: 3,
   },
+
+  {
+  id: 9,
+  ChallengeTitle: "Landing Page Interativa com React",
+  Author: "Lara",
+  Category: "Front-End",
+  Status: "In Progress",
+  Date: "2025-10-08",
+  Visibility: "Private", 
+  companyId: 2,
+},
+
 ];
