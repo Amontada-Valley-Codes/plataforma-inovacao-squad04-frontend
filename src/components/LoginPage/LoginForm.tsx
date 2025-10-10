@@ -5,6 +5,7 @@ import Image from "next/image";
 import { User, LockKeyhole, EyeIcon } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
+import { authService } from "@/api/services/auth.service";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !senha) {
       setError("Preencha e-mail e senha.");
@@ -22,14 +23,18 @@ export default function LoginForm() {
       setError("E-mail inválido.");
       return;
     }
-    setError("");
-    console.log("✅ Login enviado:", { email, senha });
-  };
 
-  const handleClicker = (e: any) => {
-    setSenha(e.target.value)
-    setShowPassword(!showPassword)
-  }
+    setError("");
+    
+    try {
+      const data = await authService.login({ email, password: senha });
+      localStorage.setItem('access_token', data.access_token);
+
+    } catch (err: any ){
+      console.log(err);
+      setError(err.response?.data?.message)
+    }
+  };
 
   return (
     <div
