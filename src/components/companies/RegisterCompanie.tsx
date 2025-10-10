@@ -67,7 +67,7 @@ export default function RegisterCompany() {
             placeholder="Nome da Empresa"
             value={formData.nomeEmpresa}
             onChange={(e) => handleChange("nomeEmpresa", e.target.value)}
-            className="w-full bg-white text-gray-800 rounded-full pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
+            className="w-full bg-white text-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
           />
           <Building2 className="absolute top-3 left-4 text-gray-400" size={18} />
         </div>
@@ -79,7 +79,7 @@ export default function RegisterCompany() {
             placeholder="CNPJ"
             value={formData.cnpj}
             onChange={(e) => handleChange("cnpj", e.target.value)}
-            className="w-full bg-white text-gray-800 rounded-full pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
+            className="w-full bg-white text-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
           />
           <FileText className="absolute top-3 left-4 text-gray-400" size={18} />
         </div>
@@ -91,7 +91,7 @@ export default function RegisterCompany() {
             placeholder="Setor"
             value={formData.setor}
             onChange={(e) => handleChange("setor", e.target.value)}
-            className="w-full bg-white text-gray-800 rounded-full pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
+            className="w-full bg-white text-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
           />
           <Layers className="absolute top-3 left-4 text-gray-400" size={18} />
         </div>
@@ -103,7 +103,7 @@ export default function RegisterCompany() {
             placeholder="Gestor"
             value={formData.gestor}
             onChange={(e) => handleChange("gestor", e.target.value)}
-            className="w-full bg-white text-gray-800 rounded-full pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
+            className="w-full bg-white text-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
           />
           <User className="absolute top-3 left-4 text-gray-400" size={18} />
         </div>
@@ -115,7 +115,7 @@ export default function RegisterCompany() {
             placeholder="E-mail"
             value={formData.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="w-full bg-white text-gray-800 rounded-full pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
+            className="w-full bg-white text-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
           />
           <Mail className="absolute top-3 left-4 text-gray-400" size={18} />
         </div>
@@ -127,7 +127,7 @@ export default function RegisterCompany() {
             placeholder="Endereço"
             value={formData.endereco}
             onChange={(e) => handleChange("endereco", e.target.value)}
-            className="w-full bg-white text-gray-800 rounded-full pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
+            className="w-full bg-white text-gray-800 rounded-xl pl-11 pr-4 py-3 text-sm placeholder-gray-400 focus:outline-none"
           />
           <MapPin className="absolute top-3 left-4 text-gray-400" size={18} />
         </div>
@@ -146,7 +146,7 @@ export default function RegisterCompany() {
         {/* Botão */}
         <button
           type="submit"
-          className="w-full rounded-full bg-gradient-to-r from-[#0C0869] to-[#15358D] text-white text-lg font-semibold py-3 shadow hover:scale-[1.02] transition-transform duration-300"
+          className="w-full rounded-xl bg-gradient-to-r from-[#0C0869] to-[#15358D] text-white text-lg font-semibold py-3 shadow hover:scale-[1.02] transition-transform duration-300"
         >
           Cadastrar
         </button>
