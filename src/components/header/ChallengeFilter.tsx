@@ -7,30 +7,34 @@ import RegisterStartupBtn from "../startup/RegisterStartupButton";
 import RegisterCOmpanieBtn from "../companies/RegisterCompanieButton";
 
 type Props = {
-  isStartup?: boolean
-  IsChallenge?: boolean
-  isCompanie?: boolean
-}
+  isStartup?: boolean;
+  IsChallenge?: boolean;
+  isCompanie?: boolean;
 
-export default function ChallengeFilter({ IsChallenge, isStartup, isCompanie }: Props) {
+  /** NOVO: controla a exibição dos botões de ação (default: true) */
+  showAddButtons?: boolean;
+};
 
+export default function ChallengeFilter({
+  IsChallenge,
+  isStartup,
+  isCompanie,
+  showAddButtons = true,
+}: Props) {
   const [isSetorOpen, setSetorIsOpen] = useState(false);
   const [isStatusOpen, setStatusIsOpen] = useState(false);
 
   return (
     <div className="w-full justify-between flex pl-4 px-6">
-
+      {/* Filtros */}
       <div className="flex gap-2">
-        {/* Filtro por Data */}
+        {/* Data */}
         <label className="flex items-center gap-2 border border-gray-200 dark:text-[#ced3db] dark:border-gray-800 dark:bg-gray-900 px-4 py-3 rounded-[12px] bg-white text-zinc-500 font-semibold cursor-pointer">
-          <input
-            type="date"
-          />
+          <input type="date" />
         </label>
 
-        {/* Filtro por Setor */}
+        {/* Setor */}
         <div className="relative flex items-center">
-
           <div className="absolute left-3 text-zinc-500 dark:text-[#ced3db]">
             <ClipboardList size={20} />
           </div>
@@ -40,7 +44,7 @@ export default function ChallengeFilter({ IsChallenge, isStartup, isCompanie }: 
             onBlur={() => setSetorIsOpen(false)}
             className="flex items-center gap-2 border border-gray-200 dark:text-[#ced3db] dark:border-gray-800 dark:bg-gray-900 px-10 py-3 rounded-[12px] bg-white text-zinc-500 font-semibold appearance-none pr-8"
           >
-            <option disabled >Setor</option>
+            <option disabled>Setor</option>
             <option value="financeiro">Financeiro</option>
             <option value="rh">RH</option>
             <option value="ti">TI</option>
@@ -54,11 +58,10 @@ export default function ChallengeFilter({ IsChallenge, isStartup, isCompanie }: 
           />
         </div>
 
-        {/* Filtro por Status */}
+        {/* Status */}
         <div className="relative flex items-center">
-          
           <div className="absolute left-3 text-zinc-500 dark:text-[#ced3db]">
-            <CircleCheckBig size={20}/>
+            <CircleCheckBig size={20} />
           </div>
 
           <select
@@ -66,7 +69,7 @@ export default function ChallengeFilter({ IsChallenge, isStartup, isCompanie }: 
             onBlur={() => setStatusIsOpen(false)}
             className="flex items-center gap-2 border border-gray-200 dark:text-[#ced3db] dark:border-gray-800 dark:bg-gray-900 px-10 py-3 rounded-[12px] bg-white text-zinc-500 font-semibold appearance-none pr-8"
           >
-            <option disabled >Status</option>
+            <option disabled>Status</option>
             <option value="pending">Pending</option>
             <option value="in-progress">In progress</option>
             <option value="completed">Completed</option>
@@ -81,19 +84,14 @@ export default function ChallengeFilter({ IsChallenge, isStartup, isCompanie }: 
         </div>
       </div>
 
-      <div>
-        {IsChallenge && (
-          <CreateChallengeButton/>
-        )}
-
-        {isStartup && (
-          <RegisterStartupBtn/>
-        )}
-
-        {isCompanie && (
-          <RegisterCOmpanieBtn/>
-        )}
-      </div>
+      {/* Ações (condicionais) */}
+      {showAddButtons && (
+        <div className="flex items-center gap-2">
+          {IsChallenge && <CreateChallengeButton />}
+          {isStartup && <RegisterStartupBtn />}
+          {isCompanie && <RegisterCOmpanieBtn />}
+        </div>
+      )}
     </div>
   );
 }
