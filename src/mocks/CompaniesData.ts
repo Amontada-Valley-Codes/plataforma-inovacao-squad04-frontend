@@ -8,9 +8,15 @@ export type Companie = {
   setor: string;
   descricao: string;
   logo: string;
+  cover?: string | null;
+  gallery?: string[];
+  instagram?: string | null;
+  whatsapp?: string | null;
+  linkedin?: string | null;
+  locationUrl?: string | null;
 };
 
-export const companiesData: Companie[] = [
+const seed: Companie[] = [
   {
     id: 1,
     nome: "TechWave",
@@ -19,56 +25,28 @@ export const companiesData: Companie[] = [
     gestor: "Mariana Alves",
     email: "contato@techwave.com",
     setor: "Tecnologia",
-    descricao:
-      "Desenvolve soluções de IA para otimizar processos empresariais e automação de dados.",
+    descricao: "Desenvolve soluções de IA para otimizar processos empresariais e automação de dados.",
     logo: "/logos/techwave.png",
-  },
-  {
-    id: 2,
-    nome: "EcoLife",
-    areaAtuacao: "Sustentabilidade",
-    cnpj: "98.765.432/0001-10",
-    gestor: "Rafael Souza",
-    email: "info@ecolife.com",
-    setor: "Meio Ambiente",
-    descricao:
-      "Foca em tecnologias verdes e projetos sustentáveis para reduzir impactos ambientais.",
-    logo: "/logos/ecolife.png",
-  },
-  {
-    id: 3,
-    nome: "MediConnect",
-    areaAtuacao: "Saúde Digital",
-    cnpj: "11.222.333/0001-44",
-    gestor: "Carla Fernandes",
-    email: "suporte@mediconnect.com",
-    setor: "Saúde",
-    descricao:
-      "Plataforma digital que conecta pacientes e profissionais de saúde de forma eficiente.",
-    logo: "/logos/mediconnect.png",
-  },
-  {
-    id: 4,
-    nome: "AgroSmart",
-    areaAtuacao: "Agrotech",
-    cnpj: "55.666.777/0001-22",
-    gestor: "João Pereira",
-    email: "contato@agrosmart.com",
-    setor: "Agronegócio",
-    descricao:
-      "Fornece soluções tecnológicas para monitoramento de plantações e otimização da produção agrícola.",
-    logo: "/logos/agrosmart.png",
-  },
-  {
-    id: 5,
-    nome: "FintechX",
-    areaAtuacao: "Serviços Financeiros",
-    cnpj: "88.999.000/0001-55",
-    gestor: "Fernanda Lima",
-    email: "suporte@fintechx.com",
-    setor: "Financeiro",
-    descricao:
-      "Oferece plataformas digitais de pagamento, crédito e análise financeira para pequenas empresas.",
-    logo: "/logos/fintechx.png",
+    cover: null,
+    gallery: [],
+    instagram: null,
+    whatsapp: null,
+    linkedin: null,
+    locationUrl: null,
   },
 ];
+
+export const companiesData: Companie[] =
+  (globalThis as any).__companiesData ??
+  ((globalThis as any).__companiesData = seed);
+
+export function getCompanyById(id: number): Companie | null {
+  return companiesData.find((c) => c.id === id) ?? null;
+}
+
+export function updateCompanyInMock(id: number, patch: Partial<Companie>): Companie | null {
+  const i = companiesData.findIndex((c) => c.id === id);
+  if (i === -1) return null;
+  companiesData[i] = { ...companiesData[i], ...patch };
+  return companiesData[i];
+}
