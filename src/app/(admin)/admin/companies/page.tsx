@@ -19,14 +19,9 @@ export default async function AdminCompaniesPage() {
   }
 
   return (
-    <main className="p-6 space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold">Empresas</h1>
-        <p className="text-sm text-muted-foreground">Perfil: {role}</p>
-      </header>
-
-      {/* role passado explicitamente */}
+    <div className="p-3 sm:p-4 lg:p-6">
+      {/* mantém o mesmo nome do componente que já usas */}
       <CompanieCard role="admin" />
-    </main>
+    </div>         
   );
 }

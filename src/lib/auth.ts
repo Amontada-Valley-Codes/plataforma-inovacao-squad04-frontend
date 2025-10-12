@@ -2,7 +2,7 @@
 import { usersData, type Role, type User } from "@/mocks/UserData";
 
 // Simulação de usuário logado (troque o índice para testar)
-const currentUser: User = usersData[2];
+const currentUser: User = usersData[1];
 
 export async function getUserRole(): Promise<Role> {
     return currentUser.role;
