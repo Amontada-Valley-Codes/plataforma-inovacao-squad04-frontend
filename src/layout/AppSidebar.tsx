@@ -254,7 +254,7 @@ const AppSidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image className="dark:hidden" src="/images/logo/ninna-logo.svg" alt="Logo" width={85} height={40} priority />
-              <Image className="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width={85} height={40} priority />
+              <Image className="hidden dark:block" src="/images/logo/ninna-logo.svg" alt="Logo" width={85} height={40} priority />
             </>
           ) : (
             <Image src="/images/logo/ninna-logo.svg" alt="Logo" width={32} height={32} priority />
