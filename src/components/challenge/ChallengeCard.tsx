@@ -4,8 +4,11 @@
 import React from "react";
 import { Tag, Calendar, Eye, EyeOff, MoreHorizontal } from "lucide-react";
 import { challengesData } from "@/mocks/ChallengeData";
+import { getUserRole } from "@/lib/auth";
+import { useSearchParams } from "next/navigation";
+import ApplyButton from "./ApplyButton";
 
-/** Status/Visibility livres para manter compat com teu mock */
+
 type Status = "Completed" | "In Progress" | "Pending" | string;
 type Visibility = "Public" | "Private" | string;
 
@@ -17,33 +20,32 @@ type Challenge = {
   Status: Status;
   Date: string;
   Visibility: Visibility;
-  companyId?: number;   // <- importante para filtros por empresa
-  startupId?: number;   // <- opcional se quiseres filtrar por startup depois
+  companyId?: number;
+  startupId?: number;
 };
 
-type Role = "admin" | "gestor" | "avaliador" | "usuario";
+type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 type Props = {
-  /** Filtro da rota de empresa (ex.: /company/[companyId]/desafios) */
   companyId?: number;
-  /** Mostrar tudo (inclusive privados) — típico de admin/gestor no contexto da empresa */
   isAdminView?: boolean;
-  /** Mostrar apenas os desafios do autor (usado em /user/meus-desafios) */
   onlyMine?: boolean;
-  /** Nome do autor “logado” (passado pela page) */
   authorName?: string;
-  /** Empresa do usuário viewer (passado pela page quando onlyMine=true) */
   viewerCompanyId?: number;
-
-  /** ✅ Liga o botão "Candidatar-se" (apenas para desafios públicos) */
   canApply?: boolean;
-  /** ✅ Identifica a startup atual (para persistir candidatura em localStorage) */
   startupId?: number | string;
-  /** ✅ Callback opcional após aplicar */
   onApply?: (challengeId: number) => void;
 };
 
 const STORAGE_PREFIX = "appliedChallenges";
+
+function parseRoleFromQS(v: string | null): Role | null {
+  if (!v) return null;
+  const val = v.toLowerCase();
+  return ["admin", "gestor", "avaliador", "usuario", "startup"].includes(val)
+    ? (val as Role)
+    : null;
+}
 
 export default function ChallengeCard({
   companyId,
@@ -57,14 +59,33 @@ export default function ChallengeCard({
 }: Props) {
   const data: Challenge[] = challengesData as Challenge[];
 
-  // ====== Persistência de candidatura por startup ======
+  // role
+  const searchParams = useSearchParams();
+  const roleQS = parseRoleFromQS(searchParams?.get("role") ?? null);
+  const [role, setRole] = React.useState<Role | null>(null);
+
+  React.useEffect(() => {
+    let cancel = false;
+    getUserRole()
+      .then((r) => {
+        if (cancel) return;
+        setRole(roleQS ?? ((r as Role) ?? null));
+      })
+      .catch(() => setRole(roleQS ?? null));
+    return () => {
+      cancel = true;
+    };
+  }, [roleQS]);
+
+  const allowApply = Boolean(canApply && role === "startup");
+
+  // persistência
   const storageKey = React.useMemo(() => {
     const sid = startupId ?? "anon";
     return `${STORAGE_PREFIX}:${sid}`;
   }, [startupId]);
 
   const [applied, setApplied] = React.useState<Set<number>>(new Set());
-
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -72,14 +93,11 @@ export default function ChallengeCard({
       if (!raw) return;
       const arr = JSON.parse(raw) as number[];
       setApplied(new Set(arr));
-    } catch {
-      // ignore parsing errors
-    }
+    } catch {}
   }, [storageKey]);
 
   function persistApplied(next: Set<number>) {
-    const arr = Array.from(next);
-    localStorage.setItem(storageKey, JSON.stringify(arr));
+    localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
     setApplied(next);
   }
 
@@ -90,7 +108,6 @@ export default function ChallengeCard({
     onApply?.(challengeId);
   }
 
-  // ====== UI helpers ======
   const getStatusColor = (status: Status) => {
     switch (status) {
       case "Completed":
@@ -104,34 +121,19 @@ export default function ChallengeCard({
     }
   };
 
-  // ====== Filtros ======
   const filtered = React.useMemo(() => {
     let base = data;
+    if (typeof companyId === "number") base = base.filter((c) => c.companyId === companyId);
+    if (isAdminView) return base;
 
-    // 1) Se vier companyId da rota, filtra por empresa
-    if (typeof companyId === "number") {
-      base = base.filter((c) => c.companyId === companyId);
-    }
-
-    // 2) ADMIN/GESTOR (isAdminView): vê tudo (público/privado) dentro do escopo acima
-    if (isAdminView) {
-      return base;
-    }
-
-    // 3) onlyMine: mostra apenas os desafios do autor no contexto da empresa do viewer (se houver)
     if (onlyMine) {
       const nameToUse = authorName?.trim();
-      if (!nameToUse) {
-        // sem authorName não dá pra filtrar "meus"
-        return [];
-      }
+      if (!nameToUse) return [];
       const inCompany = (c: Challenge) =>
         typeof viewerCompanyId === "number" ? c.companyId === viewerCompanyId : true;
-
       return base.filter((c) => c.Author === nameToUse && inCompany(c));
     }
 
-    // 4) fallback: apenas públicos (respeitando o companyId, se veio)
     return base.filter((c) => c.Visibility === "Public");
   }, [data, companyId, isAdminView, onlyMine, authorName, viewerCompanyId]);
 
@@ -143,7 +145,6 @@ export default function ChallengeCard({
     );
   }
 
-  // ====== Render ======
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-4">
       {filtered.map((challenge) => {
@@ -153,67 +154,68 @@ export default function ChallengeCard({
         return (
           <div
             key={challenge.id}
-            className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl p-5 flex flex-col justify-between hover:scale-[1.02] transition-transform"
+            className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl overflow-hidden hover:scale-[1.01] transition-transform shadow-sm hover:shadow-md"
           >
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-300">
-                  {challenge.ChallengeTitle}
-                </h2>
-                <p className="text-gray-500 dark:text-[#ced3db] text-sm">
-                  {challenge.Author}
-                </p>
-              </div>
-              <button aria-label="Mais opções">
-                <MoreHorizontal className="text-gray-400 dark:text-[#ced3db] hover:text-gray-600 cursor-pointer" />
-              </button>
-            </div>
+            {/* detalhe topo */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
 
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-                <Tag size={16} /> {challenge.Category}
+            {/* corpo — espaçamento enxuto */}
+            <div className="p-4 flex flex-col gap-2.5">
+              <div className="flex justify-between items-start">
+                <div className="min-w-0">
+                  <h2
+                    title={challenge.ChallengeTitle}
+                    className="text-[15px] font-semibold text-blue-900 dark:text-blue-300 leading-snug truncate"
+                  >
+                    {challenge.ChallengeTitle}
+                  </h2>
+                  <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
+                    {challenge.Author}
+                  </p>
+                </div>
+                <button aria-label="Mais opções">
+                  <MoreHorizontal className="text-gray-400 dark:text-[#ced3db] hover:text-gray-600 cursor-pointer" />
+                </button>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-                <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.Status)}`} />
-                {challenge.Status}
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-                <Calendar size={16} /> {challenge.Date}
-              </div>
-            </div>
 
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-gray-600 dark:text-[#ced3db]">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
+                  <Tag size={15} /> {challenge.Category}
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
+                  <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.Status)}`} />
+                  {challenge.Status}
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
+                  <Calendar size={15} /> {challenge.Date}
+                </div>
+              </div>
+
+              <div className="text-gray-600 dark:text-[#ced3db] text-[13px] flex items-center gap-1">
                 {isPublic ? (
-                  <span title="Público" className="inline-flex items-center gap-1 text-sm">
-                    <Eye size={18} /> Público
-                  </span>
+                  <>
+                    <Eye size={16} /> Público
+                  </>
                 ) : (
-                  <span title="Privado" className="inline-flex items-center gap-1 text-sm">
-                    <EyeOff size={18} /> Privado
-                  </span>
+                  <>
+                    <EyeOff size={16} /> Privado
+                  </>
                 )}
               </div>
-
-              {/* ✅ Botão Candidatar-se: só aparece se canApply=true e o desafio for Public */}
-              {canApply && isPublic && (
-                alreadyApplied ? (
-                  <button
-                    className="rounded-xl border px-3 py-2 text-sm font-medium opacity-70 cursor-default"
-                    aria-disabled
-                  >
-                    ✅ Candidatura enviada
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleApply(challenge.id)}
-                    className="rounded-xl bg-[#15358d] text-white px-3 py-2 text-sm font-semibold hover:opacity-90"
-                  >
-                    Candidatar-se
-                  </button>
-                )
-              )}
             </div>
+
+            {/* rodapé — metade do espaçamento */}
+            {allowApply && isPublic && (
+              <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
+                <ApplyButton
+                  applied={alreadyApplied}
+                  onApply={async () => handleApply(challenge.id)}
+                  labelApply="Candidatar-se"
+                  labelApplied="Solicitado"
+                  className="w-full"
+                />
+              </div>
+            )}
           </div>
         );
       })}
