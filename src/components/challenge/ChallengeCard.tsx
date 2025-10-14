@@ -157,7 +157,7 @@ export default function ChallengeCard({
           >
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-300">
+                <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-800">
                   {challenge.ChallengeTitle}
                 </h2>
                 <p className="text-gray-500 dark:text-[#ced3db] text-sm">
