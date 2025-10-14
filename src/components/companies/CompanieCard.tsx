@@ -1,12 +1,19 @@
-// src/components/companies/CompanieCard.tsx
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import { LayoutGrid, List as ListIcon, Settings, User, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  LayoutGrid,
+  List as ListIcon,
+  MoreHorizontal,
+  User,
+  Mail,
+  Settings,
+} from "lucide-react";
 import { companiesData, type Companie } from "@/mocks/CompaniesData";
-import CompaniesProfileInline from "./CompaniesProfileInline";
+import { useModal } from "@/hooks/useModal";
+import CompaniesProfile from "./CompaniesProfile"; // ✅ Corrigido nome do componente
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
@@ -15,6 +22,7 @@ type Props = {
   companyId?: string;
   autoOpen?: boolean;
   viewerCompanyId?: number;
+  title?: string;
 };
 
 export default function CompanieCard({
@@ -22,18 +30,28 @@ export default function CompanieCard({
   companyId,
   autoOpen = false,
   viewerCompanyId,
+  title = "Empresas",
 }: Props) {
-  const list = useMemo(() => {
-    const base = companiesData as Companie[];
-    if (!companyId) return base;
-    const idNum = Number(companyId);
-    if (Number.isFinite(idNum)) return base.filter((c) => c.id === idNum);
-    return base.filter((c) => String(c.id) === String(companyId));
-  }, [companyId]);
-
+  const { isOpen, openModal, closeModal } = useModal();
+  const [selectedCompany, setSelectedCompany] = useState<Companie | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+
+  const data = useMemo(() => companiesData as Companie[], []);
+  const filtered = useMemo(() => {
+    let base = companyId
+      ? data.filter((c) => String(c.id) === String(companyId))
+      : data;
+
+    const canSeeAll = role === "admin" || role === "gestor";
+    if (canSeeAll) return base;
+
+    if (viewerCompanyId == null) return [];
+    return base.filter((c) => c.id === viewerCompanyId);
+  }, [data, companyId, role, viewerCompanyId]);
+
   const listRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
 
   const recalcHeight = useCallback(() => {
@@ -43,8 +61,9 @@ export default function CompanieCard({
   }, [viewMode]);
 
   useEffect(() => {
-    requestAnimationFrame(recalcHeight);
-  }, [viewMode, list, recalcHeight]);
+    const frame = requestAnimationFrame(recalcHeight);
+    return () => cancelAnimationFrame(frame);
+  }, [viewMode, filtered, recalcHeight]);
 
   useEffect(() => {
     const onResize = () => recalcHeight();
@@ -52,41 +71,54 @@ export default function CompanieCard({
     return () => window.removeEventListener("resize", onResize);
   }, [recalcHeight]);
 
-  if (autoOpen) {
-    if (!list.length) {
-      return <div className="w-full p-6 text-sm text-gray-500">Empresa não encontrada.</div>;
-    }
-    const canEdit =
-      role === "admin" ||
-      (role === "gestor" && String(viewerCompanyId) === String(list[0].id));
-    return <CompaniesProfileInline data={list[0]} editable={canEdit} />;
+  useEffect(() => {
+    if (!autoOpen) return;
+    if (filtered[0]) setSelectedCompany(filtered[0]);
+  }, [autoOpen, filtered]);
+
+  if (!filtered.length) {
+    return (
+      <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
+        Nenhuma empresa encontrada
+        {role === "admin" || role === "gestor" ? "" : " para sua empresa"}.
+      </div>
+    );
   }
 
-  if (!list.length) {
-    return <div className="w-full p-6 text-sm text-gray-500">Nenhuma empresa encontrada.</div>;
-  }
-
-  // 🧭 redirecionamentos
-  const hrefFor = (c: Companie): string => {
-    const q = `?role=${role}`;
-    switch (role) {
-      case "admin":
-        return `/company/${c.id}/empresa${q}`; // admin agora vai pra EMPRESA
-      case "gestor":
-      case "usuario":
-        return `/company/${c.id}/empresa${q}`;
-      case "avaliador":
-        return `/company/${c.id}/desafios${q}`;
-      default:
-        return `/company/${c.id}/empresa${q}`;
+  const wrapIfNeeded = (company: Companie, children: React.ReactNode, asCard?: boolean) => {
+    if (role === "admin") {
+      const handlers = {
+        onClick: () => {
+          setSelectedCompany(company);
+          openModal();
+        },
+        onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setSelectedCompany(company);
+            openModal();
+          }
+        },
+        role: "button" as const,
+        tabIndex: 0,
+      };
+      return <div {...handlers}>{children}</div>;
     }
+    return (
+      <Link
+        href={`/company/${company.id}/empresa?role=${role}`}
+        className="block"
+        prefetch={false}
+      >
+        {children}
+      </Link>
+    );
   };
 
   return (
     <div className="flex flex-col gap-6 w-full p-4">
       {/* Cabeçalho + Toggle */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[20px] font-semibold text-slate-900 dark:text-gray-100">Empresas</h2>
+        <h2 className="text-[20px] font-semibold text-slate-900 dark:text-gray-100">{title}</h2>
         <button
           type="button"
           onClick={() => setViewMode(viewMode === "list" ? "grid" : "list")}
@@ -102,29 +134,32 @@ export default function CompanieCard({
         </button>
       </div>
 
-      {/* Conteúdo */}
-      <div style={{ height: containerHeight ?? "auto" }} className="relative transition-[height] duration-300 ease-out">
+      {/* Contêiner com altura animada */}
+      <div
+        ref={containerRef}
+        style={{ height: containerHeight }}
+        className="relative transition-[height] duration-300 ease-out"
+      >
         {/* LISTA */}
         <div
           ref={listRef}
           aria-hidden={viewMode !== "list"}
-          className={`absolute inset-0 transition duration-200 ${viewMode === "list" ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-[0.98] pointer-events-none"} space-y-4`}
+          className={`absolute inset-0 overflow-hidden will-change-transform transition duration-200 space-y-4 ${
+            viewMode === "list"
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-[0.98] pointer-events-none"
+          }`}
         >
-          {list.map((c) => (
-            <Link
-              key={`list-${c.id}`}
-              href={hrefFor(c)}
-              className="group relative block rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-[#F9FAFB] dark:bg-gray-900 shadow-sm hover:shadow-md transition"
-              prefetch={false}
-            >
+          {filtered.map((c) => {
+            const row = (
               <div className="flex items-stretch gap-6 px-6 py-5 md:py-6">
                 {/* Coluna 1 */}
                 <div className="flex w-full md:w-[32%] items-center gap-4">
-                  <div className="w-16 h-16 bg-[#E5E7EB] dark:bg-gray-700 rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                     {c.logo ? (
                       <Image
                         src={c.logo}
-                        alt={`${c.nome} logo`}
+                        alt={c.nome ?? "Logo da empresa"}
                         width={64}
                         height={64}
                         className="object-contain"
@@ -136,48 +171,82 @@ export default function CompanieCard({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-[#15358D] dark:text-blue-500 truncate">{c.nome}</h3>
-                    <p className="text-sm text-[#98A2B3] truncate">{c.areaAtuacao}</p>
+                    <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">
+                      {c.nome}
+                    </div>
+                    <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">
+                      {c.areaAtuacao}
+                    </div>
                   </div>
                 </div>
 
                 {/* Coluna 2 */}
-                <div className="hidden md:flex w-[36%] flex-col gap-2 text-sm text-[#344054] dark:text-[#ced3db]">
-                  <div className="flex w-full items-center gap-2">
+                <div className="hidden md:flex w-[36%] flex-col gap-2 text-sm text-slate-700 dark:text-gray-300">
+                  <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#15358D]" />
                     <span className="truncate">{c.cnpj}</span>
                   </div>
-                  <div className="flex w-full items-center gap-2">
-                    <User size={15} className="text-[#98A2B3]" />
+                  <div className="flex items-center gap-2">
+                    <User size={14} className="text-slate-400" />
                     <span className="truncate">{c.gestor}</span>
                   </div>
-                  <div className="flex w-full items-center gap-2">
-                    <Mail size={15} className="text-[#98A2B3]" />
+                  <div className="flex items-center gap-2">
+                    <Mail size={14} className="text-slate-400" />
                     <span className="truncate">{c.email}</span>
                   </div>
-                  <div className="flex w-full items-center gap-2">
-                    <Settings size={15} className="text-[#98A2B3]" />
+                  <div className="flex items-center gap-2">
+                    <Settings size={14} className="text-slate-400" />
                     <span className="truncate">{c.setor}</span>
                   </div>
                 </div>
 
                 {/* Coluna 3 */}
-                <div className="hidden lg:flex w-[28%] items-center text-sm text-[#344054] dark:text-[#ced3db]">
+                <div className="hidden lg:flex w-[28%] items-center text-sm text-slate-600 dark:text-gray-400">
                   <p className="line-clamp-3">{c.descricao}</p>
                 </div>
+
+                {/* Ações admin */}
+                {role === "admin" && (
+                  <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCompany(c);
+                        openModal();
+                      }}
+                      aria-label={`Abrir menu de ${c.nome}`}
+                      className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 transition"
+                    >
+                      <MoreHorizontal className="text-slate-600 dark:text-gray-300" />
+                    </button>
+                  </div>
+                )}
               </div>
-            </Link>
-          ))}
+            );
+
+            return (
+              <div
+                key={`list-${c.id}`}
+                className="group relative rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition"
+              >
+                {wrapIfNeeded(c, row)}
+              </div>
+            );
+          })}
         </div>
 
         {/* GRID */}
         <div
           ref={gridRef}
           aria-hidden={viewMode !== "grid"}
-          className={`absolute inset-0 overflow-auto transition duration-200 ${viewMode === "grid" ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-[0.98] pointer-events-none"} grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1`}
+          className={`absolute inset-0 overflow-auto will-change-transform transition duration-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1 ${
+            viewMode === "grid"
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-[0.98] pointer-events-none"
+          }`}
         >
-          {list.map((c) => (
-            <Link key={`grid-${c.id}`} href={hrefFor(c)} className="block" prefetch={false}>
+          {filtered.map((c) => {
+            const card = (
               <article className="group relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-900 shadow-sm transition border-[#E5E7EB] dark:border-gray-800 hover:border-[#15358D]/40 hover:ring-1 hover:ring-[#15358D]/20 hover:scale-[1.01]">
                 <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
                 <div className="p-6">
@@ -231,10 +300,24 @@ export default function CompanieCard({
                   </p>
                 </div>
               </article>
-            </Link>
-          ))}
+            );
+
+            return <div key={`grid-${c.id}`}>{wrapIfNeeded(c, card, true)}</div>;
+          })}
         </div>
       </div>
+
+      {/* Modal admin */}
+      {role === "admin" && selectedCompany && (
+        <CompaniesProfile
+          data={selectedCompany}
+          isOpen={isOpen}
+          onClose={() => {
+            setSelectedCompany(null);
+            closeModal();
+          }}
+        />
+      )}
     </div>
   );
 }
