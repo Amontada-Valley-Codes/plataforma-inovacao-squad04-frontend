@@ -1,26 +1,31 @@
-import { BriefcaseBusiness, Bug, Building2, ChartNoAxesCombined, ChartPie, Lamp, Lightbulb, Menu, TriangleAlert, Trophy } from "lucide-react";
+import { BriefcaseBusiness, Bug, Building2, ChartNoAxesCombined, ChartPie, CircleCheck, CircleCheckBig, ClipboardList, Lamp, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users } from "lucide-react";
 import ForwardButton from "./ForwardButton"
 import { useState } from 'react';
-import { HelpCircle } from 'lucide-react';
+import { Comment } from "./Comment";
+import { ideationCommentSections } from "./commentsData";
 
 type CardChallangeContentProps = {
   challangeTitle: string;
-  category: string;
+  categories: string[];
   description: string;
   featureId: string | undefined;
   handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardChallangeContent = ({ challangeTitle, category, description, featureId, handleApproveAndMove}: CardChallangeContentProps) => {
+export const CardChallangeContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardChallangeContentProps) => {
   return (
     //conteudo do card de desafio
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
       <div className="mb-6">
         <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-        <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-          {category.toUpperCase()}
-        </button>
+        <div className="flex gap-2">
+          {categories.map((category) => (
+            <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+              {category.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* conteudo */}
@@ -82,71 +87,27 @@ export const CardChallangeContent = ({ challangeTitle, category, description, fe
   )
 }
 
-export const Rating = ({ initialScore = 0 }) => {
-  const [score, setScore] = useState(initialScore);
-  const ratingOptions = [1, 2, 3, 4, 5];
-
-  return (
-    <div className="mt-3 flex items-center ml-2 gap-3">
-      {ratingOptions.map((num) => (
-        <div className="flex flex-col justify-center items-center gap-[2px]">
-          <p className="text-[10px]">{num}</p>
-          <button
-            type="button"
-            key={num}
-            value={num}
-            onClick={() => setScore(num)}
-            className={`h-5 w-5 rounded-full flex items-center justify-center 
-            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-            focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
-          >
-            <div className={`h-3 w-3 rounded-full ${
-              num === score ? "bg-[#0B2B72]" : ""
-            }`}>
-
-            </div>
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export const ProgressBarActions = ({percentage}: {percentage: number}) => {
-  return (
-    <div className="mb-6">
-      <div>
-        <p className="text-green-600 font-bold text-sm">
-          {percentage}% <span className="text-[#666]">Aprovado</span>
-        </p>
-        <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-green-500 h-2 rounded-full"
-            style={{ width: `${percentage}%` }}
-          ></div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 type CardPreScreeningContentProps = {
   challangeTitle: string;
-  category: string;
+  categories: string[];
   description: string;
   featureId: string | undefined;
   handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardPreScreeningContent = ({ challangeTitle, category, description, featureId, handleApproveAndMove}: CardChallangeContentProps) => {
+export const CardPreScreeningContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardPreScreeningContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
       <div className="mb-6">
         <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-        <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-          {category.toUpperCase()}
-        </button>
+        <div className="flex gap-2">
+          {categories.map((category) => (
+            <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+              {category.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* conteudo */}
@@ -204,13 +165,13 @@ export const CardPreScreeningContent = ({ challangeTitle, category, description,
 
 type CardDetailedScreeningContentProps = {
   challangeTitle: string;
-  category: string;
+  categories: string[];
   description: string;
   featureId: string | undefined;
   handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardDetailedScreeningContent = ({ challangeTitle, category, description, featureId, handleApproveAndMove}: CardDetailedScreeningContentProps) => {
+export const CardDetailedScreeningContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
 
@@ -220,16 +181,22 @@ export const CardDetailedScreeningContent = ({ challangeTitle, category, descrip
       <div className="flex justify-between mb-6">
         <div className="">
           <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-            {category.toUpperCase()}
-          </button>
+          <div className="flex gap-2">
+            {categories.map((category) => (
+              <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+                {category.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="relative flex items-center">
           <div className="flex  gap-4 items-center justify-center w-full max-w-md mx-auto">
             <div className="flex flex-col items-center">
               <button 
-                className="w-8 h-8 rounded-full bg-[#0B2B72] text-white font-semibold flex items-center justify-center"
+                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${
+                  page === '1' ? "bg-[#0B2B72] text-white" : "border-gray-400 border-2 text-gray-500"
+                }`}
                 onClick={() => setPage('1')}
               >
                 1
@@ -450,29 +417,303 @@ export const CardDetailedScreeningContent = ({ challangeTitle, category, descrip
 }
 
 type CardIdeationContentProps = {
+  challangeTitle: string;
+  categories: string[];
+  description: string;
   featureId: string | undefined;
   handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardIdeationContent = ({ featureId, handleApproveAndMove}: CardIdeationContentProps) => {
+export const CardIdeationContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardIdeationContentProps) => {
   return (
-    <div>
-      <p>Desaf</p>
-      <ForwardButton featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
+    <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+      {/* header */}
+      <div className="mb-6">
+        <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
+        <div className="flex gap-4">
+          <button className="bg-white border-2 border-[#A9A9A9] text-[12px] text-[#666] font-semibold w-fit rounded-[4px] px-3 py-1">
+          + Tag
+          </button>
+          <button className="bg-white border-2 border-[#A9A9A9] text-[12px] text-[#666] font-semibold w-fit rounded-[4px] px-3 py-1">
+            + Sugestões
+          </button>
+          <button className="bg-white border-2 border-[#A9A9A9] text-[12px] text-[#666] font-semibold w-fit rounded-[4px] px-3 py-1">
+            + Checklist
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col mb-4 gap-4">
+        <div className="flex flex-col w-full gap-4">
+          <div className="flex items-center w-full bg-[#D9D9D9] text-[#D9D9D9] font-semibold text-sm rounded-[12px] px-4 py-1 gap-2">
+            <Tag fill="#666" size={16}/>
+            <p className="text-[#666]">TAGS</p>
+          </div>
+          <div className="flex gap-2">
+            {categories.map((category) => (
+              <button className="border border-[#0B2B70] text-[12px] text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1">
+                {category.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col w-full gap-4">
+          <div className="flex items-center w-full bg-[#D9D9D9] text-[#D9D9D9] font-semibold text-sm rounded-[12px] px-4 py-1 gap-2">
+            <CircleCheck fill="#666" size={16}/>
+            <p className="text-[#666]">SUGESTÕES</p>
+          </div>
+          <div>
+            {ideationCommentSections
+            .find((section) => section.id === "sugestoes")
+            ?.comments.map((comment) => (
+              <Comment key={comment.id} comment={comment} />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col w-full">
+          <div className="flex items-center w-full bg-[#D9D9D9] text-[#666] font-semibold text-sm rounded-[12px] px-4 py-1 gap-2">
+            <ListCheck strokeWidth={3} size={16}/>
+            <p className="text-[#666]">CHECKLIST</p>
+          </div>
+          <Checklist/>
+        </div>
+      </div>
+
+      <div className="w-full flex justify-center gap-6">
+        <button className="flex w-45 justify-center px-1 py-2 
+        rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
+        text-[12px] cursor-pointer">
+          Voltar
+        </button>
+        <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
+      </div>
     </div>
   )
 }
 
 type CardExperimentationContentProps = {
-  featureId: string | undefined;
-  handleApproveAndMove: (featureId: string | undefined) => void;
+  challangeTitle: string;
+  categories: string[];
+  description: string;
 }
 
-export const CardExperimentationContent = ({ featureId, handleApproveAndMove}: CardExperimentationContentProps) => {
+export const CardExperimentationContent = ({ challangeTitle, categories, description }: CardExperimentationContentProps) => {
  return (
-  <div>
-    <p>Desa</p>
-    <ForwardButton featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
+  <div  className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+    <div className="mb-6">
+      <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
+      <div className="flex gap-2">
+        {categories.map((category) => (
+          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+            {category.toUpperCase()}
+          </button>
+        ))}
+      </div>
+    </div>
+    
+    <div className="flex flex-col mb-6">
+      <h1 className="flex gap-1 items-center text-black text-lg">
+        <Target size={16}/>
+        Objetivo
+      </h1>
+      <p className="text-sm bg-gray-200 px-4 py-2 rounded-[8px] text-justify">
+        {description}
+      </p>
+    </div>
+
+    <div className="flex flex-col mb-6">
+      <h1 className="flex gap-1 items-center text-black text-lg">
+        <ClipboardList size={16}/>
+        Escopo Resumido
+      </h1>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-4 text-sm">
+            <label className="w-36 whitespace-nowrap">Entrega Minima: </label>
+            <input 
+              type="text" 
+              className="bg-[#d9d9d9] rounded-[4px]"
+            />
+          </div>
+          <div className="flex gap-4 text-sm">
+            <label className="w-36 whitespace-nowrap">Prazo: </label>
+            <input 
+              type="text" 
+              className="bg-[#d9d9d9] rounded-[4px]"
+            />
+          </div>
+          <div className="flex gap-4 text-sm">
+            <label className="w-36 whitespace-nowrap">Ambiente de Teste: </label>
+            <input 
+              type="text" 
+              className="bg-[#d9d9d9] rounded-[4px]"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex flex-col mb-6">
+      <h1 className="flex gap-1 items-center text-black text-lg">
+        <ChartNoAxesCombined size={16}/>
+        KPIs de Sucesso
+      </h1>
+      <div className="flex flex-col text-sm">
+        <div className="flex w-3/4 justify-between">
+          <p>Taxa de Conclusão</p>
+          <p>90% dos Usuários</p>
+        </div>
+        <div className="flex w-3/4 justify-between">
+          <p>Tempo Médio de Entrega</p>
+          <p>≤ 2 Dias</p>
+        </div>
+        <div className="flex w-3/4 justify-between">
+          <p>Satisfação do usuário</p>
+          <p>≥ 4,5 de 5</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex flex-col mb-6">
+      <h1 className="flex gap-1 items-center text-black text-lg">
+        <Users size={16}/>
+        Responsáveis
+      </h1>
+      <div className="flex gap-16">
+        <div className="flex flex-col gap-2">
+          <p className="text-sm">Empresa:</p>
+          <p className="p-2 rounded-[8px] bg-gray-200">Empresa Tal</p>
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm">Startup:</p>
+          <p className="p-2 rounded-[8px] bg-gray-200">Startup Tal</p>
+        </div>
+      </div>
+    </div>
   </div>
  )
+}
+
+export const Rating = ({ initialScore = 0 }) => {
+  const [score, setScore] = useState(initialScore);
+  const ratingOptions = [1, 2, 3, 4, 5];
+
+  return (
+    <div className="mt-3 flex items-center ml-2 gap-3">
+      {ratingOptions.map((num) => (
+        <div className="flex flex-col justify-center items-center gap-[2px]">
+          <p className="text-[10px]">{num}</p>
+          <button
+            type="button"
+            key={num}
+            value={num}
+            onClick={() => setScore(num)}
+            className={`h-5 w-5 rounded-full flex items-center justify-center 
+            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+            focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
+          >
+            <div className={`h-3 w-3 rounded-full ${
+              num === score ? "bg-[#0B2B72]" : ""
+            }`}>
+
+            </div>
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const ProgressBarActions = ({percentage}: {percentage: number}) => {
+  return (
+    <div className="mb-6">
+      <div>
+        <p className="text-green-600 font-bold text-sm">
+          {percentage}% <span className="text-[#666]">Aprovado</span>
+        </p>
+        <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-green-500 h-2 rounded-full"
+            style={{ width: `${percentage}%` }}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Checklist = () => {
+  const [items, setItems] = useState([
+    {id: 1, text: "Checklist teste", checked: false},
+    {id: 2, text: "Checklist teste", checked: false},
+    {id: 3, text: "Checklist teste", checked: false},
+  ])
+  const [newItem, setNewItem] = useState('')
+  const [isAdding, setIsAdding] = useState(false)
+
+  const toggleItem = (id: number) => {
+    setItems(items.map((item) => 
+      item.id === id ? {...item, checked: !item.checked } : item
+    ))
+  }
+
+  const addItem = () => {
+    if (newItem.trim() === '') return
+    const newChecklistItem = {
+      id: Date.now(),
+      text: newItem,
+      checked: false
+    }
+    setItems([...items, newChecklistItem])
+    setNewItem('')
+    setIsAdding(false)
+  }
+
+  return (
+    <div className="w-full p-4">
+
+      <div className="flex flex-col gap-2">
+        {items.map(item => (
+          <label key={item.id} className="flex items-center gap-2 text-sm cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={item.checked}
+              onChange={() => toggleItem(item.id)}
+              className="w-4 h-4 accent-gray-600 rounded"
+            />
+            <span className={item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}>
+              {item.text}
+            </span>
+          </label>
+        ))}
+      </div>
+
+      {isAdding ? (
+        <div className="flex items-center gap-2 mt-4">
+          <input
+            type="text"
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            placeholder="Novo item..."
+            className="flex-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B2B72]"
+          />
+          <button
+            onClick={addItem}
+            className="flex items-center gap-1 px-2 py-1.5 text-sm rounded-[8px] text-[#666] bg-[#E2E2E2] hover:bg-gray-300 transition"
+          >
+            Adicionar
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setIsAdding(true)}
+          className="flex items-center gap-1 px-2 py-1.5 text-sm text-[#666] bg-[#E2E2E2] hover:bg-gray-300 rounded-[8px] transition mt-4"
+        >
+          Adicionar
+        </button>
+      )}
+    </div>
+  )
 }

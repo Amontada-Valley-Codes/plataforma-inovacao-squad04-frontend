@@ -34,7 +34,7 @@ const users = Array.from({ length: 4 })
 export type Feature = {
     id: string;
     name: string;
-    category: string;
+    categories: string[];
     startAt: Date;
     endAt: Date;
     description: string;
@@ -47,7 +47,7 @@ const exampleFeatures: Feature[] = Array.from({ length: 6 })
   .map(() => ({
     id: faker.string.uuid(),
     name: capitalize(faker.company.buzzPhrase()),
-    category: faker.commerce.department(),
+    categories: Array.from({ length: 3 }, () => faker.commerce.department()),
     startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
     endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
     description: faker.lorem.paragraph({
@@ -85,7 +85,6 @@ const KanbanPage = () => {
       const otherFeatures = features.filter(f => f.id !== featureId);
       const newFeatures = [updatedFeature, ...otherFeatures];
       setFeatures(newFeatures);
-      setExpandedCard(updatedFeature)
     }
   };
 
@@ -122,7 +121,12 @@ const KanbanPage = () => {
                           <div className='flex gap-1 mt-1'>
                             <p className='flex items-center gap-1 m-0 font-semibold dark:text-[#ced3db] text-neutral-700 text-[12px]'>
                               <Tag size={14} className='text-white dark:text-[#ced3db] fill-neutral-700'/>
-                              {feature.category}
+                              {feature.categories.map((category, index) => (
+                                <span key={index}>
+                                  {category}
+                                  {index < feature.categories.length - 1 && " |"}
+                                </span>
+                              ))}
                             </p>
                           </div>
                           <p className="flex items-center gap-1 m-0 font-semibold text-[#666] dark:text-[#ced3db] text-[12px] mt-1">
@@ -143,7 +147,9 @@ const KanbanPage = () => {
                         onClose={() => setExpandedCard(null)}
                         cardData={expandedCard}
                         columns={columns}
-                        handleApproveAndMove={handleApproveAndMove}
+                        features={features}
+                        setFeatures={setFeatures}
+                        setExpandedCard={setExpandedCard}
                       />
                     </div>
                   </KanbanCard>

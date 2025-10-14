@@ -21,6 +21,7 @@ import {
   experimentationCommentSections,
 } from "./commentsData"
 import React, { useEffect } from "react"
+import { Card } from "../ui/card"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -44,15 +45,17 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent }: CardExp
 type CardExpandedProps = {
   isOpen: boolean;
   onClose: () => void;
-  cardData: Feature | null
+  features: Feature[];
+  setFeatures: (newFeatures: Feature[]) => void;
+  setExpandedCard: (feature: Feature | null) => void
+  cardData: Feature | null;
   columns: {
     name: string;
     id: string;
   }[];
-  handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export default function CardExpanded({ isOpen, onClose, columns, cardData, handleApproveAndMove }: CardExpandedProps) {
+export default function CardExpanded({ isOpen, onClose, columns, cardData, features, setFeatures, setExpandedCard }: CardExpandedProps) {
   if (!cardData) return null
 
   var currentColumnName = columns.find(c => c.id === cardData.column)?.name
@@ -60,6 +63,24 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
   useEffect(() => {
     currentColumnName = columns.find(c => c.id === cardData.column)?.name
   }, [currentColumnName])
+
+  const handleApproveAndMove = (featureId: string | undefined) => {
+    const featureToMove = features.find(f => f.id === featureId);
+    if (!featureToMove) return;
+
+    const currentColumnIndex = columns.findIndex(c => c.id === featureToMove.column);
+
+    if (currentColumnIndex < columns.length - 1) {
+      const nextColumn = columns[currentColumnIndex + 1];
+      const updatedFeature = { ...featureToMove, column: nextColumn.id };
+      const otherFeatures = features.filter(f => f.id !== featureId);
+      setFeatures([updatedFeature, ...otherFeatures]);
+
+      setExpandedCard(updatedFeature);
+    } else {
+      setExpandedCard(null);
+    }
+  };
 
   return (
     <div>
@@ -75,7 +96,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
                 mainContent={
                   <CardChallangeContent 
                     challangeTitle={cardData.name} 
-                    category={cardData.category}
+                    categories={cardData.categories}
                     description={cardData.description}
                     featureId={cardData.id} 
                     handleApproveAndMove={handleApproveAndMove}
@@ -90,7 +111,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
               <CardExpandedLayout mainContent={
                   <CardPreScreeningContent 
                     challangeTitle={cardData.name} 
-                    category={cardData.category}
+                    categories={cardData.categories}
                     description={cardData.description}
                     featureId={cardData.id} 
                     handleApproveAndMove={handleApproveAndMove}
@@ -106,7 +127,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
                 mainContent={
                   <CardDetailedScreeningContent
                     challangeTitle={cardData.name}
-                    category={cardData.category}
+                    categories={cardData.categories}
                     description={cardData.description}
                     featureId={cardData.id}
                     handleApproveAndMove={handleApproveAndMove}
@@ -118,10 +139,34 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, handl
               />
             )}
             {currentColumnName === "Ideação" && (
-              <CardIdeationContent featureId={cardData.id} handleApproveAndMove={handleApproveAndMove}/>
+              <CardExpandedLayout
+                mainContent={
+                  <CardIdeationContent
+                    challangeTitle={cardData.name}
+                    categories={cardData.categories}
+                    description={cardData.description}
+                    featureId={cardData.id}
+                    handleApproveAndMove={handleApproveAndMove}
+                  />
+                }
+                commentsContent={
+                  <CommentsPanel sections={ideationCommentSections}/>
+                }
+              />
             )}
             {currentColumnName === "Experimentação" && (
-              <CardExperimentationContent featureId={cardData.id} handleApproveAndMove={handleApproveAndMove}/>
+              <CardExpandedLayout
+                mainContent={
+                  <CardExperimentationContent
+                    challangeTitle={cardData.name}
+                    categories={cardData.categories}
+                    description={cardData.description}
+                  />
+                }
+                commentsContent={
+                  <CommentsPanel sections={experimentationCommentSections}/>
+                }
+              />  
             )}
           </div>
         </div>
