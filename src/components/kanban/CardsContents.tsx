@@ -3,16 +3,15 @@ import ForwardButton from "./ForwardButton"
 import { useState } from 'react';
 import { Comment } from "./Comment";
 import { ideationCommentSections } from "./commentsData";
+import PreviousButton from "./PreviousButton";
 
 type CardChallangeContentProps = {
   challangeTitle: string;
   categories: string[];
   description: string;
-  featureId: string | undefined;
-  handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardChallangeContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardChallangeContentProps) => {
+export const CardChallangeContent = ({ challangeTitle, categories, description }: CardChallangeContentProps) => {
   return (
     //conteudo do card de desafio
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
@@ -74,15 +73,6 @@ export const CardChallangeContent = ({ challangeTitle, categories, description, 
           </p>
         </div>
       </div>
-
-      <div className="w-full flex justify-center gap-6">
-        <button className="flex w-45 justify-center px-1 py-2 
-        rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-        text-[12px] cursor-pointer">
-          Arquivar
-        </button>
-        <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
-      </div>
     </div>
   )
 }
@@ -91,11 +81,9 @@ type CardPreScreeningContentProps = {
   challangeTitle: string;
   categories: string[];
   description: string;
-  featureId: string | undefined;
-  handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardPreScreeningContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardPreScreeningContentProps) => {
+export const CardPreScreeningContent = ({ challangeTitle, categories, description }: CardPreScreeningContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
@@ -150,15 +138,6 @@ export const CardPreScreeningContent = ({ challangeTitle, categories, descriptio
       </div>
 
       <ProgressBarActions percentage={66}/>
-
-      <div className="w-full flex justify-center gap-6">
-        <button className="flex w-45 justify-center px-1 py-2 
-        rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-        text-[12px] cursor-pointer">
-          Voltar
-        </button>
-        <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
-      </div>
     </div>
   )
 }
@@ -167,11 +146,9 @@ type CardDetailedScreeningContentProps = {
   challangeTitle: string;
   categories: string[];
   description: string;
-  featureId: string | undefined;
-  handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardDetailedScreeningContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardDetailedScreeningContentProps) => {
+export const CardDetailedScreeningContent = ({ challangeTitle, categories, description }: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
 
@@ -403,15 +380,6 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
           <ProgressBarActions percentage={66}/>
         </div>
       )}
-
-      <div className="w-full flex justify-center gap-6">
-        <button className="flex w-45 justify-center px-1 py-2 
-        rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-        text-[12px] cursor-pointer">
-          Voltar
-        </button>
-        <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
-      </div>
     </div>
   )
 }
@@ -420,11 +388,9 @@ type CardIdeationContentProps = {
   challangeTitle: string;
   categories: string[];
   description: string;
-  featureId: string | undefined;
-  handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export const CardIdeationContent = ({ challangeTitle, categories, description, featureId, handleApproveAndMove}: CardIdeationContentProps) => {
+export const CardIdeationContent = ({ challangeTitle, categories, description }: CardIdeationContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
@@ -479,15 +445,6 @@ export const CardIdeationContent = ({ challangeTitle, categories, description, f
           </div>
           <Checklist/>
         </div>
-      </div>
-
-      <div className="w-full flex justify-center gap-6">
-        <button className="flex w-45 justify-center px-1 py-2 
-        rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-        text-[12px] cursor-pointer">
-          Voltar
-        </button>
-        <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove}/>
       </div>
     </div>
   )

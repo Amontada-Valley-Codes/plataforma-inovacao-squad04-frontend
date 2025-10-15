@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { CalendarClock, Tag, Send } from 'lucide-react';
 import CardExpanded from './CardExpanded';
 import ForwardButton from './ForwardButton';
+import PreviousButton from './PreviousButton';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -88,6 +89,21 @@ const KanbanPage = () => {
     }
   };
 
+  const handleMoveBack = (featureId: string | undefined) => {
+    const featureToMove = features.find(f => f.id === featureId);
+    if (!featureToMove) return;
+
+    const currentColumnIndex = columns.findIndex(c => c.id === featureToMove.column);
+
+    if (currentColumnIndex > 0) {
+      const prevColumn = columns[currentColumnIndex - 1];
+      const updatedFeature = { ...featureToMove, column: prevColumn.id };
+      const otherFeatures = features.filter(f => f.id !== featureId);
+      const newFeatures = [updatedFeature, ...otherFeatures];
+      setFeatures(newFeatures);
+    }
+  };
+
   return (
     <div className='w-full h-full'>
       <KanbanProvider
@@ -96,6 +112,7 @@ const KanbanPage = () => {
       >
         {(column) => {
           const isLastColumn = columns.findIndex(c => c.id === column.id) === columns.length - 1;
+          const isFirstColumn = columns.findIndex(c => c.id === column.id) === 0
           
           return (
             <KanbanBoard id={column.id} key={column.id}>
@@ -137,11 +154,19 @@ const KanbanPage = () => {
                         </div>
                       </div>
                       
-                      {!isLastColumn && (
-                        <div className='flex items-center justify-end'>
+                      <div className={`flex w-full ${
+                        !isFirstColumn && !isLastColumn ?
+                        "justify-between"
+                        : isLastColumn ? "justify-start"
+                        : "justify-end"
+                      }`}>
+                        {!isFirstColumn && (
+                          <PreviousButton className='w-25' featureId={feature.id} handleMoveBack={handleMoveBack}/>
+                        )}
+                        {!isLastColumn && (
                           <ForwardButton className="w-25" featureId={feature.id} handleApproveAndMove={handleApproveAndMove}/>
-                        </div>
-                      )}
+                        )}  
+                      </div>
                       <CardExpanded
                         isOpen={!!expandedCard}
                         onClose={() => setExpandedCard(null)}
