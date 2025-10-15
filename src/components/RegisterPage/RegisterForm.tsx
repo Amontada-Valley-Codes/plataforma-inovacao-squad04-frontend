@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { User, Mail, LockKeyhole, Phone, EyeIcon } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
+import { authService } from "@/api/services/auth.service";
+import { useSearchParams } from "next/navigation";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
-    nome: "",
-    telefone: "",
+    name: "",
+    phone: "",
     email: "",
-    senha: "",
-    repetirSenha: "",
+    password: "",
+    repeatPassword: "",
   });
 
   const [error, setError] = useState("");
@@ -20,7 +22,10 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
-  const formatTelefone = (value: string) => {
+  const searchParams = useSearchParams();
+  const [token, setToken] = useState<string>('');
+
+  const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 2) return `(${numbers}`;
     if (numbers.length <= 6)
@@ -35,28 +40,43 @@ export default function RegisterForm() {
     )}`;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (
-      !formData.nome ||
-      !formData.telefone ||
+      !formData.name ||
+      !formData.phone ||
       !formData.email ||
-      !formData.senha ||
-      !formData.repetirSenha
+      !formData.password ||
+      !formData.repeatPassword
     ) {
       setError("Preencha todos os campos.");
       return;
     }
 
-    if (formData.senha !== formData.repetirSenha) {
+    if (formData.password !== formData.repeatPassword) {
       setError("As senhas não coincidem.");
       return;
+    }
+
+    try {
+      const { repeatPassword, ...dataToSend } = formData;
+      const data = await authService.Register({...dataToSend, token});
+      console.log(data);
+      return 'logaado com sucesso'
+    } catch (err: any ){
+      console.log(err);
+      setError(err.response?.data?.message)
     }
 
     setError("");
     console.log("✅ Formulário enviado:", formData);
   };
+
+  useEffect(() => {
+    const token = searchParams.get("auth");
+    if (token) setToken(token);
+  }, [searchParams]);
 
   return (
     <div
@@ -86,8 +106,8 @@ export default function RegisterForm() {
           <input
             type="text"
             placeholder="Nome Completo"
-            value={formData.nome}
-            onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full bg-white text-black rounded-full pl-12 pr-4 py-3 shadow-sm"
           />
           <User className="absolute top-3 left-4" color="#6B7280" size={20} />
@@ -98,9 +118,9 @@ export default function RegisterForm() {
           <input
             type="tel"
             placeholder="Telefone"
-            value={formData.telefone}
+            value={formData.phone}
             onChange={(e) =>
-              setFormData({ ...formData, telefone: formatTelefone(e.target.value) })
+              setFormData({ ...formData, phone: formatPhone(e.target.value) })
             }
             className="w-full bg-white text-black rounded-full pl-12 pr-4 py-3 shadow-sm"
           />
@@ -126,9 +146,9 @@ export default function RegisterForm() {
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Senha"
-            value={formData.senha}
+            value={formData.password}
             onChange={(e) =>
-              setFormData({ ...formData, senha: e.target.value })
+              setFormData({ ...formData, password: e.target.value })
             }
             className="w-full bg-white text-black rounded-full pl-12 pr-10 py-3 shadow-sm"
           />
@@ -154,9 +174,9 @@ export default function RegisterForm() {
           <input
             type={showRepeatPassword ? "text" : "password"}
             placeholder="Repetir senha"
-            value={formData.repetirSenha}
+            value={formData.repeatPassword}
             onChange={(e) =>
-              setFormData({ ...formData, repetirSenha: e.target.value })
+              setFormData({ ...formData, repeatPassword: e.target.value })
             }
             className="w-full bg-white text-black rounded-full pl-12 pr-10 py-3 shadow-sm"
           />
