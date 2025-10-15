@@ -6,5 +6,9 @@ export const ENDPOINTS = {
 
   ENTERPRISE: {
     CREATE: '/enterprise'
+  },
+
+  INVITE: {
+    SEND: '/invite'
   }
 }
