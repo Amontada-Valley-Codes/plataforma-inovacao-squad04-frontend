@@ -20,16 +20,21 @@ export default async function AdminHistoryPage() {
   const viewerUserId = viewer?.id as number | undefined;
 
   return (
-    <div className="space-y-4">
-      <div className="text-sm text-muted-foreground">
-        Admin / <span className="font-semibold">Histórico</span>
+    <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4">
+      {/* Breadcrumb */}
+      <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap gap-1">
+        <span>Admin /</span>
+        <span className="font-semibold truncate">Histórico</span>
       </div>
 
-      <CompanyHistory
-        role={role}
-        viewerUserId={viewerUserId}
-        // para admin não precisa de companyId nem viewerCompanyId
-      />
+      {/* Conteúdo */}
+      <div className="w-full overflow-x-auto">
+        <CompanyHistory
+          role={role}
+          viewerUserId={viewerUserId}
+          // para admin não precisa de companyId nem viewerCompanyId
+        />
+      </div>
     </div>
   );
 }

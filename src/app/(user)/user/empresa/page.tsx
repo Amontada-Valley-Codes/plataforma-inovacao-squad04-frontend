@@ -9,13 +9,14 @@ export default async function UserEmpresaPage() {
     redirect("/");
   }
 
-  // Passa role e viewerCompanyId (id da empresa do usuário logado)
   return (
-    <CompanieCard
-      role={role}
-      companyId={String(me.companyId)}
-      autoOpen
-      viewerCompanyId={me.companyId}
-    />
+    <div className="w-full max-w-screen-lg mx-auto px-3 sm:px-4 md:px-6 py-4 overflow-x-hidden">
+      <CompanieCard
+        role={role}
+        companyId={String(me.companyId)}
+        autoOpen
+        viewerCompanyId={me.companyId}
+      />
+    </div>
   );
 }
