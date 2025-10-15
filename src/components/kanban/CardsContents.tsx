@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, Bug, Building2, ChartNoAxesCombined, ChartPie, CircleCheck, CircleCheckBig, ClipboardList, Lamp, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users } from "lucide-react";
+import { BriefcaseBusiness, Bug, Building2, ChartNoAxesCombined, ChartPie, CircleCheck, CircleCheckBig, ClipboardList, Lamp, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users, X } from "lucide-react";
 import ForwardButton from "./ForwardButton"
 import { useState } from 'react';
 import { Comment } from "./Comment";
@@ -151,6 +151,9 @@ type CardDetailedScreeningContentProps = {
 export const CardDetailedScreeningContent = ({ challangeTitle, categories, description }: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
+  const [isPublic, setIsPublic] = useState(false)
+  const [inviteStartup, setInviteStartup] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
@@ -164,6 +167,12 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
                 {category.toUpperCase()}
               </button>
             ))}
+            <button 
+              onClick={() => setIsOpen(true)}
+              className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1"
+            >
+              {isPublic ? "PUBLICO" : "PRIVADO"}
+            </button>
           </div>
         </div>
 
@@ -380,6 +389,24 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
           <ProgressBarActions percentage={66}/>
         </div>
       )}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
+          <div className="bg-white rounded-[12px] shadow-xl p-4 w-[30vw] relative">
+            <X 
+              onClick={() => setIsOpen(false)}
+              size={18} 
+              className="absolute top-4 right-4 text-black hover:text-[#090D15]"
+            />
+
+            <FormResolutionCard 
+              isPublic={isPublic} 
+              setIsPublic={setIsPublic} 
+              setInviteStartup={setInviteStartup} 
+              inviteStartup={inviteStartup}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -582,6 +609,99 @@ export const Rating = ({ initialScore = 0 }) => {
     </div>
   );
 };
+
+type FormResolutionCardsProps = {
+  isPublic: boolean;
+  setIsPublic: (isPublic: boolean) => void;
+  inviteStartup: boolean;
+  setInviteStartup: (invite: boolean) => void;
+}
+
+export const FormResolutionCard = ({ isPublic, setIsPublic, inviteStartup, setInviteStartup }: FormResolutionCardsProps) => {
+
+  return (
+    <div className="flex flex-col w-full">
+      <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
+      <div className="flex w-full justify-around">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsPublic(false)}
+            className={`h-5 w-5 rounded-full flex items-center justify-center 
+            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+          >
+            <div className={`h-3 w-3 rounded-full ${
+              !isPublic ? "bg-[#0B2B72]" : ""
+            }`}>
+
+            </div>
+          </button>
+          <label className="text-sm text-[#666] font-semibold">PRIVADO</label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsPublic(true)}
+            className={`h-5 w-5 rounded-full flex items-center justify-center 
+            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+          >
+            <div className={`h-3 w-3 rounded-full ${
+              isPublic ? "bg-[#0B2B72]" : ""
+            }`}>
+
+            </div>
+          </button>
+          <label className="text-sm text-[#666] font-semibold">PUBLICO</label>
+        </div>
+      </div>
+      {!isPublic ? (
+        <div className="border-t flex flex-col mt-4 py-4">
+          <div className="flex w-full justify-around">
+            <div className="flex items-center w-35 gap-2">
+              <button
+                onClick={() => setInviteStartup(true)}
+                className={`h-4 w-4 rounded-full flex items-center justify-center 
+                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+              >
+                <div className={`h-2 w-2 rounded-full ${
+                  inviteStartup ? "bg-[#0B2B72]" : ""
+                }`}>
+
+                </div>
+              </button>
+              <label className="text-xs text-[#666] font-semibold">Convidar startup especifica</label>
+            </div>
+
+            <div className="flex items-center w-35 gap-2">
+              <button
+                onClick={() => setInviteStartup(false)}
+                className={`h-4 w-4 rounded-full flex items-center justify-center 
+                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+              >
+                <div className={`h-2 w-2 rounded-full ${
+                  !inviteStartup ? "bg-[#0B2B72]" : ""
+                }`}>
+
+                </div>
+              </button>
+              <label className="text-xs text-[#666] font-semibold">Resolver internamente</label>
+            </div>
+          </div>
+          {inviteStartup && (
+            <div>
+              <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
+      )}
+    </div>
+  )
+}
 
 export const ProgressBarActions = ({percentage}: {percentage: number}) => {
   return (
