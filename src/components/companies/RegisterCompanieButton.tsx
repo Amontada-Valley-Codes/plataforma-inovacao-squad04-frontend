@@ -1,7 +1,7 @@
 'use client'
 
 import { useModal } from "@/hooks/useModal";
-import AddCompanieForm from "./AddStartupForm";
+import AddCompanieForm from "./AddCompaniesForm";
 import { PlusCircle } from "lucide-react";
 
 export default function RegisterCOmpanieBtn() {

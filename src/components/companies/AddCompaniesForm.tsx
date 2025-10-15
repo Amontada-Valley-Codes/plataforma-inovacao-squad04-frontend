@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { X, Building2, SlidersHorizontal, Mail, User } from "lucide-react";
 import { Modal } from "../ui/modal";
+import { enterpriseService } from "@/api/services/enterprise.service";
 
 type Props = {
   isOpen: boolean;
@@ -10,24 +11,26 @@ type Props = {
 
 export default function AddCompanieForm({ onClose, isOpen }: Props) {
   const [formData, setFormData] = useState({
-    nome: "",
+    name: "",
     cnpj: "",
-    setor: "",
+    sector: "",
     email: "",
-    gestor: "",
-    endereco: "",
-    descricao: "",
+    gestorEmail: "",
+    address: "",
+    description: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" })); // limpa erro ao digitar
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSave = () => {
+  const handleSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
     Object.entries(formData).forEach(([key, value]) => {
       if (!value.trim()) {
@@ -40,7 +43,13 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
       return;
     }
 
-    console.log("Dados salvos:", formData);
+    try {
+      const data = await enterpriseService.createEnterprise(formData);
+      localStorage.setItem("access_token", data?.token?.token ?? "");
+      console.log("✅ Dados enviados:", data.token.message);
+    } catch (err) {
+      console.error("❌ Erro ao enviar:", err);
+    }
     onClose();
   };
 
@@ -83,25 +92,39 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
             {/* Inputs */}
             <div className="space-y-3">
               {[
-                { name: "nome", placeholder: "Nome da Empresa", icon: <Building2 className={iconStyle} size={18} /> },
+                { name: "name", placeholder: "Nome da Empresa", icon: <Building2 className={iconStyle} size={18} /> },
                 { name: "cnpj", placeholder: "CNPJ", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
-                { name: "setor", placeholder: "Setor", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
+                { name: "sector", placeholder: "Setor", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
                 { name: "email", placeholder: "E-mail", icon: <Mail className={iconStyle} size={18} />, type: "email" },
-                { name: "gestor", placeholder: "Gestor", icon: <User className={iconStyle} size={18} /> },
-                { name: "endereco", placeholder: "Endereço", icon: <Building2 className={`${iconStyle} mt-1`} size={18} /> },
-                { name: "descricao", placeholder: "Descrição", icon: <Building2 className={`${iconStyle} mt-1`} size={18} />, type: "text", textarea: true },
+                { name: "gestorEmail", placeholder: "Email do Gestor", icon: <User className={iconStyle} size={18} />, type: "email" },
+                { name: "address", placeholder: "Endereço", icon: <Building2 className={`${iconStyle} mt-1`} size={18} /> },
+                { name: "description", placeholder: "Descrição", icon: <Building2 className={`${iconStyle} mt-1`} size={18} />, type: "text", textarea: true },
               ].map(({ name, placeholder, icon, type = "text", textarea }) => (
                 <div key={name}>
-                  <div className={`${inputBase} ${getBorderColor(name)} ${getBgColor(name)} ${textarea ? "h-20 items-start" : ""}`}>
+                  <div
+                    className={`${inputBase} ${getBorderColor(name)} ${getBgColor(name)} ${
+                      textarea ? "items-start" : ""
+                    }`}
+                  >
                     {icon}
-                    <input
-                      name={name}
-                      value={formData[name as keyof typeof formData]}
-                      onChange={handleChange}
-                      type={type}
-                      placeholder={placeholder}
-                      className={inputText}
-                    />
+                    {textarea ? (
+                      <textarea
+                        name={name}
+                        value={formData[name as keyof typeof formData]}
+                        onChange={handleChange}
+                        placeholder={placeholder}
+                        className={`${inputText} resize-none h-20`}
+                      />
+                    ) : (
+                      <input
+                        name={name}
+                        value={formData[name as keyof typeof formData]}
+                        onChange={handleChange}
+                        type={type}
+                        placeholder={placeholder}
+                        className={inputText}
+                      />
+                    )}
                   </div>
                   {errors[name] && (
                     <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
@@ -121,7 +144,7 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
                 Cancelar
               </button>
               <button
-                onClick={handleSave}
+                onClick={handleSubmit}
                 className="w-1/2 ml-2 bg-[#15358D] dark:bg-blue-800 dark:hover:bg-blue-900 text-white py-2 rounded-lg font-medium 
                 transition-colors ease-in-out dark:text-[#ced3db]
                 hover:bg-[#0f2a6d]"
