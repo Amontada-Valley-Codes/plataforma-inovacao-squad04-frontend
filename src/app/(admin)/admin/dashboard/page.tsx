@@ -14,36 +14,31 @@ export const metadata: Metadata = {
 
 export default function Ecommerce() {
   return (
-    <div className="grid grid-cols-12 gap-4 md:gap-6">
-
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 gap-4 sm:gap-5 md:gap-6 p-3 sm:p-4 md:p-6">
       {/* Metrics Cards */}
-      <div className="col-span-12">
+      <div className="col-span-1 sm:col-span-2 xl:col-span-12">
         <MetricsCards />
       </div>
 
-      {/* Ideias perfomance */}
-      <div className="col-span-12 xl:col-span-6">
+      {/* Ideias Performance */}
+      <div className="col-span-1 sm:col-span-2 xl:col-span-6">
         <IdeiasPerfomance />
       </div>
-      
-      {/* Sector Distribuition */}
-      <div className="col-span-12 xl:col-span-6">
+
+      {/* Sector Distribution */}
+      <div className="col-span-1 sm:col-span-2 xl:col-span-6">
         <DistributionBySector />
       </div>
 
-       {/* Participation Evoluiton */}
-       <div className="col-span-12 xl:col-span-6">
+      {/* Participation Evolution */}
+      <div className="col-span-1 sm:col-span-2 xl:col-span-6">
         <EvolutionChart />
       </div>
-      
+
       {/* Monthly Target */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-1 sm:col-span-2 xl:col-span-6">
         <ActiveCompaniesCard />
       </div>
-
-
-
-
     </div>
   );
 }

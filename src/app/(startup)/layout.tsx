@@ -21,18 +21,24 @@ export default function AdminLayout({
     : "lg:ml-[90px]";
 
   return (
-    <div className="min-h-screen xl:flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Sidebar and Backdrop */}
       <AppSidebar />
       <Backdrop />
+
       {/* Main Content Area */}
       <div
-        className={`flex-1 min-w-0 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
+        className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${mainContentMargin}`}
       >
-        {/* Header */}
-        <AppHeader />
+        {/* Header (fixo no topo em telas menores) */}
+        <div className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur">
+          <AppHeader />
+        </div>
+
         {/* Page Content */}
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+        <div className="p-3 sm:p-4 md:p-6 mx-auto w-full max-w-screen-2xl overflow-x-hidden">
+          {children}
+        </div>
       </div>
     </div>
   );
