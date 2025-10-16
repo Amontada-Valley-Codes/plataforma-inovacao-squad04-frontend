@@ -11,5 +11,10 @@ export const ENDPOINTS = {
 
   INVITE: {
     SEND: '/invite'
+  },
+
+  STARTUP: {
+    CREATE: '/startup',
+    SHOW_ALL: '/startup'
   }
 }
