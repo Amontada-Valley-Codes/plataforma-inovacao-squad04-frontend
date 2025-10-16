@@ -2,16 +2,43 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, LockKeyhole, EyeIcon } from "lucide-react";
+import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
+
+  const showCustomToast = (message: string, type: "success" | "error") => {
+    toast.custom((t) => (
+      <div
+        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
+          text-white font-medium transition-all duration-300 transform ${
+            t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+          }
+          ${
+            type === "success"
+              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
+              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
+          }`}
+      >
+        {type === "success" ? (
+          <CheckCircle2 className="text-green-300" size={22} />
+        ) : (
+          <XCircle className="text-red-300" size={22} />
+        )}
+        <span>{message}</span>
+      </div>
+    ));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +52,19 @@ export default function LoginForm() {
     }
 
     setError("");
-    
+
     try {
       const data = await authService.login({ email, password: senha });
-      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem("access_token", data.access_token);
 
-    } catch (err: any ){
+      showCustomToast("Login realizado com sucesso!", "success");
+
+      setTimeout(() => {
+        router.push("/admin/dashboard");
+      }, 1500);
+    } catch (err: any) {
       console.log(err);
-      setError(err.response?.data?.message)
+      setError(err.response?.data?.message);
     }
   };
 
@@ -43,6 +75,9 @@ export default function LoginForm() {
        bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] 
       border-l-2 border-[#C7E6FE]"
     >
+      {/* ✅ Toaster global */}
+      <Toaster position="top-right" reverseOrder={false} />
+
       <div className="relative w-[135px] h-[101px] mb-6">
         <Image
           src={"/images/logo/ninna-logo.svg"}
@@ -53,7 +88,6 @@ export default function LoginForm() {
       </div>
       <h1 className="font-semibold text-[34px] text-white mb-4">Login</h1>
       <form onSubmit={handleSubmit}>
-
         {/* Email */}
         <div className="relative w-[300px] mb-6">
           <input
@@ -84,7 +118,7 @@ export default function LoginForm() {
             className="absolute top-3 left-3.5 pointer-events-none"
             color="#6B7280"
           />
-          
+
           {/* Botão de mostrar/ocultar senha */}
           <span
             onClick={() => setShowPassword(!showPassword)}
@@ -93,7 +127,10 @@ export default function LoginForm() {
             {showPassword ? (
               <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
             ) : (
-              <EyeCloseIcon size={20} className="text-gray-500 dark:text-gray-400" />
+              <EyeCloseIcon
+                size={20}
+                className="text-gray-500 dark:text-gray-400"
+              />
             )}
           </span>
         </div>
@@ -112,7 +149,7 @@ export default function LoginForm() {
           <p className="text-base text-[#D2F5FB] font-light">
             Não possui cadastro?
             <Link
-              href={"/register"}
+              href={"/auth/register"}
               className="relative text-white font-normal cursor-pointer
               after:content-[''] after:absolute after:left-0 after:-bottom-0.5
               after:h-[1.5px] after:w-full after:bg-white
