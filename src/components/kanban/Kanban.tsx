@@ -109,6 +109,7 @@ const KanbanPage = () => {
       <KanbanProvider
         columns={columns}
         data={features}
+        onDataChange={setFeatures}
       >
         {(column) => {
           const isLastColumn = columns.findIndex(c => c.id === column.id) === columns.length - 1;
