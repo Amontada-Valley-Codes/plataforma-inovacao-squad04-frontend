@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { User, Mail, LockKeyhole, Phone, EyeIcon } from "lucide-react";
+import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -18,12 +19,35 @@ export default function RegisterForm() {
   });
 
   const [error, setError] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const searchParams = useSearchParams();
-  const [token, setToken] = useState<string>('');
+  const [token, setToken] = useState<string>("");
+  const router = useRouter();
+
+  const showCustomToast = (message: string, type: "success" | "error") => {
+    toast.custom((t) => (
+      <div
+        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
+          text-white font-medium transition-all duration-300 transform ${
+            t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+          }
+          ${
+            type === "success"
+              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
+              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
+          }`}
+      >
+        {type === "success" ? (
+          <CheckCircle2 className="text-green-300" size={22} />
+        ) : (
+          <XCircle className="text-red-300" size={22} />
+        )}
+        <span>{message}</span>
+      </div>
+    ));
+  };
 
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
@@ -59,17 +83,23 @@ export default function RegisterForm() {
       return;
     }
 
+    setError("");
+
     try {
       const { repeatPassword, ...dataToSend } = formData;
-      const data = await authService.Register({...dataToSend, token});
+      const data = await authService.Register({ ...dataToSend, token });
       console.log(data);
-      return 'logaado com sucesso'
-    } catch (err: any ){
+
+      showCustomToast("Conta criada com sucesso! Faça login para continuar.", "success");
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 1000);
+    } catch (err: any) {
       console.log(err);
-      setError(err.response?.data?.message)
+      setError(err.response?.data?.message);
+      showCustomToast(err.response?.data?.message || "Erro ao criar conta.", "error");
     }
 
-    setError("");
     console.log("✅ Formulário enviado:", formData);
   };
 
@@ -85,6 +115,8 @@ export default function RegisterForm() {
       bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] 
       border-l-2 border-[#C7E6FE]"
     >
+      <Toaster position="top-right" reverseOrder={false} />
+
       <div className="relative w-[140px] h-[90px] mb-6">
         <Image
           src={"/images/logo/ninna-logo.svg"}
@@ -100,7 +132,6 @@ export default function RegisterForm() {
         className="flex flex-col items-center w-[300px]"
         onSubmit={handleSubmit}
       >
-
         {/* Full name */}
         <div className="relative w-full mb-4">
           <input
@@ -140,7 +171,7 @@ export default function RegisterForm() {
           />
           <Mail className="absolute top-3 left-4" color="#6B7280" size={20} />
         </div>
-          
+
         {/* Password */}
         <div className="relative w-full mb-4">
           <input
@@ -196,16 +227,20 @@ export default function RegisterForm() {
             )}
           </span>
         </div>
+
         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
         <div className="w-[300px] text-center mb-5">
           <p className="text-base text-[#D2F5FB] font-light">
             Já possui cadastro?
-            <Link href="/auth/login" className="relative text-white font-normal cursor-pointer
+            <Link
+              href="/auth/login"
+              className="relative text-white font-normal cursor-pointer
               after:content-[''] after:absolute after:left-0 after:-bottom-0.5
               after:h-[1.5px] after:w-full after:bg-white
               after:origin-center after:scale-x-0 after:transition-transform 
-              after:duration-300 hover:after:scale-x-100">
+              after:duration-300 hover:after:scale-x-100"
+            >
               {" "}
               Faça login
             </Link>
