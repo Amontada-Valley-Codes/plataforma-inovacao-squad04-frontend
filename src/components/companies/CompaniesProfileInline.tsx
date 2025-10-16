@@ -3,9 +3,6 @@
 
 import {
   FaRegImage,
-  FaInstagram,
-  FaWhatsapp,
-  FaLinkedin,
   FaMapMarkedAlt,
 } from "react-icons/fa";
 import Image from "next/image";
@@ -18,9 +15,8 @@ type Props = { data: Companie | null; editable?: boolean };
 type MediaTarget = "logo" | "cover" | null;
 
 export default function CompaniesProfileInline({ data, editable = false }: Props) {
-  if (!data) return null;
-
-  const [company, setCompany] = useState<Companie>(data);
+  
+  const [company, setCompany] = useState<Companie | null>(data);
   const [editInfo, setEditInfo] = useState(false);
   const [editMedia, setEditMedia] = useState(false);
   const [editSocial, setEditSocial] = useState(false);
@@ -42,12 +38,15 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
   const qs = searchParams?.toString();
   const suffix = qs ? `?${qs}` : "";
 
+  if (!data) return null;
+  
+
   async function savePatch(patch: Partial<Companie>) {
     if (!editable) {
       alert("Sem permissão para editar.");
       return;
     }
-    const res = await fetch(`/api/company/${company.id}${suffix}`, {
+    const res = await fetch(`/api/company/${company?.id}${suffix}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
@@ -63,7 +62,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
 
   // DESAFIOS: filtra de forma robusta por companyId
   const desafios: Challenge[] = challengesData.filter(
-    (ch) => Number(ch.companyId) === Number(company.id)
+    (ch) => Number(ch.companyId) === Number(company?.id)
   );
 
   return (
@@ -72,10 +71,10 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
         {/* Header / Capa com overlay */}
         <div className="relative group">
           <div className="relative h-45 w-full bg-gray-200 dark:bg-gray-800">
-            {company.cover && (
+            {company?.cover && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={company.cover}
+                src={company?.cover}
                 alt="capa"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -98,9 +97,9 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
           {/* Logo com overlay */}
           <div className="absolute left-12 -bottom-24">
             <div className="relative w-36 h-36 rounded-full bg-gray-100 dark:bg-gray-700 border-8 border-white dark:border-gray-900 shadow-md overflow-hidden group/logo">
-              {company.logo ? (
+              {company?.logo ? (
                 <Image
-                  src={company.logo}
+                  src={company?.logo}
                   alt="logo"
                   width={144}
                   height={144}
@@ -136,7 +135,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
             <section id="info" className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-800">
-                  {company.nome}
+                  {company?.name}
                 </h2>
                 {editable && (
                   <button
@@ -151,29 +150,31 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
               {!editInfo ? (
                 <>
                   <p className="text-gray-600 dark:text-[#ced3db] mt-1">
-                    {company.descricao}
+                    {company?.description}
                   </p>
                   <div className="flex flex-wrap gap-3 mt-4">
                     <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      Gestor: {company.gestor}
+                      Gestor: {company?.gestorEmail}
                     </span>
                     <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      Área de Atuação: {company.areaAtuacao}
+                      Área de Atuação: {company?.sector}
                     </span>
                     <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      CNPJ: {company.cnpj}
+                      CNPJ: {company?.cnpj}
                     </span>
                   </div>
                 </>
               ) : (
-                <InfoForm
-                  company={company}
-                  onSave={async (form) => {
-                    await savePatch(form);
-                    setEditInfo(false);
-                  }}
-                  onCancel={() => setEditInfo(false)}
-                />
+              company && (
+                  <InfoForm
+                    company={company}
+                    onSave={async (form) => {
+                      await savePatch(form);
+                      setEditInfo(false);
+                    }}
+                    onCancel={() => setEditInfo(false)}
+                  />
+                )
               )}
             </section>
 
@@ -234,7 +235,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
   {!editSocial ? (
     <div className="flex flex-col gap-2 mt-3">
       <a
-        href={company.instagram ?? "#"}
+        href={company?.instagram ?? "#"}
         target="_blank"
         rel="noopener noreferrer"
         className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
@@ -242,7 +243,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
         Instagram
       </a>
       <a
-        href={company.whatsapp ?? "#"}
+        href={company?.whatsapp ?? "#"}
         target="_blank"
         rel="noopener noreferrer"
         className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
@@ -250,7 +251,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
         WhatsApp
       </a>
       <a
-        href={company.linkedin ?? "#"}
+        href={company?.linkedin ?? "#"}
         target="_blank"
         rel="noopener noreferrer"
         className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
@@ -259,14 +260,16 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
       </a>
     </div>
   ) : (
-    <SocialForm
-      company={company}
-      onSave={async (form) => {
-        await savePatch(form);
-        setEditSocial(false);
-      }}
-      onCancel={() => setEditSocial(false)}
-    />
+    company && (
+      <SocialForm
+        company={company}
+        onSave={async (form) => {
+          await savePatch(form);
+          setEditSocial(false);
+        }}
+        onCancel={() => setEditSocial(false)}
+      />
+    )
   )}
 </section>
             {/* ====== LOCALIZAÇÃO ====== */}
@@ -287,28 +290,30 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
 
               {!editLocation ? (
                 <a
-                  href={company.locationUrl ?? "#"}
+                  href={company?.locationUrl ?? "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 w-full h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-sm hover:shadow-md transition"
-                  title={company.locationUrl ?? "—"}
+                  title={company?.locationUrl ?? "—"}
                 >
                   <FaMapMarkedAlt className="text-blue-700 dark:text-blue-300 text-4xl" />
                 </a>
               ) : (
-                <LocationForm
-                  company={company}
-                  onSave={async (form) => {
-                    await savePatch(form);
-                    setEditLocation(false);
-                  }}
-                  onCancel={() => setEditLocation(false)}
-                />
+                company && (
+                  <LocationForm
+                    company={company}
+                    onSave={async (form) => {
+                      await savePatch(form);
+                      setEditLocation(false);
+                    }}
+                    onCancel={() => setEditLocation(false)}
+                  />
+                )
               )}
             </section>
 
             {/* ====== MÍDIA (logo/capa) — aparece após clicar no “+” ====== */}
-            {editMedia && (
+            {editMedia && company && (
               <section id="media" className="space-y-3 mt-10">
                 <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">
                   Mídia
@@ -328,6 +333,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                 />
               </section>
             )}
+
           </div>
         </div>
       </div>
@@ -368,13 +374,12 @@ function InfoForm({
   onCancel: () => void;
 }) {
   const [form, setForm] = useState({
-    nome: company.nome,
-    gestor: company.gestor,
+    nome: company.name,
+    gestor: company.gestorEmail,
     cnpj: company.cnpj,
     email: company.email,
-    setor: company.setor,
-    areaAtuacao: company.areaAtuacao,
-    descricao: company.descricao,
+    setor: company.sector,
+    descricao: company.description,
   });
   return (
     <form
@@ -417,13 +422,6 @@ function InfoForm({
           className="rounded-xl border px-3 py-[10px]"
           value={form.setor}
           onChange={(e) => setForm({ ...form, setor: e.target.value })}
-        />
-      </Row>
-      <Row label="Área de Atuação">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.areaAtuacao}
-          onChange={(e) => setForm({ ...form, areaAtuacao: e.target.value })}
         />
       </Row>
       <div className="md:col-span-2">

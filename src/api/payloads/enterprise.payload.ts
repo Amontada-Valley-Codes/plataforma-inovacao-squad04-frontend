@@ -29,3 +29,24 @@ export type CreateEnterpriseResponse = {
     expiresAt: string
   }
 }
+
+export type ShowAllEnterpriseResponse = {
+  id: string
+  name: string
+  cnpj: string
+  sector: string
+  description: string
+  address: string
+  email: string
+  gestorEmail: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  logo?: string;
+  cover?: string | null | undefined;
+  gallery?: string[] | undefined;
+  instagram?: string | null | undefined;
+  whatsapp?: string | null | undefined;
+  linkedin?: string | null | undefined;
+  locationUrl?: string | null | undefined
+}

@@ -11,9 +11,11 @@ import {
   Mail,
   Settings,
 } from "lucide-react";
-import { companiesData, type Companie } from "@/mocks/CompaniesData";
+import { type Companie } from "@/mocks/CompaniesData";
 import { useModal } from "@/hooks/useModal";
-import CompaniesProfile from "./CompaniesProfile"; // ✅ Corrigido nome do componente
+import CompaniesProfile from "./CompaniesProfile"; 
+import { ShowAllEnterpriseResponse } from "@/api/payloads/enterprise.payload";
+import { enterpriseService } from "@/api/services/enterprise.service";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
@@ -34,11 +36,13 @@ export default function CompanieCard({
 }: Props) {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedCompany, setSelectedCompany] = useState<Companie | null>(null);
+  const [companies, setCompaniesData] = useState<ShowAllEnterpriseResponse[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
-  const data = useMemo(() => companiesData as Companie[], []);
+  const data = useMemo(() => companies, [companies]);
   const filtered = useMemo(() => {
-    let base = companyId
+    const base = companyId
       ? data.filter((c) => String(c.id) === String(companyId))
       : data;
 
@@ -46,7 +50,7 @@ export default function CompanieCard({
     if (canSeeAll) return base;
 
     if (viewerCompanyId == null) return [];
-    return base.filter((c) => c.id === viewerCompanyId);
+    return base.filter((c) => c.id === viewerCompanyId.toString());
   }, [data, companyId, role, viewerCompanyId]);
 
   const listRef = useRef<HTMLDivElement>(null);
@@ -59,6 +63,21 @@ export default function CompanieCard({
     if (!activeEl) return;
     setContainerHeight(activeEl.scrollHeight);
   }, [viewMode]);
+
+  useEffect(() => {
+    async function fetchCompanies() {
+      try {
+        const data = await enterpriseService.showAllEnterprises();
+        setCompaniesData(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCompanies();
+  }, []);
 
   useEffect(() => {
     const frame = requestAnimationFrame(recalcHeight);
@@ -76,6 +95,14 @@ export default function CompanieCard({
     if (filtered[0]) setSelectedCompany(filtered[0]);
   }, [autoOpen, filtered]);
 
+  if (loading) {
+    return (
+      <div className="w-full p-6 flex justify-center items-center">
+        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!filtered.length) {
     return (
       <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
@@ -85,7 +112,7 @@ export default function CompanieCard({
     );
   }
 
-  const wrapIfNeeded = (company: Companie, children: React.ReactNode, asCard?: boolean) => {
+  const wrapIfNeeded = (company: Companie, children: React.ReactNode) => {
     if (role === "admin") {
       const handlers = {
         onClick: () => {
@@ -159,23 +186,23 @@ export default function CompanieCard({
                     {c.logo ? (
                       <Image
                         src={c.logo}
-                        alt={c.nome ?? "Logo da empresa"}
+                        alt={c.name ?? "Logo da empresa"}
                         width={64}
                         height={64}
                         className="object-contain"
                       />
                     ) : (
                       <div className="w-16 h-16 grid place-items-center text-sm font-medium">
-                        {c.nome?.[0]?.toUpperCase() ?? "?"}
+                        {c.name?.[0]?.toUpperCase() ?? "?"}
                       </div>
                     )}
                   </div>
                   <div className="min-w-0">
                     <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">
-                      {c.nome}
+                      {c.name}
                     </div>
                     <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">
-                      {c.areaAtuacao}
+                      {c.sector}
                     </div>
                   </div>
                 </div>
@@ -188,7 +215,7 @@ export default function CompanieCard({
                   </div>
                   <div className="flex items-center gap-2">
                     <User size={14} className="text-slate-400" />
-                    <span className="truncate">{c.gestor}</span>
+                    <span className="truncate">{c.gestorEmail}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail size={14} className="text-slate-400" />
@@ -196,13 +223,13 @@ export default function CompanieCard({
                   </div>
                   <div className="flex items-center gap-2">
                     <Settings size={14} className="text-slate-400" />
-                    <span className="truncate">{c.setor}</span>
+                    <span className="truncate">{c.sector}</span>
                   </div>
                 </div>
 
                 {/* Coluna 3 */}
                 <div className="hidden lg:flex w-[28%] items-center text-sm text-slate-600 dark:text-gray-400">
-                  <p className="line-clamp-3">{c.descricao}</p>
+                  <p className="line-clamp-3">{c.description}</p>
                 </div>
 
                 {/* Ações admin */}
@@ -214,7 +241,7 @@ export default function CompanieCard({
                         setSelectedCompany(c);
                         openModal();
                       }}
-                      aria-label={`Abrir menu de ${c.nome}`}
+                      aria-label={`Abrir menu de ${c.name}`}
                       className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 transition"
                     >
                       <MoreHorizontal className="text-slate-600 dark:text-gray-300" />
@@ -255,23 +282,23 @@ export default function CompanieCard({
                       {c.logo ? (
                         <Image
                           src={c.logo}
-                          alt={c.nome ?? "Logo da empresa"}
+                          alt={c.name ?? "Logo da empresa"}
                           width={48}
                           height={48}
                           className="object-contain"
                         />
                       ) : (
                         <div className="size-12 grid place-items-center text-sm font-semibold text-slate-700">
-                          {c.nome?.[0]?.toUpperCase() ?? "?"}
+                          {c.name?.[0]?.toUpperCase() ?? "?"}
                         </div>
                       )}
                     </div>
                     <div className="min-w-0">
                       <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">
-                        {c.nome}
+                        {c.name}
                       </h3>
                       <div className="mt-1 text-[12px] text-[#15358D] truncate">
-                        {c.areaAtuacao}
+                        {c.sector}
                       </div>
                     </div>
                   </div>
@@ -283,7 +310,7 @@ export default function CompanieCard({
                     </li>
                     <li className="flex items-center gap-2">
                       <User size={14} className="text-slate-400" />
-                      <span className="truncate">{c.gestor}</span>
+                      <span className="truncate">{c.gestorEmail}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Mail size={14} className="text-slate-400" />
@@ -291,18 +318,18 @@ export default function CompanieCard({
                     </li>
                     <li className="flex items-center gap-2">
                       <Settings size={14} className="text-slate-400" />
-                      <span className="truncate">{c.setor}</span>
+                      <span className="truncate">{c.sector}</span>
                     </li>
                   </ul>
 
                   <p className="mt-3 text-sm text-slate-600 dark:text-gray-400 line-clamp-3">
-                    {c.descricao}
+                    {c.description}
                   </p>
                 </div>
               </article>
             );
 
-            return <div key={`grid-${c.id}`}>{wrapIfNeeded(c, card, true)}</div>;
+            return <div key={`grid-${c.id}`}>{wrapIfNeeded(c, card)}</div>;
           })}
         </div>
       </div>
