@@ -58,16 +58,16 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
               {/* Esquerda */}
               <div className="flex-1 px-12 mt-28">
                 <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-800">
-                  {data?.nome}
+                  {data?.name}
                 </h2>
-                <p className="text-gray-600 dark:text-[#ced3db] mt-1">{data?.descricao}</p>
+                <p className="text-gray-600 dark:text-[#ced3db] mt-1">{data?.description  }</p>
 
                 <div className="flex flex-wrap gap-3 mt-4">
                   <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                    Gestor: {data?.gestor}
+                    Gestor: {data?.gestorEmail}
                   </span>
                   <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                    Área de Atuação: {data?.areaAtuacao}
+                    Área de Atuação: {data?.sector}
                   </span>
                   <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
                     CNPJ: {data?.cnpj}
