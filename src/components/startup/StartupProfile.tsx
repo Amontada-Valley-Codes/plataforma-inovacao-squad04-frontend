@@ -2,13 +2,13 @@
 import React from "react";
 import { FaClipboardList, FaEnvelope, FaInstagram, FaLinkedin, FaMapMarkedAlt, FaRegImage, FaRocket, FaWhatsapp } from "react-icons/fa";
 import { Modal } from "../ui/modal";
-import { Startup } from "@/mocks/StartupData";
 import { X } from "lucide-react";
+import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  data: Startup;
+  data: ShowAllStartupsResponse;
 }
 
 export default function StartupProfile({ isOpen, onClose, data }: Props) {
@@ -47,25 +47,24 @@ export default function StartupProfile({ isOpen, onClose, data }: Props) {
               <div className="flex-1 px-12 mt-24">
                 <div className="flex items-center gap-4">
                   <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-800">
-                    {data?.nome}
+                    {data?.name}
                   </h2>
                   <button className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium transition">
                     Baixar Pitch
                   </button>
                 </div>
 
-                <p className="text-gray-600 dark:text-[#ced3db] mt-1">Descrição: {data?.descricao}</p>
                 <p className="text-gray-600 dark:text-[#ced3db] mt-1">
-                  Tecnologias Usadas: {data?.tecnologias ?? "Não informado"}
+                  Tecnologias Usadas: {data?.technologies_used ?? "Não informado"}
                 </p>
 
                 {/* Infos extras */}
                 <div className="flex flex-wrap gap-3 mt-4">
                   <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                    Gestor: {data?.gestor ?? "Desconhecido"}
+                    Gestor: {data?.founders ?? "Desconhecido"}
                   </span>
                   <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                    Área de Atuação: {data?.areaAtuacao}
+                    Área de Atuação: {data?.industry_segment}
                   </span>
                   <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
                     CNPJ: {data?.cnpj}

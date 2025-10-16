@@ -2,19 +2,18 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   LayoutGrid,
   List as ListIcon,
   MoreHorizontal,
   Calendar,
-  Mail,
   Settings,
 } from "lucide-react";
-import { Startup, StartupData } from "@/mocks/StartupData";
 import { useModal } from "@/hooks/useModal";
 import StartupProfile from "./StartupProfile";
+import { startupService } from "@/api/services/startup.service";
+import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
@@ -26,8 +25,6 @@ type Props = {
   autoOpen?: boolean;
 };
 
-type StartupView = Startup;
-
 export default function StartupCard({
   role = "admin",
   viewerCompanyId,
@@ -36,25 +33,43 @@ export default function StartupCard({
   autoOpen = false,
 }: Props) {
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedStartup, setSelectedStartup] = useState<Startup | null>(null);
+  const [selectedStartup, setSelectedStartup] = useState<ShowAllStartupsResponse | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // dados
-  const data: StartupView[] = useMemo(() => StartupData, []);
+  // --- Carregar startups da API ---
+  useEffect(() => {
+    async function fetchStartups() {
+      try {
+        setLoading(true);
+        const response = await startupService.showAllStartups();
+        setStartups(response);
+      } catch (error) {
+        console.error("Erro ao buscar startups:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStartups();
+  }, []);
+
+  // --- Filtrar startups conforme role e empresa ---
   const filtered = useMemo(() => {
     const byCompany =
       companyIdFilter !== undefined
-        ? data.filter((s) => s.companyId === Number(companyIdFilter))
-        : data;
+        ? startups.filter((s) => s.cnpj === String(companyIdFilter))
+        : startups;
 
     const canSeeAll = role === "admin" || role === "gestor";
     if (canSeeAll) return byCompany;
 
     if (viewerCompanyId == null) return [];
-    return byCompany.filter((s) => s.companyId === Number(viewerCompanyId));
-  }, [data, role, viewerCompanyId, companyIdFilter]);
+    return byCompany;
+  }, [startups, role, viewerCompanyId, companyIdFilter]);
 
-  // --- Transição suave: animar altura do contêiner entre views ---
+  // --- Animação suave da altura ---
   const listRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +82,6 @@ export default function StartupCard({
   }, [viewMode]);
 
   useEffect(() => {
-    // mede após o paint
     requestAnimationFrame(recalcHeight);
   }, [viewMode, filtered, recalcHeight]);
 
@@ -78,9 +92,19 @@ export default function StartupCard({
   }, [recalcHeight]);
 
   useEffect(() => {
-    if (!autoOpen) return;
-    if (filtered[0]) setSelectedStartup(filtered[0]);
+    if (autoOpen && filtered[0]) {
+      setSelectedStartup(filtered[0]);
+    }
   }, [autoOpen, filtered]);
+
+  // --- Loading ---
+  if (loading) {
+    return (
+      <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
+        Carregando startups...
+      </div>
+    );
+  }
 
   if (!filtered.length) {
     return (
@@ -91,11 +115,10 @@ export default function StartupCard({
     );
   }
 
-  // Admin abre modal; outros papéis navegam para a página da startup.
+  // --- Comportamento ao clicar ---
   const wrapIfNeeded = (
-    startup: Startup,
+    startup: ShowAllStartupsResponse,
     children: React.ReactNode,
-    asCard?: boolean
   ) => {
     if (role === "admin") {
       const handlers = {
@@ -112,18 +135,10 @@ export default function StartupCard({
         role: "button" as const,
         tabIndex: 0,
       };
-      return (
-        <div {...handlers} className={asCard ? "" : ""}>
-          {children}
-        </div>
-      );
+      return <div {...handlers}>{children}</div>;
     }
     return (
-      <Link
-        href={`/startup/${startup.id}?role=${role}`}
-        className="block"
-        prefetch={false}
-      >
+      <Link href={`/startup/${startup.id}?role=${role}`} className="block" prefetch={false}>
         {children}
       </Link>
     );
@@ -140,7 +155,7 @@ export default function StartupCard({
         <button
           type="button"
           onClick={() => setViewMode(viewMode === "list" ? "grid" : "list")}
-          className="inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 p-2 transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#15358D] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+          className="inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 p-2 transition-all duration-200 ease-out"
           aria-label="Alternar visualização"
           title={viewMode === "list" ? "Ver em cards" : "Ver em lista"}
         >
@@ -152,19 +167,18 @@ export default function StartupCard({
         </button>
       </div>
 
-      {/* Contêiner com altura animada para transição suave */}
+      {/* Container animado */}
       <div
         ref={containerRef}
         style={{ height: containerHeight }}
         className="relative transition-[height] duration-300 ease-out"
       >
-        {/* LISTA — mesmo layout da lista de empresas */}
+        {/* --- LISTA --- */}
         <div
           ref={listRef}
           aria-hidden={viewMode !== "list"}
           className={[
-            "absolute inset-0 overflow-hidden will-change-transform",
-            "transition duration-200",
+            "absolute inset-0 overflow-hidden transition duration-200",
             viewMode === "list"
               ? "opacity-100 scale-100 pointer-events-auto"
               : "opacity-0 scale-[0.98] pointer-events-none",
@@ -174,34 +188,24 @@ export default function StartupCard({
           {filtered.map((s) => {
             const row = (
               <div className="flex items-stretch gap-6 px-6 py-5 md:py-6">
-                {/* Coluna 1 — Logo, Nome, Área (≈32%) */}
+                {/* Logo e nome */}
                 <div className="flex w-full md:w-[32%] items-center gap-4">
                   <div className="flex-shrink-0 size-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                    {s.logo ? (
-                      <Image
-                        src={s.logo}
-                        alt={s.nome ?? "Logo da startup"}
-                        width={64}
-                        height={64}
-                        className="object-contain"
-                      />
-                    ) : (
-                      <div className="size-16 grid place-items-center text-sm font-medium text-slate-600">
-                        {s.nome?.[0]?.toUpperCase() ?? "?"}
-                      </div>
-                    )}
+                    <div className="size-16 grid place-items-center text-sm font-medium text-slate-600">
+                      {s.name?.[0]?.toUpperCase() ?? "?"}
+                    </div>
                   </div>
                   <div className="min-w-0">
-                    <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">
-                      {s.nome}
+                    <div className="text-slate-900 dark:text-gray-100 font-semibold truncate">
+                      {s.name}
                     </div>
                     <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">
-                      {s.areaAtuacao}
+                      {s.industry_segment}
                     </div>
                   </div>
                 </div>
 
-                {/* Coluna 2 — CNPJ / Razão / Email / Setor (≈36%) */}
+                {/* Dados extras */}
                 <div className="hidden md:flex w-[36%] flex-col gap-2 text-sm text-slate-700 dark:text-gray-300">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#15358D]" />
@@ -209,24 +213,15 @@ export default function StartupCard({
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar size={14} className="text-slate-400" />
-                    <span className="truncate">{s.razaoSocial}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail size={14} className="text-slate-400" />
-                    <span className="truncate">{s.email}</span>
+                    <span className="truncate">{s.founders.join(", ")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Settings size={14} className="text-slate-400" />
-                    <span className="truncate">{s.setor}</span>
+                    <span className="truncate">{s.problems_solved.join(", ")}</span>
                   </div>
                 </div>
 
-                {/* Coluna 3 — Descrição (≈28%) */}
-                <div className="hidden lg:flex w-[28%] items-center text-sm text-slate-600 dark:text-gray-400">
-                  <p className="line-clamp-3">{s.descricao}</p>
-                </div>
-
-                {/* Ações (somente admin) */}
+                {/* Ações */}
                 {role === "admin" && (
                   <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
                     <button
@@ -235,7 +230,7 @@ export default function StartupCard({
                         setSelectedStartup(s);
                         openModal();
                       }}
-                      aria-label={`Abrir menu de ${s.nome}`}
+                      aria-label={`Abrir menu de ${s.name}`}
                       className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 transition"
                     >
                       <MoreHorizontal className="text-slate-600 dark:text-gray-300" />
@@ -256,13 +251,12 @@ export default function StartupCard({
           })}
         </div>
 
-        {/* CARDS — elegantes, com gradiente no topo */}
+        {/* --- GRID --- */}
         <div
           ref={gridRef}
           aria-hidden={viewMode !== "grid"}
           className={[
-            "absolute inset-0 overflow-auto will-change-transform",
-            "transition duration-200",
+            "absolute inset-0 overflow-auto transition duration-200",
             viewMode === "grid"
               ? "opacity-100 scale-100 pointer-events-auto"
               : "opacity-0 scale-[0.98] pointer-events-none",
@@ -275,27 +269,17 @@ export default function StartupCard({
                 <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
                 <div className="p-6">
                   <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-xl bg-slate-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden ring-1 ring-[#15358D]/20 ring-offset-2 ring-offset-white dark:ring-offset-gray-900">
-                      {s.logo ? (
-                        <Image
-                          src={s.logo}
-                          alt={s.nome ?? "Logo da startup"}
-                          width={48}
-                          height={48}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <div className="size-12 grid place-items-center text-sm font-semibold text-slate-700">
-                          {s.nome?.[0]?.toUpperCase() ?? "?"}
-                        </div>
-                      )}
+                    <div className="size-12 rounded-xl bg-slate-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden ring-1 ring-[#15358D]/20">
+                      <div className="size-12 grid place-items-center text-sm font-semibold text-slate-700">
+                        {s.name?.[0]?.toUpperCase() ?? "?"}
+                      </div>
                     </div>
                     <div className="min-w-0">
                       <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">
-                        {s.nome}
+                        {s.name}
                       </h3>
                       <div className="mt-1 text-[12px] text-[#15358D] truncate">
-                        {s.areaAtuacao}
+                        {s.industry_segment}
                       </div>
                     </div>
                   </div>
@@ -307,31 +291,23 @@ export default function StartupCard({
                     </li>
                     <li className="flex items-center gap-2">
                       <Calendar size={14} className="text-slate-400" />
-                      <span className="truncate">{s.razaoSocial}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Mail size={14} className="text-slate-400" />
-                      <span className="truncate">{s.email}</span>
+                      <span className="truncate">{s.founders.join(", ")}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Settings size={14} className="text-slate-400" />
-                      <span className="truncate">{s.setor}</span>
+                      <span className="truncate">{s.problems_solved.join(", ")}</span>
                     </li>
                   </ul>
-
-                  <p className="mt-3 text-sm text-slate-600 dark:text-gray-400 line-clamp-3">
-                    {s.descricao}
-                  </p>
                 </div>
               </article>
             );
 
-            return <div key={`grid-${s.id}`}>{wrapIfNeeded(s, card, true)}</div>;
+            return <div key={`grid-${s.id}`}>{wrapIfNeeded(s, card)}</div>;
           })}
         </div>
       </div>
 
-      {/* Modal (apenas admin) */}
+      {/* Modal (somente admin) */}
       {role === "admin" && selectedStartup && (
         <StartupProfile
           isOpen={isOpen}

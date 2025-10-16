@@ -73,6 +73,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
 
   const handleSubmit = () => {
     if (validateForm()) {
+      
       console.log("✅ Formulário válido:", formData);
       // Aqui você pode enviar os dados para a API
       onClose();
