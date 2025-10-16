@@ -201,7 +201,7 @@ export default function RegisterForm() {
         <div className="w-[300px] text-center mb-5">
           <p className="text-base text-[#D2F5FB] font-light">
             Já possui cadastro?
-            <Link href="/login" className="relative text-white font-normal cursor-pointer
+            <Link href="/auth/login" className="relative text-white font-normal cursor-pointer
               after:content-[''] after:absolute after:left-0 after:-bottom-0.5
               after:h-[1.5px] after:w-full after:bg-white
               after:origin-center after:scale-x-0 after:transition-transform 
