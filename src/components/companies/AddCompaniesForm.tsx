@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { X, Building2, SlidersHorizontal, Mail, User } from "lucide-react";
+import { X, Building2, SlidersHorizontal, Mail, User, ChevronDown } from "lucide-react";
 import { Modal } from "../ui/modal";
 import { enterpriseService } from "@/api/services/enterprise.service";
 
@@ -22,8 +22,10 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  const [isFuncOpen, setIsFuncOpen] = useState(false);
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -91,10 +93,10 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
 
             {/* Inputs */}
             <div className="space-y-3">
+              {/* Nome, CNPJ, E-mails, Endereço, Descrição */}
               {[
                 { name: "name", placeholder: "Nome da Empresa", icon: <Building2 className={iconStyle} size={18} /> },
                 { name: "cnpj", placeholder: "CNPJ", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
-                { name: "sector", placeholder: "Setor", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
                 { name: "email", placeholder: "E-mail", icon: <Mail className={iconStyle} size={18} />, type: "email" },
                 { name: "gestorEmail", placeholder: "Email do Gestor", icon: <User className={iconStyle} size={18} />, type: "email" },
                 { name: "address", placeholder: "Endereço", icon: <Building2 className={`${iconStyle} mt-1`} size={18} /> },
@@ -131,6 +133,54 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
                   )}
                 </div>
               ))}
+
+              {/* Campo SECTOR hardcode com nomes em português */}
+              <div>
+                <div
+                  className={`relative  ${inputBase} ${getBorderColor("sector")} ${getBgColor(
+                    "sector"
+                  )} items-center`}
+                >
+                  <SlidersHorizontal className={iconStyle} size={18} />
+                  <select
+                    name="sector"
+                    onFocus={() => setIsFuncOpen(true)}
+                    onBlur={() => setIsFuncOpen(false)}
+                    value={formData.sector}
+                    onChange={handleChange}
+                    className="w-full bg-transparentdark:text-[#ced3db] hover:bg-[#E5E7EB] text-sm outline-non text-[#344054] dark:text-[#ced3db] dark:border-gray-800 dark:bg-gray-900 font-semibold appearance-none"
+                  >
+                    <option value="">Selecione o setor</option>
+                    <option value="ADMINISTRATIVE">Administrativo</option>
+                    <option value="FINANCIAL">Financeiro</option>
+                    <option value="ACCOUNTING">Contábil</option>
+                    <option value="LEGAL">Jurídico</option>
+                    <option value="HUMAN_RESOURCES">Recursos Humanos</option>
+                    <option value="MARKETING">Marketing</option>
+                    <option value="SALES">Vendas</option>
+                    <option value="COMMERCIAL">Comercial</option>
+                    <option value="SUPPLY">Suprimentos</option>
+                    <option value="LOGISTICS">Logística</option>
+                    <option value="PRODUCTION">Produção</option>
+                    <option value="TECHNOLOGY">Tecnologia</option>
+                    <option value="ENGINEERING">Engenharia</option>
+                    <option value="CUSTOMER_SERVICE">Atendimento ao Cliente</option>
+                    <option value="QUALITY">Qualidade</option>
+                    <option value="RESEARCH_DEVELOPMENT">Pesquisa e Desenvolvimento</option>
+                    <option value="HEALTH_SAFETY">Saúde e Segurança</option>
+                    <option value="OTHER">Outro</option>
+                  </select>
+                  <ChevronDown
+                    size={20}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-[#ced3db] transition-transform duration-300 ${
+                      isFuncOpen ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
+                </div>
+                {errors["sector"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors["sector"]}</p>
+                )}
+              </div>
             </div>
 
             {/* Buttons */}
