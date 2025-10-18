@@ -146,7 +146,6 @@ export default function StartupCard({
 
   return (
     <div className="flex flex-col gap-6 w-full p-4">
-      {/* Cabeçalho + Toggle */}
       <div className="flex items-center justify-between">
         <h2 className="text-[20px] font-semibold text-slate-900 dark:text-gray-100">
           {title}
@@ -167,13 +166,11 @@ export default function StartupCard({
         </button>
       </div>
 
-      {/* Container animado */}
       <div
         ref={containerRef}
         style={{ height: containerHeight }}
         className="relative transition-[height] duration-300 ease-out"
       >
-        {/* --- LISTA --- */}
         <div
           ref={listRef}
           aria-hidden={viewMode !== "list"}
@@ -188,7 +185,6 @@ export default function StartupCard({
           {filtered.map((s) => {
             const row = (
               <div className="flex items-stretch gap-6 px-6 py-5 md:py-6">
-                {/* Logo e nome */}
                 <div className="flex w-full md:w-[32%] items-center gap-4">
                   <div className="flex-shrink-0 size-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                     <div className="size-16 grid place-items-center text-sm font-medium text-slate-600">
@@ -205,7 +201,6 @@ export default function StartupCard({
                   </div>
                 </div>
 
-                {/* Dados extras */}
                 <div className="hidden md:flex w-[36%] flex-col gap-2 text-sm text-slate-700 dark:text-gray-300">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#15358D]" />
@@ -221,7 +216,6 @@ export default function StartupCard({
                   </div>
                 </div>
 
-                {/* Ações */}
                 {role === "admin" && (
                   <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
                     <button
@@ -251,7 +245,6 @@ export default function StartupCard({
           })}
         </div>
 
-        {/* --- GRID --- */}
         <div
           ref={gridRef}
           aria-hidden={viewMode !== "grid"}
@@ -307,7 +300,6 @@ export default function StartupCard({
         </div>
       </div>
 
-      {/* Modal (somente admin) */}
       {role === "admin" && selectedStartup && (
         <StartupProfile
           isOpen={isOpen}
