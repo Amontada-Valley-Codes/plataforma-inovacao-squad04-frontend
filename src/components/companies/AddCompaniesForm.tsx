@@ -78,7 +78,6 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
       >
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg w-full max-w-md p-6 border dark:border-gray-800">
-            {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#15358D] dark:text-blue-800">
                 Cadastrar Empresa
@@ -91,50 +90,8 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
               </button>
             </div>
 
-            {/* Inputs */}
             <div className="space-y-3">
-              {/* Nome, CNPJ, E-mails, Endereço, Descrição */}
-              {[
-                { name: "name", placeholder: "Nome da Empresa", icon: <Building2 className={iconStyle} size={18} /> },
-                { name: "cnpj", placeholder: "CNPJ", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
-                { name: "email", placeholder: "E-mail", icon: <Mail className={iconStyle} size={18} />, type: "email" },
-                { name: "gestorEmail", placeholder: "Email do Gestor", icon: <User className={iconStyle} size={18} />, type: "email" },
-                { name: "address", placeholder: "Endereço", icon: <Building2 className={`${iconStyle} mt-1`} size={18} /> },
-                { name: "description", placeholder: "Descrição", icon: <Building2 className={`${iconStyle} mt-1`} size={18} />, type: "text", textarea: true },
-              ].map(({ name, placeholder, icon, type = "text", textarea }) => (
-                <div key={name}>
-                  <div
-                    className={`${inputBase} ${getBorderColor(name)} ${getBgColor(name)} ${
-                      textarea ? "items-start" : ""
-                    }`}
-                  >
-                    {icon}
-                    {textarea ? (
-                      <textarea
-                        name={name}
-                        value={formData[name as keyof typeof formData]}
-                        onChange={handleChange}
-                        placeholder={placeholder}
-                        className={`${inputText} resize-none h-20`}
-                      />
-                    ) : (
-                      <input
-                        name={name}
-                        value={formData[name as keyof typeof formData]}
-                        onChange={handleChange}
-                        type={type}
-                        placeholder={placeholder}
-                        className={inputText}
-                      />
-                    )}
-                  </div>
-                  {errors[name] && (
-                    <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
-                  )}
-                </div>
-              ))}
 
-              {/* Campo SECTOR hardcode com nomes em português */}
               <div>
                 <div
                   className={`relative  ${inputBase} ${getBorderColor("sector")} ${getBgColor(
@@ -181,9 +138,50 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
                   <p className="text-red-500 text-xs mt-1">{errors["sector"]}</p>
                 )}
               </div>
+
+              {[
+                { name: "name", placeholder: "Nome da Empresa", icon: <Building2 className={iconStyle} size={18} /> },
+                { name: "cnpj", placeholder: "CNPJ", icon: <SlidersHorizontal className={iconStyle} size={18} /> },
+                { name: "email", placeholder: "E-mail", icon: <Mail className={iconStyle} size={18} />, type: "email" },
+                { name: "gestorEmail", placeholder: "Email do Gestor", icon: <User className={iconStyle} size={18} />, type: "email" },
+                { name: "address", placeholder: "Endereço", icon: <Building2 className={`${iconStyle} mt-1`} size={18} /> },
+                { name: "description", placeholder: "Descrição", icon: <Building2 className={`${iconStyle} mt-1`} size={18} />, type: "text", textarea: true },
+              ].map(({ name, placeholder, icon, type = "text", textarea }) => (
+                <div key={name}>
+                  <div
+                    className={`${inputBase} ${getBorderColor(name)} ${getBgColor(name)} ${
+                      textarea ? "items-start" : ""
+                    }`}
+                  >
+                    {icon}
+                    {textarea ? (
+                      <textarea
+                        name={name}
+                        value={formData[name as keyof typeof formData]}
+                        onChange={handleChange}
+                        placeholder={placeholder}
+                        className={`${inputText} resize-none h-20`}
+                      />
+                    ) : (
+                      <input
+                        name={name}
+                        value={formData[name as keyof typeof formData]}
+                        onChange={handleChange}
+                        type={type}
+                        placeholder={placeholder}
+                        className={inputText}
+                      />
+                    )}
+                  </div>
+                  {errors[name] && (
+                    <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+                  )}
+                </div>
+              ))}
+
+
             </div>
 
-            {/* Buttons */}
             <div className="flex justify-between mt-6">
               <button
                 onClick={onClose}
