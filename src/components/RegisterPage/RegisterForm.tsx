@@ -104,7 +104,7 @@ export default function RegisterForm() {
   };
 
   useEffect(() => {
-    const token = searchParams.get("auth");
+    const token = searchParams.get("token");
     if (token) setToken(token);
   }, [searchParams]);
 
