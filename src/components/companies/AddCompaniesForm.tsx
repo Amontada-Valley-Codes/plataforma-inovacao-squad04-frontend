@@ -1,6 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import { X, Building2, SlidersHorizontal, Mail, User, ChevronDown } from "lucide-react";
+import {
+  X,
+  Building2,
+  SlidersHorizontal,
+  Mail,
+  User,
+  ChevronDown,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
 import { Modal } from "../ui/modal";
 import { enterpriseService } from "@/api/services/enterprise.service";
 
@@ -21,11 +30,14 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
   const [isFuncOpen, setIsFuncOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,9 +47,7 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
   const handleSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
     Object.entries(formData).forEach(([key, value]) => {
-      if (!value.trim()) {
-        newErrors[key] = "Campo obrigatório";
-      }
+      if (!value.trim()) newErrors[key] = "Campo obrigatório";
     });
 
     if (Object.keys(newErrors).length > 0) {
@@ -45,14 +55,24 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
       return;
     }
 
+    setLoading(true);
     try {
       const data = await enterpriseService.createEnterprise(formData);
       localStorage.setItem("access_token", data?.token?.token ?? "");
       console.log("✅ Dados enviados:", data.token.message);
+
+      setTimeout(() => {
+        setLoading(false);
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          onClose();
+        }, 2000);
+      }, 1500);
     } catch (err) {
       console.error("❌ Erro ao enviar:", err);
+      setLoading(false);
     }
-    onClose();
   };
 
   const inputBase =
@@ -71,13 +91,28 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
 
   return (
     <div>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        className="max-w-[600px] p-5 lg:p-10"
-      >
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-5 lg:p-10">
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg w-full max-w-md p-6 border dark:border-gray-800">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg w-full max-w-md p-6 border dark:border-gray-800 relative overflow-hidden">
+
+            {loading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 z-50">
+                <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
+                <p className="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Cadastrando empresa...
+                </p>
+              </div>
+            )}
+
+            {success && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-900/95 z-50 animate-fade-in">
+                <CheckCircle2 className="text-green-600 dark:text-green-400" size={48} />
+                <p className="mt-3 text-lg font-semibold text-green-700 dark:text-green-300">
+                  Empresa cadastrada com sucesso!
+                </p>
+              </div>
+            )}
+
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#15358D] dark:text-blue-800">
                 Cadastrar Empresa
@@ -91,12 +126,9 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
             </div>
 
             <div className="space-y-3">
-
               <div>
                 <div
-                  className={`relative  ${inputBase} ${getBorderColor("sector")} ${getBgColor(
-                    "sector"
-                  )} items-center`}
+                  className={`relative ${inputBase} ${getBorderColor("sector")} ${getBgColor("sector")} items-center`}
                 >
                   <SlidersHorizontal className={iconStyle} size={18} />
                   <select
@@ -105,7 +137,7 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
                     onBlur={() => setIsFuncOpen(false)}
                     value={formData.sector}
                     onChange={handleChange}
-                    className="w-full bg-transparentdark:text-[#ced3db] hover:bg-[#E5E7EB] text-sm outline-non text-[#344054] dark:text-[#ced3db] dark:border-gray-800 dark:bg-gray-900 font-semibold appearance-none"
+                    className="w-full bg-transparent dark:text-[#ced3db] dark:bg-gray-900 text-sm outline-none text-[#344054] font-semibold appearance-none"
                   >
                     <option value="">Selecione o setor</option>
                     <option value="ADMINISTRATIVE">Administrativo</option>
@@ -178,24 +210,19 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
                   )}
                 </div>
               ))}
-
-
             </div>
 
             <div className="flex justify-between mt-6">
               <button
                 onClick={onClose}
-                className="w-1/2 mr-2 bg-[#F2F4F7] text-[#344054] py-2 rounded-lg font-medium 
-                transition-colors ease-in-out border dark:border-gray-800 dark:bg-gray-900 dark:text-[#ced3db]
-                hover:bg-[#E5E7EB]"
+                className="w-1/2 mr-2 bg-[#F2F4F7] text-[#344054] py-2 rounded-lg font-medium transition-colors ease-in-out border dark:border-gray-800 dark:bg-gray-900 dark:text-[#ced3db] hover:bg-[#E5E7EB]"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSubmit}
-                className="w-1/2 ml-2 bg-[#15358D] dark:bg-blue-800 dark:hover:bg-blue-900 text-white py-2 rounded-lg font-medium 
-                transition-colors ease-in-out dark:text-[#ced3db]
-                hover:bg-[#0f2a6d]"
+                disabled={loading}
+                className="w-1/2 ml-2 bg-[#15358D] dark:bg-blue-800 dark:hover:bg-blue-900 text-white py-2 rounded-lg font-medium transition-colors ease-in-out dark:text-[#ced3db] hover:bg-[#0f2a6d] disabled:opacity-50"
               >
                 Adicionar Empresa
               </button>
