@@ -207,33 +207,49 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
       
       {/* pagina 1 - resumo */}
       {page === '1' && (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col h-full">
           <h1 className="text-[#0B2B72] text-2xl font-semibold mb-4">Canvas Rápido</h1>
 
-          <div className="w-full flex gap-3 mb-3">
-            <div className="w-1/2 rounded-[12px] border-2 border-[#DAE0E7] px-4 py-2">
-              <h1 className="w-full flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
-                Problema
-                <Bug size={20}/>
-              </h1>
-              <p className="text-gray-600 text-[14px] text-justify">{description}</p>
+          <div className="flex-1 flex flex-col gap-3">
+            <div className="flex gap-3 flex-1">
+              <div className="w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
+                <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
+                  Problema
+                  <Bug size={20}/>
+                </h1>
+                
+                <textarea
+                  className="w-full flex-1 bg-transparent outline-none resize-none overflow-y-auto"
+                  placeholder="Qual o resultado esperado?"
+                  rows={8}
+                />
+              </div>
+
+              <div className="w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
+                <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
+                  Solução
+                  <Lightbulb size={20}/>
+                </h1>
+
+                <textarea
+                  className="w-full flex-1 bg-transparent outline-none resize-none h-full overflow-y-auto"
+                  placeholder="Qual o resultado esperado?"
+                />
+              </div>
             </div>
 
-            <div className="w-1/2 rounded-[12px] border-2 border-[#DAE0E7] px-4 py-2">
-              <h1 className="w-full flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
-                Solução
-                <Lightbulb size={20}/>
+            <div className="flex-1 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
+              <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
+                Resultado Esperado
+                <Trophy size={20}/>
               </h1>
-              <p className="text-gray-600 text-[14px] text-justify">{description}</p>
-            </div>
-          </div>
 
-          <div className="rounded-[12px] border-2 border-[#DAE0E7] px-4 py-2 mb-6">
-            <h1 className="w-full flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
-              Solução
-              <Trophy size={20}/>
-            </h1>
-            <p className="text-gray-600 text-[14px] text-justify">{description}</p>
+              <textarea
+                className="w-full flex-1 bg-transparent outline-none resize-none h-full overflow-y-auto"
+                placeholder="Qual o resultado esperado?"
+                rows={6}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -245,140 +261,197 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
             {/* viabilidade tecnica */}
             <div className="flex flex-col mb-6">
               <h1 className="flex gap-1 items-center text-black text-lg">
-                <Building2 size={16}/>
                 Viabilidade Técnica
               </h1>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">API's/Documentação: </label>
-                    <input 
-                      type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
-                    />
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
+                  
+                  {/* Input: API's/Documentação */}
+                  <div className="flex flex-col gap-1 text-sm">
+                    <div className="flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                      <Building2 className="text-[#98A2B3] mr-2" size={18} />
+                      <input 
+                        type="text" 
+                        placeholder="APIs / documentação"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">Stacks Compatíveis: </label>
-                    <input 
-                      type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
-                    />
+
+                  {/* Input: Stacks Compatíveis */}
+                  <div className="flex flex-col gap-1 text-sm">
+                    <div className="flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                      <Building2 className="text-[#98A2B3] mr-2" size={18} />
+                      <input 
+                        type="text" 
+                        placeholder="Stacks Compatíveis"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">Nº de Sprints Esperadas: </label>
-                    <input 
-                      type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
-                    />
+
+                  {/* Input: Nº de Sprints Esperadas */}
+                  <div className="flex flex-col gap-1 text-sm">
+                    <div className="flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                      <Building2 className="text-[#98A2B3] mr-2" size={18} />
+                      <input 
+                        type="text" 
+                        placeholder="Nº de sprints esperadas"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-[2px]">
+
+                {/* Seção de Rádios */}
+                <div className="flex flex-col gap-[2px] mt-2">
                   <div className="flex gap-1 cursor-pointer">
-                    <input type="radio" name="api-doc"/>
-                    <label className="text-sm">Nenhum</label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="api-doc" className="hidden peer" />
+                      <span className="w-3 h-3 rounded-full border border-[#0B2B70] peer-checked:bg-[#0B2B70]"></span>
+                      <span className="text-sm">Nenhuma </span>
+                    </label>
                   </div>
                   <div className="flex gap-1 cursor-pointer">
-                    <input type="radio" name="api-doc"/>
-                    <label className="text-sm">API Externa</label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="api-doc" className="hidden peer" />
+                      <span className="w-3 h-3 rounded-full border border-[#0B2B70] peer-checked:bg-[#0B2B70]"></span>
+                      <span className="text-sm">API Externa</span>
+                    </label>
                   </div>
                   <div className="flex gap-1 cursor-pointer">
-                    <input type="radio" name="api-doc"/>
-                    <label className="text-sm">API Interna</label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="api-doc" className="hidden peer" />
+                      <span className="w-3 h-3 rounded-full border border-[#0B2B70] peer-checked:bg-[#0B2B70]"></span>
+                      <span className="text-sm">API Interna</span>
+                    </label>
                   </div>
                   <div className="flex gap-1 cursor-pointer">
-                    <input type="radio" name="api-doc"/>
-                    <label className="text-sm">Outro...</label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="api-doc" className="hidden peer" />
+                      <span className="w-3 h-3 rounded-full border border-[#0B2B70] peer-checked:bg-[#0B2B70]"></span>
+                      <span className="text-sm">Outro...</span>
+                    </label>
                   </div>
                 </div>
               </div>
               <Rating/>
             </div>
+
             {/* impacto financeiro */}
             <div className="flex flex-col mb-6">
-              <h1 className="flex gap-1 items-center text-black text-lg mb-2">
-                <ChartNoAxesCombined size={16}/>
+              <h1 className="flex gap-1 items-center   text-black text-lg mb-2">
                 Impacto Financeiro
               </h1>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">API's/Documentação: </label>
+              <div className="flex flex-col gap-2">
+
+                {/* Input: API's/Documentação */}
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <ChartNoAxesCombined className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Investimento inicial estimado (CAPEX)"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">Stacks Compatíveis: </label>
+                </div>
+
+                {/* Input: Stacks Compatíveis */}
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <ChartNoAxesCombined className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Custo mensal estimado (OPEX)"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">Nº de Sprints Esperadas: </label>
+                </div>
+
+                {/* Input: Nº de Sprints Esperadas */}
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <ChartNoAxesCombined className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Benefício esperado (mensal)"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
                 </div>
               </div>
               <Rating/>
             </div>
+
             {/* aderencia estrategica */}
             <div className="flex flex-col mb-6">
               <h1 className="flex gap-1 items-center text-black text-lg mb-2">
-                <ChartPie size={16}/>
                 Aderência Estratégica
               </h1>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">API's/Documentação: </label>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <ChartPie className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Pilar Estratégico"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
                 </div>
               </div>
               <Rating/>
             </div>
+
             {/* riscos */}
             <div className="flex flex-col mb-6">
               <h1 className="flex gap-1 items-center text-black text-lg mb-2">
-                <TriangleAlert size={16}/>
                 Riscos
               </h1>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">API's/Documentação: </label>
+              <div className="flex flex-col gap-2">
+                
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Principal risco identificado"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">API's/Documentação: </label>
+                </div>
+
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Mitigação Proposta"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">Stacks Compatíveis: </label>
+                </div>
+
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Responsável"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <label className="w-36 whitespace-nowrap">Nº de Sprints Esperadas: </label>
+                </div>
+
+                {/* Input: Nº de Sprints Esperadas */}
+                <div className="flex gap-4 text-sm items-center">
+                  <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+                    <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
                     <input 
                       type="text" 
-                      className="bg-[#d9d9d9] rounded-[4px]"
+                      placeholder="Prazo"
+                      className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                     />
                   </div>
                 </div>
@@ -397,7 +470,6 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
               size={18} 
               className="absolute top-4 right-4 text-black hover:text-[#090D15]"
             />
-
             <FormResolutionCard 
               isPublic={isPublic} 
               setIsPublic={setIsPublic} 
@@ -497,49 +569,57 @@ export const CardExperimentationContent = ({ challangeTitle, categories, descrip
       </div>
     </div>
     
-    <div className="flex flex-col mb-6">
+    <div className="flex flex-col gap-1 mb-6">
       <h1 className="flex gap-1 items-center text-black text-lg">
         <Target size={16}/>
         Objetivo
       </h1>
-      <p className="text-sm bg-gray-200 px-4 py-2 rounded-[8px] text-justify">
-        {description}
-      </p>
+      <div className="flex items-center rounded-lg border p-2 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+        <textarea 
+          className="w-full bg-transparent outline-none resize-none overflow-y-auto"
+          placeholder="Qual o objetivo?"
+          rows={5}
+        />
+      </div>
     </div>
 
-    <div className="flex flex-col mb-6">
+    <div className="flex flex-col gap-1 mb-6">
       <h1 className="flex gap-1 items-center text-black text-lg">
         <ClipboardList size={16}/>
         Escopo Resumido
       </h1>
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="flex gap-4 text-sm">
-            <label className="w-36 whitespace-nowrap">Entrega Minima: </label>
+      <div className="w-full flex flex-col gap-2">
+        <div className="flex gap-4 text-sm items-center">
+          <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
             <input 
               type="text" 
-              className="bg-[#d9d9d9] rounded-[4px]"
+              placeholder="Entrega Minima"
+              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
             />
           </div>
-          <div className="flex gap-4 text-sm">
-            <label className="w-36 whitespace-nowrap">Prazo: </label>
+        </div>
+        <div className="flex gap-4 text-sm items-center">
+          <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
             <input 
               type="text" 
-              className="bg-[#d9d9d9] rounded-[4px]"
+              placeholder="Prazo"
+              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
             />
           </div>
-          <div className="flex gap-4 text-sm">
-            <label className="w-36 whitespace-nowrap">Ambiente de Teste: </label>
+        </div>
+        <div className="flex gap-4 text-sm items-center">
+          <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
             <input 
               type="text" 
-              className="bg-[#d9d9d9] rounded-[4px]"
+              placeholder="Ambiente de Teste"
+              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
             />
           </div>
         </div>
       </div>
     </div>
 
-    <div className="flex flex-col mb-6">
+    <div className="flex flex-col gap-1 mb-6">
       <h1 className="flex gap-1 items-center text-black text-lg">
         <ChartNoAxesCombined size={16}/>
         KPIs de Sucesso
@@ -560,19 +640,30 @@ export const CardExperimentationContent = ({ challangeTitle, categories, descrip
       </div>
     </div>
 
-    <div className="flex flex-col mb-6">
+    <div className="flex w-full flex-col gap-1 mb-6">
       <h1 className="flex gap-1 items-center text-black text-lg">
         <Users size={16}/>
         Responsáveis
       </h1>
-      <div className="flex gap-16">
-        <div className="flex flex-col gap-2">
-          <p className="text-sm">Empresa:</p>
-          <p className="p-2 rounded-[8px] bg-gray-200">Empresa Tal</p>
+      <div className="flex w-full gap-16">
+        <div className="flex w-full gap-4 text-sm items-center">
+          <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+            <input 
+              type="text" 
+              placeholder="Empresa"
+              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+            />
+          </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <p className="text-sm">Startup:</p>
-          <p className="p-2 rounded-[8px] bg-gray-200">Startup Tal</p>
+
+        <div className="flex w-full gap-4 text-sm items-center">
+          <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+            <input 
+              type="text" 
+              placeholder="Startup"
+              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -585,7 +676,7 @@ export const Rating = ({ initialScore = 0 }) => {
   const ratingOptions = [1, 2, 3, 4, 5];
 
   return (
-    <div className="mt-3 flex items-center ml-2 gap-3">
+    <div className="mt-3 flex items-center gap-3">
       {ratingOptions.map((num) => (
         <div className="flex flex-col justify-center items-center gap-[2px]">
           <p className="text-[10px]">{num}</p>
@@ -595,7 +686,7 @@ export const Rating = ({ initialScore = 0 }) => {
             value={num}
             onClick={() => setScore(num)}
             className={`h-5 w-5 rounded-full flex items-center justify-center 
-            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+            font-semibold text-sm transition-all duration-200 bg-[#F9FAFB] border border-[#E5E7EB] focus:outline-none 
             focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
           >
             <div className={`h-3 w-3 rounded-full ${
