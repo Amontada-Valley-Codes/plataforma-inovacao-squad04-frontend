@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle } from "lucide-react";
+import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
@@ -14,6 +14,7 @@ export default function LoginForm() {
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -53,9 +54,12 @@ export default function LoginForm() {
 
     setError("");
 
+    setLoading(true);
     try {
       const data = await authService.login({ email, password: senha });
       localStorage.setItem("access_token", data.access_token);
+
+      setLoading(false);
 
       showCustomToast("Login realizado com sucesso!", "success");
 
@@ -63,6 +67,7 @@ export default function LoginForm() {
         router.push("/admin/dashboard");
       }, 1500);
     } catch (err: any) {
+      setLoading(false);
       console.log(err);
       setError(err.response?.data?.message);
     }
@@ -75,7 +80,6 @@ export default function LoginForm() {
        bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] 
       border-l-2 border-[#C7E6FE]"
     >
-      {/* ✅ Toaster global */}
       <Toaster position="top-right" reverseOrder={false} />
 
       <div className="relative w-[135px] h-[101px] mb-6">
@@ -161,13 +165,14 @@ export default function LoginForm() {
             </Link>
           </p>
         </div>
-        <div className="w-[300px] mb-6">
+        <div className="w-[300px] text-center mb-6">     
           <button
             type="submit"
-            className="w-full bg-linear-to-r hover:scale-[102.5%] from-[#0C0869] from-5% cursor-pointer
-            to-[#15358D] rounded-3xl p-[10px] shadow text-2xl font-semibold text-white transition-all duration-300 ease-in-out"
+            className="w-full flex items-center justify-center bg-gradient-to-r hover:scale-[102.5%]
+          from-[#0C0869] to-[#15358D] rounded-3xl p-[10px] shadow text-2xl font-semibold
+          text-white transition-all duration-300 ease-in-out"
           >
-            Entrar
+            {loading ? <Loader2 className="animate-spin w-8 h-8 text-blue-600" /> : 'Entrar'}
           </button>
         </div>
       </form>
