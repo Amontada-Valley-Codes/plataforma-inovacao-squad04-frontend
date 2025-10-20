@@ -1,12 +1,16 @@
-// app/(admin)/admin/companies/page.tsx
-import CompanieCard from "@/components/companies/CompanieCard";
+"use client";
+import { useEffect, useState } from "react";
 import { getUserRole } from "@/lib/auth";
+import CompanieCard from "@/components/companies/CompanieCard";
 
-export const dynamic = "force-dynamic";
+export default function AdminCompaniesPage() {
+  const [role, setRole] = useState<string | null>(null);
 
-export default async function AdminCompaniesPage() {
-  const role = await getUserRole();
+  useEffect(() => {
+    getUserRole().then(setRole);
+  }, []);
 
+  if (!role) return null; // ou spinner
   if (role !== "admin") {
     return (
       <main className="p-6">
@@ -20,8 +24,7 @@ export default async function AdminCompaniesPage() {
 
   return (
     <div className="p-3 sm:p-4 lg:p-6">
-      {/* mantém o mesmo nome do componente que já usas */}
       <CompanieCard role="admin" />
-    </div>         
+    </div>
   );
 }
