@@ -2,7 +2,14 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle } from "lucide-react";
+import {
+  User,
+  LockKeyhole,
+  EyeIcon,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
@@ -16,6 +23,7 @@ export default function LoginForm() {
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -52,17 +60,19 @@ export default function LoginForm() {
     }
 
     setError("");
+    setLoading(true);
 
     try {
       const data = await authService.login({ email, password: senha });
       localStorage.setItem("access_token", data.access_token);
-
+      setLoading(false);
       showCustomToast("Login realizado com sucesso!", "success");
 
       setTimeout(() => {
         redirectByRole(data.access_token);
       }, 1500);
     } catch (err: any) {
+      setLoading(false);
       console.log(err);
       setError(err.response?.data?.message);
     }
@@ -70,106 +80,110 @@ export default function LoginForm() {
 
   return (
     <div
-      className="flex flex-col justify-center items-center 
-       z-10
-       bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] 
-      border-l-2 border-[#C7E6FE]"
+      className="flex flex-col justify-center items-center min-h-screen 
+      bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)]
+      px-6 sm:px-10 py-8"
     >
-      {/* ✅ Toaster global */}
       <Toaster position="top-right" reverseOrder={false} />
 
-      <div className="relative w-[135px] h-[101px] mb-6">
+      {/* Logo */}
+      <div className="relative w-[90px] h-[65px] sm:w-[110px] sm:h-[80px] mb-6 sm:mb-8">
         <Image
-          src={"/images/logo/ninna-logo.svg"}
+          src="/images/logo/ninna-logo.svg"
           alt="ninna-logo"
           fill
-          className="object-cover"
+          className="object-contain"
+          priority
         />
       </div>
-      <h1 className="font-semibold text-[34px] text-white mb-4">Login</h1>
-      <form onSubmit={handleSubmit}>
-        {/* Email */}
-        <div className="relative w-[300px] mb-6">
+
+      {/* Título */}
+      <h1 className="font-semibold text-xl sm:text-3xl text-white mb-5 sm:mb-6 text-center">
+        Login
+      </h1>
+
+      {/* Formulário */}
+      <form
+        onSubmit={handleSubmit}
+        className="w-5/6 max-w-[360px] flex flex-col items-center gap-3 sm:gap-4"
+      >
+        {/* Campo de E-mail */}
+        <div className="relative w-5/6">
           <input
-            type="text"
+            type="email"
             placeholder="E-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block bg-white text-black hover:bg-gray-100 hover:shadow-lg w-full rounded-3xl pl-12 p-3 cursor-pointer
-            placeholder:text-lg placeholder-[#6B7280] focus:outline-none transition-all duration-300 ease-in-out"
+            className="block bg-white text-black w-full rounded-full pl-11 pr-4 py-2.5 sm:py-3
+              placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
           />
           <User
-            className="absolute top-3 left-3.5 pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2"
             color="#6B7280"
+            size={18}
           />
         </div>
 
-        {/* Password */}
-        <div className="relative w-[300px] mb-5">
+        {/* Campo de Senha */}
+        <div className="relative w-5/6">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="block bg-white text-black hover:bg-gray-100 hover:shadow-lg w-[300px] rounded-3xl pl-12 p-3 cursor-pointer 
-            placeholder:text-lg placeholder-[#6B7280] focus:outline-none transition-all duration-300 ease-in-out"
+            className="block bg-white text-black w-full rounded-full pl-11 pr-10 py-2.5 sm:py-3
+              placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
           />
           <LockKeyhole
-            className="absolute top-3 left-3.5 pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2"
             color="#6B7280"
+            size={18}
           />
-
-          {/* Botão de mostrar/ocultar senha */}
-          <span
+          <button
+            type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showPassword ? (
-              <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
-            ) : (
-              <EyeCloseIcon
-                size={20}
-                className="text-gray-500 dark:text-gray-400"
-              />
-            )}
-          </span>
+            {showPassword ? <EyeIcon size={18} /> : <EyeCloseIcon size={18} />}
+          </button>
         </div>
-        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-        <div className="w-[300px] text-center mb-5">
+
+        {error && (
+          <p className="text-red-400 text-sm text-center w-full">{error}</p>
+        )}
+
+        {/* Links */}
+        <div className="text-center mt-1 space-y-1">
           <Link
-            href={"#"}
-            className="relative text-base text-white cursor-pointer
-            after:content-[''] after:absolute after:left-0 after:-bottom-0.5
-            after:h-[1.5px] after:w-full after:bg-white
-            after:origin-center after:scale-x-0 after:transition-transform after:duration-300
-            hover:after:scale-x-100"
+            href="#"
+            className="text-xs sm:text-sm text-white hover:underline"
           >
             Esqueceu a senha?
           </Link>
-          <p className="text-base text-[#D2F5FB] font-light">
-            Não possui cadastro?
+          <p className="text-xs sm:text-sm text-[#D2F5FB] font-light">
+            Não possui cadastro?{" "}
             <Link
-              href={"/auth/register"}
-              className="relative text-white font-normal cursor-pointer
-              after:content-[''] after:absolute after:left-0 after:-bottom-0.5
-              after:h-[1.5px] after:w-full after:bg-white
-              after:origin-center after:scale-x-0 after:transition-transform 
-              after:duration-300 hover:after:scale-x-100"
+              href="/auth/register"
+              className="text-white font-medium hover:underline"
             >
-              {" "}
               Inscreva-se
             </Link>
           </p>
         </div>
-        <div className="w-[300px] mb-6">
-          <button
-            type="submit"
-            className="w-full bg-linear-to-r hover:scale-[102.5%] from-[#0C0869] from-5% cursor-pointer
-            to-[#15358D] rounded-3xl p-[10px] shadow text-2xl font-semibold text-white transition-all duration-300 ease-in-out"
-          >
-            Entrar
-          </button>
-        </div>
+
+        {/* Botão Entrar */}
+        <button
+          type="submit"
+          className="mt-3 w-5/6 py-2.5 sm:py-3 rounded-full text-white font-semibold text-sm sm:text-base
+          bg-[linear-gradient(90deg,#0C0869_0%,#15358D_100%)]
+          hover:scale-[1.03] transition-transform duration-300"
+        >
+          {loading ? (
+            <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" />
+          ) : (
+            "Entrar"
+          )}
+        </button>
       </form>
     </div>
   );

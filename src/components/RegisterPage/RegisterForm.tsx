@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle } from "lucide-react";
+import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
@@ -21,6 +21,7 @@ export default function RegisterForm() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const searchParams = useSearchParams();
   const [token, setToken] = useState<string>("");
@@ -85,16 +86,20 @@ export default function RegisterForm() {
 
     setError("");
 
+    setLoading(true);
     try {
       const { repeatPassword, ...dataToSend } = formData;
       const data = await authService.Register({ ...dataToSend, token });
       console.log(data);
+
+      setLoading(false);
 
       showCustomToast("Conta criada com sucesso! Faça login para continuar.", "success");
       setTimeout(() => {
         router.push("/auth/login");
       }, 1000);
     } catch (err: any) {
+      setLoading(false);
       console.log(err);
       setError(err.response?.data?.message);
       showCustomToast(err.response?.data?.message || "Erro ao criar conta.", "error");
@@ -249,11 +254,11 @@ export default function RegisterForm() {
 
         <button
           type="submit"
-          className="w-full rounded-full bg-gradient-to-r from-[#0C0869] to-[#15358D] 
-          text-white text-lg font-semibold py-3 shadow hover:scale-[1.02] 
-          transition-transform duration-300 mb-4"
+          className="w-full flex items-center justify-center bg-gradient-to-r hover:scale-[102.5%]
+          from-[#0C0869] to-[#15358D] rounded-3xl p-[10px] shadow text-2xl font-semibold
+          text-white transition-all duration-300 ease-in-out"
         >
-          Cadastrar
+          {loading ? <Loader2 className="animate-spin w-8 h-8 text-blue-600" /> : 'Cadastrar'}
         </button>
       </form>
     </div>

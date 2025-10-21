@@ -136,7 +136,10 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
                     onFocus={() => setIsFuncOpen(true)}
                     onBlur={() => setIsFuncOpen(false)}
                     value={formData.sector}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e)
+                      setIsFuncOpen(false)
+                    }}
                     className="w-full bg-transparent dark:text-[#ced3db] dark:bg-gray-900 text-sm outline-none text-[#344054] font-semibold appearance-none"
                   >
                     <option value="">Selecione o setor</option>

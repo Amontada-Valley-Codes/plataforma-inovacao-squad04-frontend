@@ -136,7 +136,8 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
         <t.In>
           <Card
             className={cn(
-              'cursor-grabbing gap-4 rounded-[8px] bg-[#fff] p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900 ring-2 ring-primary',
+              'cursor-grabbing gap-4 rounded-[8px] bg-[#fff] p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900',
+              'transition-all duration-150',
               className
             )}
           >
@@ -244,7 +245,12 @@ export const KanbanProvider = <
         delay: 250,
       }
     }),
-    useSensor(TouchSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 100,
+        delay: 250,
+      }
+    }),
     useSensor(KeyboardSensor)
   );
 
