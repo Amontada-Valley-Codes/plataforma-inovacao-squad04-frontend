@@ -2,31 +2,44 @@
 import { decodeJwt } from "@/lib/jwt";
 
 export function redirectByRole(token: string) {
-    const payload: any = decodeJwt(token);
-    const type = payload?.type_user as
-        | "COMMON"
-        | "ADMINISTRATOR"
-        | "EVALUATOR"
-        | "MANAGER"
-        | undefined;
+    try {
+        const payload: any = decodeJwt(token);
+        const type = payload?.type_user as
+            | "COMMON"
+            | "ADMINISTRATOR"
+            | "EVALUATOR"
+            | "MANAGER"
+            | undefined;
 
-    let route = "/";
+        let route = "/";
 
-    switch (type) {
-        case "ADMINISTRATOR":
-            route = "/admin/companies?role=admin";
-            break;
-        case "MANAGER":
-            route = "/gestor/dashboard?role=gestor";
-            break;
-        case "EVALUATOR":
-            route = "/avaliador?role=avaliador";
-            break;
-        case "COMMON":
-        default:
-            route = "/user";
-            break;
+        switch (type) {
+            case "ADMINISTRATOR":
+                route = "/admin/companies?role=admin";
+                break;
+
+            case "MANAGER":
+                route = "/company/1/dashboard?role=gestor";
+                // 🔧 substitui o "1" pelo ID dinâmico se quiser
+                break;
+
+            case "EVALUATOR":
+                route = "/avaliador/dashboard?role=avaliador";
+                break;
+
+            case "COMMON":
+                route = "/user/empresa?role=usuario";
+                break;
+
+            default:
+                route = "/";
+                break;
+        }
+
+        // Redireciona o usuário
+        window.location.href = route;
+    } catch (error) {
+        console.error("Erro ao redirecionar por role:", error);
+        window.location.href = "/";
     }
-
-    window.location.href = route;
 }
