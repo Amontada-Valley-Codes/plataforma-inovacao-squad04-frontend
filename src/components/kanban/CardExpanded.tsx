@@ -22,7 +22,7 @@ import {
   experimentationCommentSections,
 } from "./commentsData"
 import React, { useEffect } from "react"
-import { Card } from "../ui/card"
+import { useBreakpoints } from "@/hooks/useBreakpoints"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -36,13 +36,40 @@ type CardExpandedLayoutProps = {
 }
 
 const CardExpandedLayout = ({ className, mainContent, commentsContent, featureId, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack }: CardExpandedLayoutProps) => {
+  const { isDesktop } = useBreakpoints()
+
   return (
-    <div className={cn("flex flex-1 min-h-0 bg-white w-full rounded-b-2xl", className)}>
-      <div className="flex flex-col w-[55%] h-full bg-white rounded-b-2xl">
-        <div className="flex-1 overflow-y-auto px-8 py-6 scrollbar-hidden">
+    <div className={cn("flex flex-col lg:flex-row flex-1 min-h-0 bg-white w-full rounded-b-2xl overflow-y-auto", className)}>
+      <div className="flex flex-col w-full lg:w-[55%] bg-white rounded-b-2xl">
+        <div className="flex-1 lg:overflow-y-auto px-8 py-6 scrollbar-hidden">
           {mainContent}
         </div>
 
+        {isDesktop && (
+          <div className="sticky bottom-0 left-0 w-full bg-white border-t flex justify-center py-4 px-8">
+            <div className={`w-full flex items-center gap-12 ${
+              !isFirstColumn && !isLastColumn ?
+              "justify-center"
+              : isLastColumn
+              ? "justify-start"
+              : "justify-end"
+            }`}>
+              {!isFirstColumn && handleMoveBack && (
+                <PreviousButton className="w-45" featureId={featureId} handleMoveBack={handleMoveBack} />
+              )}
+              {!isLastColumn && handleApproveAndMove && (
+                <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove} />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex w-full lg:w-[45%] h-full bg-[#D9D9D9]">
+        {commentsContent}
+      </div>
+
+      {!isDesktop && (
         <div className="sticky bottom-0 left-0 w-full bg-white border-t flex justify-center py-4 px-8">
           <div className={`w-full flex items-center gap-12 ${
             !isFirstColumn && !isLastColumn ?
@@ -52,18 +79,14 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, featureId
             : "justify-end"
           }`}>
             {!isFirstColumn && handleMoveBack && (
-              <PreviousButton className="w-45" featureId={featureId} handleMoveBack={handleMoveBack} />
+              <PreviousButton className="w-45 py-3" featureId={featureId} handleMoveBack={handleMoveBack} />
             )}
             {!isLastColumn && handleApproveAndMove && (
-              <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove} />
+              <ForwardButton className="w-45 py-3" featureId={featureId} handleApproveAndMove={handleApproveAndMove} />
             )}
           </div>
         </div>
-      </div>
-
-      <div className="flex w-[45%] h-full bg-[#D9D9D9]">
-        {commentsContent}
-      </div>
+      )}
     </div>
   )
 }
@@ -136,7 +159,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, featu
         onClose={onClose}
       >
         <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl w-[90vw] md:w-[80vw] h-[90vh] overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl w-[95vw] md:w-[80vw] h-[90vh] overflow-hidden flex flex-col">
             <CardExpandedHeader onClose={onClose} columns={columns} currentColumnId={cardData?.column}/>
             {currentColumnName === "Desafios" && (
               <CardExpandedLayout
@@ -241,20 +264,36 @@ type CardExpandedHeaderProps = {
 }
 
 const CardExpandedHeader = ({ onClose, columns, currentColumnId, }: CardExpandedHeaderProps) => {
+  const { isMobile, isDesktop, isTablet} = useBreakpoints()
+
   return (
-    <div className="relative w-full flex justify-center items-center px-16 border-b-2 border-[#A9A9A9]">
-      <div className="flex justify-center items-center gap-5">
+    <div className="relative w-full flex justify-between items-center px-8 md:px-16 border-b-2 border-[#A9A9A9]">
+      {!isMobile && (
+        <div className="flex justify-center items-center h-full gap-5">
           {columns.map((column) => (
-          <div key={column.id} className={`flex justify-center items-center p-3 text-base font-semibold 
-          ${column.id === currentColumnId ? "bg-[#D9D9D9] text-[#848484]" : "text-[#666]"}`}>
-            {column.name}
-          </div>
-        ))}
-      </div>
+            <div key={column.id} className={`flex justify-center p-2 lg:p-3 items-center h-full text-sm lg:text-base font-semibold 
+            ${column.id === currentColumnId ? "bg-[#D9D9D9] text-[#848484]" : "text-[#666]"}`}>
+              {column.name}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isMobile && (
+        <div className="flex justify-center items-center h-full gap-5">
+          {columns.map((column) => {
+            if (column.id === currentColumnId) return (
+              <div key={column.id} className="flex justify-center py-3 items-center h-full text-lg text-[#666] font-semibold ">
+                {column.name}
+              </div>
+            )
+          })}
+        </div>
+      )}
       
       <X 
         size={20} 
-        className="absolute right-4 top-[14px] text-[#666] cursor-pointer"
+        className="text-[#666] cursor-pointer"
         onClick={onClose}
       />
     </div>
