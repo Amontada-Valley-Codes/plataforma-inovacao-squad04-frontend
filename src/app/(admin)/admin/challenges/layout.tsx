@@ -8,7 +8,7 @@ export default function ChallengeLayout({
   return (
     <div className="flex flex-col gap-1 w-full">
       {/* Filtro */}
-      <div className="w-full px-2 sm:px-4 md:px-6">
+      <div className="w-full px-2 sm:px-6">
         <ChallengeFilter IsChallenge />
       </div>
 

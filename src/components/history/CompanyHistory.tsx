@@ -90,7 +90,7 @@ type Visibility = "Public" | "Private" | string;
     };
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
         {filtered.map((challenge: Challenge) => {
             const isPublic = challenge.Visibility === "Public";
 
