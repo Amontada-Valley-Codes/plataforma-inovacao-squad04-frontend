@@ -1,4 +1,3 @@
-import { LogOut } from "lucide-react";
 import api from "../axios"
 import { ENDPOINTS } from "../endpoints"
 import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse } from "../payloads/auth.payload"

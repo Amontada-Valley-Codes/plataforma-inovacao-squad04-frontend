@@ -23,15 +23,17 @@ export const ENDPOINTS = {
     SHOW_ENTERPRISE_CHALLENGE: '/challenge',
     SHOW_ALL_PUBLIC_CHALLENGE: '/challenge/public',
     SHOW_CHALLENGE_HISTORICAL_ENTERPRISE: '/challenge/historical',
-    SHOW_ONE_CHALLENGE: '/challenge/',
-    UPDATE_CHALLENGE: '/challenge/'
+    SHOW_ONE_CHALLENGE: (id: string) => `/challenge/${id}`,
+    UPDATE_CHALLENGE: (id: string) => `/challenge/${id}`,
+    UPDATE_STATUS: (id: string) => `/challenge/${id}/status`,
+    UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visiblity`
   },
 
   CHECKLIST: {
-    CREATE_CHECKLIST: '/checklist/',
-    SHOW_CHECKLIST: '/checklist/',
-    UPDATE_STATUS_CHECKLIST: '/checklist/',
-    DELETE_CHECKLIST: '/checklist/',
-    UPDATE_ITEM_CHECKLIST: '/checklist/' 
+    CREATE_CHECKLIST: (id: string) => `/checklist/${id}`,
+    SHOW_CHECKLIST: (id: string) => `/checklist/${id}`,
+    UPDATE_STATUS_CHECKLIST: (id: string) => `/checklist/${id}`,
+    DELETE_CHECKLIST: (id: string) => `/checklist/${id}`,
+    UPDATE_ITEM_CHECKLIST: (id: string) => `/checklist/${id}`
   }
 }
