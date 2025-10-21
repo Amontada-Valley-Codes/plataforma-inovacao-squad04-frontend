@@ -6,6 +6,7 @@ import {
   SlidersHorizontal,
   Menu,
   CalendarDays,
+  ChevronDown
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 
@@ -25,12 +26,17 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
     dataInicio: "",
     dataFim: "",
   });
-
+  const [isFuncOpen, setIsFuncOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const handleChange = (field: string, value: string) => {
-    setFormData({ ...formData, [field]: value });
-    setErrors({ ...errors, [field]: "" }); // limpa erro ao digitar
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const validateForm = () => {
@@ -108,9 +114,10 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                   <Building2 className="text-[#98A2B3] mr-2" size={18} />
                   <input
                     type="text"
+                    name="titulo"
                     placeholder="Título do Desafio"
                     value={formData.titulo}
-                    onChange={(e) => handleChange("titulo", e.target.value)}
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
@@ -121,14 +128,36 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
 
               {/* Setor */}
               <div>
-                <div className={inputClass(!!errors.setor)}>
+                <div className={`relative ${inputClass(!!errors.setor)}`}>
                   <SlidersHorizontal className="text-[#98A2B3] mr-2" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Setor"
+                  <select
+                    name="setor"
+                    onFocus={() => setIsFuncOpen(true)}
+                    onBlur={() => setIsFuncOpen(false)}
                     value={formData.setor}
-                    onChange={(e) => handleChange("setor", e.target.value)}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                    onChange={(e) => {
+                      handleChange(e)
+                      setIsFuncOpen(false)
+                    }}
+                    className="w-full bg-transparent dark:text-[#ced3db] dark:bg-gray-900 text-sm outline-none text-[#344054] font-semibold appearance-none"
+                  >
+                    <option value="">Selecione o setor</option>
+                    <option value="TECHNOLOGY">Tecnologia</option>
+                    <option value="HEALTH">Saúde</option>
+                    <option value="EDUCATION">Educação</option>
+                    <option value="ENVIRONMENT">Ambiental</option>
+                    <option value="BUSINESS">Negócios</option>
+                    <option value="SOCIAL">Social</option>
+                    <option value="ENGINEERING">Engenharia</option>
+                    <option value="AGRICULTURE">Agricultura</option>
+                    <option value="DESIGN">Design</option>
+                    <option value="OTHER">Outro</option>
+                  </select>
+                  <ChevronDown
+                    size={20}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-[#ced3db] transition-transform duration-300 ${
+                      isFuncOpen ? "rotate-180" : "rotate-0"
+                    }`}
                   />
                 </div>
                 {errors.setor && (
@@ -141,12 +170,11 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                 <div className={textareaClass(!!errors.alinhamento)}>
                   <Building2 className="text-[#98A2B3] mr-2 mt-1" size={18} />
                   <input
+                    name="alinhamento"
                     type="text"
                     placeholder="Alinhamento estratégico"
                     value={formData.alinhamento}
-                    onChange={(e) =>
-                      handleChange("alinhamento", e.target.value)
-                    }
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
@@ -162,10 +190,11 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                 <div className={textareaClass(!!errors.potencial)}>
                   <SlidersHorizontal className="text-[#98A2B3] mr-2 mt-1" size={18} />
                   <input
+                    name="potencial"
                     type="text"
                     placeholder="Potencial inovador"
                     value={formData.potencial}
-                    onChange={(e) => handleChange("potencial", e.target.value)}
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
@@ -181,10 +210,11 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                 <div className={textareaClass(!!errors.relevancia)}>
                   <SlidersHorizontal className="text-[#98A2B3] mr-2 mt-1" size={18} />
                   <input
+                    name="relevancia"
                     type="text"
                     placeholder="Relevância para o negócio"
                     value={formData.relevancia}
-                    onChange={(e) => handleChange("relevancia", e.target.value)}
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
@@ -200,9 +230,10 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                 <div className={textareaClass(!!errors.descricao)}>
                   <Menu className="text-[#98A2B3] mr-2 mt-1" size={18} />
                   <textarea
+                    name="descricao"
                     placeholder="Descrição"
                     value={formData.descricao}
-                    onChange={(e) => handleChange("descricao", e.target.value)}
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none resize-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
@@ -218,6 +249,7 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                 <div className={dateInputClass(!!errors.dataInicio)}>
                   <CalendarDays className="text-[#98A2B3] mr-2" size={18} />
                   <input
+                    name="dataInicio"
                     type={formData.dataInicio ? "date" : "text"}
                     placeholder="Data início"
                     value={formData.dataInicio}
@@ -225,7 +257,7 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                     onBlur={(e) => {
                       if (!e.target.value) e.target.type = "text";
                     }}
-                    onChange={(e) => handleChange("dataInicio", e.target.value)}
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
@@ -233,6 +265,7 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                 <div className={dateInputClass(!!errors.dataFim)}>
                   <CalendarDays className="text-[#98A2B3] mr-2" size={18} />
                   <input
+                    name="dataFim"
                     type={formData.dataFim ? "date" : "text"}
                     placeholder="Data final"
                     value={formData.dataFim}
@@ -240,7 +273,7 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
                     onBlur={(e) => {
                       if (!e.target.value) e.target.type = "text";
                     }}
-                    onChange={(e) => handleChange("dataFim", e.target.value)}
+                    onChange={handleChange}
                     className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
                   />
                 </div>
