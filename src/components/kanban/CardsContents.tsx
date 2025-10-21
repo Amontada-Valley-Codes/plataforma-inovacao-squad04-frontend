@@ -158,8 +158,8 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
-      <div className="flex justify-between mb-6">
-        <div className="">
+      <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
+        <div className="mb-6">
           <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
           <div className="flex gap-2">
             {categories.map((category) => (
@@ -177,7 +177,7 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
         </div>
 
         <div className="relative flex items-center">
-          <div className="flex  gap-4 items-center justify-center w-full max-w-md mx-auto">
+          <div className="flex gap-4 items-center xl:justify-center w-full max-w-md">
             <div className="flex flex-col items-center">
               <button 
                 className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${
@@ -211,8 +211,8 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
           <h1 className="text-[#0B2B72] text-2xl font-semibold mb-4">Canvas Rápido</h1>
 
           <div className="flex-1 flex flex-col gap-3">
-            <div className="flex gap-3 flex-1">
-              <div className="w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
+            <div className="flex flex-col md:flex-row gap-3 flex-1">
+              <div className="w-full md:w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
                 <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
                   Problema
                   <Bug size={20}/>
@@ -221,11 +221,11 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
                 <textarea
                   className="w-full flex-1 bg-transparent outline-none resize-none overflow-y-auto"
                   placeholder="Qual o resultado esperado?"
-                  rows={8}
+                  rows={6}
                 />
               </div>
 
-              <div className="w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
+              <div className="w-full md:w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
                 <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
                   Solução
                   <Lightbulb size={20}/>
@@ -234,6 +234,7 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
                 <textarea
                   className="w-full flex-1 bg-transparent outline-none resize-none h-full overflow-y-auto"
                   placeholder="Qual o resultado esperado?"
+                  rows={6}
                 />
               </div>
             </div>
@@ -464,7 +465,7 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
       )}
       {isOpen && (
         <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
-          <div className="bg-white rounded-[12px] shadow-xl p-4 w-[30vw] relative">
+          <div className="bg-white rounded-[12px] shadow-xl p-4 w-[80vw] sm:w-[50vw] lg:w-[30vw] relative">
             <X 
               onClick={() => setIsOpen(false)}
               size={18} 

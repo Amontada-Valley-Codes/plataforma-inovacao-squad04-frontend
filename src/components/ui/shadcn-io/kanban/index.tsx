@@ -244,7 +244,12 @@ export const KanbanProvider = <
         delay: 250,
       }
     }),
-    useSensor(TouchSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 100,
+        delay: 250,
+      }
+    }),
     useSensor(KeyboardSensor)
   );
 
