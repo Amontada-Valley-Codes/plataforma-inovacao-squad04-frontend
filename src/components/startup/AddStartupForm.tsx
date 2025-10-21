@@ -7,7 +7,6 @@ import {
   Cpu,
   ChevronDown,
   User,
-  Mail,
   MapPin,
   Paperclip,
   Github,
@@ -15,10 +14,12 @@ import {
   Globe,
   Loader2,
   CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { Modal } from "../ui/modal";
-import { startupService } from "@/api/services/startup.service"; 
+import { startupService } from "@/api/services/startup.service";
 import { CreateStartupPayload } from "@/api/payloads/startup.payload";
+import toast, { Toaster } from "react-hot-toast";
 
 type Props = {
   isOpen: boolean;
@@ -38,7 +39,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
     name: "",
     cnpj: "",
     industry_segment: "",
-    problems_solved: "", 
+    problems_solved: "",
     technologies_used: "",
     maturity_stage: "",
     location: "",
@@ -50,6 +51,30 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+
+  const showCustomToast = (message: string, type: "success" | "error") => {
+    toast.custom((t) => (
+      <div
+        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
+        text-white font-medium transition-all duration-300 transform ${
+          t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+        }
+        ${
+          type === "success"
+            ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
+            : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
+        }`}
+      >
+        {type === "success" ? (
+          <CheckCircle2 className="text-green-300" size={22} />
+        ) : (
+          <XCircle className="text-red-300" size={22} />
+        )}
+        <span>{message}</span>
+      </div>
+    ));
+  };
+
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: "" });
@@ -60,9 +85,14 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
 
     if (!formData.name.trim()) newErrors.name = "Nome é obrigatório";
     if (!formData.cnpj.trim()) newErrors.cnpj = "CNPJ é obrigatório";
-    if (!formData.industry_segment.trim()) newErrors.industry_segment = "Segmento de industria é obrigatório";
-    if (!formData.technologies_used.trim()) newErrors.technologies_used = "Tecnologias Utilizadas são obrigatórias";
-    if (!formData.maturity_stage.trim()) newErrors.maturity_stage = "Selecione o estágio de maturidade";
+    if (!formData.industry_segment.trim())
+      newErrors.industry_segment = "Segmento de indústria é obrigatório";
+    if (!formData.problems_solved.trim())
+      newErrors.problems_solved = "Problema resolvido é obrigatório";
+    if (!formData.technologies_used.trim())
+      newErrors.technologies_used = "Tecnologias utilizadas são obrigatórias";
+    if (!formData.maturity_stage.trim())
+      newErrors.maturity_stage = "Selecione o estágio de maturidade";
     if (!formData.founders.trim()) newErrors.founders = "Líder é obrigatório";
     if (!formData.pitch.trim()) newErrors.pitch = "Pitch é obrigatório";
     if (!formData.location.trim()) newErrors.location = "Endereço é obrigatório";
@@ -72,50 +102,67 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+  if (!validateForm()) {
+    showCustomToast("Preencha todos os campos obrigatórios.", "error");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  setLoading(true);
 
-      const payload: CreateStartupPayload = {
-        name: formData.name,
-        cnpj: formData.cnpj,
-        industry_segment: formData.industry_segment,
-        problems_solved: [formData.problems_solved],
-        technologies_used: formData.technologies_used.split(",").map(t => t.trim()),
-        maturity_stage: formData.maturity_stage,
-        location: formData.location,
-        founders: formData.founders.split(",").map(f => f.trim()),
-        pitch: formData.pitch,
-        useful_links: {
-          github: formData.github,
-          linkedin: formData.linkedin,
-          website: formData.website,
-        }
-      };
+  try {
+    const payload: CreateStartupPayload = {
+      name: formData.name,
+      cnpj: formData.cnpj,
+      industry_segment: formData.industry_segment,
+      problems_solved: [formData.problems_solved],
+      technologies_used: formData.technologies_used.split(",").map((t) => t.trim()),
+      maturity_stage: formData.maturity_stage,
+      location: formData.location,
+      founders: formData.founders.split(",").map((f) => f.trim()),
+      pitch: formData.pitch,
+      useful_links: {
+        github: formData.github,
+        linkedin: formData.linkedin,
+        website: formData.website,
+      },
+    };
 
-      const response = await startupService.createStartup(payload);
-      console.log("✅ Startup criada com sucesso:", response);
+    await Promise.all([
+      startupService.createStartup(payload),
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+    ]);
+
+  
+    showCustomToast("Startup cadastrada com sucesso!", "success");
+    setSuccess(true);
+
+
+    setTimeout(() => {
+      setSuccess(false);
       onClose();
-    } catch (error: any) {
-      console.error("❌ Erro ao criar startup:", error.response?.data || error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }, 1500);
+  } catch (error: any) {
+    console.error("❌ Erro ao criar startup:", error.response?.data || error.message);
+    showCustomToast("Erro ao cadastrar startup.", "error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const inputClass = (field: string) =>
     `flex items-center h-10 rounded-lg border px-3 text-sm transition-all duration-200 
-     ${errors[field]
-       ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/20"
-       : "bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900"}`;
+     ${
+       errors[field]
+         ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/20"
+         : "bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900"
+     }`;
 
   return (
     <div>
+
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-[500px] p-5">
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg w-full max-w-md p-6">
-
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg w-full max-w-md p-6 relative">
             {loading && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 z-50">
                 <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
@@ -144,6 +191,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
               </button>
             </div>
 
+            {/* Campos */}
             <div className="space-y-3">
               {/* Nome */}
               <div>
@@ -175,7 +223,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                 {errors.cnpj && <p className="text-xs text-red-500 mt-1">{errors.cnpj}</p>}
               </div>
 
-              {/* Tecnologias */}
+              {/* Tecnologia usada */}
               <div>
                 <div className={`${inputClass("technologies_used")} relative`}>
                   <Cpu className="text-[#98A2B3] mr-2" size={16} />
@@ -207,7 +255,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                 )}
               </div>
 
-              {/* Segmento de industria */}
+              {/* Segmento */}
               <div>
                 <div className={`${inputClass("industry_segment")} relative`}>
                   <Building2 className="text-[#98A2B3] mr-2" size={16} />
@@ -218,14 +266,14 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                     onBlur={() => setIsIndustryOpen(false)}
                     className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
                   >
-                    <option disabled>Segmento de industria</option>
+                    <option disabled>Segmento de indústria</option>
                     <option value="TECHNOLOGY">Tecnologia</option>
                     <option value="FINANCE">Finanças</option>
                     <option value="HEALTH">Saúde</option>
-                    <option value="ADMINISTRATIVE">Administrativo</option>
+                    <option value="EDUCATION">Educação</option>
                     <option value="TOURISM">Turismo</option>
                     <option value="SECURITY">Segurança</option>
-                    <option value="EDUCATION">Educação</option>
+                    <option value="OTHER">Outros</option>
                   </select>
                   <ChevronDown
                     size={18}
@@ -239,7 +287,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                 )}
               </div>
 
-              {/* Problemas Resolvidos */}
+              {/* Problema Resolvido */}
               <div>
                 <div className={`${inputClass("problems_solved")} relative`}>
                   <User className="text-[#98A2B3] mr-2" size={16} />
@@ -250,7 +298,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                     onBlur={() => setIsProblemsOpen(false)}
                     className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
                   >
-                    <option disabled >Problema Resolvido</option>
+                    <option disabled>Problema Resolvido</option>
                     <option value="HEALTHCARE">Saúde</option>
                     <option value="EDUCATION">Educação</option>
                     <option value="FINANCE">Finanças</option>
@@ -294,7 +342,9 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                     }`}
                   />
                 </div>
-                {errors.maturity_stage && <p className="text-xs text-red-500 mt-1">{errors.maturity_stage}</p>}
+                {errors.maturity_stage && (
+                  <p className="text-xs text-red-500 mt-1">{errors.maturity_stage}</p>
+                )}
               </div>
 
               {/* Líder */}
@@ -309,7 +359,9 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                     className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
                   />
                 </div>
-                {errors.founders && <p className="text-xs text-red-500 mt-1">{errors.founders}</p>}
+                {errors.founders && (
+                  <p className="text-xs text-red-500 mt-1">{errors.founders}</p>
+                )}
               </div>
 
               {/* Endereço */}
@@ -324,10 +376,12 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                     className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
                   />
                 </div>
-                {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+                {errors.location && (
+                  <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+                )}
               </div>
 
-              {/* Pitch / Descrição */}
+              {/* Pitch */}
               <div>
                 <div className={`${inputClass("pitch")} h-20 items-start`}>
                   <FileText className="text-[#98A2B3] mr-2 mt-2" size={16} />
@@ -395,9 +449,15 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-1/2 ml-2 bg-[#15358D] text-white py-2 rounded-lg font-medium hover:bg-[#0f2a6d] dark:bg-blue-800 dark:hover:bg-blue-900"
+                className="w-1/2 ml-2 bg-[#15358D] text-white py-2 rounded-lg font-medium hover:bg-[#0f2a6d] dark:bg-blue-800 dark:hover:bg-blue-900 flex items-center justify-center gap-2"
               >
-                Adicionar Startup
+                {loading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" /> Cadastrando...
+                  </>
+                ) : (
+                  "Adicionar Startup"
+                )}
               </button>
             </div>
           </div>
