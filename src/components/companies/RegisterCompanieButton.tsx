@@ -21,11 +21,12 @@ export default function RegisterCOmpanieBtn() {
       >
         <PlusCircle className="h-4 w-4 md:h-5 md:w-5 max-[832px]:h-4 max-[832px]:w-4" />
 
-{/* curto até 832px */}
-<span className="hidden max-[832px]:inline">+ Empresa</span>
+      {/* curto até 832px */}
+      <span className="hidden max-[832px]:inline">+ Empresa</span>
 
-{/* completo a partir de 833px */}
-<span className="hidden min-[833px]:inline">Adicionar Empresa</span>
+      {/* completo a partir de 833px */}
+      <span className="hidden min-[833px]:inline">Adicionar Empresa</span>
+      
       </button>
 
 

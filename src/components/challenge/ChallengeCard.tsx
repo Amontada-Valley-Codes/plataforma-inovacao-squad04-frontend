@@ -171,7 +171,7 @@ export default function ChallengeCard({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
         {filtered.map((challenge) => {
           const isPublic = challenge.Visibility === "Public";
           const alreadyApplied = applied.has(challenge.id);
