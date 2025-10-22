@@ -47,7 +47,7 @@ export type ShowAllChallengeResponse = {
     image: null
   }
   enterpriseName?: string
-}[]
+}
 
 export type ShowOneChallengeResponse = {
   id: string
