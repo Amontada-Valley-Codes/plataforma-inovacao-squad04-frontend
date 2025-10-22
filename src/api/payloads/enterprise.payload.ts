@@ -50,3 +50,28 @@ export type ShowAllEnterpriseResponse = {
   linkedin?: string | null | undefined;
   locationUrl?: string | null | undefined
 }
+
+export type ShowOneEnterpriseResponse = {
+  id: string
+  name: string
+  cnpj: string
+  sector: string
+  description: string
+  address: string
+  email: string
+  gestorEmail: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  User: string[] | []
+  _count: {
+    Users: number
+  }
+  logo?: string;
+  cover?: string | null | undefined;
+  gallery?: string[] | undefined;
+  instagram?: string | null | undefined;
+  whatsapp?: string | null | undefined;
+  linkedin?: string | null | undefined;
+  locationUrl?: string | null | undefined
+}

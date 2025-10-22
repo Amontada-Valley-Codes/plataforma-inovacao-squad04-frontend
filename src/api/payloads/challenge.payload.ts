@@ -46,7 +46,8 @@ export type ShowAllChallengeResponse = {
     name: string
     image: null
   }
-}
+  enterpriseName?: string
+}[]
 
 export type ShowOneChallengeResponse = {
   id: string
@@ -63,6 +64,7 @@ export type ShowOneChallengeResponse = {
   updatedAt: string
   enterpriseId: string
   usersId: string
+  enterpriseName?: string
 }
 
 export type ChangeStatusPayload = {
