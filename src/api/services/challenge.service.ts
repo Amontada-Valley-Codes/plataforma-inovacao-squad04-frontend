@@ -9,7 +9,7 @@ export const ChallengeService = {
     return response.data;
   },
 
-  async showAllChallenges(): Promise<ShowAllChallengeResponse> {
+  async showAllChallenges(): Promise<ShowAllChallengeResponse[]> {
     const response = await api.get(ENDPOINTS.CHALLENGE.SHOW_ENTERPRISE_CHALLENGE);
     console.log(response.data);
     return response.data;

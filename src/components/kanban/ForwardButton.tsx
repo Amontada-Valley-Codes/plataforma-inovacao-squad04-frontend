@@ -2,11 +2,11 @@ import { cn } from "@/lib/utils"
 
 type ForwardButtonProps = {
   className?: string;
-  featureId: string | undefined;
+  challengeId: string | undefined;
   handleApproveAndMove: (featureId: string | undefined) => void;
 }
 
-export default function ForwardButton({ className, handleApproveAndMove, featureId }: ForwardButtonProps) {
+export default function ForwardButton({ className, handleApproveAndMove, challengeId }: ForwardButtonProps) {
   return (
     <button
       className={cn("flex justify-center w-20 px-1 py-2", 
@@ -14,7 +14,7 @@ export default function ForwardButton({ className, handleApproveAndMove, feature
       "text-[12px] cursor-pointer", className)}
       onClick={(e) => {
         e.stopPropagation()
-        handleApproveAndMove(featureId)
+        handleApproveAndMove(challengeId)
       }}
     >
       Avançar

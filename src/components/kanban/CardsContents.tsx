@@ -7,11 +7,11 @@ import PreviousButton from "./PreviousButton";
 
 type CardChallangeContentProps = {
   challangeTitle: string;
-  categories: string[];
+  category: string;
   description: string;
 }
 
-export const CardChallangeContent = ({ challangeTitle, categories, description }: CardChallangeContentProps) => {
+export const CardChallangeContent = ({ challangeTitle, category, description }: CardChallangeContentProps) => {
   return (
     //conteudo do card de desafio
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
@@ -19,11 +19,9 @@ export const CardChallangeContent = ({ challangeTitle, categories, description }
       <div className="mb-6">
         <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
         <div className="flex gap-2">
-          {categories.map((category) => (
-            <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-              {category.toUpperCase()}
-            </button>
-          ))}
+          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+            {category.toUpperCase()}
+          </button>
         </div>
       </div>
 
@@ -79,22 +77,20 @@ export const CardChallangeContent = ({ challangeTitle, categories, description }
 
 type CardPreScreeningContentProps = {
   challangeTitle: string;
-  categories: string[];
+  category: string;
   description: string;
 }
 
-export const CardPreScreeningContent = ({ challangeTitle, categories, description }: CardPreScreeningContentProps) => {
+export const CardPreScreeningContent = ({ challangeTitle, category, description }: CardPreScreeningContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
       <div className="mb-6">
         <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
         <div className="flex gap-2">
-          {categories.map((category) => (
-            <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-              {category.toUpperCase()}
-            </button>
-          ))}
+          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+            {category.toUpperCase()}
+          </button>
         </div>
       </div>
 
@@ -144,11 +140,11 @@ export const CardPreScreeningContent = ({ challangeTitle, categories, descriptio
 
 type CardDetailedScreeningContentProps = {
   challangeTitle: string;
-  categories: string[];
+  category: string;
   description: string;
 }
 
-export const CardDetailedScreeningContent = ({ challangeTitle, categories, description }: CardDetailedScreeningContentProps) => {
+export const CardDetailedScreeningContent = ({ challangeTitle, category, description }: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
   const [isPublic, setIsPublic] = useState(false)
@@ -162,11 +158,10 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
         <div className="mb-6">
           <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
           <div className="flex gap-2">
-            {categories.map((category) => (
-              <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-                {category.toUpperCase()}
-              </button>
-            ))}
+            <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+              {category.toUpperCase()}
+            </button>
+
             <button 
               onClick={() => setIsOpen(true)}
               className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1"
@@ -486,11 +481,11 @@ export const CardDetailedScreeningContent = ({ challangeTitle, categories, descr
 
 type CardIdeationContentProps = {
   challangeTitle: string;
-  categories: string[];
+  category: string;
   description: string;
 }
 
-export const CardIdeationContent = ({ challangeTitle, categories, description }: CardIdeationContentProps) => {
+export const CardIdeationContent = ({ challangeTitle, category, description }: CardIdeationContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
@@ -516,11 +511,9 @@ export const CardIdeationContent = ({ challangeTitle, categories, description }:
             <p className="text-[#666]">TAGS</p>
           </div>
           <div className="flex gap-2">
-            {categories.map((category) => (
-              <button className="border border-[#0B2B70] text-[12px] text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1">
-                {category.toUpperCase()}
-              </button>
-            ))}
+            <button className="border border-[#0B2B70] text-[12px] text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1">
+              {category.toUpperCase()}
+            </button>
           </div>
         </div>
 
@@ -552,21 +545,19 @@ export const CardIdeationContent = ({ challangeTitle, categories, description }:
 
 type CardExperimentationContentProps = {
   challangeTitle: string;
-  categories: string[];
+  category: string;
   description: string;
 }
 
-export const CardExperimentationContent = ({ challangeTitle, categories, description }: CardExperimentationContentProps) => {
+export const CardExperimentationContent = ({ challangeTitle, category, description }: CardExperimentationContentProps) => {
  return (
   <div  className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
     <div className="mb-6">
       <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
       <div className="flex gap-2">
-        {categories.map((category) => (
-          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-            {category.toUpperCase()}
-          </button>
-        ))}
+        <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+          {category.toUpperCase()}
+        </button>
       </div>
     </div>
     

@@ -2,11 +2,11 @@ import { cn } from "@/lib/utils"
 
 type PreviousButtonProps = {
   className?: string;
-  featureId: string | undefined;
+  challengeId: string | undefined;
   handleMoveBack: (featureId: string | undefined) => void;
 }
 
-export default function PreviousButton({ className, handleMoveBack, featureId }: PreviousButtonProps) {
+export default function PreviousButton({ className, handleMoveBack, challengeId }: PreviousButtonProps) {
   return (
     <button
       className={cn("flex w-20 justify-center px-1 py-2",
@@ -14,7 +14,7 @@ export default function PreviousButton({ className, handleMoveBack, featureId }:
         "text-[12px] cursor-pointer", className)}
       onClick={(e) => {
         e.stopPropagation()
-        handleMoveBack(featureId)
+        handleMoveBack(challengeId)
       }}
     >
       Voltar
