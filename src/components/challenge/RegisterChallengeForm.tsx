@@ -6,9 +6,12 @@ import {
   SlidersHorizontal,
   Menu,
   CalendarDays,
-  ChevronDown
+  ChevronDown,
+  Loader2,
+  CheckCircle2
 } from "lucide-react";
 import { Modal } from "../ui/modal";
+import { ChallengeService } from "@/api/services/challenge.service";
 
 type Props = {
   isOpen: boolean;
@@ -28,6 +31,8 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
   });
   const [isFuncOpen, setIsFuncOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -57,14 +62,45 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
     return newErrors;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    console.log("Dados salvos:", formData);
-    onClose();
+
+    try {
+      setLoading(true);
+
+      const dataInicioISO = new Date(formData.dataInicio).toISOString();
+      const dataFimISO = new Date(formData.dataFim).toISOString();
+
+      const payload = {
+        name: formData.titulo,
+        startDate: dataInicioISO,
+        endDate: dataFimISO,
+        area: formData.setor,
+        description: formData.descricao,
+        strategic_alignment: formData.alinhamento,
+        innovative_potential: formData.potencial,
+        business_relevance: formData.relevancia
+      }
+
+      const response = await ChallengeService.createChallenge(payload);
+      console.log("Desafio criado:", response);
+
+      setTimeout(() => {
+        setLoading(false);
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          onClose();
+        }, 2000);
+      }, 1500);
+    } catch (error) {
+      setLoading(false);
+      console.error("Erro ao criar desafio:", error);
+    }
   };
 
   const inputClass = (hasError: boolean) =>
@@ -93,6 +129,25 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-5 lg:p-10">
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 dark:border-gray-800 dark:bg-gray-900">
+
+            {loading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 z-50">
+                <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
+                <p className="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Criando desafio...
+                </p>
+              </div>
+            )}
+
+            {success && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-900/95 z-50 animate-fade-in">
+                <CheckCircle2 className="text-green-600 dark:text-green-400" size={48} />
+                <p className="mt-3 text-lg font-semibold text-green-700 dark:text-green-300">
+                  Desafio criado com sucesso!
+                </p>
+              </div>
+            )}
+
             {/* Cabeçalho */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#15358D] dark:text-blue-800">

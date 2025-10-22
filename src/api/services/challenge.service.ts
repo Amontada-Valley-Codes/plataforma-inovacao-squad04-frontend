@@ -3,7 +3,7 @@ import { ENDPOINTS } from "../endpoints";
 import { ChangeStatusPayload, ChangeStatusResponse, ChangeVisibilityPayload, ChangeVisibilityResponse, CreateChallengePayload, CreateChallengeResponse, ShowAllChallengeResponse, ShowAllPubliChallengeResponse, ShowOneChallengeResponse } from "../payloads/challenge.payload";
 
 export const ChallengeService = {
-  async createEnterprise(createChallengePayload: CreateChallengePayload): Promise<CreateChallengeResponse> {
+  async createChallenge(createChallengePayload: CreateChallengePayload): Promise<CreateChallengeResponse> {
     const response = await api.post(ENDPOINTS.CHALLENGE.CREATE, createChallengePayload);
     console.log(response.data);
     return response.data;
