@@ -106,3 +106,14 @@ export type ChangeVisibilityResponse = {
   enterpriseId: string
   usersId: string
 }
+
+export type ShowAllPubliChallengeResponse = {
+  id: string
+  name: string
+  endDate: string
+  status: string
+  visibility: string
+  Enterprise: {
+    name: string
+  }
+}

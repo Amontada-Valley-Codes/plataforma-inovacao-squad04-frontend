@@ -1,6 +1,6 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
-import { ChangeStatusPayload, ChangeStatusResponse, ChangeVisibilityPayload, ChangeVisibilityResponse, CreateChallengePayload, CreateChallengeResponse, ShowAllChallengeResponse, ShowOneChallengeResponse } from "../payloads/challenge.payload";
+import { ChangeStatusPayload, ChangeStatusResponse, ChangeVisibilityPayload, ChangeVisibilityResponse, CreateChallengePayload, CreateChallengeResponse, ShowAllChallengeResponse, ShowAllPubliChallengeResponse, ShowOneChallengeResponse } from "../payloads/challenge.payload";
 
 export const ChallengeService = {
   async createEnterprise(createChallengePayload: CreateChallengePayload): Promise<CreateChallengeResponse> {
@@ -31,5 +31,11 @@ export const ChallengeService = {
     const response = await api.patch(ENDPOINTS.CHALLENGE.UPDATE_VISIBILITY(id), changeVisibilityPayload);
     console.log(response.data);
     return response.data
-  }
+  },
+
+  async showAllPublicChallenges(): Promise<ShowAllPubliChallengeResponse> {
+    const response = await api.get(ENDPOINTS.CHALLENGE.SHOW_ALL_PUBLIC_CHALLENGE);
+    console.log(response.data);
+    return response.data;
+  },
 }
