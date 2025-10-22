@@ -38,6 +38,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
   const [formData, setFormData] = useState({
     name: "",
     cnpj: "",
+    email: "",
     industry_segment: "",
     problems_solved: "",
     technologies_used: "",
@@ -48,6 +49,8 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
     github: "",
     linkedin: "",
     website: "",
+    description: "",
+    liderEmail: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -82,6 +85,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
     const newErrors: { [key: string]: string } = {};
     if (!formData.name.trim()) newErrors.name = "Nome é obrigatório";
     if (!formData.cnpj.trim()) newErrors.cnpj = "CNPJ é obrigatório";
+    if (!formData.email.trim()) newErrors.email = "Email da startup é obrigatório";
     if (!formData.industry_segment.trim())
       newErrors.industry_segment = "Segmento de indústria é obrigatório";
     if (!formData.problems_solved.trim())
@@ -93,56 +97,64 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
     if (!formData.founders.trim()) newErrors.founders = "Líder é obrigatório";
     if (!formData.pitch.trim()) newErrors.pitch = "Pitch é obrigatório";
     if (!formData.location.trim()) newErrors.location = "Endereço é obrigatório";
+    if (!formData.description.trim()) newErrors.description = "Descrição é obrigatória";
+    if (!formData.liderEmail.trim()) newErrors.liderEmail = "Email do líder é obrigatório";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      showCustomToast("Preencha todos os campos obrigatórios.", "error");
-      return;
-    }
+    const handleSubmit = async () => {
+      if (!validateForm()) {
+        showCustomToast("Preencha todos os campos obrigatórios.", "error");
+        return;
+      }
 
-    setLoading(true);
+      setLoading(true);
 
-    try {
-      const payload: CreateStartupPayload = {
-        name: formData.name,
-        cnpj: formData.cnpj,
-        industry_segment: formData.industry_segment,
-        problems_solved: [formData.problems_solved],
-        technologies_used: formData.technologies_used.split(",").map((t) => t.trim()),
-        maturity_stage: formData.maturity_stage,
-        location: formData.location,
-        founders: formData.founders.split(",").map((f) => f.trim()),
-        pitch: formData.pitch,
-        useful_links: {
-          github: formData.github,
-          linkedin: formData.linkedin,
-          website: formData.website,
-        },
-      };
+      try {
+        const payload: CreateStartupPayload = {
+          name: formData.name,
+          cnpj: formData.cnpj,
+          email: formData.email,
+          industry_segment: formData.industry_segment,
+          problems_solved: [formData.problems_solved],
+          technologies_used: formData.technologies_used
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          maturity_stage: formData.maturity_stage,
+          location: formData.location,
+          founders: formData.founders.split(",").map((f) => f.trim()),
+          pitch: formData.pitch,
+          description: formData.description,
+          liderEmail: formData.liderEmail,
+          useful_links: {
+            github: formData.github,
+            linkedin: formData.linkedin,
+            website: formData.website,
+          },
+        };
 
-      await Promise.all([
-        startupService.createStartup(payload),
-        new Promise((resolve) => setTimeout(resolve, 1500)),
-      ]);
+        await Promise.all([
+          startupService.createStartup(payload),
+          new Promise((resolve) => setTimeout(resolve, 1500)),
+        ]);
 
-      showCustomToast("Startup cadastrada com sucesso!", "success");
-      setSuccess(true);
+        showCustomToast("Startup cadastrada com sucesso!", "success");
+        setSuccess(true);
 
-      setTimeout(() => {
-        setSuccess(false);
-        onClose();
-      }, 1500);
-    } catch (error: any) {
-      console.error("❌ Erro ao criar startup:", error.response?.data || error.message);
-      showCustomToast("Erro ao cadastrar startup.", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+        setTimeout(() => {
+          setSuccess(false);
+          onClose();
+        }, 1500);
+      } catch (error: any) {
+        console.error("❌ Erro ao criar startup:", error?.response?.data || error?.message || error);
+        showCustomToast("Erro ao cadastrar startup.", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const inputClass = (field: string) =>
     `flex items-center h-10 rounded-lg border px-3 text-sm transition-all duration-200 
@@ -164,9 +176,9 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
 
       {/* Modal */}
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-lg 
-  w-full max-w-md p-6 mx-3 md:mx-0
-  max-h-[calc(100vh-40px)] md:max-h-[auto] 
-  overflow-y-auto md:overflow-visible z-50">
+        w-full max-w-md p-6 mx-3 md:mx-0
+        max-h-[calc(100vh-40px)] md:max-h-[auto] 
+        overflow-y-auto md:overflow-visible z-50">
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 z-50">
             <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
@@ -227,219 +239,268 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
             {errors.cnpj && <p className="text-xs text-red-500 mt-1">{errors.cnpj}</p>}
           </div>
 
-          {/* Tecnologia usada */}
-        <div>
-          <div className={`${inputClass("technologies_used")} relative`}>
-            <Cpu className="text-[#98A2B3] mr-2" size={16} />
-            <select
-              value={formData.technologies_used}
-              onChange={(e) => handleChange("technologies_used", e.target.value)}
-              onFocus={() => setIsTechnologyOpen(true)}
-              onBlur={() => setIsTechnologyOpen(false)}
-              className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
-            >
-              <option disabled>Tecnologia Utilizada</option>
-              <option value="AI">AI</option>
-              <option value="BLOCKCHAIN">Blockchain</option>
-              <option value="IOT">IoT</option>
-              <option value="CLOUD">Cloud</option>
-              <option value="BIG_DATA">Big Data</option>
-              <option value="BIOTECH">Biotech</option>
-              <option value="OTHER">Outra</option>
-            </select>
-            <ChevronDown
-              size={18}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
-                isTechnologyOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
+          {/* EMAIL */}
+          <div>
+            <div className={inputClass("cnpj")}>
+              <FileText className="text-[#98A2B3] mr-2" size={16} />
+              <input
+                type="text"
+                placeholder="Email da Startup"
+                value={formData.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
           </div>
-          {errors.technologies_used && (
-            <p className="text-xs text-red-500 mt-1">{errors.technologies_used}</p>
-          )}
-        </div>
 
-        {/* Segmento de indústria */}
-        <div>
-          <div className={`${inputClass("industry_segment")} relative`}>
-            <Building2 className="text-[#98A2B3] mr-2" size={16} />
-            <select
-              value={formData.industry_segment}
-              onChange={(e) => handleChange("industry_segment", e.target.value)}
-              onFocus={() => setIsIndustryOpen(true)}
-              onBlur={() => setIsIndustryOpen(false)}
-              className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
-            >
-              <option disabled>Segmento de indústria</option>
-              <option value="TECHNOLOGY">Tecnologia</option>
-              <option value="FINANCE">Finanças</option>
-              <option value="HEALTH">Saúde</option>
-              <option value="EDUCATION">Educação</option>
-              <option value="TOURISM">Turismo</option>
-              <option value="SECURITY">Segurança</option>
-              <option value="OTHER">Outros</option>
-            </select>
-            <ChevronDown
-              size={18}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
-                isIndustryOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
-          </div>
-          {errors.industry_segment && (
-            <p className="text-xs text-red-500 mt-1">{errors.industry_segment}</p>
-          )}
-        </div>
-
-        {/* Problema Resolvido */}
-        <div>
-          <div className={`${inputClass("problems_solved")} relative`}>
-            <User className="text-[#98A2B3] mr-2" size={16} />
-            <select
-              value={formData.problems_solved}
-              onChange={(e) => handleChange("problems_solved", e.target.value)}
-              onFocus={() => setIsProblemsOpen(true)}
-              onBlur={() => setIsProblemsOpen(false)}
-              className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
-            >
-              <option disabled>Problema Resolvido</option>
-              <option value="HEALTHCARE">Saúde</option>
-              <option value="EDUCATION">Educação</option>
-              <option value="FINANCE">Finanças</option>
-              <option value="ENVIRONMENT">Ambiental</option>
-              <option value="TRANSPORT">Transporte</option>
-              <option value="OTHER">Outros</option>
-            </select>
-            <ChevronDown
-              size={18}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
-                isProblemsOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
-          </div>
-          {errors.problems_solved && (
-            <p className="text-xs text-red-500 mt-1">{errors.problems_solved}</p>
-          )}
-        </div>
-
-        {/* Estágio de Maturidade */}
-        <div>
-          <div className={`${inputClass("maturity_stage")} relative`}>
-            <User className="text-[#98A2B3] mr-2" size={16} />
-            <select
-              value={formData.maturity_stage}
-              onChange={(e) => handleChange("maturity_stage", e.target.value)}
-              onFocus={() => setIsMaturityOpen(true)}
-              onBlur={() => setIsMaturityOpen(false)}
-              className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
-            >
-              <option disabled>Estágio de Maturidade</option>
-              <option value="IDEATION">Ideação</option>
-              <option value="OPERATION">Operação</option>
-              <option value="TRACTION">Tração</option>
-              <option value="SCALE">Escala</option>
-            </select>
-            <ChevronDown
-              size={18}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
-                isMaturityOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
-          </div>
-          {errors.maturity_stage && (
-            <p className="text-xs text-red-500 mt-1">{errors.maturity_stage}</p>
-          )}
-        </div>
-
-        {/* Líder */}
-        <div>
-          <div className={inputClass("founders")}>
-            <User className="text-[#98A2B3] mr-2" size={16} />
-            <input
-              type="text"
-              placeholder="Líder"
-              value={formData.founders}
-              onChange={(e) => handleChange("founders", e.target.value)}
-              className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
-            />
-          </div>
-          {errors.founders && (
-            <p className="text-xs text-red-500 mt-1">{errors.founders}</p>
-          )}
-        </div>
-
-        {/* Endereço */}
-        <div>
-          <div className={inputClass("location")}>
-            <MapPin className="text-[#98A2B3] mr-2" size={16} />
-            <input
-              type="text"
-              placeholder="Endereço"
-              value={formData.location}
-              onChange={(e) => handleChange("location", e.target.value)}
-              className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
-            />
-          </div>
-          {errors.location && (
-            <p className="text-xs text-red-500 mt-1">{errors.location}</p>
-          )}
-        </div>
-
-        {/* Pitch */}
-        <div>
-          <div className={`${inputClass("pitch")} h-20 items-start`}>
-            <FileText className="text-[#98A2B3] mr-2 mt-2" size={16} />
-            <textarea
-              placeholder="Pitch"
-              value={formData.pitch}
-              onChange={(e) => handleChange("pitch", e.target.value)}
-              className="w-full mt-2 bg-transparent outline-none resize-none text-[#344054] dark:text-[#ced3db]"
-            />
-          </div>
-          {errors.pitch && <p className="text-xs text-red-500 mt-1">{errors.pitch}</p>}
-        </div>
-
-          {/* Links úteis */}
-          <div className="mt-4">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-              <Paperclip size={16} /> Links úteis
-            </h3>
-            <div className="flex gap-4 justify-center">
-              {[
-                { id: "github", icon: Github },
-                { id: "linkedin", icon: Linkedin },
-                { id: "website", icon: Globe },
-              ].map(({ id, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setActiveLink(activeLink === id ? null : id)}
-                  className={`p-2 rounded-lg transition-all ${
-                    activeLink === id
-                      ? "bg-[#15358D] text-white"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  }`}
+          {/* Grid de selects */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Tecnologia usada */}
+            <div>
+              <div className={`${inputClass("technologies_used")} relative`}>
+                <Cpu className="text-[#98A2B3] mr-2" size={16} />
+                <select
+                  value={formData.technologies_used}
+                  onChange={(e) => handleChange("technologies_used", e.target.value)}
+                  onFocus={() => setIsTechnologyOpen(true)}
+                  onBlur={() => setIsTechnologyOpen(false)}
+                  className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
                 >
-                  <Icon size={18} />
-                </button>
-              ))}
+                  <option value=''>Tecnologia Utilizada</option>
+                  <option value="AI">AI</option>
+                  <option value="BLOCKCHAIN">Blockchain</option>
+                  <option value="IOT">IoT</option>
+                  <option value="CLOUD">Cloud</option>
+                  <option value="BIG_DATA">Big Data</option>
+                  <option value="BIOTECH">Biotech</option>
+                  <option value="OTHER">Outra</option>
+                </select>
+                <ChevronDown
+                  size={18}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
+                    isTechnologyOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              {errors.technologies_used && (
+                <p className="text-xs text-red-500 mt-1">{errors.technologies_used}</p>
+              )}
             </div>
 
-            {activeLink && (
-              <div className="mt-3">
-                <div className={inputClass(activeLink)}>
-                  <input
-                    type="url"
-                    placeholder={`Insira o link do ${activeLink}`}
-                    className="bg-transparent w-full outline-none text-sm"
-                    value={(formData as any)[activeLink]}
-                    onChange={(e) => handleChange(activeLink, e.target.value)}
-                  />
-                </div>
+            {/* Segmento de indústria */}
+            <div>
+              <div className={`${inputClass("industry_segment")} relative`}>
+                <Building2 className="text-[#98A2B3] mr-2" size={16} />
+                <select
+                  value={formData.industry_segment}
+                  onChange={(e) => handleChange("industry_segment", e.target.value)}
+                  onFocus={() => setIsIndustryOpen(true)}
+                  onBlur={() => setIsIndustryOpen(false)}
+                  className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
+                >
+                  <option value=''>Segmento de indústria</option>
+                  <option value="TECHNOLOGY">Tecnologia</option>
+                  <option value="FINANCE">Finanças</option>
+                  <option value="HEALTH">Saúde</option>
+                  <option value="EDUCATION">Educação</option>
+                  <option value="TOURISM">Turismo</option>
+                  <option value="SECURITY">Segurança</option>
+                  <option value="OTHER">Outros</option>
+                </select>
+                <ChevronDown
+                  size={18}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
+                    isIndustryOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
               </div>
+              {errors.industry_segment && (
+                <p className="text-xs text-red-500 mt-1">{errors.industry_segment}</p>
+              )}
+            </div>
+
+            {/* Problema Resolvido */}
+            <div>
+              <div className={`${inputClass("problems_solved")} relative`}>
+                <User className="text-[#98A2B3] mr-2" size={16} />
+                <select
+                  value={formData.problems_solved}
+                  onChange={(e) => handleChange("problems_solved", e.target.value)}
+                  onFocus={() => setIsProblemsOpen(true)}
+                  onBlur={() => setIsProblemsOpen(false)}
+                  className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
+                >
+                  <option value=''>Problema Resolvido</option>
+                  <option value="HEALTHCARE">Saúde</option>
+                  <option value="EDUCATION">Educação</option>
+                  <option value="FINANCE">Finanças</option>
+                  <option value="ENVIRONMENT">Ambiental</option>
+                  <option value="TRANSPORT">Transporte</option>
+                  <option value="OTHER">Outros</option>
+                </select>
+                <ChevronDown
+                  size={18}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
+                    isProblemsOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              {errors.problems_solved && (
+                <p className="text-xs text-red-500 mt-1">{errors.problems_solved}</p>
+              )}
+            </div>
+
+            {/* Estágio de Maturidade */}
+            <div>
+              <div className={`${inputClass("maturity_stage")} relative`}>
+                <User className="text-[#98A2B3] mr-2" size={16} />
+                <select
+                  value={formData.maturity_stage}
+                  onChange={(e) => handleChange("maturity_stage", e.target.value)}
+                  onFocus={() => setIsMaturityOpen(true)}
+                  onBlur={() => setIsMaturityOpen(false)}
+                  className="w-full bg-transparent text-sm outline-none dark:bg-gray-900 dark:text-[#ced3db] appearance-none"
+                >
+                  <option value=''>Estágio de Maturidade</option>
+                  <option value="IDEATION">Ideação</option>
+                  <option value="OPERATION">Operação</option>
+                  <option value="TRACTION">Tração</option>
+                  <option value="SCALE">Escala</option>
+                </select>
+                <ChevronDown
+                  size={18}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform ${
+                    isMaturityOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              {errors.maturity_stage && (
+                <p className="text-xs text-red-500 mt-1">{errors.maturity_stage}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Líder */}
+          <div>
+            <div className={inputClass("founders")}>
+              <User className="text-[#98A2B3] mr-2" size={16} />
+              <input
+                type="text"
+                placeholder="Líder"
+                value={formData.founders}
+                onChange={(e) => handleChange("founders", e.target.value)}
+                className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.founders && (
+              <p className="text-xs text-red-500 mt-1">{errors.founders}</p>
             )}
           </div>
-        </div>
+
+          {/* Líder Email */}
+          <div>
+            <div className={inputClass("founders")}>
+              <User className="text-[#98A2B3] mr-2" size={16} />
+              <input
+                type="text"
+                placeholder="Email do líder"
+                value={formData.liderEmail}
+                onChange={(e) => handleChange("liderEmail", e.target.value)}
+                className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.liderEmail && (
+              <p className="text-xs text-red-500 mt-1">{errors.liderEmail}</p>
+            )}
+          </div>
+
+          {/* Endereço */}
+          <div>
+            <div className={inputClass("location")}>
+              <MapPin className="text-[#98A2B3] mr-2" size={16} />
+              <input
+                type="text"
+                placeholder="Endereço"
+                value={formData.location}
+                onChange={(e) => handleChange("location", e.target.value)}
+                className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.location && (
+              <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+            )}
+          </div>
+
+          {/* Pitch */}
+          <div>
+            <div className={`${inputClass("pitch")} h-20 items-start`}>
+              <FileText className="text-[#98A2B3] mr-2 mt-2" size={16} />
+              <textarea
+                placeholder="Pitch"
+                value={formData.pitch}
+                onChange={(e) => handleChange("pitch", e.target.value)}
+                className="w-full mt-2 bg-transparent outline-none resize-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.pitch && <p className="text-xs text-red-500 mt-1">{errors.pitch}</p>}
+          </div>
+
+          {/* Descrição */}
+          <div>
+            <div className={`${inputClass("pitch")} h-20 items-start`}>
+              <FileText className="text-[#98A2B3] mr-2 mt-2" size={16} />
+              <textarea
+                placeholder="Descrição"
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                className="w-full mt-2 bg-transparent outline-none resize-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
+          </div>
+
+            {/* Links úteis */}
+          <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <Paperclip size={16} /> Links úteis
+              </h3>
+              <div className="flex gap-4 justify-center">
+                {[
+                  { id: "github", icon: Github },
+                  { id: "linkedin", icon: Linkedin },
+                  { id: "website", icon: Globe },
+                ].map(({ id, icon: Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setActiveLink(activeLink === id ? null : id)}
+                    className={`p-2 rounded-lg transition-all ${
+                      activeLink === id
+                        ? "bg-[#15358D] text-white"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+                    }`}
+                  >
+                    <Icon size={18} />
+                  </button>
+                ))}
+              </div>
+
+              {activeLink && (
+                <div className="mt-3">
+                  <div className={inputClass(activeLink)}>
+                    <input
+                      type="url"
+                      placeholder={`Insira o link do ${activeLink}`}
+                      className="bg-transparent w-full outline-none text-sm"
+                      value={(formData as any)[activeLink]}
+                      onChange={(e) => handleChange(activeLink, e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
         {/* Botões */}
         <div className="flex justify-between mt-6">
@@ -463,6 +524,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
             )}
           </button>
         </div>
+
       </div>
     </div>,
     document.body

@@ -20,6 +20,7 @@ export type ShowAllStartupsResponse = {
 export type CreateStartupPayload = {
   name: string;
   cnpj: string;
+  email: string
   industry_segment: string;
   problems_solved: string[];
   technologies_used: string[];
@@ -32,6 +33,8 @@ export type CreateStartupPayload = {
     website: string;
     linkedin: string;
   };
+  description: string
+  liderEmail: string
 }
 
 export type CreateStartupResponse = {
