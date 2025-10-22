@@ -466,5 +466,5 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
       </div>
     </div>,
     document.body
-  );
+);
 }
