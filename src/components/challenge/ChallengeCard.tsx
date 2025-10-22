@@ -1,26 +1,36 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Tag, Calendar, Eye, EyeOff, MoreHorizontal } from "lucide-react";
-import { challengesData } from "@/mocks/ChallengeData";
 import { getUserRole } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
 import ApplyButton from "./ApplyButton";
-import ApplyModal from "@/components/startup/ApplyModal"; // ⬅ importa o modal
+import ApplyModal from "@/components/startup/ApplyModal";
+import { ChallengeService } from "@/api/services/challenge.service";
+import { enterpriseService } from "@/api/services/enterprise.service";
 
 type Status = "Completed" | "In Progress" | "Pending" | string;
-type Visibility = "Public" | "Private" | string;
 
 type Challenge = {
-  id: number;
-  ChallengeTitle: string;
-  Author: string;
-  Category: string;
-  Status: Status;
-  Date: string;
-  Visibility: Visibility;
-  companyId?: number;
-  startupId?: number;
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  area: string;
+  description: string;
+  visibility: string;
+  status: string;
+  strategic_alignment: string;
+  innovative_potential: string;
+  business_relevance: string;
+  updatedAt: string;
+  enterpriseId: string;
+  usersId: string;
+  Users: {
+    name: string;
+    image: null;
+  };
+  enterpriseName?: string
 };
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
@@ -33,7 +43,7 @@ type Props = {
   viewerCompanyId?: number;
   canApply?: boolean;
   startupId?: number | string;
-  onApply?: (challengeId: number) => void;
+  onApply?: (challengeId: string) => void;
 };
 
 const STORAGE_PREFIX = "appliedChallenges";
@@ -47,23 +57,64 @@ function parseRoleFromQS(v: string | null): Role | null {
 }
 
 export default function ChallengeCard({
-  companyId,
   isAdminView = false,
   onlyMine = false,
   authorName,
-  viewerCompanyId,
   canApply = false,
   startupId,
   onApply,
 }: Props) {
-  const data: Challenge[] = challengesData as Challenge[];
+  const [data, setData] = useState<Challenge[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchChallenges() {
+      try {
+        const response = await ChallengeService.showAllChallenges();
+        setData(response);
+
+        const enterpriseIds = [...new Set(response.map((c) => c.enterpriseId))];
+
+        const enterpriseResponses = await Promise.all(
+          enterpriseIds.map(async (id) => {
+            try {
+              const enterpriseData = await enterpriseService.showOneEnterprises(id);
+              return { id, name: enterpriseData?.name || "Empresa sem nome" };
+            } catch (err) {
+              console.error(`Erro ao buscar empresa ${id}:`, err);
+              return { id, name: "Empresa desconhecida" };
+            }
+          })
+        );
+
+        const enterpriseMap: Record<string, string> = {};
+        enterpriseResponses.forEach((e) => {
+          enterpriseMap[e.id] = e.name;
+        });
+
+        setData((prev) =>
+          prev.map((challenge) => ({
+            ...challenge,
+            enterpriseName: enterpriseMap[challenge.enterpriseId] || "Empresa não informada",
+          }))
+        );
+      } catch (err) {
+        console.error("Erro ao buscar desafios:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchChallenges();
+  }, []);
+
 
   // role
   const searchParams = useSearchParams();
   const roleQS = parseRoleFromQS(searchParams?.get("role") ?? null);
-  const [role, setRole] = React.useState<Role | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let cancel = false;
     getUserRole()
       .then((r) => {
@@ -78,29 +129,28 @@ export default function ChallengeCard({
 
   const allowApply = Boolean(canApply && role === "startup");
 
-  // persistência
   const storageKey = React.useMemo(() => {
     const sid = startupId ?? "anon";
     return `${STORAGE_PREFIX}:${sid}`;
   }, [startupId]);
 
-  const [applied, setApplied] = React.useState<Set<number>>(new Set());
-  React.useEffect(() => {
+  const [applied, setApplied] = useState<Set<string>>(new Set());
+  useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) return;
-      const arr = JSON.parse(raw) as number[];
+      const arr = JSON.parse(raw) as string[];
       setApplied(new Set(arr));
     } catch {}
   }, [storageKey]);
 
-  function persistApplied(next: Set<number>) {
+  function persistApplied(next: Set<string>) {
     localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
     setApplied(next);
   }
 
-  function markApplied(challengeId: number) {
+  function markApplied(challengeId: string) {
     const next = new Set(applied);
     next.add(challengeId);
     persistApplied(next);
@@ -122,43 +172,40 @@ export default function ChallengeCard({
 
   const filtered = React.useMemo(() => {
     let base = data;
-    if (typeof companyId === "number") base = base.filter((c) => c.companyId === companyId);
-    if (isAdminView) return base;
 
     if (onlyMine) {
       const nameToUse = authorName?.trim();
       if (!nameToUse) return [];
-      const inCompany = (c: Challenge) =>
-        typeof viewerCompanyId === "number" ? c.companyId === viewerCompanyId : true;
-      return base.filter((c) => c.Author === nameToUse && inCompany(c));
+      base = base.filter((c) => c.Users?.name === nameToUse);
     }
 
-    return base.filter((c) => c.Visibility === "Public");
-  }, [data, companyId, isAdminView, onlyMine, authorName, viewerCompanyId]);
+    if (!isAdminView) {
+      base = base.filter(
+        (c) => c.visibility?.toLowerCase() === "public" || "private"
+      );
+    }
 
-  // =========================
-  // 🔗 Estado do ApplyModal
-  // =========================
+    return base;
+  }, [data, isAdminView, onlyMine, authorName]);
+
+
+  // Estado do modal
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<Challenge | null>(null);
 
   async function handleSubmitFromModal(payload: {
-    challengeId: number;
+    challengeId: string;
     description: string;
     experience: string;
     files: File[];
   }) {
-    // Aqui você pluga a API real:
-    // const form = new FormData();
-    // form.append("description", payload.description);
-    // form.append("experience", payload.experience);
-    // payload.files.forEach((f) => form.append("files", f));
-    // await fetch(`/api/challenges/${payload.challengeId}/apply`, { method: "POST", body: form });
-
-    // Marca como aplicado localmente
-    markApplied(payload.challengeId);
+    markApplied(String(payload.challengeId));
     setOpen(false);
     setSelected(null);
+  }
+
+  if (loading) {
+    return <div className="p-6 text-gray-500">Carregando desafios...</div>;
   }
 
   if (!filtered.length) {
@@ -169,11 +216,34 @@ export default function ChallengeCard({
     );
   }
 
+  const typeTranslations: Record<string, string> = {
+    TECHNOLOGY: "Tecnologia",
+    HEALTH: "Saúde",
+    EDUCATION: "Educação",
+    ENVIRONMENT: "Meio Ambiente",
+    BUSINESS: "Negócios",
+    SOCIAL: "Social",
+    ENGINEERING: "Engenharia",
+    AGRICULTURE: "Agricultura",
+    DESIGN: "Design",
+    OTHER: "Outro",
+  }; 
+
+  const stageTranslations: Record<string, string> = {
+    GENERATION: "Desafio",
+    PRE_SCREENING: "Pré-Triagem",
+    IDEATION: "Ideação",
+    DETAILED_SCREENING: "Triagem detalhada",
+    EXPERIMENTATION: "Experimentação",
+    APPROVE: "Aprovado",
+    DISAPPROVE: "Reprovado",
+  };  
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
         {filtered.map((challenge) => {
-          const isPublic = challenge.Visibility === "Public";
+          const isPublic = challenge.visibility === "Public";
           const alreadyApplied = applied.has(challenge.id);
 
           return (
@@ -181,21 +251,22 @@ export default function ChallengeCard({
               key={challenge.id}
               className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl overflow-hidden hover:scale-[1.01] transition-transform shadow-sm hover:shadow-md"
             >
-              {/* detalhe topo */}
               <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
 
-              {/* corpo */}
               <div className="p-4 flex flex-col gap-2.5">
                 <div className="flex justify-between items-start">
                   <div className="min-w-0">
                     <h2
-                      title={challenge.ChallengeTitle}
+                      title={challenge.name}
                       className="text-[15px] font-semibold text-blue-900 dark:text-blue-300 leading-snug truncate"
                     >
-                      {challenge.ChallengeTitle}
+                      {challenge.name}
                     </h2>
                     <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
-                      {challenge.Author}
+                      {challenge.enterpriseName || "Empresa desconhecida"}
+                    </p>
+                    <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
+                      {challenge.Users?.name || "Autor desconhecido"}
                     </p>
                   </div>
                   <button aria-label="Mais opções">
@@ -205,14 +276,14 @@ export default function ChallengeCard({
 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                    <Tag size={15} /> {challenge.Category}
+                    <Tag size={15} /> {typeTranslations[challenge.area] || "Sem categoria"}
                   </div>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                    <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.Status)}`} />
-                    {challenge.Status}
+                    <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.status)}`} />
+                    {stageTranslations[challenge.status]}
                   </div>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                    <Calendar size={15} /> {challenge.Date}
+                    <Calendar size={15} /> {new Date(challenge.startDate).toLocaleDateString("pt-BR")} - {new Date(challenge.endDate).toLocaleDateString("pt-BR")}
                   </div>
                 </div>
 
@@ -229,7 +300,6 @@ export default function ChallengeCard({
                 </div>
               </div>
 
-              {/* rodapé */}
               {allowApply && isPublic && (
                 <div className="border-top border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
                   <ApplyButton
@@ -249,7 +319,6 @@ export default function ChallengeCard({
         })}
       </div>
 
-      {/* ÚNICO modal controlado aqui (evita 1 modal por card) */}
       {selected && (
         <ApplyModal
           isOpen={open}
@@ -258,7 +327,7 @@ export default function ChallengeCard({
             setSelected(null);
           }}
           challengeId={selected.id}
-          challengeTitle={selected.ChallengeTitle}
+          challengeTitle={selected.name}
           onSubmit={handleSubmitFromModal}
         />
       )}
