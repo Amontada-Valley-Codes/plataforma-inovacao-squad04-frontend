@@ -12,25 +12,20 @@ export default function RegisterStartupBtn() {
       <button
         onClick={openModal}
         aria-label="Adicionar startup"
-        className={[
-          // visual
-          "inline-flex items-center rounded-[12px] font-medium transition-colors duration-200 bg-[#15358d] hover:bg-[#112c75] text-white",
-          "border border-gray-200 dark:border-gray-800 dark:text-[#ced3db] dark:bg-blue-800 dark:hover:bg-blue-900",
-          // não deixa quebrar/encolher
-          "whitespace-nowrap shrink-0",
-          // tamanhos por breakpoint
-          "h-9 px-3 text-xs",                                 // <768
-          "min-[768px]:h-9 min-[768px]:px-2.5 min-[768px]:text-xs", // 768–839 (mais compacto!)
-          "min-[840px]:h-10 min-[840px]:px-3.5 min-[840px]:text-sm", // 840–1127
-          "min-[1128px]:h-11 min-[1128px]:px-4"                    // ≥1128
-        ].join(" ")}
+      className="flex items-center gap-2 whitespace-nowrap shrink-0
+              text-white font-medium rounded-[12px]
+              border border-gray-200 dark:border-gray-800
+              bg-[#15358d] hover:bg-[#112c75] dark:bg-blue-800 dark:hover:bg-blue-900
+              h-9 md:h-11 px-3 md:px-4 text-xs md:text-sm transition-colors duration-200
+              max-[832px]:h-9 max-[832px]:px-2.5 max-[832px]:text-[11px] max-[832px]:gap-1.5 max-[832px]:scale-[0.94]"
       >
-        <PlusCircle className="mr-1 h-4 w-4 min-[840px]:h-5 min-[840px]:w-5" />
+        <PlusCircle className="h-4 w-4 md:h-5 md:w-5 max-[832px]:h-4 max-[832px]:w-4" />
 
-        {/* curto no mobile e no 768–839 */}
-        <span className="min-[1128px]:hidden"> Startup</span>
-        {/* label completo só no ≥1128 */}
-        <span className="hidden min-[1128px]:inline">Adicionar Startup</span>
+      {/* curto até 832px */}
+      <span className="hidden max-[832px]:inline">+ Startup</span>
+
+      {/* completo a partir de 833px */}
+      <span className="hidden min-[833px]:inline">Adicionar Startup</span>
       </button>
 
       <AddStartupForm isOpen={isOpen} onClose={closeModal} />
