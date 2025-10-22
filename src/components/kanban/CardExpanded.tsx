@@ -4,7 +4,6 @@ import { Modal } from "../ui/modal"
 import ForwardButton from "./ForwardButton"
 import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
-import { Feature } from "./Kanban"
 import { X } from "lucide-react"
 import {
   CardChallangeContent,
@@ -23,19 +22,20 @@ import {
 } from "./commentsData"
 import React, { useEffect } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
+import { Challenge } from "./Kanban"
 
 type CardExpandedLayoutProps = {
   className?: string;
   mainContent: React.ReactNode;
   commentsContent: React.ReactNode;
-  featureId: string | undefined;
+  challengeId: string | undefined;
   isFirstColumn: boolean;
   isLastColumn: boolean;
-  handleMoveBack: (featureId: string | undefined) => void;
-  handleApproveAndMove: (featureId: string | undefined) => void;
+  handleMoveBack: (challengeId: string | undefined) => void;
+  handleApproveAndMove: (challengeId: string | undefined) => void;
 }
 
-const CardExpandedLayout = ({ className, mainContent, commentsContent, featureId, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack }: CardExpandedLayoutProps) => {
+const CardExpandedLayout = ({ className, mainContent, commentsContent, challengeId, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack }: CardExpandedLayoutProps) => {
   const { isDesktop } = useBreakpoints()
 
   return (
@@ -55,10 +55,10 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, featureId
               : "justify-end"
             }`}>
               {!isFirstColumn && handleMoveBack && (
-                <PreviousButton className="w-45" featureId={featureId} handleMoveBack={handleMoveBack} />
+                <PreviousButton className="w-45" challengeId={challengeId} handleMoveBack={handleMoveBack} />
               )}
               {!isLastColumn && handleApproveAndMove && (
-                <ForwardButton className="w-45" featureId={featureId} handleApproveAndMove={handleApproveAndMove} />
+                <ForwardButton className="w-45" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
               )}
             </div>
           </div>
@@ -79,10 +79,10 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, featureId
             : "justify-end"
           }`}>
             {!isFirstColumn && handleMoveBack && (
-              <PreviousButton className="w-45 py-3" featureId={featureId} handleMoveBack={handleMoveBack} />
+              <PreviousButton className="w-45 py-3" challengeId={challengeId} handleMoveBack={handleMoveBack} />
             )}
             {!isLastColumn && handleApproveAndMove && (
-              <ForwardButton className="w-45 py-3" featureId={featureId} handleApproveAndMove={handleApproveAndMove} />
+              <ForwardButton className="w-45 py-3" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
             )}
           </div>
         </div>
@@ -94,59 +94,59 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, featureId
 type CardExpandedProps = {
   isOpen: boolean;
   onClose: () => void;
-  features: Feature[];
-  setFeatures: (newFeatures: Feature[]) => void;
-  setExpandedCard: (feature: Feature | null) => void
-  cardData: Feature | null;
+  challenges: Challenge[];
+  setChallenges: (newFeatures: Challenge[]) => void;
+  setExpandedCard: (feature: Challenge | null) => void
+  cardData: Challenge | null;
   columns: {
     name: string;
     id: string;
   }[];
 }
 
-export default function CardExpanded({ isOpen, onClose, columns, cardData, features, setFeatures, setExpandedCard }: CardExpandedProps) {
+export default function CardExpanded({ isOpen, onClose, columns, cardData, challenges, setChallenges, setExpandedCard }: CardExpandedProps) {
   if (!cardData) return null
 
-  var currentColumnName = columns.find(c => c.id === cardData.column)?.name
-  const currentColumnIndex = columns.findIndex(c => c.id === cardData.column)
+  var currentColumnName = columns.find(c => c.id === cardData.status)?.name
+  const currentColumnIndex = columns.findIndex(c => c.id === cardData.status)
   const isFirstColumn = currentColumnIndex === 0
   const isLastColumn = currentColumnIndex === columns.length - 1
 
   useEffect(() => {
-    currentColumnName = columns.find(c => c.id === cardData.column)?.name
+    currentColumnName = columns.find(c => c.id === cardData.status)?.name
   }, [currentColumnName])
 
-  const handleApproveAndMove = (featureId: string | undefined) => {
-    const featureToMove = features.find(f => f.id === featureId);
-    if (!featureToMove) return;
+  const handleApproveAndMove = (challengeId: string | undefined) => {
+    const challengeToMove = challenges.find(c => c.id === challengeId);
+    if (!challengeToMove) return;
 
-    const currentColumnIndex = columns.findIndex(c => c.id === featureToMove.column);
+    const currentColumnIndex = columns.findIndex(c => c.id === challengeToMove?.status);
 
     if (currentColumnIndex < columns.length - 1) {
       const nextColumn = columns[currentColumnIndex + 1];
-      const updatedFeature = { ...featureToMove, column: nextColumn.id };
-      const otherFeatures = features.filter(f => f.id !== featureId);
-      setFeatures([updatedFeature, ...otherFeatures]);
+      const updatedChallenges = { ...challengeToMove, column: nextColumn.id };
+      const otherChallenges = challenges.filter(c => c.id !== challengeId);
+      setChallenges([updatedChallenges, ...otherChallenges]);
 
-      setExpandedCard(updatedFeature);
+      setExpandedCard(updatedChallenges);
     } else {
       setExpandedCard(null);
     }
   };
 
-  const handleMoveBack = (featureId: string | undefined) => {
-    const featureToMove = features.find(f => f.id === featureId);
-    if (!featureToMove) return;
+  const handleMoveBack = (challengeId: string | undefined) => {
+    const challengeToMove = challenges.find(c => c.id === challengeId);
+    if (!challengeToMove) return;
 
-    const currentColumnIndex = columns.findIndex(c => c.id === featureToMove.column);
+    const currentColumnIndex = columns.findIndex(c => c.id === challengeToMove.status);
 
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
-      const updatedFeature = { ...featureToMove, column: prevColumn.id };
-      const otherFeatures = features.filter(f => f.id !== featureId);
-      setFeatures([updatedFeature, ...otherFeatures]);
+      const updatedChallenges = { ...challengeToMove, column: prevColumn.id };
+      const otherChallenges = challenges.filter(c => c.id !== challengeId);
+      setChallenges([updatedChallenges, ...otherChallenges]);
 
-      setExpandedCard(updatedFeature);
+      setExpandedCard(updatedChallenges);
     } else {
       setExpandedCard(null);
     }
@@ -160,18 +160,18 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, featu
       >
         <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl w-[95vw] md:w-[80vw] h-[90vh] overflow-hidden flex flex-col">
-            <CardExpandedHeader onClose={onClose} columns={columns} currentColumnId={cardData?.column}/>
+            <CardExpandedHeader onClose={onClose} columns={columns} currentColumnId={cardData?.status}/>
             {currentColumnName === "Desafios" && (
               <CardExpandedLayout
                 mainContent={
                   <CardChallangeContent 
                     challangeTitle={cardData.name} 
-                    categories={cardData.categories}
+                    category={cardData.area}
                     description={cardData.description}
                   />
                 }
                 commentsContent={<CommentsPanel sections={challangeCommentSections}/>}
-                featureId={cardData.id}
+                challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
@@ -182,12 +182,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, featu
               <CardExpandedLayout mainContent={
                   <CardPreScreeningContent 
                     challangeTitle={cardData.name} 
-                    categories={cardData.categories}
+                    category={cardData.area}
                     description={cardData.description}
                   />
                 }
                 commentsContent={<CommentsPanel sections={preScreeningCommentSections}/>}
-                featureId={cardData.id}
+                challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
@@ -199,14 +199,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, featu
                 mainContent={
                   <CardDetailedScreeningContent
                     challangeTitle={cardData.name}
-                    categories={cardData.categories}
+                    category={cardData.area}
                     description={cardData.description}
                   />
                 }
                 commentsContent={
                   <CommentsPanel sections={detailedScreeningCommentSections}/>
                 }
-                featureId={cardData.id}
+                challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
@@ -218,12 +218,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, featu
                 mainContent={
                   <CardIdeationContent
                     challangeTitle={cardData.name}
-                    categories={cardData.categories}
+                    category={cardData.area}
                     description={cardData.description}
                   />
                 }
                 commentsContent={<CommentsPanel sections={ideationCommentSections}/>}
-                featureId={cardData.id}
+                challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
@@ -235,12 +235,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, featu
                 mainContent={
                   <CardExperimentationContent
                     challangeTitle={cardData.name}
-                    categories={cardData.categories}
+                    category={cardData.area}
                     description={cardData.description}
                   />
                 }
                 commentsContent={<CommentsPanel sections={experimentationCommentSections}/>}
-                featureId={cardData.id}
+                challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
