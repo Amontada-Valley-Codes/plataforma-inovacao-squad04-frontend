@@ -39,6 +39,8 @@ export type ShowAllEnterpriseResponse = {
   address: string
   email: string
   gestorEmail: string
+  coverImage: null
+  profileImage: null
   status: string
   createdAt: string
   updatedAt: string
