@@ -115,96 +115,104 @@ type FormResolutionCardsProps = {
 export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
 
   return (
-    <div className="flex flex-col w-full">
-      <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
-      <div className="flex w-full justify-around">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setVisibility("PRIVATE")}
-            className={`h-5 w-5 rounded-full flex items-center justify-center 
-            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-          >
-            <div className={`h-3 w-3 rounded-full ${
-              visibility === "PRIVATE" ? "bg-[#0B2B72]" : ""
-            }`}>
+    <div className="relative flex flex-col justify-between w-full h-full">
+      <div>
+        <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
+        <div className="relative flex w-full justify-around">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setVisibility("PRIVATE")}
+              className={`h-5 w-5 rounded-full flex items-center justify-center 
+              font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+              focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+            >
+              <div className={`h-3 w-3 rounded-full ${
+              visibility === "PRIVATE" || visibility === "INTERNAL" ? "bg-[#0B2B72]" : ""
+              }`}>
 
-            </div>
-          </button>
-          <label className="text-sm text-[#666] font-semibold">PRIVADO</label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setVisibility("PUBLIC")}
-            className={`h-5 w-5 rounded-full flex items-center justify-center 
-            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-          >
-            <div className={`h-3 w-3 rounded-full ${
-              visibility === "PUBLIC" ? "bg-[#0B2B72]" : ""
-            }`}>
-
-            </div>
-          </button>
-          <label className="text-sm text-[#666] font-semibold">PUBLICO</label>
-        </div>
-      </div>
-      {(visibility === "PRIVATE" || visibility === "INTERNAL") && (
-        <div className="border-t flex flex-col mt-4 py-4">
-          <div className="flex w-full justify-around">
-            <div className="flex items-center w-35 gap-2">
-              <button
-                onClick={() => setVisibility("PRIVATE")}
-                className={`h-4 w-4 rounded-full flex items-center justify-center 
-                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-              >
-                <div className={`h-2 w-2 rounded-full ${
-                  visibility === "PRIVATE" ? "bg-[#0B2B72]" : ""
-                }`}>
-
-                </div>
-              </button>
-              <label className="text-xs text-[#666] font-semibold">Convidar startup especifica</label>
-            </div>
-
-            <div className="flex items-center w-35 gap-2">
-              <button
-                onClick={() => setVisibility("INTERNAL")}
-                className={`h-4 w-4 rounded-full flex items-center justify-center 
-                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-              >
-                <div className={`h-2 w-2 rounded-full ${
-                  visibility === "INTERNAL" ? "bg-[#0B2B72]" : ""
-                }`}>
-
-                </div>
-              </button>
-              <label className="text-xs text-[#666] font-semibold">Resolver internamente</label>
-            </div>
+              </div>
+            </button>
+            <label className="text-sm text-[#666] font-semibold">PRIVADO</label>
           </div>
-          {visibility === "PRIVATE" && (
-            <div>
-              <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
-            </div>
-          )}
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setVisibility("PUBLIC")}
+              className={`h-5 w-5 rounded-full flex items-center justify-center 
+              font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+              focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+            >
+              <div className={`h-3 w-3 rounded-full ${
+                visibility === "PUBLIC" ? "bg-[#0B2B72]" : ""
+              }`}>
+
+              </div>
+            </button>
+            <label className="text-sm text-[#666] font-semibold">PUBLICO</label>
+          </div>
         </div>
-      )} 
-      {visibility === "PUBLIC" && (
-        <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
-      )}
-      <div className="flex gap-4">
+        {(visibility === "PRIVATE" || visibility === "INTERNAL") && (
+          <div className="border-t flex flex-col mt-4 py-4">
+            <div className="flex w-full justify-around">
+              <div className="flex items-center w-45 gap-2">
+                <button
+                  onClick={() => setVisibility("PRIVATE")}
+                  className={`h-5 w-5 rounded-full flex items-center justify-center 
+                  font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+                  focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+                >
+                  <div className={`h-3 w-3 rounded-full ${
+                    visibility === "PRIVATE" ? "bg-[#0B2B72]" : ""
+                  }`}>
+
+                  </div>
+                </button>
+                <label className="text-xs text-[#666] font-semibold">Convidar startup especifica</label>
+              </div>
+
+              <div className="flex items-center w-45 gap-2">
+                <button
+                  onClick={() => setVisibility("INTERNAL")}
+                  className={`h-5 w-5 rounded-full flex items-center justify-center 
+                  font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+                  focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+                >
+                  <div className={`h-3 w-3 rounded-full ${
+                    visibility === "INTERNAL" ? "bg-[#0B2B72]" : ""
+                  }`}>
+
+                  </div>
+                </button>
+                <label className="text-xs text-[#666] font-semibold">Resolver internamente</label>
+              </div>
+            </div>
+            {visibility === "PRIVATE" && (
+              <div>
+                <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
+              </div>
+            )}
+          </div>
+        )} 
+        {visibility === "PUBLIC" && (
+          <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
+        )}
+      </div>
+      <div className="sticky bottom-0 flex gap-4 items-center justify-center">
         <button
+          className="flex w-30 justify-center px-1 py-2
+          rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
+          text-[14px] cursor-pointer"
           onClick={() => setIsOpen(false)}
         >
-          cancelar
+          Cancelar
         </button>
         <button
+          className="flex justify-center w-30 px-1 py-2
+          rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
+          text-[14px] cursor-pointer"
           onClick={() => performMove(challengeId, visibility)}
         >
-          avançar
+          Avançar
         </button>
       </div>
     </div>
@@ -401,7 +409,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             onClose={() => setIsCardOpen(false)}
           >
             <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-100">
-              <div className="bg-white rounded-2xl w-[50vw] md:w-[30vw] h-[40vh] overflow-hidden flex flex-col">
+              <div className="bg-white p-4 rounded-2xl w-[80vw] md:w-[40vw] h-[40vh] overflow-hidden flex flex-col">
                 <FormResolutionCard
                   setIsOpen={setIsCardOpen}
                   performMove={performMove}
