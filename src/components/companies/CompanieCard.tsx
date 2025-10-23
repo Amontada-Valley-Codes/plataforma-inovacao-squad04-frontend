@@ -16,6 +16,7 @@ import { useModal } from "@/hooks/useModal";
 import CompaniesProfile from "./CompaniesProfile"; 
 import { ShowAllEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
+import { useStore } from "../../../store";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
@@ -39,6 +40,7 @@ export default function CompanieCard({
   const [companies, setCompaniesData] = useState<ShowAllEnterpriseResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const { reload } = useStore();
 
   const data = useMemo(() => companies, [companies]);
   const filtered = useMemo(() => {
@@ -64,20 +66,20 @@ export default function CompanieCard({
     setContainerHeight(activeEl.scrollHeight);
   }, [viewMode]);
 
-  useEffect(() => {
-    async function fetchCompanies() {
-      try {
-        const data = await enterpriseService.showAllEnterprises();
-        setCompaniesData(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchCompanies() {
+    try {
+      const data = await enterpriseService.showAllEnterprises();
+      setCompaniesData(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(()=> {
     fetchCompanies();
-  }, []);
+  }, [reload])
 
   useEffect(() => {
     const frame = requestAnimationFrame(recalcHeight);

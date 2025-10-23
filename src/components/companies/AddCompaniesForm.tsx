@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 import { enterpriseService } from "@/api/services/enterprise.service";
+import { useStore } from "../../../store";
 
 type Props = {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
   const [isFuncOpen, setIsFuncOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { triggerReload } = useStore();
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -58,7 +60,6 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
     setLoading(true);
     try {
       const data = await enterpriseService.createEnterprise(formData);
-      localStorage.setItem("access_token", data?.token?.token ?? "");
       console.log("✅ Dados enviados:", data.token.message);
 
       setTimeout(() => {
@@ -66,6 +67,7 @@ export default function AddCompanieForm({ onClose, isOpen }: Props) {
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
+          triggerReload();
           onClose();
         }, 2000);
       }, 1500);
