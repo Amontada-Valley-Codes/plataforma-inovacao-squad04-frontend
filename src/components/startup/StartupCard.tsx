@@ -1,7 +1,7 @@
 // src/components/startup/StartupCard.tsx
 "use client";
 
-import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import {
   LayoutGrid,
@@ -14,6 +14,7 @@ import { useModal } from "@/hooks/useModal";
 import StartupProfile from "./StartupProfile";
 import { startupService } from "@/api/services/startup.service";
 import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload";
+import { useStore } from "../../../store";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
@@ -37,23 +38,25 @@ export default function StartupCard({
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const { reload } = useStore();
 
   // --- Carregar startups da API ---
-  useEffect(() => {
-    async function fetchStartups() {
-      try {
-        setLoading(true);
-        const response = await startupService.showAllStartups();
-        setStartups(response);
-      } catch (error) {
-        console.error("Erro ao buscar startups:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
 
+  async function fetchStartups() {
+    try {
+      setLoading(true);
+      const response = await startupService.showAllStartups();
+      setStartups(response);
+    } catch (error) {
+      console.error("Erro ao buscar startups:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
     fetchStartups();
-  }, []);
+  }, [reload])
 
   // --- Filtrar startups conforme role e empresa ---
   const filtered = useMemo(() => {
