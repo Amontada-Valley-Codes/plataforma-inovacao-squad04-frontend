@@ -162,7 +162,7 @@
     ...props
   }: KanbanCardsProps<T>) => {
     const { data } = useContext(KanbanContext) as KanbanContextProps<T>;
-    const filteredData = data.filter((item) => item.column === props.id);
+    const filteredData = data.filter((item) => item.status === props.id);
     const items = filteredData.map((item) => item.id);
 
     return (

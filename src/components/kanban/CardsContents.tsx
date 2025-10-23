@@ -702,8 +702,8 @@ export const Rating = ({ initialScore = 0 }) => {
 
   return (
     <div className="mt-3 flex items-center gap-3">
-      {ratingOptions.map((num) => (
-        <div className="flex flex-col justify-center items-center gap-[2px]">
+      {ratingOptions.map((num, i) => (
+        <div key={i} className="flex flex-col justify-center items-center gap-[2px]">
           <p className="text-[10px]">{num}</p>
           <button
             type="button"
