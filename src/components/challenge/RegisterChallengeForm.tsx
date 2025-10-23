@@ -131,10 +131,10 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
     <div>
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-5 lg:p-10">
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="relative bg-white rounded-2xl shadow-lg w-full max-w-md p-6 dark:border-gray-800 dark:bg-gray-900">
 
             {loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 z-50">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-2xl z-50">
                 <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
                 <p className="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">
                   Criando desafio...
@@ -143,14 +143,13 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
             )}
 
             {success && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-900/95 z-50 animate-fade-in">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-900/95 rounded-2xl z-50 animate-fade-in">
                 <CheckCircle2 className="text-green-600 dark:text-green-400" size={48} />
                 <p className="mt-3 text-lg font-semibold text-green-700 dark:text-green-300">
                   Desafio criado com sucesso!
                 </p>
               </div>
             )}
-
             {/* Cabeçalho */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#15358D] dark:text-blue-800">
