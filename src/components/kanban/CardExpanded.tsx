@@ -4,7 +4,7 @@ import { Modal } from "../ui/modal"
 import ForwardButton from "./ForwardButton"
 import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
-import { X } from "lucide-react"
+import { MoreHorizontal, MoreVertical, Plus, X } from "lucide-react"
 import {
   CardChallangeContent,
   CardDetailedScreeningContent,
@@ -22,8 +22,11 @@ import {
 } from "./commentsData"
 import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
-import { Challenge } from "./Kanban"
+import { Challenge, getCategoryLabel } from "./Kanban"
 import { ChallengeService } from "@/api/services/challenge.service"
+import { startupService } from "@/api/services/startup.service"
+import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload"
+import Image from "next/image"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -114,8 +117,16 @@ type FormResolutionCardsProps = {
 }
 
 export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
-  useEffect(() => {
+  const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([])
+  const { isMobile } = useBreakpoints()
 
+  useEffect(() => {
+    async function fetchStartups() {
+      const response = await startupService.showAllStartups()
+      setStartups(response)
+    }
+
+    fetchStartups()
   }, [])
 
   return (
@@ -191,8 +202,52 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
               </div>
             </div>
             {visibility === "PRIVATE" && (
-              <div>
+              <div className="flex flex-col w-full gap-2 overflow-y-auto scrollbar-hidden max-h-[300px]">
                 <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
+                {startups.map((startup) => (
+                  <div key={startup.id} className={`flex rounded-2xl w-full justify-between bg-gray-100 flex-col`}>
+                    <div className={`relative bg-gray-200 rounded-t-2xl h-30 w-full`}>
+                      {startup.logo && (
+                        <Image
+                          src={startup.logo}
+                          alt="startup-logo"
+                          fill
+                          objectFit="cover"
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex flex-col w-full justify-between gap-2 p-4">
+                      <div className="flex w-full justify-between">
+                        <div className="flex flex-col gap-1">
+                          <h1 className="text-black text-lg font-semibold">
+                            {startup.name}
+                          </h1>
+                          <h2 className="text-[#666] text-sm">
+                            {getCategoryLabel(startup.industry_segment)}
+                          </h2>
+                        </div>
+
+                        <div className="flex flex-col gap-2 text-black">
+                          <div className="flex items-center gap-1">
+                            <MoreVertical size={20}/>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end">
+                        <button 
+                          className="flex justify-center w-20 px-1 py-2
+                          rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
+                          text-[12px] cursor-pointer"
+                        >
+                          Convidar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -201,7 +256,8 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
           <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
         )}
       </div>
-      <div className="sticky bottom-0 flex gap-4 items-center justify-center">
+      
+      <div className="sticky bottom-0 left-0 w-full bg-white border-t flex gap-4 items-center justify-center py-3">
         <button
           className="flex w-30 justify-center px-1 py-2
           rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
@@ -429,7 +485,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             onClose={() => setIsCardOpen(false)}
           >
             <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-100">
-              <div className="bg-white p-4 rounded-2xl w-[80vw] md:w-[40vw] h-[40vh] overflow-hidden flex flex-col">
+              <div className="bg-white px-4 pt-4 rounded-2xl w-[90vw] md:w-[40vw] h-[70vh] overflow-hidden flex flex-col">
                 <FormResolutionCard
                   setIsOpen={setIsCardOpen}
                   performMove={performMove}
