@@ -1,29 +1,77 @@
-import { BriefcaseBusiness, Bug, Building2, ChartNoAxesCombined, ChartPie, CircleCheck, CircleCheckBig, ClipboardList, Lamp, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users, X } from "lucide-react";
+import { BriefcaseBusiness, Bug, Building2, Calendar, ChartNoAxesCombined, ChartPie, CircleCheck, CircleCheckBig, CircleUserRound, ClipboardList, Lamp, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users, X } from "lucide-react";
 import ForwardButton from "./ForwardButton"
 import { useState } from 'react';
 import { Comment } from "./Comment";
 import { ideationCommentSections } from "./commentsData";
 import PreviousButton from "./PreviousButton";
+import { dateFormatter, shortDateFormatter } from "./Kanban";
+
+type CardContentsHeaderProps = {
+  challengeTitle: string;
+  category: string;
+  creator: string;
+  startDate: string;
+  endDate: string;
+  visibility?: string;
+}
+
+export const CardContentsHeader = ({ challengeTitle, category, creator, startDate, endDate, visibility }: CardContentsHeaderProps) => {
+
+  return (
+    <div className="mb-6">
+      <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challengeTitle}</h1>
+      <div className="flex gap-2">
+        <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+          {category.toUpperCase()}
+        </button>
+
+        {visibility && (
+          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+            {visibility.toUpperCase()}
+          </button>
+        )}
+      </div>
+      <div className="flex">
+        <div className="flex items-center gap-2">
+          <Calendar size={16}/>
+          <p>
+            {shortDateFormatter.format(new Date(startDate))} -{" "}
+            {dateFormatter.format(new Date(endDate))}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <CircleUserRound size={16}/>
+          <p>{creator}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 type CardChallangeContentProps = {
   challangeTitle: string;
   category: string;
   description: string;
+  strategicAlignment: string;
+  innovativePotential: string;
+  businessRelevance: string;
+  startDate: string;
+  endDate: string;
+  creator: string;
 }
 
-export const CardChallangeContent = ({ challangeTitle, category, description }: CardChallangeContentProps) => {
+export const CardChallangeContent = ({ challangeTitle, category, description, strategicAlignment, innovativePotential, businessRelevance, startDate, endDate, creator }: CardChallangeContentProps) => {
   return (
     //conteudo do card de desafio
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
-      <div className="mb-6">
-        <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-        <div className="flex gap-2">
-          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-            {category.toUpperCase()}
-          </button>
-        </div>
-      </div>
+      <CardContentsHeader
+        challengeTitle={challangeTitle}
+        category={category}
+        startDate={startDate}
+        endDate={endDate}
+        creator={creator}
+      />
 
       {/* conteudo */}
       <div>
@@ -45,7 +93,7 @@ export const CardChallangeContent = ({ challangeTitle, category, description }: 
             Alinhamento Estratégico
           </h1>
           <p className="text-sm text-gray-600 font-medium text-justify">
-            {description}
+            {strategicAlignment}
           </p>
         </div>
 
@@ -56,7 +104,7 @@ export const CardChallangeContent = ({ challangeTitle, category, description }: 
             Potência Inovador
           </h1>
           <p className="text-sm text-gray-600 font-medium text-justify">
-            {description}
+            {innovativePotential}
           </p>
         </div>
 
@@ -67,7 +115,7 @@ export const CardChallangeContent = ({ challangeTitle, category, description }: 
             Relevância para o negócio
           </h1>
           <p className="text-sm text-gray-600 font-medium text-justify">
-            {description}
+            {businessRelevance}
           </p>
         </div>
       </div>
@@ -78,21 +126,25 @@ export const CardChallangeContent = ({ challangeTitle, category, description }: 
 type CardPreScreeningContentProps = {
   challangeTitle: string;
   category: string;
-  description: string;
+  strategicAlignment: string;
+  innovativePotential: string;
+  businessRelevance: string;
+  startDate: string;
+  endDate: string;
+  creator: string;
 }
 
-export const CardPreScreeningContent = ({ challangeTitle, category, description }: CardPreScreeningContentProps) => {
+export const CardPreScreeningContent = ({ challangeTitle, category, startDate, endDate, creator, businessRelevance, innovativePotential, strategicAlignment }: CardPreScreeningContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
-      <div className="mb-6">
-        <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-        <div className="flex gap-2">
-          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-            {category.toUpperCase()}
-          </button>
-        </div>
-      </div>
+      <CardContentsHeader
+        challengeTitle={challangeTitle}
+        category={category}
+        startDate={startDate}
+        endDate={endDate}
+        creator={creator}
+      />
 
       {/* conteudo */}
       <div>
@@ -103,7 +155,7 @@ export const CardPreScreeningContent = ({ challangeTitle, category, description 
             Alinhamento Estratégico
           </h1>
           <p className="text-sm text-gray-600 font-medium text-justify">
-            {description}
+            {strategicAlignment}
           </p>
           <Rating/>
         </div>
@@ -115,7 +167,7 @@ export const CardPreScreeningContent = ({ challangeTitle, category, description 
             Potência Inovador
           </h1>
           <p className="text-sm text-gray-600 font-medium text-justify">
-            {description}
+            {innovativePotential}
           </p>
           <Rating/>
         </div>
@@ -127,7 +179,7 @@ export const CardPreScreeningContent = ({ challangeTitle, category, description 
             Relevância para o negócio
           </h1>
           <p className="text-sm text-gray-600 font-medium text-justify">
-            {description}
+            {businessRelevance}
           </p>
           <Rating/>
         </div>
@@ -141,35 +193,29 @@ export const CardPreScreeningContent = ({ challangeTitle, category, description 
 type CardDetailedScreeningContentProps = {
   challangeTitle: string;
   category: string;
-  description: string;
+  startDate: string;
+  endDate: string;
+  creator: string;
+  visibility: string;
 }
 
-export const CardDetailedScreeningContent = ({ challangeTitle, category, description }: CardDetailedScreeningContentProps) => {
+export const CardDetailedScreeningContent = ({ challangeTitle, category, startDate, endDate, creator, visibility }: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
-  const [isPublic, setIsPublic] = useState(false)
   const [inviteStartup, setInviteStartup] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}
       <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
-        <div className="mb-6">
-          <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-          <div className="flex gap-2">
-            <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-              {category.toUpperCase()}
-            </button>
-
-            <button 
-              onClick={() => setIsOpen(true)}
-              className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1"
-            >
-              {isPublic ? "PUBLICO" : "PRIVADO"}
-            </button>
-          </div>
-        </div>
+        <CardContentsHeader
+          challengeTitle={challangeTitle}
+          category={category}
+          startDate={startDate}
+          endDate={endDate}
+          creator={creator}
+          visibility={visibility}
+        />
 
         <div className="relative flex items-center">
           <div className="flex gap-4 items-center xl:justify-center w-full max-w-md">
@@ -458,23 +504,6 @@ export const CardDetailedScreeningContent = ({ challangeTitle, category, descrip
           <ProgressBarActions percentage={66}/>
         </div>
       )}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
-          <div className="bg-white rounded-[12px] shadow-xl p-4 w-[80vw] sm:w-[50vw] lg:w-[30vw] relative">
-            <X 
-              onClick={() => setIsOpen(false)}
-              size={18} 
-              className="absolute top-4 right-4 text-black hover:text-[#090D15]"
-            />
-            <FormResolutionCard 
-              isPublic={isPublic} 
-              setIsPublic={setIsPublic} 
-              setInviteStartup={setInviteStartup} 
-              inviteStartup={inviteStartup}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -547,19 +576,23 @@ type CardExperimentationContentProps = {
   challangeTitle: string;
   category: string;
   description: string;
+  startDate: string;
+  endDate: string;
+  creator: string;
+  visibility: string;
 }
 
-export const CardExperimentationContent = ({ challangeTitle, category, description }: CardExperimentationContentProps) => {
+export const CardExperimentationContent = ({ challangeTitle, category, startDate, endDate, creator, visibility }: CardExperimentationContentProps) => {
  return (
   <div  className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
-    <div className="mb-6">
-      <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challangeTitle}</h1>
-      <div className="flex gap-2">
-        <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-          {category.toUpperCase()}
-        </button>
-      </div>
-    </div>
+    <CardContentsHeader
+      challengeTitle={challangeTitle}
+      category={category}
+      startDate={startDate}
+      endDate={endDate}
+      creator={creator}
+      visibility={visibility}
+    />
     
     <div className="flex flex-col gap-1 mb-6">
       <h1 className="flex gap-1 items-center text-black text-lg">
@@ -692,99 +725,6 @@ export const Rating = ({ initialScore = 0 }) => {
     </div>
   );
 };
-
-type FormResolutionCardsProps = {
-  isPublic: boolean;
-  setIsPublic: (isPublic: boolean) => void;
-  inviteStartup: boolean;
-  setInviteStartup: (invite: boolean) => void;
-}
-
-export const FormResolutionCard = ({ isPublic, setIsPublic, inviteStartup, setInviteStartup }: FormResolutionCardsProps) => {
-
-  return (
-    <div className="flex flex-col w-full">
-      <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
-      <div className="flex w-full justify-around">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsPublic(false)}
-            className={`h-5 w-5 rounded-full flex items-center justify-center 
-            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-          >
-            <div className={`h-3 w-3 rounded-full ${
-              !isPublic ? "bg-[#0B2B72]" : ""
-            }`}>
-
-            </div>
-          </button>
-          <label className="text-sm text-[#666] font-semibold">PRIVADO</label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsPublic(true)}
-            className={`h-5 w-5 rounded-full flex items-center justify-center 
-            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-          >
-            <div className={`h-3 w-3 rounded-full ${
-              isPublic ? "bg-[#0B2B72]" : ""
-            }`}>
-
-            </div>
-          </button>
-          <label className="text-sm text-[#666] font-semibold">PUBLICO</label>
-        </div>
-      </div>
-      {!isPublic ? (
-        <div className="border-t flex flex-col mt-4 py-4">
-          <div className="flex w-full justify-around">
-            <div className="flex items-center w-35 gap-2">
-              <button
-                onClick={() => setInviteStartup(true)}
-                className={`h-4 w-4 rounded-full flex items-center justify-center 
-                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-              >
-                <div className={`h-2 w-2 rounded-full ${
-                  inviteStartup ? "bg-[#0B2B72]" : ""
-                }`}>
-
-                </div>
-              </button>
-              <label className="text-xs text-[#666] font-semibold">Convidar startup especifica</label>
-            </div>
-
-            <div className="flex items-center w-35 gap-2">
-              <button
-                onClick={() => setInviteStartup(false)}
-                className={`h-4 w-4 rounded-full flex items-center justify-center 
-                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
-                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
-              >
-                <div className={`h-2 w-2 rounded-full ${
-                  !inviteStartup ? "bg-[#0B2B72]" : ""
-                }`}>
-
-                </div>
-              </button>
-              <label className="text-xs text-[#666] font-semibold">Resolver internamente</label>
-            </div>
-          </div>
-          {inviteStartup && (
-            <div>
-              <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
-            </div>
-          )}
-        </div>
-      ) : (
-        <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
-      )}
-    </div>
-  )
-}
 
 export const ProgressBarActions = ({percentage}: {percentage: number}) => {
   return (
