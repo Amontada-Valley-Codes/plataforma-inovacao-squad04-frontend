@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 type ForwardButtonProps = {
   className?: string;
   challengeId: string | undefined;
-  handleApproveAndMove: (featureId: string | undefined) => void;
+  handleApproveAndMove: (challengeId: string | undefined) => void;
 }
 
 export default function ForwardButton({ className, handleApproveAndMove, challengeId }: ForwardButtonProps) {

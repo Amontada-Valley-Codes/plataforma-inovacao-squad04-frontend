@@ -20,7 +20,7 @@ import {
   ideationCommentSections,
   experimentationCommentSections,
 } from "./commentsData"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
 import { Challenge } from "./Kanban"
 
@@ -104,6 +104,113 @@ type CardExpandedProps = {
   }[];
 }
 
+type FormResolutionCardsProps = {
+  setIsOpen: (isOpen: boolean) => void;
+  challengeId: string | undefined;
+  performMove: (challengeId: string | undefined, visibilitytToSet?: string) => void
+  visibility: string;
+  setVisibility: (visibility: string) => void;
+}
+
+export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
+
+  return (
+    <div className="flex flex-col w-full">
+      <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
+      <div className="flex w-full justify-around">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setVisibility("PRIVATE")}
+            className={`h-5 w-5 rounded-full flex items-center justify-center 
+            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+          >
+            <div className={`h-3 w-3 rounded-full ${
+              visibility === "PRIVATE" ? "bg-[#0B2B72]" : ""
+            }`}>
+
+            </div>
+          </button>
+          <label className="text-sm text-[#666] font-semibold">PRIVADO</label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setVisibility("PUBLIC")}
+            className={`h-5 w-5 rounded-full flex items-center justify-center 
+            font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+            focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+          >
+            <div className={`h-3 w-3 rounded-full ${
+              visibility === "PUBLIC" ? "bg-[#0B2B72]" : ""
+            }`}>
+
+            </div>
+          </button>
+          <label className="text-sm text-[#666] font-semibold">PUBLICO</label>
+        </div>
+      </div>
+      {(visibility === "PRIVATE" || visibility === "INTERNAL") && (
+        <div className="border-t flex flex-col mt-4 py-4">
+          <div className="flex w-full justify-around">
+            <div className="flex items-center w-35 gap-2">
+              <button
+                onClick={() => setVisibility("PRIVATE")}
+                className={`h-4 w-4 rounded-full flex items-center justify-center 
+                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+              >
+                <div className={`h-2 w-2 rounded-full ${
+                  visibility === "PRIVATE" ? "bg-[#0B2B72]" : ""
+                }`}>
+
+                </div>
+              </button>
+              <label className="text-xs text-[#666] font-semibold">Convidar startup especifica</label>
+            </div>
+
+            <div className="flex items-center w-35 gap-2">
+              <button
+                onClick={() => setVisibility("INTERNAL")}
+                className={`h-4 w-4 rounded-full flex items-center justify-center 
+                font-semibold text-sm transition-all duration-200 bg-[#D9D9D9] focus:outline-none 
+                focus:ring-1 focus:ring-blue-400 focus:ring-offset-2`}
+              >
+                <div className={`h-2 w-2 rounded-full ${
+                  visibility === "INTERNAL" ? "bg-[#0B2B72]" : ""
+                }`}>
+
+                </div>
+              </button>
+              <label className="text-xs text-[#666] font-semibold">Resolver internamente</label>
+            </div>
+          </div>
+          {visibility === "PRIVATE" && (
+            <div>
+              <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
+            </div>
+          )}
+        </div>
+      )} 
+      {visibility === "PUBLIC" && (
+        <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
+      )}
+      <div className="flex gap-4">
+        <button
+          onClick={() => setIsOpen(false)}
+        >
+          cancelar
+        </button>
+        <button
+          onClick={() => performMove(challengeId, visibility)}
+        >
+          avançar
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function CardExpanded({ isOpen, onClose, columns, cardData, challenges, setChallenges, setExpandedCard }: CardExpandedProps) {
   if (!cardData) return null
 
@@ -111,27 +218,50 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
   const currentColumnIndex = columns.findIndex(c => c.id === cardData.status)
   const isFirstColumn = currentColumnIndex === 0
   const isLastColumn = currentColumnIndex === columns.length - 1
+  const [visibility, setVisibility] = useState(cardData.visibility)
+  const [isCardOpen, setIsCardOpen] = useState(false)
 
   useEffect(() => {
     currentColumnName = columns.find(c => c.id === cardData.status)?.name
   }, [currentColumnName])
 
+  const performMove = (challengeId: string | undefined, visibilityToSet?: string) => {
+    const challengeToMove = challenges.find(c => c.id === challengeId);
+    if (!challengeToMove) return;
+
+    let challengeWithUpdates = { ...challengeToMove };
+
+    if (visibilityToSet) {
+      challengeWithUpdates.visibility = visibilityToSet;
+      setVisibility(visibilityToSet);
+    }
+
+    const currentColumnIndex = columns.findIndex(c => c.id === challengeWithUpdates.status);
+
+    if (currentColumnIndex < columns.length - 1) {
+      const nextColumn = columns[currentColumnIndex + 1];
+      const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
+      const otherChallenges = challenges.filter(c => c.id !== challengeId);
+      setChallenges([updatedChallenge, ...otherChallenges]);
+      setExpandedCard(updatedChallenge);
+    } else {
+      setExpandedCard(null);
+    }
+
+    setIsCardOpen(false);
+  };
+
+
   const handleApproveAndMove = (challengeId: string | undefined) => {
     const challengeToMove = challenges.find(c => c.id === challengeId);
     if (!challengeToMove) return;
 
-    const currentColumnIndex = columns.findIndex(c => c.id === challengeToMove?.status);
-
-    if (currentColumnIndex < columns.length - 1) {
-      const nextColumn = columns[currentColumnIndex + 1];
-      const updatedChallenges = { ...challengeToMove, column: nextColumn.id };
-      const otherChallenges = challenges.filter(c => c.id !== challengeId);
-      setChallenges([updatedChallenges, ...otherChallenges]);
-
-      setExpandedCard(updatedChallenges);
-    } else {
-      setExpandedCard(null);
+    if (challengeToMove.status === "DETAILED_SCREENING") {
+      setIsCardOpen(true)
+      return
     }
+
+    performMove(challengeId)
   };
 
   const handleMoveBack = (challengeId: string | undefined) => {
@@ -168,6 +298,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     challangeTitle={cardData.name} 
                     category={cardData.area}
                     description={cardData.description}
+                    startDate={cardData.startDate}
+                    endDate={cardData.endDate}
+                    creator={cardData.Users.name}
+                    businessRelevance={cardData.business_relevance}
+                    innovativePotential={cardData.innovative_potential}
+                    strategicAlignment={cardData.strategic_alignment}
                   />
                 }
                 commentsContent={<CommentsPanel sections={challangeCommentSections}/>}
@@ -183,7 +319,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   <CardPreScreeningContent 
                     challangeTitle={cardData.name} 
                     category={cardData.area}
-                    description={cardData.description}
+                    startDate={cardData.startDate}
+                    endDate={cardData.endDate}
+                    creator={cardData.Users.name}
+                    businessRelevance={cardData.business_relevance}
+                    innovativePotential={cardData.innovative_potential}
+                    strategicAlignment={cardData.strategic_alignment}
                   />
                 }
                 commentsContent={<CommentsPanel sections={preScreeningCommentSections}/>}
@@ -200,7 +341,10 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   <CardDetailedScreeningContent
                     challangeTitle={cardData.name}
                     category={cardData.area}
-                    description={cardData.description}
+                    startDate={cardData.startDate}
+                    endDate={cardData.endDate}
+                    creator={cardData.Users.name}
+                    visibility={cardData.visibility}
                   />
                 }
                 commentsContent={
@@ -237,6 +381,10 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     challangeTitle={cardData.name}
                     category={cardData.area}
                     description={cardData.description}
+                    startDate={cardData.startDate}
+                    endDate={cardData.endDate}
+                    creator={cardData.Users.name}
+                    visibility={cardData.visibility}
                   />
                 }
                 commentsContent={<CommentsPanel sections={experimentationCommentSections}/>}
@@ -248,6 +396,22 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
               />  
             )}
           </div>
+          <Modal
+            isOpen={isCardOpen}
+            onClose={() => setIsCardOpen(false)}
+          >
+            <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-100">
+              <div className="bg-white rounded-2xl w-[50vw] md:w-[30vw] h-[40vh] overflow-hidden flex flex-col">
+                <FormResolutionCard
+                  setIsOpen={setIsCardOpen}
+                  performMove={performMove}
+                  challengeId={cardData.id}
+                  visibility={visibility}
+                  setVisibility={setVisibility}
+                />
+              </div>
+            </div>
+          </Modal>
         </div>
       </Modal>
     </div>
