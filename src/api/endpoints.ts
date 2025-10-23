@@ -27,7 +27,7 @@ export const ENDPOINTS = {
     SHOW_ONE_CHALLENGE: (id: string) => `/challenge/${id}`,
     UPDATE_CHALLENGE: (id: string) => `/challenge/${id}`,
     UPDATE_STATUS: (id: string) => `/challenge/${id}/status`,
-    UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visiblity`
+    UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visibility`
   },
 
   CHECKLIST: {
