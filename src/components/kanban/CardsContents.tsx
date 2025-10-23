@@ -18,9 +18,9 @@ type CardContentsHeaderProps = {
 export const CardContentsHeader = ({ challengeTitle, category, creator, startDate, endDate, visibility }: CardContentsHeaderProps) => {
 
   return (
-    <div className="mb-6">
-      <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-3">{challengeTitle}</h1>
-      <div className="flex gap-2">
+    <div className="mb-4">
+      <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-1">{challengeTitle}</h1>
+      <div className="flex gap-2 mb-2">
         <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
           {category.toUpperCase()}
         </button>
@@ -31,7 +31,8 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
           </button>
         )}
       </div>
-      <div className="flex">
+
+      <div className="flex gap-4 text-gray-600">
         <div className="flex items-center gap-2">
           <Calendar size={16}/>
           <p>
@@ -40,7 +41,7 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <CircleUserRound size={16}/>
+          <CircleUserRound size={20}/>
           <p>{creator}</p>
         </div>
       </div>

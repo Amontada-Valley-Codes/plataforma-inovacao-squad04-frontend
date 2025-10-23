@@ -274,10 +274,10 @@
       const overColumn = columns.find((col) => col.id === overId);
 
 
-      if (overColumn && activeItem.column !== overId) {
+      if (overColumn && activeItem.status !== overId) {
         const activeIndex = data.findIndex((item) => item.id === active.id);
         const newData = [...data];
-        newData[activeIndex] = { ...newData[activeIndex], column: overId as string };
+        newData[activeIndex] = { ...newData[activeIndex], status: overId as string };
         onDataChange?.(arrayMove(newData, activeIndex, activeIndex));
       }
 
@@ -307,7 +307,7 @@
     const announcements: Announcements = {
       onDragStart({ active }) {
         const card = data.find((item) => item.id === active.id);
-        return `Pegou o card "${card?.name}" da coluna "${card?.column}"`;
+        return `Pegou o card "${card?.name}" da coluna "${card?.status}"`;
       },
       onDragOver({ active, over }) {
         const cardName = data.find((item) => item.id === active.id)?.name;
@@ -316,7 +316,7 @@
       },
       onDragEnd({ active, over }) {
         const cardName = data.find((item) => item.id === active.id)?.name;
-        const newColumnName = data.find(item => item.id === over?.id)?.column || columns.find((col) => col.id === over?.id)?.name;
+        const newColumnName = data.find(item => item.id === over?.id)?.status || columns.find((col) => col.id === over?.id)?.name;
         return `Soltou o card "${cardName}" na coluna "${newColumnName}"`;
       },
       onDragCancel({ active }) {

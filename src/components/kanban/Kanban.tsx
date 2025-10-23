@@ -53,17 +53,22 @@ const KanbanPage = () => {
   const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
 
   const handleApproveAndMove = (challangeId: string | undefined) => {
-    const cardToMove = challanges?.find(c => c.id === challangeId);
-    if (!cardToMove) return;
+    const challengeToMove = challanges?.find(c => c.id === challangeId);
+    if (!challengeToMove) return;
 
-    const currentColumnIndex = columns.findIndex(c => c.id === cardToMove.status);
+    const currentColumnIndex = columns.findIndex(c => c.id === challengeToMove.status);
 
     if (currentColumnIndex < columns.length - 1) {
       const nextColumn = columns[currentColumnIndex + 1];
-      const updatedChallenge = { ...cardToMove, column: nextColumn.id };
-      const otherChallenges = challanges?.filter(c => c.id !== challangeId);
-      const newChallenges = [updatedChallenge, ...otherChallenges];
-      setChallanges(newChallenges);
+
+      if (nextColumn.id === "IDEATION") {
+        setExpandedCard(challengeToMove)
+      } else {
+        const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
+        const otherChallenges = challanges?.filter(c => c.id !== challangeId);
+        const newChallenges = [updatedChallenge, ...otherChallenges];
+        setChallanges(newChallenges);
+      }
     }
   };
 
@@ -75,7 +80,7 @@ const KanbanPage = () => {
 
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
-      const updatedChallenges = { ...cardToMove, column: prevColumn.id };
+      const updatedChallenges = { ...cardToMove, status: prevColumn.id };
       const otherChallenges = challanges?.filter(c => c.id !== challengeId);
       const newChallenges = [updatedChallenges, ...otherChallenges];
       setChallanges(newChallenges);
@@ -136,10 +141,14 @@ const KanbanPage = () => {
                           : "justify-end"
                         }`}>
                           {!isFirstColumn && (
-                            <PreviousButton className='w-25' challengeId={challenge.id} handleMoveBack={handleMoveBack}/>
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <PreviousButton className='w-25' challengeId={challenge.id} handleMoveBack={handleMoveBack}/>
+                            </div>
                           )}
                           {!isLastColumn && (
-                            <ForwardButton className="w-25" challengeId={challenge.id} handleApproveAndMove={handleApproveAndMove}/>
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <ForwardButton className="w-25" challengeId={challenge.id} handleApproveAndMove={handleApproveAndMove}/>
+                            </div>
                           )}  
                         </div>
                       </div>
