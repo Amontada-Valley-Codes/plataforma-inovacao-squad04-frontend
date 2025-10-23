@@ -36,6 +36,7 @@ export type ShowAllChallengeResponse = {
   description: string
   visibility: string
   status: string
+  createdAt: string
   strategic_alignment: string
   innovative_potential: string
   business_relevance: string
