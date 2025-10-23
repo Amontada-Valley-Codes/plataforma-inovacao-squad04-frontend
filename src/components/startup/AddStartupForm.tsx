@@ -20,6 +20,7 @@ import { createPortal } from "react-dom";
 import { startupService } from "@/api/services/startup.service";
 import { CreateStartupPayload } from "@/api/payloads/startup.payload";
 import toast from "react-hot-toast";
+import { useStore } from "../../../store";
 
 type Props = {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
   const [activeLink, setActiveLink] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { triggerReload } = useStore();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -146,6 +148,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
 
         setTimeout(() => {
           setSuccess(false);
+          triggerReload();
           onClose();
         }, 1500);
       } catch (error: any) {
