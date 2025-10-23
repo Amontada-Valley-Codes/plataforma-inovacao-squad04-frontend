@@ -280,7 +280,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
-      const updatedChallenges = { ...challengeToMove, column: prevColumn.id };
+      const updatedChallenges = { ...challengeToMove, status: prevColumn.id };
       const otherChallenges = challenges.filter(c => c.id !== challengeId);
       setChallenges([updatedChallenges, ...otherChallenges]);
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Comment } from "./Comment";
 import { ideationCommentSections } from "./commentsData";
 import PreviousButton from "./PreviousButton";
-import { dateFormatter, shortDateFormatter } from "./Kanban";
+import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 
 type CardContentsHeaderProps = {
   challengeTitle: string;
@@ -15,6 +15,18 @@ type CardContentsHeaderProps = {
   visibility?: string;
 }
 
+export const getVisibilityLabel = (visibility: string) => {
+  switch (visibility) {
+    case "PUBLIC":
+      return "PÚBLICO"
+    case "PRIVATE":
+    default:
+      return "PRIVADO"
+    case "INTERNAL":
+      return "PRIVADO"
+  }
+}
+
 export const CardContentsHeader = ({ challengeTitle, category, creator, startDate, endDate, visibility }: CardContentsHeaderProps) => {
 
   return (
@@ -22,12 +34,12 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
       <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-1">{challengeTitle}</h1>
       <div className="flex gap-2 mb-2">
         <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-          {category.toUpperCase()}
+          {getCategoryLabel(category)}
         </button>
 
         {visibility && (
           <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-            {visibility.toUpperCase()}
+            {getVisibilityLabel(visibility)}
           </button>
         )}
       </div>
