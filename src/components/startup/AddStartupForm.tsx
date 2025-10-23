@@ -175,10 +175,13 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-lg 
-        w-full max-w-md p-6 mx-3 md:mx-0
-        max-h-[calc(100vh-40px)] md:max-h-[auto] 
-        overflow-y-auto md:overflow-visible z-50">
+      <div className=" relative bg-white dark:bg-gray-900 rounded-2xl shadow-lg 
+    w-full max-w-md p-6 mx-3 md:mx-0 max-h-[calc(100vh-40px)] 
+    overflow-y-auto z-50
+    [&::-webkit-scrollbar]:w-0
+    [&::-webkit-scrollbar-track]:bg-transparent
+    [&::-webkit-scrollbar-thumb]:bg-transparent
+    scrollbar-thin">
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 z-50">
             <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
