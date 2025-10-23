@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 import { ChallengeService } from "@/api/services/challenge.service";
+import { useStore } from "../../../store";
 
 type Props = {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
   });
   const [isFuncOpen, setIsFuncOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { triggerReload } = useStore();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -91,10 +93,11 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
 
       setTimeout(() => {
         setLoading(false);
-        setSuccess(true);
+        setSuccess(true); 
         setTimeout(() => {
           setSuccess(false);
           onClose();
+          triggerReload();
         }, 2000);
       }, 1500);
     } catch (error) {

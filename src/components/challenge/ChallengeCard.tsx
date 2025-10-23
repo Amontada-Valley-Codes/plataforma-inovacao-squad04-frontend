@@ -8,6 +8,7 @@ import ApplyButton from "./ApplyButton";
 import ApplyModal from "@/components/startup/ApplyModal";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { enterpriseService } from "@/api/services/enterprise.service";
+import { useStore } from "../../../store";
 
 type Status = "Completed" | "In Progress" | "Pending" | string;
 
@@ -65,48 +66,51 @@ export default function ChallengeCard({
   onApply,
 }: Props) {
   const [data, setData] = useState<Challenge[]>([]);
+  const { reload } = useStore();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchChallenges() {
-      try {
-        const response = await ChallengeService.showAllChallenges();
-        setData(response);
 
-        const enterpriseIds = [...new Set(response.map((c) => c.enterpriseId))];
+  async function fetchChallenges() {
+    try {
+      const response = await ChallengeService.showAllChallenges();
+      setData(response);
 
-        const enterpriseResponses = await Promise.all(
-          enterpriseIds.map(async (id) => {
-            try {
-              const enterpriseData = await enterpriseService.showOneEnterprises(id);
-              return { id, name: enterpriseData?.name || "Empresa sem nome" };
-            } catch (err) {
-              console.error(`Erro ao buscar empresa ${id}:`, err);
-              return { id, name: "Empresa desconhecida" };
-            }
-          })
-        );
+      const enterpriseIds = [...new Set(response.map((c) => c.enterpriseId))];
 
-        const enterpriseMap: Record<string, string> = {};
-        enterpriseResponses.forEach((e) => {
-          enterpriseMap[e.id] = e.name;
-        });
+      const enterpriseResponses = await Promise.all(
+        enterpriseIds.map(async (id) => {
+          try {
+            const enterpriseData = await enterpriseService.showOneEnterprises(id);
+            return { id, name: enterpriseData?.name || "Empresa sem nome" };
+          } catch (err) {
+            console.error(`Erro ao buscar empresa ${id}:`, err);
+            return { id, name: "Empresa desconhecida" };
+          }
+        })
+      );
 
-        setData((prev) =>
-          prev.map((challenge) => ({
-            ...challenge,
-            enterpriseName: enterpriseMap[challenge.enterpriseId] || "Empresa não informada",
-          }))
-        );
-      } catch (err) {
-        console.error("Erro ao buscar desafios:", err);
-      } finally {
-        setLoading(false);
-      }
+      const enterpriseMap: Record<string, string> = {};
+      enterpriseResponses.forEach((e) => {
+        enterpriseMap[e.id] = e.name;
+      });
+
+      setData((prev) =>
+        prev.map((challenge) => ({
+          ...challenge,
+          enterpriseName: enterpriseMap[challenge.enterpriseId] || "Empresa não informada",
+        }))
+      );
+    } catch (err) {
+      console.error("Erro ao buscar desafios:", err);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchChallenges();
-  }, []);
+  }, [reload])
+
 
 
   // role
