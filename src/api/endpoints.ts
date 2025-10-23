@@ -30,11 +30,16 @@
       UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visibility`
     },
 
-    CHECKLIST: {
-      CREATE_CHECKLIST: (id: string) => `/checklist/${id}`,
-      SHOW_CHECKLIST: (id: string) => `/checklist/${id}`,
-      UPDATE_STATUS_CHECKLIST: (id: string) => `/checklist/${id}`,
-      DELETE_CHECKLIST: (id: string) => `/checklist/${id}`,
-      UPDATE_ITEM_CHECKLIST: (id: string) => `/checklist/${id}`
-    }
+  CHECKLIST: {
+    CREATE_CHECKLIST: (id: string) => `/checklist/${id}`,
+    SHOW_CHECKLIST: (id: string) => `/checklist/${id}`,
+    UPDATE_STATUS_CHECKLIST: (id: string) => `/checklist/${id}`,
+    DELETE_CHECKLIST: (id: string) => `/checklist/${id}`,
+    UPDATE_ITEM_CHECKLIST: (id: string) => `/checklist/${id}`
+  },
+
+  DASHBOARD: {
+    ADMIN: '/admin/dashboard',
+    GESTOR: '/dashboard/gestor'
   }
+}
