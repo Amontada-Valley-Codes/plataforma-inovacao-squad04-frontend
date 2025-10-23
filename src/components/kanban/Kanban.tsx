@@ -26,12 +26,12 @@ const columns = [
   { id: 'EXPERIMENTATION', name: 'Experimentação' },
 ];
 
-const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
+export const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
   month: 'numeric',
   day: 'numeric',
   year: 'numeric',
 });
-const shortDateFormatter = new Intl.DateTimeFormat('pt-BR', {
+export const shortDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   month: 'numeric',
   day: 'numeric',
 });
