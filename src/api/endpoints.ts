@@ -36,5 +36,10 @@ export const ENDPOINTS = {
     UPDATE_STATUS_CHECKLIST: (id: string) => `/checklist/${id}`,
     DELETE_CHECKLIST: (id: string) => `/checklist/${id}`,
     UPDATE_ITEM_CHECKLIST: (id: string) => `/checklist/${id}`
+  },
+
+  DASHBOARD: {
+    ADMIN: '/admin/dashboard',
+    GESTOR: '/dashboard/gestor'
   }
 }

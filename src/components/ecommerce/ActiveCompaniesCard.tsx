@@ -7,11 +7,9 @@ type CompanyRanking = {
   rank: number;
 };
 
-const ranking: CompanyRanking[] = [
-  { rank: 1, name: "Empresa X", ideas: 27 },
-  { rank: 2, name: "Empresa Y", ideas: 19 },
-  { rank: 3, name: "Empresa Z", ideas: 15 },
-];
+type ActiveCompaniesCardProps = {
+  rankingEmpresas: { name: string; totalDesafios: number }[];
+};
 
 const getMedalColor = (rank: number) => {
   switch (rank) {
@@ -26,7 +24,16 @@ const getMedalColor = (rank: number) => {
   }
 };
 
-export default function ActiveCompaniesCard() {
+export default function ActiveCompaniesCard({ rankingEmpresas }: ActiveCompaniesCardProps) {
+  // Adiciona o rank automático
+  const ranking: CompanyRanking[] = rankingEmpresas
+    .sort((a, b) => b.totalDesafios - a.totalDesafios) 
+    .map((company, index) => ({
+      name: company.name,
+      ideas: company.totalDesafios,
+      rank: index + 1,
+    }));
+
   return (
     <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
       <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white/90 mb-4">
@@ -52,7 +59,7 @@ export default function ActiveCompaniesCard() {
               </span>
             </div>
             <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-              {company.ideas} ideias
+              {company.ideas} desafios
             </span>
           </li>
         ))}

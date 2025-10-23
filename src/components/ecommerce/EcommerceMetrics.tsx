@@ -4,16 +4,17 @@ import { BoxIconLine, GroupIcon } from "@/icons";
 
 type Metric = {
   title: string;
-  value: number;
+  value: number | null;
   icon: React.ReactNode;
 };
 
-const metrics: Metric[] = [
-  { title: "Empresas cadastradas", value: 124, icon: <GroupIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Desafios", value: 58, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Ideias submetidas", value: 842, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Empresas Ativas", value: 37, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-];
+type MetricsCardsProps = {
+  totalEmpresas: number;
+  totalDesafios: number;
+  totalIdeias: number;
+  empresasAtivas: number;
+}
+
 
 const MetricItem = ({ title, value, icon }: Metric) => (
   <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-white/[0.03] flex flex-col items-center text-center">
@@ -25,7 +26,15 @@ const MetricItem = ({ title, value, icon }: Metric) => (
   </div>
 );
 
-export const MetricsCards = () => {
+export const MetricsCards = ({ empresasAtivas, totalDesafios, totalEmpresas, totalIdeias }: MetricsCardsProps) => {
+
+  const metrics: Metric[] = [
+  { title: "Empresas cadastradas", value: totalEmpresas, icon: <GroupIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Desafios", value: totalDesafios, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Ideias submetidas", value: totalIdeias, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Empresas Ativas", value: empresasAtivas, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
       {metrics.map((metric, index) => (
