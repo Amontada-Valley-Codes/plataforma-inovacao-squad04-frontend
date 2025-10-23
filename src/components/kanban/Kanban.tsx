@@ -36,6 +36,32 @@ export const shortDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   day: 'numeric',
 });
 
+export const getCategoryLabel = (category: string) => {
+  switch (category) {
+    case 'TECHNOLOGY':
+      return 'TECNOLOGIA';
+    case 'HEALTH':
+      return 'SAÚDE';
+    case 'EDUCATION':
+      return 'EDUCAÇÃO';
+    case 'ENVIRONMENT':
+      return 'MEIO AMBIENTE';
+    case 'BUSINESS':
+      return 'NEGÓCIOS';
+    case 'SOCIAL':
+      return 'SOCIAL';
+    case 'ENGINEERING':
+      return 'ENGENHARIA';
+    case 'AGRICULTURE':
+      return 'AGRICULTURA';
+    case 'DESIGN':
+      return 'DESIGN';
+    case 'OTHER':
+    default:
+      return 'OUTRO';
+  }
+};
+
 export type Challenge = ShowAllChallengeResponse
 
 const KanbanPage = () => {
@@ -123,7 +149,7 @@ const KanbanPage = () => {
                             <div className='flex gap-1 mt-1'>
                               <p className='flex items-center gap-1 m-0 font-semibold dark:text-[#ced3db] text-neutral-700 text-[12px]'>
                                 <Tag size={14} className='text-white dark:text-[#ced3db] fill-neutral-700'/>
-                                {challenge.area}
+                                {getCategoryLabel(challenge.area)}
                               </p>
                             </div>
                             <p className="flex items-center gap-1 m-0 font-semibold text-[#666] dark:text-[#ced3db] text-[12px] mt-1">

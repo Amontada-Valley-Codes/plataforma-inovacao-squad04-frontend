@@ -23,6 +23,7 @@ import {
 import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
 import { Challenge } from "./Kanban"
+import { ChallengeService } from "@/api/services/challenge.service"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -113,6 +114,9 @@ type FormResolutionCardsProps = {
 }
 
 export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
+  useEffect(() => {
+
+  }, [])
 
   return (
     <div className="relative flex flex-col justify-between w-full h-full">
@@ -233,31 +237,47 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
     currentColumnName = columns.find(c => c.id === cardData.status)?.name
   }, [currentColumnName])
 
-  const performMove = (challengeId: string | undefined, visibilityToSet?: string) => {
+  const performMove = async (challengeId: string | undefined, visibilityToSet?: string) => {
     const challengeToMove = challenges.find(c => c.id === challengeId);
     if (!challengeToMove) return;
 
     let challengeWithUpdates = { ...challengeToMove };
 
-    if (visibilityToSet) {
-      challengeWithUpdates.visibility = visibilityToSet;
-      setVisibility(visibilityToSet);
+    try {
+      if (visibilityToSet && challengeId) {
+        challengeWithUpdates.visibility = visibilityToSet;
+        setVisibility(visibilityToSet);
+
+        if (challengeId) {
+          await ChallengeService.changeVisibility(challengeId, { visibility: visibilityToSet })
+          console.log("✅ Visibilidade alterada com sucesso");
+        }
+      }
+
+      const currentColumnIndex = columns.findIndex(c => c.id === challengeWithUpdates.status);
+
+      if (currentColumnIndex < columns.length - 1) {
+        const nextColumn = columns[currentColumnIndex + 1];
+        const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
+
+        if (challengeId) {
+          await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
+          console.log("✅ Status atualizado com sucesso");
+        }
+
+        const otherChallenges = challenges.filter(c => c.id !== challengeId);
+        setChallenges([updatedChallenge, ...otherChallenges]);
+        setExpandedCard(updatedChallenge);
+      } else {
+        setExpandedCard(null);
+      }
+
+    } catch (error) {
+      console.error("❌ Erro ao atualizar desafio:", error);
+    } finally {
+      setIsCardOpen(false);
     }
-
-    const currentColumnIndex = columns.findIndex(c => c.id === challengeWithUpdates.status);
-
-    if (currentColumnIndex < columns.length - 1) {
-      const nextColumn = columns[currentColumnIndex + 1];
-      const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
-      const otherChallenges = challenges.filter(c => c.id !== challengeId);
-      setChallenges([updatedChallenge, ...otherChallenges]);
-      setExpandedCard(updatedChallenge);
-    } else {
-      setExpandedCard(null);
-    }
-
-    setIsCardOpen(false);
-  };
+  }
 
 
   const handleApproveAndMove = (challengeId: string | undefined) => {
@@ -280,7 +300,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
-      const updatedChallenges = { ...challengeToMove, column: prevColumn.id };
+      const updatedChallenges = { ...challengeToMove, status: prevColumn.id };
       const otherChallenges = challenges.filter(c => c.id !== challengeId);
       setChallenges([updatedChallenges, ...otherChallenges]);
 
