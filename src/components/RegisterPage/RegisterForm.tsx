@@ -31,13 +31,11 @@ export default function RegisterForm() {
     toast.custom((t) => (
       <div
         className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-          text-white font-medium transition-all duration-300 transform ${
-            t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
           }
-          ${
-            type === "success"
-              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
+          ${type === "success"
+            ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
+            : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
           }`}
       >
         {type === "success" ? (
@@ -53,64 +51,61 @@ export default function RegisterForm() {
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 2) return `(${numbers}`;
-    if (numbers.length <= 6)
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    if (numbers.length <= 10)
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(
-        6
-      )}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
-      7,
-      11
-    )}`;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.phone ||
-      !formData.email ||
-      !formData.password ||
-      !formData.repeatPassword
-    ) {
+    if (!formData.name || !formData.phone || !formData.email || !formData.password || !formData.repeatPassword) {
       setError("Preencha todos os campos.");
       return;
     }
-
     if (formData.password !== formData.repeatPassword) {
       setError("As senhas não coincidem.");
       return;
     }
-
-    setError("");
-
-    setLoading(true);
-    try {
-      const { repeatPassword, ...dataToSend } = formData;
-      const data = await authService.Register({ ...dataToSend, token });
-      console.log(data);
-
-      setLoading(false);
-
-      showCustomToast("Conta criada com sucesso! Faça login para continuar.", "success");
-      setTimeout(() => {
-        router.push("/auth/login");
-      }, 1000);
-    } catch (err: any) {
-      setLoading(false);
-      console.log(err);
-      setError(err.response?.data?.message);
-      showCustomToast(err.response?.data?.message || "Erro ao criar conta.", "error");
+    if (!token) {
+      setError("Token de convite ausente. Abra o link recebido por e-mail.");
+      return;
     }
 
-    console.log("✅ Formulário enviado:", formData);
+    setError("");
+    setLoading(true);
+
+    try {
+      const { repeatPassword, ...dataToSend } = formData;
+
+      // 1) registra com token de convite
+      await authService.Register({ ...dataToSend, token });
+
+      // 2) login automático (back retorna { access_token })
+      const { access_token } = await authService.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // 3) guarda o token p/ o axios interceptor
+      localStorage.setItem("access_token", access_token);
+
+      // 4) redireciona
+      showCustomToast("Conta criada com sucesso! Redirecionando…", "success");
+      router.push("/admin/dashboard"); // ajuste se quiser outra rota
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Erro ao criar conta.";
+      setError(msg);
+      showCustomToast(msg, "error");
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) setToken(token);
+    const t = searchParams.get("token");
+    if (t) setToken(t);
   }, [searchParams]);
 
   return (
