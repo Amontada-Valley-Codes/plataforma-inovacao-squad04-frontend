@@ -7,7 +7,7 @@ import ChallengeCard from "@/components/challenge/ChallengeCard";
 import { getCurrentUser } from "@/lib/auth";
 
 export default function MeusDesafiosPage() {
-    const [authorName, setAuthorName] = React.useState<string>("");
+    const [authorName] = React.useState<string>("");
     const [companyId, setCompanyId] = React.useState<number | undefined>(undefined);
 
     React.useEffect(() => {
