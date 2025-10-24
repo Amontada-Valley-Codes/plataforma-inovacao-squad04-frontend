@@ -13,7 +13,7 @@ export default function MeusDesafiosPage() {
     React.useEffect(() => {
         (async () => {
         const me = await getCurrentUser();
-        setAuthorName(me.name);
+        // setAuthorName(me.name);
         // suporta companyId OU empresaId no mock
         const cid = (me as any).companyId ?? (me as any).empresaId;
         setCompanyId(typeof cid === "number" ? cid : undefined);
