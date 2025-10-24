@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -88,6 +90,7 @@ export default function RegisterForm() {
 
     setLoading(true);
     try {
+      /* @typescript-eslint/no-unused-vars */
       const { repeatPassword, ...dataToSend } = formData;
       const data = await authService.Register({ ...dataToSend, token });
       console.log(data);

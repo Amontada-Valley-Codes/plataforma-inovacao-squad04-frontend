@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { useState } from "react";
@@ -12,7 +14,6 @@ import {
   AlignLeft,
   Cpu,
   BarChart3,
-  Link as LinkIcon,
   X,
   Plus,
 } from "lucide-react";
