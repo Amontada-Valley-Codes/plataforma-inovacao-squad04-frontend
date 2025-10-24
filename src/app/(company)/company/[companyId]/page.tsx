@@ -1,22 +1,24 @@
-import { FC } from "react";
+import CompanieCard from "@/components/companies/CompanieCard";
+import { getCurrentUser, getUserRole } from "@/lib/auth";
 
-type PageProps = {
-  params: {
-    companyId: string;
-  };
-};
+interface PageProps {
+  params: { companyId: string };
+}
 
-const Page: FC<PageProps> = ({ params }) => {
+export default async function CompanyEmpresaPage({ params }: PageProps) {
+  const { companyId } = params;
+
+  // buscar dados async
+  const [me, role] = await Promise.all([getCurrentUser(), getUserRole()]);
+
   return (
-    <div className="p-4 sm:p-6 md:p-8 w-full max-w-screen-lg mx-auto overflow-x-hidden">
-      <h1 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">
-        Company Dashboard
-      </h1>
-      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 break-all">
-        companyId: <b>{params.companyId}</b>
-      </p>
+    <div className="w-full max-w-screen-lg mx-auto px-3 sm:px-4 md:px-6 py-4 overflow-x-hidden">
+      <CompanieCard
+        role={role}
+        companyId={companyId}
+        autoOpen
+        viewerCompanyId={me?.companyId}
+      />
     </div>
   );
-};
-
-export default Page;
+}
