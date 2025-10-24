@@ -112,7 +112,7 @@ type FormResolutionCardsProps = {
   setIsOpen: (isOpen: boolean) => void;
   challengeId: string | undefined;
   performMove: (challengeId: string | undefined, visibilitytToSet?: string) => void
-  visibility: string;
+  visibility: string | undefined;
   setVisibility: (visibility: string) => void;
 }
 
@@ -279,14 +279,16 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 }
 
 export default function CardExpanded({ isOpen, onClose, columns, cardData, challenges, setChallenges, setExpandedCard }: CardExpandedProps) {
+  const [visibility, setVisibility] = useState(cardData?.visibility)
+  const [isCardOpen, setIsCardOpen] = useState(false)
+  
+  
   if (!cardData) return null
 
 /*   const currentColumnName = columns.find(c => c.id === cardData.status)?.name */
   const currentColumnIndex = columns.findIndex(c => c.id === cardData.status)
   const isFirstColumn = currentColumnIndex === 0
   const isLastColumn = currentColumnIndex === columns.length - 1
-  const [visibility, setVisibility] = useState(cardData.visibility)
-  const [isCardOpen, setIsCardOpen] = useState(false)
 
   /* useEffect(() => {
     currentColumnName = columns.find(c => c.id === cardData.status)?.name

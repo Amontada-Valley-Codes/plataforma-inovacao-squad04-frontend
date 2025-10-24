@@ -90,7 +90,7 @@ export default function RegisterForm() {
 
     setLoading(true);
     try {
-      /* @typescript-eslint/no-unused-vars */
+      /// eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { repeatPassword, ...dataToSend } = formData;
       const data = await authService.Register({ ...dataToSend, token });
       console.log(data);

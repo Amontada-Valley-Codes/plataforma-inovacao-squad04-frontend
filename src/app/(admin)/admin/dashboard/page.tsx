@@ -15,14 +15,6 @@ export default function Ecommerce() {
   const [dashboardData, setDashboardData] = useState<adminDasboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  if (loading) {
-    return (
-      <div className="w-full p-6 flex justify-center items-center">
-        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     async function fetchDashboard() {
       try {
@@ -37,6 +29,14 @@ export default function Ecommerce() {
 
     fetchDashboard();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full p-6 flex justify-center items-center">
+        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 gap-4 sm:gap-5 md:gap-6 p-3 sm:p-4 md:p-6">
