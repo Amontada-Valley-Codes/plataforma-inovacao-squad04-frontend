@@ -3,12 +3,8 @@
 import CompanieCard from "@/components/companies/CompanieCard";
 import { getCurrentUser, getUserRole } from "@/lib/auth";
 
-export default async function CompanyEmpresaPage({
-  params,
-}: {
-  params: { companyId: string };
-  searchParams?: any;
-}) {
+export default async function CompanyEmpresaPage({ params }: any) {
+  // params aqui será do tipo { companyId: string }
   const { companyId } = params;
 
   const [me, role] = await Promise.all([getCurrentUser(), getUserRole()]);
