@@ -44,15 +44,15 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 gap-4 sm:gap-5 md:gap-6 p-3 sm:p-4 md:p-6 w-full max-w-screen-2xl mx-auto overflow-x-hidden">
       <div className="col-span-1 sm:col-span-2 xl:col-span-12">
-        <MetricsCards />
+        <MetricsCards empresasAtivas={0} totalDesafios={0} totalEmpresas={0} totalIdeias={0} />
       </div>
 
       <div className="col-span-1 sm:col-span-2 xl:col-span-6">
-        <IdeiasPerfomance />
+        <IdeiasPerfomance desempenhoMensal={{'': 0}}/>
       </div>
 
       <div className="col-span-1 sm:col-span-2 xl:col-span-6">
-        <DistributionBySector />
+        <DistributionBySector distribuicaoPorSetor={{'':0}}/>
       </div>
 
       <div className="col-span-1 sm:col-span-2 xl:col-span-6">
@@ -60,7 +60,7 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
       </div>
 
       <div className="col-span-1 sm:col-span-2 xl:col-span-6">
-        <ActiveCompaniesCard />
+        <ActiveCompaniesCard rankingEmpresas={[{name: '',  totalDesafios: 0}]}/>
       </div>
     </div>
   );

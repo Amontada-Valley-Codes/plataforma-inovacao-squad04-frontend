@@ -3,6 +3,7 @@ export type ShowAllStartupsResponse = {
   id: string;
   name: string;
   cnpj: string;
+  email: string;
   industry_segment: string;
   problems_solved: string[];
   technologies_used: string[];

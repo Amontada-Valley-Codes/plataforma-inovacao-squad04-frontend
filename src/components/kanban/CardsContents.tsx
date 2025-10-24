@@ -1,9 +1,7 @@
-import { BriefcaseBusiness, Bug, Building2, Calendar, ChartNoAxesCombined, ChartPie, CircleCheck, CircleCheckBig, CircleUserRound, ClipboardList, Lamp, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users, X } from "lucide-react";
-import ForwardButton from "./ForwardButton"
+import { BriefcaseBusiness, Bug, Building2, Calendar, ChartNoAxesCombined, ChartPie, CircleCheck, CircleUserRound, ClipboardList, Lightbulb, ListCheck, Menu, Tag, Target, TriangleAlert, Trophy, Users } from "lucide-react";
 import { useState } from 'react';
 import { Comment } from "./Comment";
 import { ideationCommentSections } from "./commentsData";
-import PreviousButton from "./PreviousButton";
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 
 type CardContentsHeaderProps = {
@@ -215,7 +213,6 @@ type CardDetailedScreeningContentProps = {
 export const CardDetailedScreeningContent = ({ challangeTitle, category, startDate, endDate, creator, visibility }: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
-  const [inviteStartup, setInviteStartup] = useState(false)
 
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
@@ -527,7 +524,7 @@ type CardIdeationContentProps = {
   description: string;
 }
 
-export const CardIdeationContent = ({ challangeTitle, category, description }: CardIdeationContentProps) => {
+export const CardIdeationContent = ({ challangeTitle, category }: CardIdeationContentProps) => {
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
       {/* header */}

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -76,6 +79,7 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { repeatPassword, ...dataToSend } = formData;
 
       // 1) registra com token de convite

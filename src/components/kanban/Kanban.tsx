@@ -1,6 +1,5 @@
 'use client';
 
-import { fakerPT_BR as faker } from '@faker-js/faker';
 import {
   KanbanBoard,
   KanbanCard,
@@ -9,14 +8,12 @@ import {
   KanbanProvider,
 } from '@/components/ui/shadcn-io/kanban';
 import { useEffect, useState } from 'react';
-import { CalendarClock, Tag, Send } from 'lucide-react';
+import { CalendarClock, Tag } from 'lucide-react';
 import CardExpanded from './CardExpanded';
 import ForwardButton from './ForwardButton';
 import PreviousButton from './PreviousButton';
 import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
-
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const columns = [
   { id: 'GENERATION', name: 'Desafios' },

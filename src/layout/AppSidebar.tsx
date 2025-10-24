@@ -1,6 +1,7 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+"use client";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";

@@ -11,7 +11,22 @@ import { adminDasboardResponse } from "@/api/payloads/dashboard.payload";
 
 export default function Ecommerce() {
   const [dashboardData, setDashboardData] = useState<adminDasboardResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        const data = await dashboardService.getAdminDashboard();
+        setDashboardData(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboard();
+  }, []);
 
   async function fetchDashboard() {
     try {
