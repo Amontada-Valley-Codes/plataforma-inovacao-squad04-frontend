@@ -33,7 +33,6 @@
   import { Card } from '@/components/ui/card';
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
   import { cn } from '@/lib/utils';
-  import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 
   const t = tunnel();
 

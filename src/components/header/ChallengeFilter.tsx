@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, ChevronDown, CircleCheckBig, ClipboardList, Plus } from "lucide-react";
+import { Calendar, ChevronDown, CircleCheckBig, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import CreateChallengeButton from "./CreateChallengeButton";
 import RegisterStartupBtn from "../startup/RegisterStartupButton";
@@ -101,7 +101,7 @@ export default function ChallengeFilter({
               <div className="md:hidden">
                 {/* Se o seu CreateChallengeButton aceitar props, use: */}
                 <CreateChallengeButton
-                  // @ts-ignore - se não existir, ignore; caso exista, ótimo
+                  // @ts-expect-error - se não existir, ignore; caso exista, ótimo
                   size="sm"
                   label="Desafio"
                   className="h-9 px-3 text-xs whitespace-nowrap"

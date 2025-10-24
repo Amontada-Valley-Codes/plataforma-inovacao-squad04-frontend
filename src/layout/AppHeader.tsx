@@ -19,8 +19,6 @@ const AppHeader: React.FC = () => {
     }
   };
 
-  const toggleApplicationMenu = () => setApplicationMenuOpen((p) => !p);
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {

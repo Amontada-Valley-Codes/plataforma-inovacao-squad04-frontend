@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 import React, { useState } from "react";
 import {
@@ -151,6 +153,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
           triggerReload();
           onClose();
         }, 1500);
+        
       } catch (error: any) {
         console.error("❌ Erro ao criar startup:", error?.response?.data || error?.message || error);
         showCustomToast("Erro ao cadastrar startup.", "error");

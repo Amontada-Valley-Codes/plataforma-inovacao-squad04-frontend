@@ -1,5 +1,4 @@
 import { CommentType } from './commentsData';
-import { Heart } from 'lucide-react';
 
 type CommentProps = {
   comment: CommentType;

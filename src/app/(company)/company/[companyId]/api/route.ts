@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from "next/server";
 import { getCompanyById, updateCompanyInMock, type Companie } from "@/mocks/CompaniesData";
 import { usersData } from "@/mocks/UserData";

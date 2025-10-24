@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Metadata } from "next";
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 import { getCurrentUser } from "@/lib/auth";
