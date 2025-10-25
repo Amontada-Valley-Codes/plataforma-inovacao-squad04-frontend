@@ -8,7 +8,53 @@ import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import { getCurrentUser, redirectByRole } from "@/lib/auth";
+
+// ⛔ Remova estes se eles chamarem o back:
+// import { getCurrentUser, redirectByRole } from "@/lib/auth";
+
+// ✅ Helpers locais (sem back) — CHANGED
+function setFrontendCookie(name: string, value: string, maxAgeSeconds: number) {
+  const secure = typeof window !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${value}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax${secure}`;
+}
+// Decodifica payload do JWT (base64url)
+function parseJwt<T = any>(token: string): T | null {
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(json) as T;
+  } catch {
+    return null;
+  }
+}
+function getJwtMaxAge(jwt: string, fallbackSeconds = 60 * 60 * 8) {
+  const payload = parseJwt<{ exp?: number }>(jwt);
+  if (!payload?.exp) return fallbackSeconds;
+  const now = Math.floor(Date.now() / 1000);
+  return Math.max(payload.exp - now, 1);
+}
+// Mapeia role EN→PT e decide rota — ajuste conforme sua árvore de rotas
+function decideDestinyFromToken(jwt: string) {
+  const p = parseJwt<{ type_user?: string; enterpriseId?: string | null }>(jwt);
+  const type = (p?.type_user ?? "").toUpperCase();
+  const companyId = p?.enterpriseId ? String(p.enterpriseId) : null;
+
+  // se você já tem um redirectByRole confiável, pode chamar ele aqui com {role, companyId}
+  // return redirectByRole(rolePt, companyId)
+
+  switch (type) {
+    case "ADMINISTRATOR":
+      return "/admin/dashboard";
+    case "MANAGER":
+      return companyId ? `/company/${companyId}/dashboard` : "/company";
+    case "EVALUATOR":
+      return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
+    case "COMMON":
+    default:
+      return "/user/meus-desafios";
+  }
+}
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -23,8 +69,7 @@ export default function LoginForm() {
     toast.custom((t) => (
       <div
         className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
-          }
+          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}
           ${type === "success"
             ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
             : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
@@ -52,24 +97,24 @@ export default function LoginForm() {
 
     try {
       // o back retorna { access_token }
+      // ⚠️ authService.login já está sem { withCredentials: true } — vide ajuste no service
       const { access_token } = await authService.login({ email, password: senha });
 
-      // salva o token pro interceptor
-localStorage.setItem("access_token", access_token);
+      // 1) salva o token pro interceptor (Authorization)
+      localStorage.setItem("access_token", access_token);
 
-// ✅ pega usuário decodificado do token
-const me = await getCurrentUser();
-console.log("decoded user:", me);
+      // 2) espelha em cookie pro middleware enxergar — CHANGED
+      const maxAge = getJwtMaxAge(access_token);
+      setFrontendCookie("access_token", access_token, maxAge);
 
-// ✅ decide a rota com role + companyId
-const destiny = redirectByRole(me?.role, me?.companyId);
+      // 3) decide a rota localmente (sem /auth/me) — CHANGED
+      const destiny = decideDestinyFromToken(access_token);
 
       setLoading(false);
       showCustomToast("Login realizado com sucesso!", "success");
-      setTimeout(() => router.push(destiny), 800);
+      setTimeout(() => router.push(destiny), 300);
     } catch (err: any) {
       setLoading(false);
-      console.log(err);
       const msg = err?.response?.data?.message || "Erro ao entrar.";
       setError(msg);
       showCustomToast(msg, "error");
@@ -89,12 +134,9 @@ const destiny = redirectByRole(me?.role, me?.companyId);
         <Image src="/images/logo/ninna-logo.svg" alt="ninna-logo" fill className="object-contain" priority />
       </div>
 
-      {/* Título */}
       <h1 className="font-semibold text-xl sm:text-3xl text-white mb-5 sm:mb-6 text-center">Login</h1>
 
-      {/* Formulário */}
       <form onSubmit={handleSubmit} className="w-5/6 max-w-[360px] flex flex-col items-center gap-3 sm:gap-4">
-        {/* Campo de E-mail */}
         <div className="relative w-5/6">
           <input
             type="email"
@@ -107,7 +149,6 @@ const destiny = redirectByRole(me?.role, me?.companyId);
           <User className="absolute left-4 top-1/2 -translate-y-1/2" color="#6B7280" size={18} />
         </div>
 
-        {/* Campo de Senha */}
         <div className="relative w-5/6">
           <input
             type={showPassword ? "text" : "password"}
@@ -129,7 +170,6 @@ const destiny = redirectByRole(me?.role, me?.companyId);
 
         {error && <p className="text-red-400 text-sm text-center w-full">{error}</p>}
 
-        {/* Links */}
         <div className="text-center mt-1 space-y-1">
           <Link href="#" className="text-xs sm:text-sm text-white hover:underline">Esqueceu a senha?</Link>
           <p className="text-xs sm:text-sm text-[#D2F5FB] font-light">
@@ -138,7 +178,6 @@ const destiny = redirectByRole(me?.role, me?.companyId);
           </p>
         </div>
 
-        {/* Botão Entrar */}
         <button
           type="submit"
           className="mt-3 w-5/6 py-2.5 sm:py-3 rounded-full text-white font-semibold text-sm sm:text-base

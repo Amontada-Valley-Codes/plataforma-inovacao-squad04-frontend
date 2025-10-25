@@ -6,7 +6,7 @@ import Link from "next/link";
 import { LayoutGrid, List as ListIcon, MoreHorizontal, User, Mail, Settings } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
 import CompaniesProfile from "./CompaniesProfile";
-import { ShowAllEnterpriseResponse } from "@/api/payloads/enterprise.payload";
+import { ShowAllEnterpriseResponse, ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import { useStore } from "../../../store";
 
@@ -14,9 +14,9 @@ type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
 type Props = {
   role?: Role;
-  companyId?: string | number;
-  autoOpen?: boolean;
-  viewerCompanyId?: string | number;
+  companyId?: string | number;       // empresa “focada” pela UI
+  autoOpen?: boolean;                // se true, abre o modal quando tiver exatamente 1 resultado
+  viewerCompanyId?: string | number; // empresa vinculada ao usuário logado
   title?: string;
 };
 
@@ -29,8 +29,11 @@ export default function CompanieCard({
 }: Props) {
   const { isOpen, openModal, closeModal } = useModal();
 
-  const [selectedCompany, setSelectedCompany] = useState<ShowAllEnterpriseResponse | null>(null);
+  // 🔹 Lista SEMPRE no shape de "listagem"
   const [companies, setCompaniesData] = useState<ShowAllEnterpriseResponse[]>([]);
+  // 🔹 Selecionada SEMPRE no shape de "detalhe"
+  const [selectedCompany, setSelectedCompany] = useState<ShowOneEnterpriseResponse | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const { reload } = useStore();
@@ -66,31 +69,57 @@ export default function CompanieCard({
     return source.filter((c) => companyKey(c) === viewerId);
   }, [data, companyId, role, viewerCompanyId]);
 
+  // ——— Altura animada
   const listRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
 
   const recalcHeight = useCallback(() => {
-    const activeEl = viewMode === "list" ? listRef.current : gridRef.current;
+    const activeEl = (viewMode === "list" ? listRef.current : gridRef.current) as HTMLDivElement | null;
     if (!activeEl) return;
     setContainerHeight(activeEl.scrollHeight);
   }, [viewMode]);
 
   async function fetchCompanies() {
     try {
-      let data: ShowAllEnterpriseResponse[] = [];
+      setLoading(true);
+      let list: ShowAllEnterpriseResponse[] = [];
 
       if (role === "admin") {
-        data = await enterpriseService.showAllEnterprises();
+        // Admin lista todas
+        list = await enterpriseService.showAllEnterprises();
       } else if (viewerCompanyId) {
+        // Não-admin: busca o detalhe da própria empresa e projeta para “lista”
         const one = await enterpriseService.showOneEnterprise(String(viewerCompanyId));
-        data = one ? ([one] as unknown as ShowAllEnterpriseResponse[]) : [];
+        list = one
+          ? [{
+              id: one.id,
+              name: one.name,
+              cnpj: one.cnpj,
+              sector: one.sector,
+              description: one.description,
+              address: one.address,
+              email: one.email,
+              gestorEmail: one.gestorEmail,
+              coverImage: null,
+              profileImage: null,
+              status: one.status,
+              createdAt: one.createdAt,
+              updatedAt: one.updatedAt,
+              logo: one.logo,
+              cover: one.cover,
+              gallery: one.gallery,
+              instagram: one.instagram,
+              whatsapp: one.whatsapp,
+              linkedin: one.linkedin,
+              locationUrl: one.locationUrl,
+            }]
+          : [];
       } else {
-        data = [];
+        list = [];
       }
 
-      setCompaniesData(data);
+      setCompaniesData(list);
     } catch (error) {
       console.error(error);
       setCompaniesData([]);
@@ -104,12 +133,18 @@ export default function CompanieCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reload, role, viewerCompanyId]);
 
-  // NEW: quando não for admin e houver exatamente 1 empresa, abre o card expandido automaticamente
+  // NEW: não-admin com exatamente 1 empresa → abre modal com DETALHE
   useEffect(() => {
-    if (role !== "admin" && filtered.length === 1) {
-      setSelectedCompany(filtered[0]);
-      if (!isOpen) openModal();
-    }
+    if (role === "admin" || filtered.length !== 1) return;
+    (async () => {
+      try {
+        const full = await enterpriseService.showOneEnterprise(String(filtered[0].id));
+        setSelectedCompany(full);
+        if (!isOpen) openModal();
+      } catch (e) {
+        console.error("Falha ao carregar detalhe:", e);
+      }
+    })();
   }, [role, filtered, isOpen, openModal]);
 
   useEffect(() => {
@@ -125,8 +160,19 @@ export default function CompanieCard({
 
   useEffect(() => {
     if (!autoOpen) return;
-    if (filtered[0]) setSelectedCompany(filtered[0]);
-  }, [autoOpen, filtered]);
+    if (filtered[0] && role !== "admin") {
+      // se quiser autoOpen para não-admin mesmo com >1, abrir o primeiro
+      (async () => {
+        try {
+          const full = await enterpriseService.showOneEnterprise(String(filtered[0].id));
+          setSelectedCompany(full);
+          openModal();
+        } catch (e) {
+          console.error("Falha ao carregar detalhe:", e);
+        }
+      })();
+    }
+  }, [autoOpen, filtered, role, openModal]);
 
   if (loading) {
     return (
@@ -144,17 +190,28 @@ export default function CompanieCard({
     );
   }
 
+  // Wrapper: admin abre modal (carrega DETALHE); não-admin navega (ou só renderiza se já for a mesma)
   const wrapIfNeeded = (company: ShowAllEnterpriseResponse, children: React.ReactNode) => {
     if (role === "admin") {
       const handlers = {
-        onClick: () => {
-          setSelectedCompany(company);
-          openModal();
-        },
-        onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter" || e.key === " ") {
-            setSelectedCompany(company);
+        onClick: async () => {
+          try {
+            const full = await enterpriseService.showOneEnterprise(String(company.id));
+            setSelectedCompany(full);
             openModal();
+          } catch (e) {
+            console.error("Falha ao carregar detalhe da empresa:", e);
+          }
+        },
+        onKeyDown: async (e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            try {
+              const full = await enterpriseService.showOneEnterprise(String(company.id));
+              setSelectedCompany(full);
+              openModal();
+            } catch (err) {
+              console.error("Falha ao carregar detalhe da empresa:", err);
+            }
           }
         },
         role: "button" as const,
@@ -197,7 +254,7 @@ export default function CompanieCard({
       </div>
 
       {/* Contêiner com altura animada */}
-      <div ref={containerRef} style={{ height: containerHeight }} className="relative transition-[height] duration-300 ease-out">
+      <div style={{ height: containerHeight }} className="relative transition-[height] duration-300 ease-out">
         {/* LISTA */}
         <div
           ref={listRef}
@@ -256,9 +313,14 @@ export default function CompanieCard({
                   <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
                     <button
                       type="button"
-                      onClick={() => {
-                        setSelectedCompany(c);
-                        openModal();
+                      onClick={async () => {
+                        try {
+                          const full = await enterpriseService.showOneEnterprise(String(c.id));
+                          setSelectedCompany(full);
+                          openModal();
+                        } catch (err) {
+                          console.error("Falha ao carregar detalhe da empresa:", err);
+                        }
                       }}
                       aria-label={`Abrir menu de ${c.name}`}
                       className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 transition"
@@ -336,7 +398,7 @@ export default function CompanieCard({
         </div>
       </div>
 
-      {/* Modal: agora abre tanto para admin (ao clicar) quanto para gestor/avaliador/usuario (auto-aberto quando filtra 1) */}
+      {/* Modal: sempre recebe DETALHE */}
       {selectedCompany && (
         <CompaniesProfile
           data={selectedCompany}

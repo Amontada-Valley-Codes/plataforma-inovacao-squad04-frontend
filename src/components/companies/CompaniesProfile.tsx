@@ -5,41 +5,35 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import { FaRegImage, FaMapMarkedAlt } from "react-icons/fa";
-
 import { Modal } from "../ui/modal";
 
-import type {
-  ShowAllEnterpriseResponse,
-  ShowOneEnterpriseResponse,
-} from "@/api/payloads/enterprise.payload";
+import type { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
 
-type Enterprise = ShowAllEnterpriseResponse | ShowOneEnterpriseResponse;
+/* ========= Helpers ========= */
 
-function getId(e: Enterprise) {
-  return String(
-    (e as any).id ??
-      (e as any).enterpriseId ??
-      (e as any).companyId ??
-      (e as any).uuid ??
-      ""
-  );
+function getId(e: ShowOneEnterpriseResponse | null) {
+  return e?.id ? String(e.id) : undefined;
 }
-function getCover(e: Enterprise): string | undefined {
-  return (e as any).coverImage ?? (e as any).cover ?? undefined;
+function getCover(e: ShowOneEnterpriseResponse | null): string | undefined {
+  return e?.cover ?? undefined;
 }
-function getLogo(e: Enterprise): string | undefined {
-  return (e as any).profileImage ?? (e as any).logo ?? undefined;
+function getLogo(e: ShowOneEnterpriseResponse | null): string | undefined {
+  return e?.logo ?? undefined;
 }
+
+/* ========= Types ========= */
 
 type Props = {
-  data: Enterprise | null;
+  data: ShowOneEnterpriseResponse | null; // ⬅️ agora só detalhe
   isOpen: boolean;
   onClose: () => void;
 };
 
+/* ========= Component ========= */
+
 export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
-  const [company, setCompany] = useState<Enterprise | null>(data);
+  const [company, setCompany] = useState<ShowOneEnterpriseResponse | null>(data);
   const [editInfo, setEditInfo] = useState(false);
   const [editSocial, setEditSocial] = useState(false);
   const [editLocation, setEditLocation] = useState(false);
@@ -54,7 +48,13 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
     setEditMedia(false);
   }, [data, isOpen]);
 
-  const enterpriseId = useMemo(() => (company ? getId(company) : undefined), [company]);
+  const enterpriseId = useMemo(() => getId(company), [company]);
+
+  async function refresh() {
+    if (!enterpriseId) return;
+    const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
+    setCompany(fresh);
+  }
 
   async function savePatchInfo(patch: {
     sector?: string;
@@ -66,7 +66,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
     setBusy(true);
     try {
       const updated = await enterpriseService.updateEnterprise(enterpriseId, patch);
-      setCompany(updated);
+      setCompany(updated); // backend já retorna detalhe
     } finally {
       setBusy(false);
     }
@@ -76,10 +76,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
     setBusy(true);
     try {
       await enterpriseService.updateCoverImage(file);
-      if (enterpriseId) {
-        const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
-        setCompany(fresh);
-      }
+      await refresh();
     } finally {
       setBusy(false);
     }
@@ -89,15 +86,13 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
     setBusy(true);
     try {
       await enterpriseService.updateProfileImage(file);
-      if (enterpriseId) {
-        const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
-        setCompany(fresh);
-      }
+      await refresh();
     } finally {
       setBusy(false);
     }
   }
 
+  // Placeholder local (se quiser, troque por dados reais depois)
   const desafios: Array<{
     ChallengeTitle: string;
     Author: string;
@@ -107,6 +102,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
     companyId?: string | number;
   }> = [];
 
+  if (!isOpen) return null;     // evita montar quando modal fechado
   if (!company) return null;
 
   return (
@@ -159,7 +155,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-800">
-                  {(company as any)?.name ?? "Nome da Empresa"}
+                  {company.name ?? "Nome da Empresa"}
                 </h2>
                 <button
                   onClick={() => setEditMedia((v) => !v)}
@@ -200,17 +196,17 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                 {!editInfo ? (
                   <>
                     <p className="text-gray-600 dark:text-[#ced3db] mt-1">
-                      {(company as any)?.description ?? "—"}
+                      {company.description ?? "—"}
                     </p>
                     <div className="flex flex-wrap gap-3 mt-4">
                       <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                        Área de Atuação: {(company as any)?.sector ?? "—"}
+                        Área de Atuação: {company.sector ?? "—"}
                       </span>
                       <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                        Endereço: {(company as any)?.address ?? "—"}
+                        Endereço: {company.address ?? "—"}
                       </span>
                       <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                        E-mail: {(company as any)?.email ?? "—"}
+                        E-mail: {company.email ?? "—"}
                       </span>
                     </div>
                   </>
@@ -234,7 +230,10 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 {desafios.length > 0 ? (
                   desafios.map((d) => (
-                    <div key={`${d.companyId}-${d.ChallengeTitle}`} className="border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+                    <div
+                      key={`${d.companyId}-${d.ChallengeTitle}`}
+                      className="border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
+                    >
                       <div>
                         <p className="text-sm text-gray-600 dark:text-[#ced3db]">{d.Author}</p>
                         <h2 className="text-lg font-bold text-blue-900 dark:text-blue-800">{d.ChallengeTitle}</h2>
@@ -255,7 +254,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
 
             {/* Direita */}
             <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 pt-5 lg:pt-0 lg:pl-6 flex flex-col gap-4">
-              {/* Redes Sociais (client-only) */}
+              {/* Redes Sociais */}
               <section className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg sm:text-xl font-bold text-blue-900 dark:text-blue-800">
@@ -273,7 +272,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                 {!editSocial ? (
                   <div className="flex flex-col gap-2">
                     <a
-                      href={(company as any)?.instagram ?? "#"}
+                      href={company.instagram ?? "#"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-blue-900 dark:text-[#ced3db] px-4 py-2 rounded-md text-sm font-medium text-center transition"
@@ -281,7 +280,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                       Instagram
                     </a>
                     <a
-                      href={(company as any)?.whatsapp ?? "#"}
+                      href={company.whatsapp ?? "#"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-blue-900 dark:text-[#ced3db] px-4 py-2 rounded-md text-sm font-medium text-center transition"
@@ -289,7 +288,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                       WhatsApp
                     </a>
                     <a
-                      href={(company as any)?.linkedin ?? "#"}
+                      href={company.linkedin ?? "#"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-blue-900 dark:text-[#ced3db] px-4 py-2 rounded-md text-sm font-medium text-center transition"
@@ -301,7 +300,9 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                   <SocialForm
                     company={company}
                     onSave={async (form) => {
-                      setCompany((prev) => (prev ? ({ ...prev, ...form } as any) : prev));
+                      // neste momento o backend ainda não tem PATCH desses campos;
+                      // mantenha client-side e force um refresh se depois expor endpoint
+                      setCompany((prev) => (prev ? { ...prev, ...form } : prev));
                       setEditSocial(false);
                     }}
                     onCancel={() => setEditSocial(false)}
@@ -310,7 +311,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                 )}
               </section>
 
-              {/* Localização (client-only) */}
+              {/* Localização */}
               <section className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg sm:text-xl font-bold text-blue-900 dark:text-blue-800">
@@ -327,11 +328,11 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
 
                 {!editLocation ? (
                   <a
-                    href={(company as any)?.locationUrl ?? "#"}
+                    href={company.locationUrl ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full h-36 sm:h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-sm hover:shadow-md transition"
-                    title={(company as any)?.locationUrl ?? "—"}
+                    title={company.locationUrl ?? "—"}
                   >
                     <FaMapMarkedAlt className="text-blue-700 dark:text-blue-800 text-3xl sm:text-4xl" />
                   </a>
@@ -339,7 +340,7 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                   <LocationForm
                     company={company}
                     onSave={async (form) => {
-                      setCompany((prev) => (prev ? ({ ...prev, ...form } as any) : prev));
+                      setCompany((prev) => (prev ? { ...prev, ...form } : prev));
                       setEditLocation(false);
                     }}
                     onCancel={() => setEditLocation(false)}
@@ -384,16 +385,16 @@ function InfoForm({
   onCancel,
   busy,
 }: {
-  company: Enterprise;
+  company: ShowOneEnterpriseResponse;
   onSave: (p: { sector?: string; description?: string; address?: string; email?: string }) => Promise<void>;
   onCancel: () => void;
   busy?: boolean;
 }) {
   const [form, setForm] = useState({
-    sector: (company as any).sector ?? "",
-    description: (company as any).description ?? "",
-    address: (company as any).address ?? "",
-    email: (company as any).email ?? "",
+    sector: company.sector ?? "",
+    description: company.description ?? "",
+    address: company.address ?? "",
+    email: company.email ?? "",
   });
 
   return (
@@ -464,22 +465,22 @@ function SocialForm({
   onCancel,
   busy,
 }: {
-  company: Enterprise;
-  onSave: (p: Partial<Enterprise>) => Promise<void>;
+  company: ShowOneEnterpriseResponse;
+  onSave: (p: Partial<ShowOneEnterpriseResponse>) => Promise<void>;
   onCancel: () => void;
   busy?: boolean;
 }) {
   const [form, setForm] = useState({
-    instagram: (company as any).instagram ?? "",
-    whatsapp: (company as any).whatsapp ?? "",
-    linkedin: (company as any).linkedin ?? "",
+    instagram: company.instagram ?? "",
+    whatsapp: company.whatsapp ?? "",
+    linkedin: company.linkedin ?? "",
   });
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSave(form as any);
+        onSave(form);
       }}
       className="grid md:grid-cols-3 gap-4 mt-3"
     >
@@ -505,18 +506,18 @@ function LocationForm({
   onCancel,
   busy,
 }: {
-  company: Enterprise;
-  onSave: (p: Partial<Enterprise>) => Promise<void>;
+  company: ShowOneEnterpriseResponse;
+  onSave: (p: Partial<ShowOneEnterpriseResponse>) => Promise<void>;
   onCancel: () => void;
   busy?: boolean;
 }) {
-  const [locationUrl, setLocationUrl] = useState((company as any).locationUrl ?? "");
+  const [locationUrl, setLocationUrl] = useState(company.locationUrl ?? "");
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSave({ locationUrl } as any);
+        onSave({ locationUrl });
       }}
       className="grid md:grid-cols-2 gap-4 mt-3"
     >

@@ -65,10 +65,10 @@ export type ShowOneEnterpriseResponse = {
   status: string
   createdAt: string
   updatedAt: string
-  User: string[] | []
-  _count: {
-    Users: number
-  }
+  
+  User?: any[];            
+  _count?: { Users: number };
+  
   logo?: string;
   cover?: string | null | undefined;
   gallery?: string[] | undefined;

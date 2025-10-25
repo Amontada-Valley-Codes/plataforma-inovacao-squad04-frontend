@@ -5,7 +5,7 @@
     timeout: 10000,
     headers: {
       "Content-Type": "application/json"
-    }
+    }, withCredentials: false, 
   });
 
   api.interceptors.request.use(
@@ -13,7 +13,8 @@
       if (typeof window !== 'undefined') {
         const token = localStorage.getItem("access_token");
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          config.headers = config.headers ?? {};
+          (config.headers as any).Authorization = `Bearer ${token}`;
         }
       }
       return config;

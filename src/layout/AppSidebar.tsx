@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client";
+
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -31,13 +31,14 @@ function appendSearch(path: string, search: string) {
   const hasQuery = path.includes("?");
   const sep = hasQuery ? "&" : "?";
   return `${path}${sep}${search.replace(/^\?/, "")}`;
-}  
+}
+
 function selectSearchFor(path: string, currentSearch: string, role: Role) {
   if (path.startsWith("/admin")) return "?role=admin";
   return currentSearch || "";
 }
 
-/** Lê a role a partir de ?role= (para testes), do JWT (access_token) ou do localStorage. */
+/** Lê a role a partir de ?role= (para testes), do JWT (access_token) ou do localStorage – apenas no client (useEffect). */
 function useCurrentRole(): Role {
   const [role, setRole] = useState<Role>("usuario");
 
@@ -46,7 +47,7 @@ function useCurrentRole(): Role {
 
     const allowed: Role[] = ["admin", "gestor", "avaliador", "usuario", "startup"];
 
-    // 1) Prioriza ?role= (útil para testes manuais)
+    // 1) ?role= (útil para testes)
     const params = new URLSearchParams(window.location.search);
     const urlRole = params.get("role") as Role | null;
     if (urlRole && allowed.includes(urlRole)) {
@@ -62,8 +63,7 @@ function useCurrentRole(): Role {
         const [, payload] = token.split(".");
         if (payload) {
           const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-          const decoded = JSON.parse(decodeURIComponent(escape(json)));
-
+          const decoded = JSON.parse(json) as { type_user?: string };
           const type = String(decoded?.type_user || "").toUpperCase();
           const map: Record<string, Role> = {
             ADMINISTRATOR: "admin",
@@ -77,7 +77,7 @@ function useCurrentRole(): Role {
           return;
         }
       } catch {
-        // se falhar o decode, ignora e tenta stored
+        // ignore
       }
     }
 
@@ -91,29 +91,12 @@ function useCurrentRole(): Role {
 
 /**
  * Monta os itens do menu de acordo com a role e com o contexto de empresa.
- * Se não houver companyId na rota, tenta obter do JWT (enterpriseId) para gestores.
+ * ⚠️ NÃO acessa window/localStorage aqui — recebe companyIdFromToken de fora.
  */
-function buildNavItems(role: Role, pathname: string): NavItem[] {
+function buildNavItems(role: Role, pathname: string, companyIdFromToken: string | null): NavItem[] {
   let companyId = extractCompanyIdFromPath(pathname);
-
-  // Se não houver no path, tenta ler do token (enterpriseId)
-  if (!companyId && typeof window !== "undefined") {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      try {
-        const [, payload] = token.split(".");
-        if (payload) {
-          const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-          const decoded = JSON.parse(decodeURIComponent(escape(json)));
-          const enterpriseId = decoded?.enterpriseId;
-          if (enterpriseId !== undefined && enterpriseId !== null) {
-            companyId = String(enterpriseId);
-          }
-        }
-      } catch {
-        // ignore
-      }
-    }
+  if (!companyId && companyIdFromToken) {
+    companyId = companyIdFromToken;
   }
 
   if (role === "admin") {
@@ -138,7 +121,6 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
   // Sem companyId na rota nem no token
   if (!companyId) {
     if (role === "gestor") {
-      // Overview do gestor sem empresa vinculada
       return [
         { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/company" },
         { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: "/company/desafios" },
@@ -152,7 +134,6 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
         { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
       ];
     }
-    // Fallback para outros perfis sem contexto
     return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
@@ -183,7 +164,7 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
   // Usuário comum (ou fallback com companyId)
   return [
     { icon: <BuildingOffice2Icon />, name: "Empresa", path: `${base}` },
-    { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
+    { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios"}`.replace(`"}`, ``) }, // proteção caso copy/paste com aspas
     { icon: <ClipboardDocumentListIcon />, name: "Meus Desafios", path: `/user/meus-desafios` },
   ];
 }
@@ -197,12 +178,32 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
   const role = useCurrentRole();
 
+  // 🔹 NOVO: companyId vindo do token, resolvido só após mount
+  const [companyIdFromToken, setCompanyIdFromToken] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+      const [, payload] = token.split(".");
+      if (!payload) return;
+      const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+      const decoded = JSON.parse(json) as { enterpriseId?: string | null };
+      if (decoded?.enterpriseId) setCompanyIdFromToken(String(decoded.enterpriseId));
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const [searchSuffix, setSearchSuffix] = useState("");
   useEffect(() => {
     if (typeof window !== "undefined") setSearchSuffix(window.location.search || "");
   }, [pathname]);
 
-  const navItems = useMemo(() => buildNavItems(role, pathname), [role, pathname]);
+  // ✅ agora buildNavItems recebe o companyIdFromToken (sem acessar window lá dentro)
+  const navItems = useMemo(
+    () => buildNavItems(role, pathname, companyIdFromToken),
+    [role, pathname, companyIdFromToken]
+  );
 
   const isActive = useCallback(
     (path: string) => {
@@ -215,22 +216,17 @@ const AppSidebar: React.FC = () => {
   const AZUL = "#15358D";
   const styleVar = { ["--azul" as any]: AZUL } as React.CSSProperties;
 
-  // ——— LIGA/DESLIGA MODO COMPACTO
   const isCompact = !(isExpanded || isHovered || isMobileOpen);
 
-  // ——— LINKS
   const linkBase = [
-    "group rounded-xl transition-all duration-200", // comum
+    "group rounded-xl transition-all duration-200",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#15358d]",
-    isCompact
-      ? "grid place-items-center w-12 h-12 mx-auto" // compacto → centro real
-      : "flex items-center w-full gap-3 px-4 py-2",  // expandido
+    isCompact ? "grid place-items-center w-12 h-12 mx-auto" : "flex items-center w-full gap-3 px-4 py-2",
   ].join(" ");
 
   const linkActive = "bg-white text-[var(--azul)]";
   const linkInactive = "text-white hover:text-[var(--azul)] hover:bg-white";
 
-  // ——— ÍCONES
   const iconCls = (active: boolean) =>
     [
       "block size-5 transition-colors duration-200 sidebar-current",
@@ -282,7 +278,14 @@ const AppSidebar: React.FC = () => {
                 <Image className="hidden dark:block" src="/images/logo/ninna-logo.svg" alt="Logo" width={85} height={40} priority />
               </>
             ) : (
-              <Image src="/images/logo/ninna-logo.svg" alt="Logo" width={32} height={32} priority />
+              <Image
+                src="/images/logo/ninna-logo.svg"
+                alt="Logo"
+                width={32}
+                height={32}
+                priority
+                style={{ height: "auto" }} // evita warning de proporção
+              />
             )}
           </Link>
         </div>
@@ -302,7 +305,7 @@ const AppSidebar: React.FC = () => {
         </div>
       </aside>
 
-      {/* Faz QUALQUER SVG herdar a cor do texto (sem global.css) */}
+      {/* Força qualquer SVG herdar a cor do texto */}
       <style jsx>{`
         :global(.sidebar-current svg) { color: currentColor; }
         :global(.sidebar-current svg [stroke]) { stroke: currentColor !important; }

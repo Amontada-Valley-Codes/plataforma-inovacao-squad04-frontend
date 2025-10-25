@@ -8,6 +8,7 @@
       CREATE: '/enterprise',
       SHOW_ALL: '/enterprise',
       SHOW_ONE_ENTERPRISE: (id: string) => `/enterprise/${id}`,
+      GET_MY_ENTERPRISE: "/enterprise/user/enterpriseMe",
     },
 
     INVITE: {

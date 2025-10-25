@@ -4,39 +4,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { FaRegImage, FaMapMarkedAlt } from "react-icons/fa";
-import type {
-  ShowAllEnterpriseResponse,
-  ShowOneEnterpriseResponse,
-} from "@/api/payloads/enterprise.payload";
+
+import type { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
 
-type Enterprise = ShowAllEnterpriseResponse | ShowOneEnterpriseResponse;
-
-type Props = { data: Enterprise | null; editable?: boolean };
+type Props = {
+  data: ShowOneEnterpriseResponse | null; // ⬅️ detalhe apenas
+  editable?: boolean;
+};
 type MediaTarget = "logo" | "cover" | null;
 
-// helpers para campos que mudam de nome entre DTOs
-function getEnterpriseId(e: Enterprise | null | undefined): string | undefined {
-  if (!e) return undefined;
-  return String(
-    (e as any).id ??
-    (e as any).enterpriseId ??
-    (e as any).companyId ??
-    (e as any).uuid ??
-    ""
-  );
+/* ===== Helpers ===== */
+function getId(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
+  return e?.id ? String(e.id) : undefined;
 }
-function getCover(e: Enterprise | null | undefined): string | undefined {
-  if (!e) return undefined;
-  return (e as any).coverImage ?? (e as any).cover ?? undefined;
+function getCover(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
+  return e?.cover ?? undefined;
 }
-function getLogo(e: Enterprise | null | undefined): string | undefined {
-  if (!e) return undefined;
-  return (e as any).profileImage ?? (e as any).logo ?? undefined;
+function getLogo(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
+  return e?.logo ?? undefined;
 }
 
 export default function CompaniesProfileInline({ data, editable = false }: Props) {
-  const [company, setCompany] = useState<Enterprise | null>(data);
+  const [company, setCompany] = useState<ShowOneEnterpriseResponse | null>(data);
   const [editInfo, setEditInfo] = useState(false);
   const [editMedia, setEditMedia] = useState(false);
   const [editSocial, setEditSocial] = useState(false);
@@ -45,37 +35,37 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    setCompany(data);
     if (!editable) {
       setEditInfo(false);
       setEditMedia(false);
       setEditSocial(false);
       setEditLocation(false);
     }
-  }, [editable]);
+  }, [data, editable]);
 
-  const enterpriseId = useMemo(() => getEnterpriseId(company), [company]);
-
+  const enterpriseId = useMemo(() => getId(company), [company]);
   if (!company) return null;
 
-  async function savePatchInfo(patch: Partial<Enterprise>) {
-    if (!editable) {
-      alert("Sem permissão para editar.");
-      return;
-    }
-    if (!enterpriseId) {
-      alert("ID da empresa não encontrado.");
-      return;
-    }
+  async function refresh() {
+    if (!enterpriseId) return;
+    const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
+    setCompany(fresh);
+  }
+
+  async function savePatchInfo(patch: {
+    sector?: string;
+    description?: string;
+    address?: string;
+    email?: string;
+  }) {
+    if (!editable) return alert("Sem permissão para editar.");
+    if (!enterpriseId) return alert("ID da empresa não encontrado.");
+
     setBusy(true);
     try {
-      const payload = {
-        sector: (patch as any).sector,
-        description: (patch as any).description,
-        address: (patch as any).address,
-        email: (patch as any).email,
-      };
-      const updated = await enterpriseService.updateEnterprise(enterpriseId, payload);
-      setCompany(updated);
+      const updated = await enterpriseService.updateEnterprise(enterpriseId, patch);
+      setCompany(updated); // backend retorna detalhe
       alert("Informações atualizadas.");
     } catch {
       alert("Falha ao salvar as informações.");
@@ -85,13 +75,11 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
   }
 
   async function saveCoverFile(file: File) {
+    if (!editable) return;
     setBusy(true);
     try {
       await enterpriseService.updateCoverImage(file);
-      if (enterpriseId) {
-        const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
-        setCompany(fresh);
-      }
+      await refresh();
       alert("Capa atualizada.");
     } catch {
       alert("Falha ao atualizar a capa.");
@@ -101,13 +89,11 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
   }
 
   async function saveProfileFile(file: File) {
+    if (!editable) return;
     setBusy(true);
     try {
       await enterpriseService.updateProfileImage(file);
-      if (enterpriseId) {
-        const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
-        setCompany(fresh);
-      }
+      await refresh();
       alert("Imagem de perfil atualizada.");
     } catch {
       alert("Falha ao atualizar a imagem de perfil.");
@@ -116,6 +102,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
     }
   }
 
+  // Placeholder (preencha com dados reais quando houver endpoint)
   const desafios: Array<{
     ChallengeTitle: string;
     Author: string;
@@ -197,7 +184,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
             <section id="info" className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-800">
-                  {(company as any)?.name}
+                  {company.name}
                 </h2>
                 {editable && (
                   <button
@@ -213,17 +200,17 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
               {!editInfo ? (
                 <>
                   <p className="text-gray-600 dark:text-[#ced3db] mt-1">
-                    {(company as any)?.description}
+                    {company.description}
                   </p>
                   <div className="flex flex-wrap gap-3 mt-4">
                     <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      Área de Atuação: {(company as any)?.sector ?? "—"}
+                      Área de Atuação: {company.sector ?? "—"}
                     </span>
                     <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      Endereço: {(company as any)?.address ?? "—"}
+                      Endereço: {company.address ?? "—"}
                     </span>
                     <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      E-mail: {(company as any)?.email ?? "—"}
+                      E-mail: {company.email ?? "—"}
                     </span>
                   </div>
                 </>
@@ -252,21 +239,19 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                   </p>
                 </div>
               ) : (
-                desafios.map((desafio) => (
+                desafios.map((d) => (
                   <div
-                    key={`${desafio.companyId}-${desafio.ChallengeTitle}`}
+                    key={`${d.companyId}-${d.ChallengeTitle}`}
                     className="border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 relative shadow-sm hover:shadow-md transition"
                   >
                     <h4 className="font-semibold text-blue-900 dark:text-blue-800">
-                      {desafio.ChallengeTitle}
+                      {d.ChallengeTitle}
                     </h4>
-                    <p className="text-gray-600 dark:text-[#ced3db] text-sm">
-                      {desafio.Author}
-                    </p>
+                    <p className="text-gray-600 dark:text-[#ced3db] text-sm">{d.Author}</p>
                     <ul className="mt-3 text-sm text-gray-700 dark:text-[#ced3db] space-y-1">
-                      <li>🏷 {desafio.Category}</li>
-                      <li>🟢 {desafio.Status}</li>
-                      {desafio.Date && <li>📅 {desafio.Date}</li>}
+                      <li>🏷 {d.Category}</li>
+                      <li>🟢 {d.Status}</li>
+                      {d.Date && <li>📅 {d.Date}</li>}
                     </ul>
                   </div>
                 ))
@@ -276,7 +261,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
 
           {/* Direita: Social + Location + Media */}
           <div className="w-full lg:w-96 px-4 pt-3 pb-6 bg-white dark:bg-gray-900">
-            {/* Redes sociais (client-only) */}
+            {/* Redes sociais */}
             <section id="social" className="space-y-3 mt-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100">
@@ -296,7 +281,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
               {!editSocial ? (
                 <div className="flex flex-col gap-2 mt-3">
                   <a
-                    href={(company as any)?.instagram ?? "#"}
+                    href={company.instagram ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
@@ -304,7 +289,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                     Instagram
                   </a>
                   <a
-                    href={(company as any)?.whatsapp ?? "#"}
+                    href={company.whatsapp ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
@@ -312,7 +297,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                     WhatsApp
                   </a>
                   <a
-                    href={(company as any)?.linkedin ?? "#"}
+                    href={company.linkedin ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
@@ -324,7 +309,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                 <SocialForm
                   company={company}
                   onSave={async (form) => {
-                    setCompany((prev) => (prev ? ({ ...prev, ...form } as any) : prev));
+                    setCompany((prev) => (prev ? { ...prev, ...form } : prev));
                     setEditSocial(false);
                   }}
                   onCancel={() => setEditSocial(false)}
@@ -333,7 +318,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
               )}
             </section>
 
-            {/* Localização (client-only) */}
+            {/* Localização */}
             <section id="location" className="space-y-3 mt-10">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">
@@ -352,11 +337,11 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
 
               {!editLocation ? (
                 <a
-                  href={(company as any)?.locationUrl ?? "#"}
+                  href={company.locationUrl ?? "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 w-full h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-sm hover:shadow-md transition"
-                  title={(company as any)?.locationUrl ?? "—"}
+                  title={company.locationUrl ?? "—"}
                 >
                   <FaMapMarkedAlt className="text-blue-700 dark:text-blue-300 text-4xl" />
                 </a>
@@ -364,7 +349,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                 <LocationForm
                   company={company}
                   onSave={async (form) => {
-                    setCompany((prev) => (prev ? ({ ...prev, ...form } as any) : prev));
+                    setCompany((prev) => (prev ? { ...prev, ...form } : prev));
                     setEditLocation(false);
                   }}
                   onCancel={() => setEditLocation(false)}
@@ -373,12 +358,10 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
               )}
             </section>
 
-            {/* Mídia: upload real de arquivos */}
+            {/* Mídia: upload de arquivos */}
             {editMedia && (
               <section id="media" className="space-y-3 mt-10">
-                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">
-                  Mídia
-                </h3>
+                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">Mídia</h3>
                 <MediaForm
                   initialTarget={mediaTarget}
                   onSave={async ({ logoFile, coverFile }) => {
@@ -402,7 +385,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
   );
 }
 
-// Forms
+/* ===== Forms ===== */
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -431,16 +414,16 @@ function InfoForm({
   onCancel,
   busy,
 }: {
-  company: Enterprise;
-  onSave: (p: Partial<Enterprise>) => Promise<void>;
+  company: ShowOneEnterpriseResponse;
+  onSave: (p: { sector?: string; description?: string; address?: string; email?: string }) => Promise<void>;
   onCancel: () => void;
   busy?: boolean;
 }) {
   const [form, setForm] = useState({
-    sector: (company as any).sector ?? "",
-    description: (company as any).description ?? "",
-    address: (company as any).address ?? "",
-    email: (company as any).email ?? "",
+    sector: company.sector ?? "",
+    description: company.description ?? "",
+    address: company.address ?? "",
+    email: company.email ?? "",
   });
 
   return (
@@ -452,33 +435,17 @@ function InfoForm({
       className="grid md:grid-cols-2 gap-4 mt-3"
     >
       <Row label="Área de Atuação">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.sector}
-          onChange={(e) => setForm({ ...form, sector: e.target.value })}
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={form.sector} onChange={(e) => setForm({ ...form, sector: e.target.value })} />
       </Row>
       <Row label="E-mail da Empresa">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
       </Row>
       <Row label="Endereço">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.address}
-          onChange={(e) => setForm({ ...form, address: e.target.value })}
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
       </Row>
       <div className="md:col-span-2">
         <Row label="Descrição">
-          <textarea
-            className="w-full rounded-xl border px-3 py-[10px] min-h-28"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
+          <textarea className="w-full rounded-xl border px-3 py-[10px] min-h-28" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </Row>
       </div>
       <div className="md:col-span-2">
@@ -499,8 +466,8 @@ function MediaForm({
   onCancel: () => void;
   busy?: boolean;
 }) {
-  const [logoFile, setLogoFile] = useState<File | undefined>(undefined);
-  const [coverFile, setCoverFile] = useState<File | undefined>(undefined);
+  const [logoFile, setLogoFile] = useState<File | undefined>();
+  const [coverFile, setCoverFile] = useState<File | undefined>();
   const logoRef = useRef<HTMLInputElement | null>(null);
   const coverRef = useRef<HTMLInputElement | null>(null);
 
@@ -518,22 +485,10 @@ function MediaForm({
       className="grid md:grid-cols-2 gap-4 mt-3"
     >
       <Row label="Logo (arquivo)">
-        <input
-          ref={logoRef}
-          type="file"
-          accept="image/*"
-          className="rounded-xl border px-3 py-[10px]"
-          onChange={(e) => setLogoFile(e.target.files?.[0])}
-        />
+        <input ref={logoRef} type="file" accept="image/*" className="rounded-xl border px-3 py-[10px]" onChange={(e) => setLogoFile(e.target.files?.[0])} />
       </Row>
       <Row label="Capa (arquivo)">
-        <input
-          ref={coverRef}
-          type="file"
-          accept="image/*"
-          className="rounded-xl border px-3 py-[10px]"
-          onChange={(e) => setCoverFile(e.target.files?.[0])}
-        />
+        <input ref={coverRef} type="file" accept="image/*" className="rounded-xl border px-3 py-[10px]" onChange={(e) => setCoverFile(e.target.files?.[0])} />
       </Row>
       <div className="md:col-span-2">
         <Actions onCancel={onCancel} busy={busy} />
@@ -548,48 +503,33 @@ function SocialForm({
   onCancel,
   busy,
 }: {
-  company: Enterprise;
-  onSave: (p: Partial<Enterprise>) => Promise<void>;
+  company: ShowOneEnterpriseResponse;
+  onSave: (p: Partial<ShowOneEnterpriseResponse>) => Promise<void>;
   onCancel: () => void;
   busy?: boolean;
 }) {
   const [form, setForm] = useState({
-    instagram: ((company as any).instagram as string) ?? "",
-    whatsapp: ((company as any).whatsapp as string) ?? "",
-    linkedin: ((company as any).linkedin as string) ?? "",
+    instagram: company.instagram ?? "",
+    whatsapp: company.whatsapp ?? "",
+    linkedin: company.linkedin ?? "",
   });
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSave(form as any);
+        onSave(form);
       }}
       className="grid md:grid-cols-3 gap-4 mt-3"
     >
       <Row label="Instagram (URL)">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.instagram}
-          onChange={(e) => setForm({ ...form, instagram: e.target.value })}
-          placeholder="https://instagram.com/..."
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="https://instagram.com/..." />
       </Row>
       <Row label="WhatsApp (URL ou número)">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.whatsapp}
-          onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-          placeholder="https://wa.me/55..."
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="https://wa.me/55..." />
       </Row>
       <Row label="LinkedIn (URL)">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={form.linkedin}
-          onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
-          placeholder="https://linkedin.com/company/..."
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} placeholder="https://linkedin.com/company/..." />
       </Row>
       <div className="md:col-span-3">
         <Actions onCancel={onCancel} busy={busy} />
@@ -604,28 +544,23 @@ function LocationForm({
   onCancel,
   busy,
 }: {
-  company: Enterprise;
-  onSave: (p: Partial<Enterprise>) => Promise<void>;
+  company: ShowOneEnterpriseResponse;
+  onSave: (p: Partial<ShowOneEnterpriseResponse>) => Promise<void>;
   onCancel: () => void;
   busy?: boolean;
 }) {
-  const [locationUrl, setLocationUrl] = useState(((company as any).locationUrl as string) ?? "");
+  const [locationUrl, setLocationUrl] = useState(company.locationUrl ?? "");
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSave({ locationUrl } as any);
+        onSave({ locationUrl });
       }}
       className="grid md:grid-cols-2 gap-4 mt-3"
     >
       <Row label="URL do Google Maps">
-        <input
-          className="rounded-xl border px-3 py-[10px]"
-          value={locationUrl}
-          onChange={(e) => setLocationUrl(e.target.value)}
-          placeholder="https://maps.google.com/?q=..."
-        />
+        <input className="rounded-xl border px-3 py-[10px]" value={locationUrl} onChange={(e) => setLocationUrl(e.target.value)} placeholder="https://maps.google.com/?q=..." />
       </Row>
       <div className="md:col-span-2">
         <Actions onCancel={onCancel} busy={busy} />

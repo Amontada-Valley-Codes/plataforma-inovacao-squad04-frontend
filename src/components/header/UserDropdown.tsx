@@ -22,7 +22,7 @@ export default function UserDropdown() {
   }
 
   function handleLogout() {
-    authService.Logout();
+    authService.logout();
     router.push("/auth/login");
   }
 

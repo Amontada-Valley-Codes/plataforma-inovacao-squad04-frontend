@@ -1,4 +1,6 @@
 // src/api/services/enterprise.service.ts
+"use client";
+
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 import {
@@ -9,43 +11,31 @@ import {
 } from "../payloads/enterprise.payload";
 
 export const enterpriseService = {
-  // Criar empresa
-  async createEnterprise(
-    createEnterprisePayload: CreateEnterprisePayload
-  ): Promise<CreateEnterpriseResponse> {
-    const response = await api.post(ENDPOINTS.ENTERPRISE.CREATE, createEnterprisePayload);
-    return response.data;
+  async createEnterprise(payload: CreateEnterprisePayload): Promise<CreateEnterpriseResponse> {
+    const { data } = await api.post(ENDPOINTS.ENTERPRISE.CREATE, payload);
+    return data;
   },
 
-  // Listar todas
   async showAllEnterprises(): Promise<ShowAllEnterpriseResponse[]> {
-    const response = await api.get(ENDPOINTS.ENTERPRISE.SHOW_ALL);
-    return response.data;
+    const { data } = await api.get(ENDPOINTS.ENTERPRISE.SHOW_ALL);
+    return data;
   },
 
-  // Buscar uma empresa
   async showOneEnterprise(id: string): Promise<ShowOneEnterpriseResponse> {
-    const response = await api.get(ENDPOINTS.ENTERPRISE.SHOW_ONE_ENTERPRISE(id));
-    return response.data;
+    const { data } = await api.get(ENDPOINTS.ENTERPRISE.SHOW_ONE_ENTERPRISE(id));
+    return data;
   },
 
-  // Atualizar dados principais
   async updateEnterprise(
     id: string,
-    payload: Partial<{
-      sector: string;
-      description: string;
-      address: string;
-      email: string;
-    }>
+    payload: Partial<Pick<ShowOneEnterpriseResponse, "sector" | "description" | "address" | "email">>
   ): Promise<ShowOneEnterpriseResponse> {
-    const response = await api.put(`/enterprise/${id}`, payload);
-    return response.data;
+    const { data } = await api.put(`/enterprise/${id}`, payload);
+    return data;
   },
 
-  // Atualizar capa (PATCH /enterprise/coverImage)
   async updateCoverImage(file: File): Promise<void> {
-    if (typeof window === "undefined") return; // garante que não rode no SSR
+    if (typeof window === "undefined") return;
     const formData = new FormData();
     formData.append("coverImage", file);
     await api.patch("/enterprise/coverImage", formData, {
@@ -53,13 +43,17 @@ export const enterpriseService = {
     });
   },
 
-  // Atualizar imagem de perfil (PATCH /enterprise/profileImage)
   async updateProfileImage(file: File): Promise<void> {
-    if (typeof window === "undefined") return; // idem
+    if (typeof window === "undefined") return;
     const formData = new FormData();
     formData.append("profileImage", file);
     await api.patch("/enterprise/profileImage", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+  },
+
+  async getMyEnterprise(): Promise<ShowOneEnterpriseResponse> {
+    const { data } = await api.get(ENDPOINTS.ENTERPRISE.GET_MY_ENTERPRISE);
+    return data;
   },
 };

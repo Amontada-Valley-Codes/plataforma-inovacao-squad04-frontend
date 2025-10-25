@@ -80,7 +80,7 @@ export default function ChallengeCard({
       const enterpriseResponses = await Promise.all(
         enterpriseIds.map(async (id) => {
           try {
-            const enterpriseData = await enterpriseService.showOneEnterprises(id);
+            const enterpriseData = await enterpriseService.showOneEnterprise(id);
             return { id, name: enterpriseData?.name || "Empresa sem nome" };
           } catch (err) {
             console.error(`Erro ao buscar empresa ${id}:`, err);
