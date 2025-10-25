@@ -5,28 +5,34 @@ export type User = {
   nome?: string;
   email?: string;
   role: Role;
-  companyId?: number;
+  companyId?: string | number;
 };
 
-// --- util: decode JWT no client ---
+// Decode simples
 function decodeJwtPayload<T = any>(token: string): T | null {
   try {
-    const base64Url = token.split(".")[1];
-    if (!base64Url) return null;
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const json = typeof window !== "undefined"
-      ? decodeURIComponent(
-          atob(base64)
-            .split("")
-            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-            .join("")
-        )
-      : Buffer.from(base64, "base64").toString("utf-8");
+    const part = token.split(".")[1];
+    if (!part) return null;
+
+    // Base64URL -> Base64 + padding
+    const b64 = part
+      .replace(/-/g, "+")
+      .replace(/_/g, "/")
+      .padEnd(Math.ceil(part.length / 4) * 4, "=");
+
+    const json =
+      typeof window !== "undefined"
+        ? (typeof atob === "function"
+          ? atob(b64)
+          : Buffer.from(b64, "base64").toString("utf-8"))
+        : Buffer.from(b64, "base64").toString("utf-8");
+
     return JSON.parse(json) as T;
   } catch {
     return null;
   }
 }
+
 
 function mapRoleFromToken(raw?: string): Role {
   const v = (raw ?? "").toString().trim().toUpperCase();

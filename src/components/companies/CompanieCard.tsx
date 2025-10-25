@@ -3,17 +3,9 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  LayoutGrid,
-  List as ListIcon,
-  MoreHorizontal,
-  User,
-  Mail,
-  Settings,
-} from "lucide-react";
-import { type Companie } from "@/mocks/CompaniesData";
+import { LayoutGrid, List as ListIcon, MoreHorizontal, User, Mail, Settings } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
-import CompaniesProfile from "./CompaniesProfile"; 
+import CompaniesProfile from "./CompaniesProfile";
 import { ShowAllEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import { useStore } from "../../../store";
@@ -22,9 +14,9 @@ type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
 type Props = {
   role?: Role;
-  companyId?: string;
+  companyId?: string | number;
   autoOpen?: boolean;
-  viewerCompanyId?: number;
+  viewerCompanyId?: string | number;
   title?: string;
 };
 
@@ -36,23 +28,42 @@ export default function CompanieCard({
   title = "Empresas",
 }: Props) {
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedCompany, setSelectedCompany] = useState<Companie | null>(null);
+
+  const [selectedCompany, setSelectedCompany] = useState<ShowAllEnterpriseResponse | null>(null);
   const [companies, setCompaniesData] = useState<ShowAllEnterpriseResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const { reload } = useStore();
 
   const data = useMemo(() => companies, [companies]);
+
+  function companyKey(c: any): string | undefined {
+    const cand =
+      c?.id ??
+      c?.enterpriseId ??
+      c?.companyId ??
+      c?.uuid ??
+      c?.empresaId ??
+      c?.enterprise_id ??
+      c?.company_id;
+    return cand == null ? undefined : String(cand);
+  }
+
   const filtered = useMemo(() => {
-    const base = companyId
-      ? data.filter((c) => String(c.id) === String(companyId))
-      : data;
+    const toStr = (v: unknown) => (v == null ? undefined : String(v).trim());
 
-    const canSeeAll = role === "admin" || role === "gestor";
-    if (canSeeAll) return base;
+    const paramId = toStr(companyId);
+    const viewerId = toStr(viewerCompanyId);
+    const isAdmin = role === "admin";
 
-    if (viewerCompanyId == null) return [];
-    return base.filter((c) => c.id === viewerCompanyId.toString());
+    const byParam = paramId ? data.filter((c) => companyKey(c) === paramId) : data;
+
+    if (isAdmin) return byParam;
+
+    if (!viewerId) return [];
+
+    const source = paramId ? byParam : data;
+    return source.filter((c) => companyKey(c) === viewerId);
   }, [data, companyId, role, viewerCompanyId]);
 
   const listRef = useRef<HTMLDivElement>(null);
@@ -68,18 +79,38 @@ export default function CompanieCard({
 
   async function fetchCompanies() {
     try {
-      const data = await enterpriseService.showAllEnterprises();
+      let data: ShowAllEnterpriseResponse[] = [];
+
+      if (role === "admin") {
+        data = await enterpriseService.showAllEnterprises();
+      } else if (viewerCompanyId) {
+        const one = await enterpriseService.showOneEnterprise(String(viewerCompanyId));
+        data = one ? ([one] as unknown as ShowAllEnterpriseResponse[]) : [];
+      } else {
+        data = [];
+      }
+
       setCompaniesData(data);
     } catch (error) {
       console.error(error);
+      setCompaniesData([]);
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(()=> {
+  useEffect(() => {
     fetchCompanies();
-  }, [reload])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reload, role, viewerCompanyId]);
+
+  // NEW: quando não for admin e houver exatamente 1 empresa, abre o card expandido automaticamente
+  useEffect(() => {
+    if (role !== "admin" && filtered.length === 1) {
+      setSelectedCompany(filtered[0]);
+      if (!isOpen) openModal();
+    }
+  }, [role, filtered, isOpen, openModal]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(recalcHeight);
@@ -100,7 +131,7 @@ export default function CompanieCard({
   if (loading) {
     return (
       <div className="w-full p-6 flex justify-center items-center">
-        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin" />
       </div>
     );
   }
@@ -108,13 +139,12 @@ export default function CompanieCard({
   if (!filtered.length) {
     return (
       <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
-        Nenhuma empresa encontrada
-        {role === "admin" || role === "gestor" ? "" : " para sua empresa"}.
+        Nenhuma empresa encontrada{role === "admin" ? "" : " para sua empresa"}.
       </div>
     );
   }
 
-  const wrapIfNeeded = (company: Companie, children: React.ReactNode) => {
+  const wrapIfNeeded = (company: ShowAllEnterpriseResponse, children: React.ReactNode) => {
     if (role === "admin") {
       const handlers = {
         onClick: () => {
@@ -132,12 +162,15 @@ export default function CompanieCard({
       };
       return <div {...handlers}>{children}</div>;
     }
+
+    const sameCompany =
+      (companyId != null && String(companyId) === companyKey(company)) ||
+      filtered.length === 1;
+
+    if (sameCompany) return <>{children}</>;
+
     return (
-      <Link
-        href={`/company/${company.id}/empresa?role=${role}`}
-        className="block"
-        prefetch={false}
-      >
+      <Link href={`/company/${company.id}/empresa?role=${role}`} className="block" prefetch={false}>
         {children}
       </Link>
     );
@@ -164,19 +197,13 @@ export default function CompanieCard({
       </div>
 
       {/* Contêiner com altura animada */}
-      <div
-        ref={containerRef}
-        style={{ height: containerHeight }}
-        className="relative transition-[height] duration-300 ease-out"
-      >
+      <div ref={containerRef} style={{ height: containerHeight }} className="relative transition-[height] duration-300 ease-out">
         {/* LISTA */}
         <div
           ref={listRef}
           aria-hidden={viewMode !== "list"}
           className={`absolute inset-0 overflow-hidden will-change-transform transition duration-200 space-y-4 ${
-            viewMode === "list"
-              ? "opacity-100 scale-100 pointer-events-auto"
-              : "opacity-0 scale-[0.98] pointer-events-none"
+            viewMode === "list" ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-[0.98] pointer-events-none"
           }`}
         >
           {filtered.map((c) => {
@@ -186,13 +213,7 @@ export default function CompanieCard({
                 <div className="flex w-full md:w-[32%] items-center gap-4">
                   <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                     {c.logo ? (
-                      <Image
-                        src={c.logo}
-                        alt={c.name ?? "Logo da empresa"}
-                        width={64}
-                        height={64}
-                        className="object-contain"
-                      />
+                      <Image src={c.logo} alt={c.name ?? "Logo da empresa"} width={64} height={64} unoptimized className="object-contain" />
                     ) : (
                       <div className="w-16 h-16 grid place-items-center text-sm font-medium">
                         {c.name?.[0]?.toUpperCase() ?? "?"}
@@ -200,12 +221,8 @@ export default function CompanieCard({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">
-                      {c.name}
-                    </div>
-                    <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">
-                      {c.sector}
-                    </div>
+                    <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">{c.name}</div>
+                    <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">{c.sector}</div>
                   </div>
                 </div>
 
@@ -254,10 +271,7 @@ export default function CompanieCard({
             );
 
             return (
-              <div
-                key={`list-${c.id}`}
-                className="group relative rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition"
-              >
+              <div key={`list-${c.id}`} className="group relative rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition">
                 {wrapIfNeeded(c, row)}
               </div>
             );
@@ -269,9 +283,7 @@ export default function CompanieCard({
           ref={gridRef}
           aria-hidden={viewMode !== "grid"}
           className={`absolute inset-0 overflow-auto will-change-transform transition duration-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1 ${
-            viewMode === "grid"
-              ? "opacity-100 scale-100 pointer-events-auto"
-              : "opacity-0 scale-[0.98] pointer-events-none"
+            viewMode === "grid" ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-[0.98] pointer-events-none"
           }`}
         >
           {filtered.map((c) => {
@@ -282,13 +294,7 @@ export default function CompanieCard({
                   <div className="flex items-center gap-3">
                     <div className="size-12 rounded-xl bg-slate-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden ring-1 ring-[#15358D]/20 ring-offset-2 ring-offset-white dark:ring-offset-gray-900">
                       {c.logo ? (
-                        <Image
-                          src={c.logo}
-                          alt={c.name ?? "Logo da empresa"}
-                          width={48}
-                          height={48}
-                          className="object-contain"
-                        />
+                        <Image src={c.logo} alt={c.name ?? "Logo da empresa"} width={48} height={48} unoptimized className="object-contain" />
                       ) : (
                         <div className="size-12 grid place-items-center text-sm font-semibold text-slate-700">
                           {c.name?.[0]?.toUpperCase() ?? "?"}
@@ -296,12 +302,8 @@ export default function CompanieCard({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">
-                        {c.name}
-                      </h3>
-                      <div className="mt-1 text-[12px] text-[#15358D] truncate">
-                        {c.sector}
-                      </div>
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">{c.name}</h3>
+                      <div className="mt-1 text-[12px] text-[#15358D] truncate">{c.sector}</div>
                     </div>
                   </div>
 
@@ -324,9 +326,7 @@ export default function CompanieCard({
                     </li>
                   </ul>
 
-                  <p className="mt-3 text-sm text-slate-600 dark:text-gray-400 line-clamp-3">
-                    {c.description}
-                  </p>
+                  <p className="mt-3 text-sm text-slate-600 dark:text-gray-400 line-clamp-3">{c.description}</p>
                 </div>
               </article>
             );
@@ -336,8 +336,8 @@ export default function CompanieCard({
         </div>
       </div>
 
-      {/* Modal admin */}
-      {role === "admin" && selectedCompany && (
+      {/* Modal: agora abre tanto para admin (ao clicar) quanto para gestor/avaliador/usuario (auto-aberto quando filtra 1) */}
+      {selectedCompany && (
         <CompaniesProfile
           data={selectedCompany}
           isOpen={isOpen}
