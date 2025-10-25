@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client";
 
 import React, { useState } from "react";
@@ -10,6 +8,7 @@ import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import { getCurrentUser, redirectByRole } from "@/lib/auth";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -55,12 +54,19 @@ export default function LoginForm() {
       // o back retorna { access_token }
       const { access_token } = await authService.login({ email, password: senha });
 
-      // guarda o token p/ o axios interceptor enviar Authorization: Bearer ...
-      localStorage.setItem("access_token", access_token);
+      // salva o token pro interceptor
+localStorage.setItem("access_token", access_token);
+
+// ✅ pega usuário decodificado do token
+const me = await getCurrentUser();
+console.log("decoded user:", me);
+
+// ✅ decide a rota com role + companyId
+const destiny = redirectByRole(me?.role, me?.companyId);
 
       setLoading(false);
       showCustomToast("Login realizado com sucesso!", "success");
-      setTimeout(() => router.push("/admin/dashboard"), 800);
+      setTimeout(() => router.push(destiny), 800);
     } catch (err: any) {
       setLoading(false);
       console.log(err);

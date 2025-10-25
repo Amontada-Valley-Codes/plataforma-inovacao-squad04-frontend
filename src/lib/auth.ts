@@ -1,7 +1,3 @@
-// src/lib/auth.ts
-import api from "@/lib/axios";
-
-// Mantém tuas roles do front
 export type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
 export type User = {
@@ -33,15 +29,18 @@ function decodeJwtPayload<T = any>(token: string): T | null {
 }
 
 function mapRoleFromToken(raw?: string): Role {
-  // ajuste se o payload do teu back for outro (ex.: type_user, role, perfil)
-  switch (raw) {
+  const v = (raw ?? "").toString().trim().toUpperCase();
+  switch (v) {
     case "ADMINISTRATOR":
     case "ADMIN":
       return "admin";
     case "MANAGER":
+    case "GESTOR":
       return "gestor";
     case "EVALUATOR":
+    case "AVALIADOR":
       return "avaliador";
+    case "COMMON":
     default:
       return "usuario";
   }
@@ -52,7 +51,6 @@ export async function getAccessToken(): Promise<string | null> {
   return localStorage.getItem("access_token");
 }
 
-// (A) Caminho 100% client: decodifica do token
 export async function getCurrentUser(): Promise<User | null> {
   const token = await getAccessToken();
   if (!token) return null;
@@ -71,19 +69,15 @@ export async function getUserRole(): Promise<Role> {
   return u?.role ?? "usuario";
 }
 
-/* (B) Opcional — se teu back tiver /auth/me:
-export async function fetchMe(): Promise<User | null> {
-  try {
-    const { data } = await api.get("/auth/me"); // precisa existir no back
-    return {
-      id: data.id,
-      nome: data.name ?? data.nome,
-      email: data.email,
-      role: mapRoleFromToken(data.type_user ?? data.role),
-      companyId: data.companyId ?? data.enterpriseId,
-    };
-  } catch {
-    return null;
+export function redirectByRole(role?: Role, companyId?: string | number): string {
+  switch (role) {
+    case "admin":
+      return "/admin/dashboard";
+    case "gestor":
+      return companyId ? `/company/${companyId}/dashboard` : "/company";
+    case "avaliador":
+      return companyId ? `/company/${companyId}/desafios` : "/desafios";
+    default:
+      return "/user/meus-desafios";
   }
 }
-*/
