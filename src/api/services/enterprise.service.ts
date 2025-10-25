@@ -15,7 +15,7 @@ export const enterpriseService = {
     return response.data;
   },
 
-  async showOneEnterprises(id: string): Promise<ShowOneEnterpriseResponse> {
+  async showOneEnterprise(id: string): Promise<ShowOneEnterpriseResponse> {
     const response = await api.get(ENDPOINTS.ENTERPRISE.SHOW_ONE_ENTERPRISE(id));
     console.log(response.data);
     return response.data;

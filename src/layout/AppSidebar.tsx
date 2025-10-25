@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client";
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -31,6 +31,10 @@ function appendSearch(path: string, search: string) {
   const hasQuery = path.includes("?");
   const sep = hasQuery ? "&" : "?";
   return `${path}${sep}${search.replace(/^\?/, "")}`;
+}  
+function selectSearchFor(path: string, currentSearch: string, role: Role) {
+  if (path.startsWith("/admin")) return "?role=admin";
+  return currentSearch || "";
 }
 
 /** Lê a role a partir de ?role= (para testes), do JWT (access_token) ou do localStorage. */
@@ -243,7 +247,7 @@ const AppSidebar: React.FC = () => {
           <li key={`${nav.name}-${index}`} className={isCompact ? "" : "w-full"}>
             {nav.path && (
               <Link
-                href={appendSearch(nav.path, searchSuffix)}
+                href={appendSearch(nav.path, selectSearchFor(nav.path, searchSuffix, role))}
                 className={`${linkBase} ${active ? linkActive : linkInactive}`}
                 style={styleVar}
                 aria-current={active ? "page" : undefined}

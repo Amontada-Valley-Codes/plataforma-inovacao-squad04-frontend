@@ -9,20 +9,22 @@ import {
   FaClipboardList,
 } from "react-icons/fa";
 import { Modal } from "../ui/modal";
-import { Companie } from "@/mocks/CompaniesData";
 import { X } from "lucide-react";
-import { Challenge, challengesData } from "@/mocks/ChallengeData";
+import { ShowAllEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  data: Companie | null;
+  data: ShowAllEnterpriseResponse | null;
 };
 
 export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
-  const desafios: Challenge[] = challengesData.filter(
-    (challenge) => challenge.companyId === data?.id
-  );
+  const desafios: Array<{
+    ChallengeTitle: string;
+    Author: string;
+    Category: string;
+    Status: string;
+  }> = [];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -44,7 +46,12 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
         >
           {/* Banner */}
           <div className="relative h-48 sm:h-56 md:h-64 w-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-            <FaRegImage className="text-gray-500 dark:text-[#ced3db] text-4xl sm:text-5xl" />
+            {data?.cover ? (
+              // pode trocar para <Image> se já estiver usando next/image aqui
+              <img src={data.cover} alt="Capa da empresa" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <FaRegImage className="text-gray-500 dark:text-[#ced3db] text-4xl sm:text-5xl" />
+            )}
 
             {/* Botão fechar */}
             <button
@@ -60,7 +67,11 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
             {/* Foto perfil */}
             <div className="absolute left-10 bottom-[-4rem] sm:bottom-[-5rem]">
               <div className="w-28 sm:w-36 h-28 sm:h-36 rounded-full bg-gray-100 dark:bg-gray-700 border-4 sm:border-8 border-white dark:border-gray-900 flex items-center justify-center shadow-md">
-                <FaRegImage className="text-gray-500 dark:text-[#ced3db] text-4xl sm:text-5xl" />
+                {data?.logo ? (
+                  <img src={data.logo} alt="Logo da empresa" className="w-full h-full object-cover" />
+                ) : (
+                  <FaRegImage className="text-gray-500 dark:text-[#ced3db] text-4xl sm:text-5xl" />
+                )}
               </div>
             </div>
           </div>
@@ -140,16 +151,20 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                 </h3>
                 <div className="flex flex-col gap-2">
                   {[
-                    { icon: FaInstagram, label: "Instagram" },
-                    { icon: FaWhatsapp, label: "WhatsApp" },
-                    { icon: FaLinkedin, label: "Linkedin" },
-                  ].map(({ icon: Icon, label }) => (
-                    <button
+                    { icon: FaInstagram, label: "Instagram", href: data?.instagram },
+                    { icon: FaWhatsapp, label: "WhatsApp", href: data?.whatsapp },
+                    { icon: FaLinkedin, label: "LinkedIn", href: data?.linkedin },
+                  ].map(({ icon: Icon, label, href }) => (
+                    <a
                       key={label}
-                      className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-blue-900 dark:text-[#ced3db] px-4 py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 transition"
+                      href={href ?? "#"}
+                      target={href ? "_blank" : undefined}
+                      rel={href ? "noopener noreferrer" : undefined}
+                      className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-blue-900 dark:text-[#ced3db] px-4 py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 transition disabled:opacity-60"
+                      aria-disabled={!href}
                     >
                       <Icon /> {label}
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -159,7 +174,13 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                   Localização Maps
                 </h3>
                 <div className="w-full h-36 sm:h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-sm hover:shadow-md transition">
-                  <FaMapMarkedAlt className="text-blue-700 dark:text-blue-800 text-3xl sm:text-4xl" />
+                  {data?.locationUrl ? (
+                    <a href={data.locationUrl} target="_blank" rel="noopener noreferrer" className="underline text-blue-700 dark:text-blue-500">
+                      Abrir no Google Maps
+                    </a>
+                  ) : (
+                    <FaMapMarkedAlt className="text-blue-700 dark:text-blue-800 text-3xl sm:text-4xl" />
+                  )}
                 </div>
               </div>
             </div>
