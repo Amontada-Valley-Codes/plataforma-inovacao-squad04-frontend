@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { Comment } from "./Comment";
 import { ideationCommentSections } from "./commentsData";
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
+import { ShowAllChallengeResponse } from "@/api/payloads/challenge.payload";
+import { ShowAllChecklistsResponse } from "@/api/payloads/checklist.payload";
+import { checklistService } from "@/api/services/checklist.service";
 
 type CardContentsHeaderProps = {
   challengeTitle: string;
@@ -520,6 +523,7 @@ export const CardDetailedScreeningContent = ({ challangeTitle, category, startDa
 
 type CardIdeationContentProps = {
   challangeTitle: string;
+  challengeId: string;
   category: string;
   description: string;
 }
@@ -575,7 +579,7 @@ export const CardIdeationContent = ({ challangeTitle, category }: CardIdeationCo
             <ListCheck strokeWidth={3} size={16}/>
             <p className="text-[#666]">CHECKLIST</p>
           </div>
-          <Checklist/>
+          <Checklist challengeId={challengeId}/>
         </div>
       </div>
     </div>
@@ -754,49 +758,138 @@ export const ProgressBarActions = ({percentage}: {percentage: number}) => {
   );
 };
 
-export const Checklist = () => {
-  const [items, setItems] = useState([
-    {id: 1, text: "Checklist teste", checked: false},
-    {id: 2, text: "Checklist teste", checked: false},
-    {id: 3, text: "Checklist teste", checked: false},
-  ])
+type ChecklistProps = {
+  challengeId: string;
+}
+
+export const Checklist = ({ challengeId }: ChecklistProps) => {
+  const [items, setItems] = useState<ShowAllChecklistsResponse[]>([])
   const [newItem, setNewItem] = useState('')
   const [isAdding, setIsAdding] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingText, setEditingText] = useState('')
 
-  const toggleItem = (id: number) => {
-    setItems(items.map((item) => 
-      item.id === id ? {...item, checked: !item.checked } : item
-    ))
+  useEffect(() => {
+    async function fetchChecklists() {
+      const response = await checklistService.showAllChecklists(challengeId)
+      setItems(response)
+    }
+
+    fetchChecklists()
+  }, [challengeId])
+
+  const toggleItem = async (checklistId: string) => {
+    try {
+      const updatedChecklist = await checklistService.updateStatusChecklist(checklistId)
+
+      setItems((prev) => 
+        prev.map((item) =>
+          item.id === checklistId ? {...item, completed: updatedChecklist.completed} : item
+        )
+      )
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const addItem = () => {
-    if (newItem.trim() === '') return
-    const newChecklistItem = {
-      id: Date.now(),
-      text: newItem,
-      checked: false
+  const addItem = async (challengeId: string, checklistText: string) => {
+    try {
+      const newChecklist = await checklistService.createChecklist(challengeId, { text: checklistText })
+      setItems((prev) => [...prev, newChecklist])
+      setNewItem('') 
+    } catch (error) {
+      console.error(error)
     }
-    setItems([...items, newChecklistItem])
-    setNewItem('')
-    setIsAdding(false)
+  }
+
+  const updateItem = async (checklistId: string, newChecklistText: string) => {
+    try {
+      const updatedChecklist = await checklistService.updateChecklist(checklistId, { text: newChecklistText })
+
+      setItems((prev) => 
+        prev.map((item) =>
+          item.id === checklistId ? {...item, text: updatedChecklist.text} : item
+        )
+      )
+      setEditingText('')
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const deleteItem = async (checklistId: string) => {
+    try {
+      await checklistService.deleteChecklist(checklistId)
+
+      setItems((prev) => prev.filter((item) => item.id !== checklistId))
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
     <div className="w-full p-4">
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-full">
         {items.map(item => (
-          <label key={item.id} className="flex items-center gap-2 text-sm cursor-pointer select-none">
+          <div key={item.id} className="flex items-center gap-2 text-sm cursor-pointer select-none">
             <input
               type="checkbox"
-              checked={item.checked}
+              checked={item.completed}
               onChange={() => toggleItem(item.id)}
               className="w-4 h-4 accent-gray-600 rounded"
             />
-            <span className={item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}>
-              {item.text}
-            </span>
-          </label>
+            <div className="flex items-center w-[60%] justify-between">
+              {editingId === item.id ? (
+                <input
+                  value={editingText}
+                  onChange={(e) => setEditingText(e.target.value)}
+                  onBlur={() => {
+                    if (editingText.trim()) updateItem(item.id, editingText)
+                    setEditingId(null)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      updateItem(item.id, editingText)
+                      setEditingId(null)
+                    }
+                    if (e.key === 'Escape') {
+                      setEditingId(null)
+                      setEditingText('')
+                    }
+                  }}
+                  className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
+                  autoFocus
+                />
+              ) : (
+                <span className={item.completed ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}>
+                  {item.text}
+                </span>
+              )}
+
+              <div className="relative flex h-5 items-end gap-2">
+                <SquarePen 
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setEditingId(item.id)
+                    setEditingText(item.text)
+                  }}
+                  size={16}
+                  className="text-[#0B2B72] 
+                  hover:text-[#0b245a] transition-all duration-300 ease-in-out"
+                />
+                <Trash2
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    deleteItem(item.id)
+                  }} 
+                  size={16}
+                  className="text-red-600 hover:text-red-800 transition-all 
+                  duration-300 ease-in-out"
+                />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -810,7 +903,10 @@ export const Checklist = () => {
             className="flex-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B2B72]"
           />
           <button
-            onClick={addItem}
+            onClick={() => {
+              addItem(challengeId, newItem)
+              setIsAdding(false)
+            }}
             className="flex items-center gap-1 px-2 py-1.5 text-sm rounded-[8px] text-[#666] bg-[#E2E2E2] hover:bg-gray-300 transition"
           >
             Adicionar
