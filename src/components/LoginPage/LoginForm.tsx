@@ -2,19 +2,13 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import {
-  User,
-  LockKeyhole,
-  EyeIcon,
-  CheckCircle2,
-  XCircle,
-  Loader2,
-} from "lucide-react";
+import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import { getCurrentUser, redirectByRole } from "@/lib/auth";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -29,20 +23,14 @@ export default function LoginForm() {
     toast.custom((t) => (
       <div
         className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-          text-white font-medium transition-all duration-300 transform ${
-            t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
           }
-          ${
-            type === "success"
-              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
+          ${type === "success"
+            ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
+            : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
           }`}
       >
-        {type === "success" ? (
-          <CheckCircle2 className="text-green-300" size={22} />
-        ) : (
-          <XCircle className="text-red-300" size={22} />
-        )}
+        {type === "success" ? <CheckCircle2 className="text-green-300" size={22} /> : <XCircle className="text-red-300" size={22} />}
         <span>{message}</span>
       </div>
     ));
@@ -63,15 +51,28 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const data = await authService.login({ email, password: senha });
-      localStorage.setItem("access_token", data.access_token);
+      // o back retorna { access_token }
+      const { access_token } = await authService.login({ email, password: senha });
+
+      // salva o token pro interceptor
+localStorage.setItem("access_token", access_token);
+
+// ✅ pega usuário decodificado do token
+const me = await getCurrentUser();
+console.log("decoded user:", me);
+
+// ✅ decide a rota com role + companyId
+const destiny = redirectByRole(me?.role, me?.companyId);
+
       setLoading(false);
       showCustomToast("Login realizado com sucesso!", "success");
-      setTimeout(() => router.push("/admin/dashboard"), 1500);
+      setTimeout(() => router.push(destiny), 800);
     } catch (err: any) {
       setLoading(false);
       console.log(err);
-      setError(err.response?.data?.message);
+      const msg = err?.response?.data?.message || "Erro ao entrar.";
+      setError(msg);
+      showCustomToast(msg, "error");
     }
   };
 
@@ -85,25 +86,14 @@ export default function LoginForm() {
 
       {/* Logo */}
       <div className="relative w-[90px] h-[65px] sm:w-[110px] sm:h-[80px] mb-6 sm:mb-8">
-        <Image
-          src="/images/logo/ninna-logo.svg"
-          alt="ninna-logo"
-          fill
-          className="object-contain"
-          priority
-        />
+        <Image src="/images/logo/ninna-logo.svg" alt="ninna-logo" fill className="object-contain" priority />
       </div>
 
       {/* Título */}
-      <h1 className="font-semibold text-xl sm:text-3xl text-white mb-5 sm:mb-6 text-center">
-        Login
-      </h1>
+      <h1 className="font-semibold text-xl sm:text-3xl text-white mb-5 sm:mb-6 text-center">Login</h1>
 
       {/* Formulário */}
-      <form
-        onSubmit={handleSubmit}
-        className="w-5/6 max-w-[360px] flex flex-col items-center gap-3 sm:gap-4"
-      >
+      <form onSubmit={handleSubmit} className="w-5/6 max-w-[360px] flex flex-col items-center gap-3 sm:gap-4">
         {/* Campo de E-mail */}
         <div className="relative w-5/6">
           <input
@@ -114,11 +104,7 @@ export default function LoginForm() {
             className="block bg-white text-black w-full rounded-full pl-11 pr-4 py-2.5 sm:py-3
               placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
           />
-          <User
-            className="absolute left-4 top-1/2 -translate-y-1/2"
-            color="#6B7280"
-            size={18}
-          />
+          <User className="absolute left-4 top-1/2 -translate-y-1/2" color="#6B7280" size={18} />
         </div>
 
         {/* Campo de Senha */}
@@ -131,11 +117,7 @@ export default function LoginForm() {
             className="block bg-white text-black w-full rounded-full pl-11 pr-10 py-2.5 sm:py-3
               placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
           />
-          <LockKeyhole
-            className="absolute left-4 top-1/2 -translate-y-1/2"
-            color="#6B7280"
-            size={18}
-          />
+          <LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2" color="#6B7280" size={18} />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -145,26 +127,14 @@ export default function LoginForm() {
           </button>
         </div>
 
-        {error && (
-          <p className="text-red-400 text-sm text-center w-full">{error}</p>
-        )}
+        {error && <p className="text-red-400 text-sm text-center w-full">{error}</p>}
 
         {/* Links */}
         <div className="text-center mt-1 space-y-1">
-          <Link
-            href="#"
-            className="text-xs sm:text-sm text-white hover:underline"
-          >
-            Esqueceu a senha?
-          </Link>
+          <Link href="#" className="text-xs sm:text-sm text-white hover:underline">Esqueceu a senha?</Link>
           <p className="text-xs sm:text-sm text-[#D2F5FB] font-light">
             Não possui cadastro?{" "}
-            <Link
-              href="/auth/register"
-              className="text-white font-medium hover:underline"
-            >
-              Inscreva-se
-            </Link>
+            <Link href="/auth/register" className="text-white font-medium hover:underline">Inscreva-se</Link>
           </p>
         </div>
 
@@ -175,11 +145,7 @@ export default function LoginForm() {
           bg-[linear-gradient(90deg,#0C0869_0%,#15358D_100%)]
           hover:scale-[1.03] transition-transform duration-300"
         >
-          {loading ? (
-            <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" />
-          ) : (
-            "Entrar"
-          )}
+          {loading ? <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" /> : "Entrar"}
         </button>
       </form>
     </div>

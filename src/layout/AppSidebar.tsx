@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
@@ -31,11 +33,16 @@ function appendSearch(path: string, search: string) {
   return `${path}${sep}${search.replace(/^\?/, "")}`;
 }
 
+/** Lê a role a partir de ?role= (para testes), do JWT (access_token) ou do localStorage. */
 function useCurrentRole(): Role {
   const [role, setRole] = useState<Role>("usuario");
+
   useEffect(() => {
     if (typeof window === "undefined") return;
+
     const allowed: Role[] = ["admin", "gestor", "avaliador", "usuario", "startup"];
+
+    // 1) Prioriza ?role= (útil para testes manuais)
     const params = new URLSearchParams(window.location.search);
     const urlRole = params.get("role") as Role | null;
     if (urlRole && allowed.includes(urlRole)) {
@@ -43,18 +50,67 @@ function useCurrentRole(): Role {
       setRole(urlRole);
       return;
     }
-    const stored = localStorage.getItem("role") as Role | null;
-    if (stored && allowed.includes(stored)) {
-      setRole(stored);
-      return;
+
+    // 2) Tenta decodificar a role do JWT salvo no login
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      try {
+        const [, payload] = token.split(".");
+        if (payload) {
+          const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+          const decoded = JSON.parse(decodeURIComponent(escape(json)));
+
+          const type = String(decoded?.type_user || "").toUpperCase();
+          const map: Record<string, Role> = {
+            ADMINISTRATOR: "admin",
+            MANAGER: "gestor",
+            EVALUATOR: "avaliador",
+            COMMON: "usuario",
+          };
+          const r = map[type] ?? "usuario";
+          localStorage.setItem("role", r);
+          setRole(r);
+          return;
+        }
+      } catch {
+        // se falhar o decode, ignora e tenta stored
+      }
     }
-    setRole("usuario");
+
+    // 3) Fallback no que já estiver salvo (ou "usuario")
+    const stored = localStorage.getItem("role") as Role | null;
+    setRole(stored && allowed.includes(stored) ? stored : "usuario");
   }, []);
+
   return role;
 }
 
+/**
+ * Monta os itens do menu de acordo com a role e com o contexto de empresa.
+ * Se não houver companyId na rota, tenta obter do JWT (enterpriseId) para gestores.
+ */
 function buildNavItems(role: Role, pathname: string): NavItem[] {
-  const companyId = extractCompanyIdFromPath(pathname);
+  let companyId = extractCompanyIdFromPath(pathname);
+
+  // Se não houver no path, tenta ler do token (enterpriseId)
+  if (!companyId && typeof window !== "undefined") {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      try {
+        const [, payload] = token.split(".");
+        if (payload) {
+          const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+          const decoded = JSON.parse(decodeURIComponent(escape(json)));
+          const enterpriseId = decoded?.enterpriseId;
+          if (enterpriseId !== undefined && enterpriseId !== null) {
+            companyId = String(enterpriseId);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
 
   if (role === "admin") {
     return [
@@ -66,6 +122,7 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
     ];
   }
 
+  // STARTUP sem contexto de empresa
   if (!companyId && role === "startup") {
     return [
       { icon: <GridIcon />, name: "Desafios Públicos", path: "/startup/desafios" },
@@ -74,7 +131,16 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
     ];
   }
 
+  // Sem companyId na rota nem no token
   if (!companyId) {
+    if (role === "gestor") {
+      // Overview do gestor sem empresa vinculada
+      return [
+        { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/company" },
+        { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: "/company/desafios" },
+        { icon: <HistoryIcon />, name: "Histórico", path: "/company/history" },
+      ];
+    }
     if (role === "usuario") {
       return [
         { icon: <GridIcon />, name: "Meus Desafios", path: "/user/meus-desafios" },
@@ -82,9 +148,11 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
         { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
       ];
     }
+    // Fallback para outros perfis sem contexto
     return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
+  // Com companyId
   const base = `/company/${companyId}`;
 
   if (role === "gestor") {
@@ -108,6 +176,7 @@ function buildNavItems(role: Role, pathname: string): NavItem[] {
     ];
   }
 
+  // Usuário comum (ou fallback com companyId)
   return [
     { icon: <BuildingOffice2Icon />, name: "Empresa", path: `${base}` },
     { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },

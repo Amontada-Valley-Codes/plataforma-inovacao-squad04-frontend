@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCompanyById, updateCompanyInMock, type Companie } from "@/mocks/CompaniesData";
 import { usersData } from "@/mocks/UserData";
@@ -49,37 +50,36 @@ function getUserFromQuery(req: Request) {
   return usersData.find((u) => u.id === userId) ?? null;
 }
 
-export async function GET(req: Request, { params }: { params: { companyId: string } }) {
-  const id = Number(params.companyId);
-  if (!Number.isFinite(id)) {
-    return NextResponse.json({ error: "companyId inválido" }, { status: 400 });
-  }
-  const company = getCompanyById(id);
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const companyId = Number(url.pathname.split("/").pop()); // pega o último segmento da rota
+  if (!Number.isFinite(companyId)) return NextResponse.json({ error: "companyId inválido" }, { status: 400 });
+
+  const company = getCompanyById(companyId);
   if (!company) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json(company, { headers: { "Cache-Control": "no-store" } });
 }
 
-export async function PUT(req: Request, { params }: { params: { companyId: string } }) {
+export async function PUT(req: Request) {
   try {
-    const id = Number(params.companyId);
-    if (!Number.isFinite(id)) return NextResponse.json({ error: "companyId inválido" }, { status: 400 });
+    const url = new URL(req.url);
+    const companyId = Number(url.pathname.split("/").pop());
+    if (!Number.isFinite(companyId)) return NextResponse.json({ error: "companyId inválido" }, { status: 400 });
 
-    const me = getUserFromQuery(req); // pega ?userId=...
-    // fallback seguro: sem user → 403
+    const me = getUserFromQuery(req);
     if (!me) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    // permissão: admin pode tudo; gestor só a própria empresa
-    const canEdit = me.role === "admin" || (me.role === "gestor" && me.companyId === id);
+    const canEdit = me.role === "admin" || (me.role === "gestor" && me.companyId === companyId);
     if (!canEdit) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     let body: any;
     try { body = await req.json(); } catch { return NextResponse.json({ error: "JSON inválido" }, { status: 400 }); }
 
     const validated = validatePatch(body);
-    if (validated.ok === false) return NextResponse.json({ error: validated.error }, { status: 400 });
+    if (!validated.ok) return NextResponse.json({ error: validated.error }, { status: 400 });
 
-    const updated = updateCompanyInMock(id, validated.patch);
+    const updated = updateCompanyInMock(companyId, validated.patch);
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     return NextResponse.json(updated, { headers: { "Cache-Control": "no-store" } });

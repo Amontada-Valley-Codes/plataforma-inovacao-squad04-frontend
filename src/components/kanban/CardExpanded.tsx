@@ -4,7 +4,7 @@ import { Modal } from "../ui/modal"
 import ForwardButton from "./ForwardButton"
 import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
-import { MoreHorizontal, MoreVertical, Plus, X } from "lucide-react"
+import { MoreVertical, X } from "lucide-react"
 import {
   CardChallangeContent,
   CardDetailedScreeningContent,
@@ -112,13 +112,12 @@ type FormResolutionCardsProps = {
   setIsOpen: (isOpen: boolean) => void;
   challengeId: string | undefined;
   performMove: (challengeId: string | undefined, visibilitytToSet?: string) => void
-  visibility: string;
+  visibility: string | undefined;
   setVisibility: (visibility: string) => void;
 }
 
 export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
   const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([])
-  const { isMobile } = useBreakpoints()
 
   useEffect(() => {
     async function fetchStartups() {
@@ -280,24 +279,26 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 }
 
 export default function CardExpanded({ isOpen, onClose, columns, cardData, challenges, setChallenges, setExpandedCard }: CardExpandedProps) {
+  const [visibility, setVisibility] = useState(cardData?.visibility)
+  const [isCardOpen, setIsCardOpen] = useState(false)
+  
+  
   if (!cardData) return null
 
-  var currentColumnName = columns.find(c => c.id === cardData.status)?.name
+/*   const currentColumnName = columns.find(c => c.id === cardData.status)?.name */
   const currentColumnIndex = columns.findIndex(c => c.id === cardData.status)
   const isFirstColumn = currentColumnIndex === 0
   const isLastColumn = currentColumnIndex === columns.length - 1
-  const [visibility, setVisibility] = useState(cardData.visibility)
-  const [isCardOpen, setIsCardOpen] = useState(false)
 
-  useEffect(() => {
+  /* useEffect(() => {
     currentColumnName = columns.find(c => c.id === cardData.status)?.name
-  }, [currentColumnName])
+  }, [currentColumnName]) */
 
   const performMove = async (challengeId: string | undefined, visibilityToSet?: string) => {
     const challengeToMove = challenges.find(c => c.id === challengeId);
     if (!challengeToMove) return;
 
-    let challengeWithUpdates = { ...challengeToMove };
+    const challengeWithUpdates = { ...challengeToMove };
 
     try {
       if (visibilityToSet && challengeId) {
@@ -375,7 +376,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
         <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl w-[95vw] md:w-[80vw] h-[90vh] overflow-hidden flex flex-col">
             <CardExpandedHeader onClose={onClose} columns={columns} currentColumnId={cardData?.status}/>
-            {currentColumnName === "Desafios" && (
+            {cardData.status === "GENERATION" && (
               <CardExpandedLayout
                 mainContent={
                   <CardChallangeContent 
@@ -398,7 +399,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleApproveAndMove={handleApproveAndMove}
               />
             )}
-            {currentColumnName === "Pré-Triagem" && (
+            {cardData.status === "PRE_SCREENING" && (
               <CardExpandedLayout mainContent={
                   <CardPreScreeningContent 
                     challangeTitle={cardData.name} 
@@ -419,7 +420,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleApproveAndMove={handleApproveAndMove}
               />
             )}
-            {currentColumnName === "Triagem Detalhada" && (
+            {cardData.status === "DETAILED_SCREENING" && (
               <CardExpandedLayout
                 mainContent={
                   <CardDetailedScreeningContent
@@ -441,7 +442,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleApproveAndMove={handleApproveAndMove}
               />
             )}
-            {currentColumnName === "Ideação" && (
+            {cardData.status === "IDEATION" && (
               <CardExpandedLayout
                 mainContent={
                   <CardIdeationContent
@@ -459,7 +460,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleApproveAndMove={handleApproveAndMove}
               />
             )}
-            {currentColumnName === "Experimentação" && (
+            {cardData.status === "EXPERIMENTATION" && (
               <CardExpandedLayout
                 mainContent={
                   <CardExperimentationContent
@@ -513,7 +514,7 @@ type CardExpandedHeaderProps = {
 }
 
 const CardExpandedHeader = ({ onClose, columns, currentColumnId, }: CardExpandedHeaderProps) => {
-  const { isMobile, isDesktop, isTablet} = useBreakpoints()
+  const { isMobile } = useBreakpoints()
 
   return (
     <div className="relative w-full flex justify-start md:justify-center items-center px-8 md:px-16 border-b-2 border-[#A9A9A9]">

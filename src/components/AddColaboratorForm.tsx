@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { ChevronDown, Mail, User, X } from "lucide-react";
 import { Modal } from "./ui/modal";
 import { useState } from "react";

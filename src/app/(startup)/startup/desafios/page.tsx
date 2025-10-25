@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Metadata } from "next";
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 import { getCurrentUser } from "@/lib/auth";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Desafios Públicos",
@@ -13,7 +16,9 @@ export default async function StartupPublicChallengesPage() {
 
   return (
     <div className="space-y-6">
-      <ChallengeCard canApply startupId={startupId} />
+      <Suspense fallback={<p>Carregando...</p>}>
+        <ChallengeCard canApply startupId={startupId} />
+      </Suspense>
     </div>
   );
 }
