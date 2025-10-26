@@ -163,9 +163,9 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
 
   // Usuário comum (ou fallback com companyId)
   return [
-    { icon: <BuildingOffice2Icon />, name: "Empresa", path: `${base}` },
-    { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios"}`.replace(`"}`, ``) }, // proteção caso copy/paste com aspas
-    { icon: <ClipboardDocumentListIcon />, name: "Meus Desafios", path: `/user/meus-desafios` },
+    { icon: <GridIcon />, name: "Meus Desafios", path: "/user/meus-desafios" },
+      { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" }, 
   ];
 }
 

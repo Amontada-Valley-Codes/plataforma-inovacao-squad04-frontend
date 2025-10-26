@@ -1,6 +1,4 @@
 // src/api/services/enterprise.service.ts
-"use client";
-
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 import {
@@ -28,7 +26,7 @@ export const enterpriseService = {
 
   async updateEnterprise(
     id: string,
-    payload: Partial<Pick<ShowOneEnterpriseResponse, "sector" | "description" | "address" | "email">>
+    payload: Partial<{ sector: string; description: string; address: string; email: string }>
   ): Promise<ShowOneEnterpriseResponse> {
     const { data } = await api.put(`/enterprise/${id}`, payload);
     return data;
@@ -52,8 +50,17 @@ export const enterpriseService = {
     });
   },
 
-  async getMyEnterprise(): Promise<ShowOneEnterpriseResponse> {
-    const { data } = await api.get(ENDPOINTS.ENTERPRISE.GET_MY_ENTERPRISE);
+  // 👇 robusto: 404 -> null; tenta fallback de rota alternativa, se existir
+  async getMyEnterprise(): Promise<ShowOneEnterpriseResponse | null> {
+  try {
+    console.log("GET enterpriseMe ->", api.defaults.baseURL,
+      "hasToken?", !!(typeof window !== "undefined" && localStorage.getItem("access_token")));
+    const { data } = await api.get("/enterprise/user/enterpriseMe");
     return data;
-  },
+  } catch (err: any) {
+    console.log("enterpriseMe ERR:", err?.response?.status, err?.response?.data);
+    if (err?.response?.status === 404) return null;
+    throw err;
+  }
+}
 };

@@ -220,6 +220,11 @@ export default function CompanieCard({
       return <div {...handlers}>{children}</div>;
     }
 
+    if (role === "usuario") {
+      return <>{children}</>; 
+    }
+
+
     const sameCompany =
       (companyId != null && String(companyId) === companyKey(company)) ||
       filtered.length === 1;
