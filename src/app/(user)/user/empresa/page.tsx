@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import CompaniesProfileInline from "@/components/companies/CompaniesProfileInline";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import type { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
@@ -14,8 +13,9 @@ function decodeJwt(): { role?: string; enterpriseId?: string | number } | null {
   try {
     const [, payload] = token.split(".");
     if (!payload) return null;
-    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    const decoded = JSON.parse(decodeURIComponent(escape(json)));
+    const b64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonStr = atob(b64); // JWT payload é JSON puro
+    const decoded = JSON.parse(jsonStr);
     return {
       role: String(decoded?.type_user || "").toLowerCase(), // administrator/manager/...
       enterpriseId: decoded?.enterpriseId ?? decoded?.companyId ?? decoded?.enterprise_id,
@@ -26,7 +26,6 @@ function decodeJwt(): { role?: string; enterpriseId?: string | number } | null {
 }
 
 export default function UserCompanyPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [company, setCompany] = useState<ShowOneEnterpriseResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +57,7 @@ export default function UserCompanyPage() {
         setLoading(false);
       }
     })();
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (

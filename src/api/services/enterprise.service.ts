@@ -50,17 +50,13 @@ export const enterpriseService = {
     });
   },
 
-  // 👇 robusto: 404 -> null; tenta fallback de rota alternativa, se existir
   async getMyEnterprise(): Promise<ShowOneEnterpriseResponse | null> {
-  try {
-    console.log("GET enterpriseMe ->", api.defaults.baseURL,
-      "hasToken?", !!(typeof window !== "undefined" && localStorage.getItem("access_token")));
-    const { data } = await api.get("/enterprise/user/enterpriseMe");
-    return data;
-  } catch (err: any) {
-    console.log("enterpriseMe ERR:", err?.response?.status, err?.response?.data);
-    if (err?.response?.status === 404) return null;
-    throw err;
-  }
-}
+    try {
+      const { data } = await api.get("/enterprise/user/enterpriseMe");
+      return data;
+    } catch (err: any) {
+      if (err?.response?.status === 404) return null;
+      throw err;
+    }
+  },
 };

@@ -33,9 +33,9 @@ function appendSearch(path: string, search: string) {
   return `${path}${sep}${search.replace(/^\?/, "")}`;
 }
 
-function selectSearchFor(path: string, currentSearch: string, role: Role) {
+function selectSearchFor(path: string, _currentSearch: string, role: Role) {
   if (path.startsWith("/admin")) return "?role=admin";
-  return currentSearch || "";
+  return "";
 }
 
 /** Lê a role a partir de ?role= (para testes), do JWT (access_token) ou do localStorage – apenas no client (useEffect). */
@@ -164,8 +164,8 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
   // Usuário comum (ou fallback com companyId)
   return [
     { icon: <GridIcon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-      { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
-      { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" }, 
+    { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+    { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
   ];
 }
 
@@ -186,6 +186,7 @@ const AppSidebar: React.FC = () => {
       if (!token) return;
       const [, payload] = token.split(".");
       if (!payload) return;
+      // base64url → base64
       const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
       const decoded = JSON.parse(json) as { enterpriseId?: string | null };
       if (decoded?.enterpriseId) setCompanyIdFromToken(String(decoded.enterpriseId));
@@ -193,6 +194,7 @@ const AppSidebar: React.FC = () => {
       // ignore
     }
   }, []);
+
 
   const [searchSuffix, setSearchSuffix] = useState("");
   useEffect(() => {
@@ -213,8 +215,10 @@ const AppSidebar: React.FC = () => {
     [pathname]
   );
 
-  const AZUL = "#15358D";
-  const styleVar = { ["--azul" as any]: AZUL } as React.CSSProperties;
+  const styleVar = React.useMemo(
+    () => ({ ["--azul" as any]: "#15358D" } as React.CSSProperties),
+    []
+  );
 
   const isCompact = !(isExpanded || isHovered || isMobileOpen);
 

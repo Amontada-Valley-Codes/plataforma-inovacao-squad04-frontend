@@ -9,15 +9,12 @@ import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
-// ⛔ Remova estes se eles chamarem o back:
-// import { getCurrentUser, redirectByRole } from "@/lib/auth";
-
-// ✅ Helpers locais (sem back) — CHANGED
 function setFrontendCookie(name: string, value: string, maxAgeSeconds: number) {
+  if (typeof document === "undefined") return;
   const secure = typeof window !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `${name}=${value}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax${secure}`;
 }
-// Decodifica payload do JWT (base64url)
+
 function parseJwt<T = any>(token: string): T | null {
   try {
     const [, payload] = token.split(".");
@@ -28,20 +25,18 @@ function parseJwt<T = any>(token: string): T | null {
     return null;
   }
 }
+
 function getJwtMaxAge(jwt: string, fallbackSeconds = 60 * 60 * 8) {
   const payload = parseJwt<{ exp?: number }>(jwt);
   if (!payload?.exp) return fallbackSeconds;
   const now = Math.floor(Date.now() / 1000);
   return Math.max(payload.exp - now, 1);
 }
-// Mapeia role EN→PT e decide rota — ajuste conforme sua árvore de rotas
-function decideDestinyFromToken(jwt: string) {
-  const p = parseJwt<{ type_user?: string; enterpriseId?: string | null }>(jwt);
-  const type = (p?.type_user ?? "").toUpperCase();
-  const companyId = p?.enterpriseId ? String(p.enterpriseId) : null;
 
-  // se você já tem um redirectByRole confiável, pode chamar ele aqui com {role, companyId}
-  // return redirectByRole(rolePt, companyId)
+function decideDestinyFromToken(jwt: string) {
+  const p = parseJwt<{ type_user?: string; enterpriseId?: string | null }>(jwt) || {};
+  const type = (p.type_user ?? "").toUpperCase();
+  const companyId = p.enterpriseId ? String(p.enterpriseId) : null;
 
   switch (type) {
     case "ADMINISTRATOR":
@@ -51,6 +46,7 @@ function decideDestinyFromToken(jwt: string) {
     case "EVALUATOR":
       return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
     case "COMMON":
+      return "/user/meus-desafios";
     default:
       return "/user/meus-desafios";
   }
@@ -70,12 +66,17 @@ export default function LoginForm() {
       <div
         className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
           text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}
-          ${type === "success"
-            ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-            : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
+          ${
+            type === "success"
+              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
+              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
           }`}
       >
-        {type === "success" ? <CheckCircle2 className="text-green-300" size={22} /> : <XCircle className="text-red-300" size={22} />}
+        {type === "success" ? (
+          <CheckCircle2 className="text-green-300" size={22} />
+        ) : (
+          <XCircle className="text-red-300" size={22} />
+        )}
         <span>{message}</span>
       </div>
     ));
@@ -83,7 +84,7 @@ export default function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !senha) {
+    if (!email.trim() || !senha.trim()) {
       setError("Preencha e-mail e senha.");
       return;
     }
@@ -96,18 +97,12 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // o back retorna { access_token }
-      // ⚠️ authService.login já está sem { withCredentials: true } — vide ajuste no service
       const { access_token } = await authService.login({ email, password: senha });
 
-      // 1) salva o token pro interceptor (Authorization)
       localStorage.setItem("access_token", access_token);
-
-      // 2) espelha em cookie pro middleware enxergar — CHANGED
       const maxAge = getJwtMaxAge(access_token);
       setFrontendCookie("access_token", access_token, maxAge);
 
-      // 3) decide a rota localmente (sem /auth/me) — CHANGED
       const destiny = decideDestinyFromToken(access_token);
 
       setLoading(false);
@@ -171,20 +166,29 @@ export default function LoginForm() {
         {error && <p className="text-red-400 text-sm text-center w-full">{error}</p>}
 
         <div className="text-center mt-1 space-y-1">
-          <Link href="#" className="text-xs sm:text-sm text-white hover:underline">Esqueceu a senha?</Link>
+          <Link href="#" className="text-xs sm:text-sm text-white hover:underline">
+            Esqueceu a senha?
+          </Link>
           <p className="text-xs sm:text-sm text-[#D2F5FB] font-light">
             Não possui cadastro?{" "}
-            <Link href="/auth/register" className="text-white font-medium hover:underline">Inscreva-se</Link>
+            <Link href="/auth/register" className="text-white font-medium hover:underline">
+              Inscreva-se
+            </Link>
           </p>
         </div>
 
         <button
           type="submit"
+          disabled={loading}
           className="mt-3 w-5/6 py-2.5 sm:py-3 rounded-full text-white font-semibold text-sm sm:text-base
           bg-[linear-gradient(90deg,#0C0869_0%,#15358D_100%)]
           hover:scale-[1.03] transition-transform duration-300"
         >
-          {loading ? <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" /> : "Entrar"}
+          {loading ? (
+            <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" />
+          ) : (
+            "Entrar"
+          )}
         </button>
       </form>
     </div>

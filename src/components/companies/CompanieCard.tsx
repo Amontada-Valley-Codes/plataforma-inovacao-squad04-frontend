@@ -14,9 +14,9 @@ type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
 type Props = {
   role?: Role;
-  companyId?: string | number;       // empresa “focada” pela UI
-  autoOpen?: boolean;                // se true, abre o modal quando tiver exatamente 1 resultado
-  viewerCompanyId?: string | number; // empresa vinculada ao usuário logado
+  companyId?: string | number;
+  autoOpen?: boolean;
+  viewerCompanyId?: string | number;
   title?: string;
 };
 
@@ -29,11 +29,8 @@ export default function CompanieCard({
 }: Props) {
   const { isOpen, openModal, closeModal } = useModal();
 
-  // 🔹 Lista SEMPRE no shape de "listagem"
   const [companies, setCompaniesData] = useState<ShowAllEnterpriseResponse[]>([]);
-  // 🔹 Selecionada SEMPRE no shape de "detalhe"
   const [selectedCompany, setSelectedCompany] = useState<ShowOneEnterpriseResponse | null>(null);
-
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const { reload } = useStore();
@@ -62,17 +59,15 @@ export default function CompanieCard({
     const byParam = paramId ? data.filter((c) => companyKey(c) === paramId) : data;
 
     if (isAdmin) return byParam;
-
     if (!viewerId) return [];
 
     const source = paramId ? byParam : data;
     return source.filter((c) => companyKey(c) === viewerId);
   }, [data, companyId, role, viewerCompanyId]);
 
-  // ——— Altura animada
   const listRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
+  const [containerHeight, setContainerHeight] = useState<number>(0);
 
   const recalcHeight = useCallback(() => {
     const activeEl = (viewMode === "list" ? listRef.current : gridRef.current) as HTMLDivElement | null;
@@ -81,15 +76,14 @@ export default function CompanieCard({
   }, [viewMode]);
 
   async function fetchCompanies() {
+    let cancelled = false;
     try {
       setLoading(true);
       let list: ShowAllEnterpriseResponse[] = [];
 
       if (role === "admin") {
-        // Admin lista todas
         list = await enterpriseService.showAllEnterprises();
       } else if (viewerCompanyId) {
-        // Não-admin: busca o detalhe da própria empresa e projeta para “lista”
         const one = await enterpriseService.showOneEnterprise(String(viewerCompanyId));
         list = one
           ? [{
@@ -119,21 +113,25 @@ export default function CompanieCard({
         list = [];
       }
 
-      setCompaniesData(list);
+      if (!cancelled) setCompaniesData(list);
     } catch (error) {
       console.error(error);
-      setCompaniesData([]);
+      if (!cancelled) setCompaniesData([]);
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
   useEffect(() => {
-    fetchCompanies();
+    let cleanup: (() => void) | undefined;
+    (async () => {
+      cleanup = await fetchCompanies();
+    })();
+    return () => { cleanup?.(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reload, role, viewerCompanyId]);
 
-  // NEW: não-admin com exatamente 1 empresa → abre modal com DETALHE
   useEffect(() => {
     if (role === "admin" || filtered.length !== 1) return;
     (async () => {
@@ -161,7 +159,6 @@ export default function CompanieCard({
   useEffect(() => {
     if (!autoOpen) return;
     if (filtered[0] && role !== "admin") {
-      // se quiser autoOpen para não-admin mesmo com >1, abrir o primeiro
       (async () => {
         try {
           const full = await enterpriseService.showOneEnterprise(String(filtered[0].id));
@@ -190,7 +187,6 @@ export default function CompanieCard({
     );
   }
 
-  // Wrapper: admin abre modal (carrega DETALHE); não-admin navega (ou só renderiza se já for a mesma)
   const wrapIfNeeded = (company: ShowAllEnterpriseResponse, children: React.ReactNode) => {
     if (role === "admin") {
       const handlers = {
@@ -221,9 +217,8 @@ export default function CompanieCard({
     }
 
     if (role === "usuario") {
-      return <>{children}</>; 
+      return <>{children}</>;
     }
-
 
     const sameCompany =
       (companyId != null && String(companyId) === companyKey(company)) ||
@@ -240,7 +235,6 @@ export default function CompanieCard({
 
   return (
     <div className="flex flex-col gap-6 w-full p-4">
-      {/* Cabeçalho + Toggle */}
       <div className="flex items-center justify-between">
         <h2 className="text-[20px] font-semibold text-slate-900 dark:text-gray-100">{title}</h2>
         <button
@@ -258,9 +252,7 @@ export default function CompanieCard({
         </button>
       </div>
 
-      {/* Contêiner com altura animada */}
       <div style={{ height: containerHeight }} className="relative transition-[height] duration-300 ease-out">
-        {/* LISTA */}
         <div
           ref={listRef}
           aria-hidden={viewMode !== "list"}
@@ -271,7 +263,6 @@ export default function CompanieCard({
           {filtered.map((c) => {
             const row = (
               <div className="flex items-stretch gap-6 px-6 py-5 md:py-6">
-                {/* Coluna 1 */}
                 <div className="flex w-full md:w-[32%] items-center gap-4">
                   <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                     {c.logo ? (
@@ -288,7 +279,6 @@ export default function CompanieCard({
                   </div>
                 </div>
 
-                {/* Coluna 2 */}
                 <div className="hidden md:flex w-[36%] flex-col gap-2 text-sm text-slate-700 dark:text-gray-300">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#15358D]" />
@@ -308,12 +298,10 @@ export default function CompanieCard({
                   </div>
                 </div>
 
-                {/* Coluna 3 */}
                 <div className="hidden lg:flex w-[28%] items-center text-sm text-slate-600 dark:text-gray-400">
                   <p className="line-clamp-3">{c.description}</p>
                 </div>
 
-                {/* Ações admin */}
                 {role === "admin" && (
                   <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
                     <button
@@ -345,7 +333,6 @@ export default function CompanieCard({
           })}
         </div>
 
-        {/* GRID */}
         <div
           ref={gridRef}
           aria-hidden={viewMode !== "grid"}
@@ -403,7 +390,6 @@ export default function CompanieCard({
         </div>
       </div>
 
-      {/* Modal: sempre recebe DETALHE */}
       {selectedCompany && (
         <CompaniesProfile
           data={selectedCompany}
