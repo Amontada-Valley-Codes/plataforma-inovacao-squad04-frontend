@@ -1,5 +1,3 @@
-const API_PREFIX = "/api";
-
 export const ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
@@ -18,10 +16,10 @@ export const ENDPOINTS = {
   },
 
   // <<< CORRIGIDO: sem STARTUP dentro de STARTUP
-  STARTUP: {
-    SHOW_ALL: `${API_PREFIX}/startup`,                          // GET -> Listar aprovadas
-    SHOW_ONE: (id: string) => `${API_PREFIX}/startup/${id}`,    // GET -> Buscar por ID
-    CREATE: `${API_PREFIX}/startup`,                            // POST -> Criar
+    STARTUP: {
+    SHOW_ALL: "/startup",
+    SHOW_ONE: (id: string) => `/startup/${id}`,
+    CREATE: "/startup",
   },
 
   CHALLENGE: {
