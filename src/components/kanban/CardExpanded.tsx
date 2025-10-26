@@ -447,6 +447,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 mainContent={
                   <CardIdeationContent
                     challangeTitle={cardData.name}
+                    challengeId={cardData.id}
                     category={cardData.area}
                     description={cardData.description}
                   />
