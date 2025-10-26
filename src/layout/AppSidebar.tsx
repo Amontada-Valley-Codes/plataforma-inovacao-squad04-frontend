@@ -89,10 +89,6 @@ function useCurrentRole(): Role {
   return role;
 }
 
-/**
- * Monta os itens do menu de acordo com a role e com o contexto de empresa.
- * ⚠️ NÃO acessa window/localStorage aqui — recebe companyIdFromToken de fora.
- */
 function buildNavItems(role: Role, pathname: string, companyIdFromToken: string | null): NavItem[] {
   let companyId = extractCompanyIdFromPath(pathname);
   if (!companyId && companyIdFromToken) {
@@ -178,7 +174,6 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
   const role = useCurrentRole();
 
-  // 🔹 NOVO: companyId vindo do token, resolvido só após mount
   const [companyIdFromToken, setCompanyIdFromToken] = useState<string | null>(null);
   useEffect(() => {
     try {
@@ -201,7 +196,6 @@ const AppSidebar: React.FC = () => {
     if (typeof window !== "undefined") setSearchSuffix(window.location.search || "");
   }, [pathname]);
 
-  // ✅ agora buildNavItems recebe o companyIdFromToken (sem acessar window lá dentro)
   const navItems = useMemo(
     () => buildNavItems(role, pathname, companyIdFromToken),
     [role, pathname, companyIdFromToken]
@@ -309,7 +303,6 @@ const AppSidebar: React.FC = () => {
         </div>
       </aside>
 
-      {/* Força qualquer SVG herdar a cor do texto */}
       <style jsx>{`
         :global(.sidebar-current svg) { color: currentColor; }
         :global(.sidebar-current svg [stroke]) { stroke: currentColor !important; }
