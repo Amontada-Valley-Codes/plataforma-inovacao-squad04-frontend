@@ -394,26 +394,26 @@ export default function ChallengeCard({
               >
                 <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
 
-                <div className="p-4 flex flex-col gap-2.5">
-                  <div className="flex justify-between items-start">
-                    <div className="min-w-0">
-                      <h2
-                        title={challenge.name}
-                        className="text-[15px] font-semibold text-blue-900 dark:text-blue-300 leading-snug truncate"
-                      >
-                        {challenge.name}
-                      </h2>
-                      <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
-                        {challenge.enterpriseName || "Empresa desconhecida"}
-                      </p>
-                      <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
-                        {challenge.Users?.name || "Autor desconhecido"}
-                      </p>
-                    </div>
-                    <button aria-label="Mais opções">
-                      <MoreHorizontal className="text-gray-400 dark:text-[#ced3db] hover:text-gray-600 cursor-pointer" />
-                    </button>
+              <div className="p-4 flex flex-col gap-2.5">
+                <div className="flex justify-between items-start">
+                  <div className="min-w-0">
+                    <h2
+                      title={challenge.name}
+                      className="text-[15px] font-semibold text-[#15358D] dark:text-blue-800 leading-snug truncate"
+                    >
+                      {challenge.name}
+                    </h2>
+                    <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
+                      {challenge.enterpriseName || "Empresa desconhecida"}
+                    </p>
+                    <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
+                      {challenge.Users?.name || "Autor desconhecido"}
+                    </p>
                   </div>
+                  <button aria-label="Mais opções">
+                    <MoreHorizontal className="text-gray-400 dark:text-[#ced3db] hover:text-gray-600 cursor-pointer" />
+                  </button>
+                </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
