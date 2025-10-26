@@ -262,7 +262,7 @@ export default function ChallengeCard({
                   <div className="min-w-0">
                     <h2
                       title={challenge.name}
-                      className="text-[15px] font-semibold text-blue-900 dark:text-blue-300 leading-snug truncate"
+                      className="text-[15px] font-semibold text-[#15358D] dark:text-blue-800 leading-snug truncate"
                     >
                       {challenge.name}
                     </h2>
