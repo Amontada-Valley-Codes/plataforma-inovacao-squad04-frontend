@@ -112,24 +112,20 @@ export type ChangeVisibilityResponse = {
   usersId: string
 }
 
-/** 🔹 ITEM da lista pública (como o Swagger mostra) */
 export type PublicChallengeItem = {
   id: string
   name: string
   endDate: string
   status: string
   visibility: string
-  // Alguns backends também mandam startDate; deixa opcional p/ não quebrar:
   startDate?: string
   Enterprise: {
     name: string
   }
 }
 
-/** 🔹 LISTA pública = ARRAY de itens */
 export type ShowAllPubliChallengeResponse = PublicChallengeItem[]
 
-/** (Opcional) 🔹 Detalhe público por ID, caso o endpoint /challenge/{id}/public retorne diferente */
 export type ShowOnePublicChallengeResponse = {
   id: string
   name: string
