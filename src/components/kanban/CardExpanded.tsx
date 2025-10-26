@@ -5,13 +5,6 @@ import ForwardButton from "./ForwardButton"
 import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
 import { MoreVertical, X } from "lucide-react"
-import {
-  CardChallangeContent,
-  CardDetailedScreeningContent,
-  CardExperimentationContent,
-  CardIdeationContent,
-  CardPreScreeningContent
-} from "./CardsContents"
 import { CommentsPanel } from "./CommentsPanel"
 import {
   challangeCommentSections,
@@ -27,6 +20,11 @@ import { ChallengeService } from "@/api/services/challenge.service"
 import { startupService } from "@/api/services/startup.service"
 import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload"
 import Image from "next/image"
+import { ChallengeSection } from "./ChallengeSection"
+import { PreScreening } from "./PreScreening"
+import { DetailedScreening } from "./DetailedScreening"
+import { Ideation } from "./Ideation"
+import { Experimentation } from "./Experimentation"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -379,7 +377,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "GENERATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <CardChallangeContent 
+                  <ChallengeSection 
                     challangeTitle={cardData.name} 
                     category={cardData.area}
                     description={cardData.description}
@@ -401,7 +399,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             )}
             {cardData.status === "PRE_SCREENING" && (
               <CardExpandedLayout mainContent={
-                  <CardPreScreeningContent 
+                  <PreScreening
                     challangeTitle={cardData.name} 
                     category={cardData.area}
                     startDate={cardData.startDate}
@@ -423,8 +421,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "DETAILED_SCREENING" && (
               <CardExpandedLayout
                 mainContent={
-                  <CardDetailedScreeningContent
+                  <DetailedScreening
                     challangeTitle={cardData.name}
+                    challengeId={cardData.id}
                     category={cardData.area}
                     startDate={cardData.startDate}
                     endDate={cardData.endDate}
@@ -445,11 +444,10 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "IDEATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <CardIdeationContent
+                  <Ideation
                     challangeTitle={cardData.name}
                     challengeId={cardData.id}
                     category={cardData.area}
-                    description={cardData.description}
                   />
                 }
                 commentsContent={<CommentsPanel sections={ideationCommentSections}/>}
@@ -463,7 +461,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "EXPERIMENTATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <CardExperimentationContent
+                  <Experimentation
                     challangeTitle={cardData.name}
                     category={cardData.area}
                     description={cardData.description}
