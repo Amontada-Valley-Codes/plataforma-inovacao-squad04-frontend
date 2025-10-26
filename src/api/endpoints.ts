@@ -38,6 +38,14 @@
     UPDATE_ITEM_CHECKLIST: (id: string) => `/checklist/${id}`
   },
 
+  DETAILED_SCREENING: {
+    CREATE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
+    SHOW_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
+    UPDATE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
+    DELETE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
+    VOTE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}/vote`
+  },
+
   DASHBOARD: {
     ADMIN: '/admin/dashboard',
     GESTOR: '/dashboard/gestor'
