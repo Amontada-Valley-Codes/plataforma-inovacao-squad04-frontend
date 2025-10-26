@@ -15,7 +15,6 @@ export const ENDPOINTS = {
     SEND: "/invite",
   },
 
-  // <<< CORRIGIDO: sem STARTUP dentro de STARTUP
     STARTUP: {
     SHOW_ALL: "/startup",
     SHOW_ONE: (id: string) => `/startup/${id}`,
@@ -27,6 +26,7 @@ export const ENDPOINTS = {
     SHOW_ENTERPRISE_CHALLENGE: "/challenge",
     SHOW_ALL_PUBLIC_CHALLENGE: "/challenge/public",
     SHOW_CHALLENGE_HISTORICAL_ENTERPRISE: "/challenge/historical",
+    SHOW_ONE_PUBLIC_CHALLENGE: (id: string) => `/challenge/${id}/public`,
     SHOW_ONE_CHALLENGE: (id: string) => `/challenge/${id}`,
     UPDATE_CHALLENGE: (id: string) => `/challenge/${id}`,
     UPDATE_STATUS: (id: string) => `/challenge/${id}/status`,
