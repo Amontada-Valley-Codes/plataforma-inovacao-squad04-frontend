@@ -83,7 +83,7 @@ export default function RegisterForm() {
       const { repeatPassword, ...dataToSend } = formData;
 
       // 1) registra com token de convite
-      await authService.Register({ ...dataToSend, token });
+      await authService.register({ ...dataToSend, token });
 
       // 2) login automático (back retorna { access_token })
       const { access_token } = await authService.login({
@@ -117,7 +117,7 @@ export default function RegisterForm() {
       className="flex flex-col justify-center items-center 
        z-10 
       bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] 
-      border-l-2 border-[#C7E6FE]"
+      md:border-l-2 border-[#C7E6FE]"
     >
       <Toaster position="top-right" reverseOrder={false} />
 

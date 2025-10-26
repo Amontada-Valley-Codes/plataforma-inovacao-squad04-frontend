@@ -120,7 +120,7 @@ export default function LoginForm() {
     <div
       className="flex flex-col justify-center items-center min-h-screen 
       bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)]
-      px-6 sm:px-10 py-8 border-l-2 border-[#C7E6FE]"
+      px-6 sm:px-10 py-8 md:border-l-2 border-[#C7E6FE]"
     >
       <Toaster position="top-right" reverseOrder={false} />
 
