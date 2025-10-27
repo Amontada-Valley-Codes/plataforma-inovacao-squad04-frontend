@@ -37,12 +37,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         setError(null);
         const response = await detailedScreeningService.showDetailedScreening(challengeId);
         setDetailedScreening(response);
-        setVote({
-        viabilidade_tecnica: response.viabilidade_tecnica || 0,
-        impacto_financeiro: response.impacto_financeiro || 0,
-        aderencia_estrategica: response.aderencia_estrategica || 0,
-        risco: response.risco || 0
-      });
       } catch (err) {
         console.error(err);
         setError("Falha ao carregar os dados da triagem.");
