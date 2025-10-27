@@ -168,12 +168,20 @@ export default function LoginForm() {
         {error && <p className="text-red-400 text-sm text-center w-full">{error}</p>}
 
         <div className="text-center mt-1 space-y-1">
-          <Link href="#" className="text-xs sm:text-sm text-white hover:underline">
+          <Link href="#" className="relative text-white font-normal cursor-pointer
+              after:content-[''] after:absolute after:left-0 after:-bottom-0.5
+              after:h-[1.5px] after:w-full after:bg-white
+              after:origin-center after:scale-x-0 after:transition-transform 
+              after:duration-300 hover:after:scale-x-100">
             Esqueceu a senha?
           </Link>
           <p className="text-xs sm:text-sm text-[#D2F5FB] font-light">
             Não possui cadastro?{" "}
-            <Link href="/auth/register" className="text-white font-medium hover:underline">
+            <Link href="/auth/register" className="relative text-white font-normal cursor-pointer
+              after:content-[''] after:absolute after:left-0 after:-bottom-0.5
+              after:h-[1.5px] after:w-full after:bg-white
+              after:origin-center after:scale-x-0 after:transition-transform 
+              after:duration-300 hover:after:scale-x-100">
               Inscreva-se
             </Link>
           </p>
