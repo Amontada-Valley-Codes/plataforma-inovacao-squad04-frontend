@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,7 +7,6 @@ import { Tag, Calendar, Eye, EyeOff, MoreHorizontal, AlertTriangle } from "lucid
 import { getUserRole } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
 import ApplyButton from "./ApplyButton";
-import ApplyModal from "@/components/startup/ApplyModal";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import { useStore } from "../../../store";
@@ -233,7 +234,6 @@ export default function ChallengeCard({
     fetchChallenges();
   }, [reload, role, authorId]);
 
-  const allowApply = Boolean(canApply && role === "startup");
 
   const storageKey = React.useMemo(() => {
     const sid = startupId ?? "anon";
@@ -344,20 +344,6 @@ export default function ChallengeCard({
     return base;
   }, [data, isAdminView, onlyMine, authorId, authorName, role, myEnterpriseId, myUserId]);
 
-  const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<Challenge | null>(null);
-
-  async function handleSubmitFromModal(payload: {
-    challengeId: string;
-    description: string;
-    experience: string;
-    files: File[];
-  }) {
-    markApplied(String(payload.challengeId));
-    setOpen(false);
-    setSelected(null);
-  }
-
   if (loading) {
     return <div className="p-6 text-gray-500">Carregando desafios...</div>;
   }
@@ -461,17 +447,4 @@ export default function ChallengeCard({
       )}
     </>
   );
-}
-
-function getStatusColor(status: Status) {
-  switch (status) {
-    case "Completed":
-      return "bg-emerald-400";
-    case "In Progress":
-      return "bg-yellow-400";
-    case "Pending":
-      return "bg-red-400";
-    default:
-      return "bg-gray-400";
-  }
 }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 export type User = {
