@@ -53,4 +53,8 @@ export const ENDPOINTS = {
     ADMIN: "/admin/dashboard",
     GESTOR: "/dashboard/gestor",
   },
+
+  USER: {
+    SHOW_ALL: "/user",
+  },
 } as const;
