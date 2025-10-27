@@ -33,6 +33,7 @@ function appendSearch(path: string, search: string) {
   return `${path}${sep}${search.replace(/^\?/, "")}`;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function selectSearchFor(path: string, _currentSearch: string, role: Role) {
   if (path.startsWith("/admin")) return "?role=admin";
   return "";

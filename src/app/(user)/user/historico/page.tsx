@@ -4,14 +4,8 @@ import React from "react";
 import { getUserRole, getUserCompanyId, getCurrentUser } from "@/lib/auth";
 import CompanyHistory from "@/components/history/CompanyHistory";
 
-/**
- * Histórico do usuário comum
- * Mostra apenas desafios públicos da empresa do usuário logado.
- * Filtra automaticamente pelo viewerCompanyId e role="usuario".
- */
-
 export default function UserHistoryPage() {
-  const [role, setRole] = React.useState<"usuario" | "admin" | "gestor" | "avaliador">("usuario");
+  const [role, setRole] = React.useState<"startup" | "usuario" | "admin" | "gestor" | "avaliador">("usuario");
   const [viewerCompanyId, setViewerCompanyId] = React.useState<string | undefined>(undefined);
   const [viewerUserId, setViewerUserId] = React.useState<string | undefined>(undefined);
   const [loaded, setLoaded] = React.useState(false);

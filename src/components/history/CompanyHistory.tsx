@@ -1,11 +1,12 @@
-// src/components/history/CompanyHistoryHistoric.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import React from "react";
 import { Tag, Calendar, MoreHorizontal, Eye, EyeOff, Archive } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
 
-type Role = "admin" | "gestor" | "avaliador" | "usuario";
+type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 // Ajuste aqui conforme seu payload real:
 type Status = "Completed" | "Archived" | "In Progress" | "Pending" | string;
@@ -32,7 +33,7 @@ type Challenge = {
 };
 
 type Props = {
-  companyId?: string;      // quando estiver em /company/[companyId]/history
+  companyId?: string; 
   role: Role;
   viewerCompanyId?: string;
   viewerUserId?: string;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,7 +7,6 @@ import { Tag, Calendar, Eye, EyeOff, MoreHorizontal, AlertTriangle } from "lucid
 import { getUserRole } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
 import ApplyButton from "./ApplyButton";
-import ApplyModal from "@/components/startup/ApplyModal";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import { useStore } from "../../../store";
@@ -114,8 +115,7 @@ export default function ChallengeCard({
   authorId,                      
   authorName,
   canApply = false,
-  startupId,
-  onApply,
+  startupId
 }: Props) {
   const [data, setData] = useState<Challenge[]>([]);
   const { reload } = useStore();
@@ -233,13 +233,13 @@ export default function ChallengeCard({
     fetchChallenges();
   }, [reload, role, authorId]);
 
-  const allowApply = Boolean(canApply && role === "startup");
 
   const storageKey = React.useMemo(() => {
     const sid = startupId ?? "anon";
     return `${STORAGE_PREFIX}:${sid}`;
   }, [startupId]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [applied, setApplied] = useState<Set<string>>(new Set());
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -250,18 +250,6 @@ export default function ChallengeCard({
       setApplied(new Set(arr));
     } catch {}
   }, [storageKey]);
-
-  function persistApplied(next: Set<string>) {
-    localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
-    setApplied(next);
-  }
-
-  function markApplied(challengeId: string) {
-    const next = new Set(applied);
-    next.add(challengeId);
-    persistApplied(next);
-    onApply?.(challengeId);
-  }
 
   const getStatusColor = (status: Status) => {
     switch (status) {
@@ -343,20 +331,6 @@ export default function ChallengeCard({
 
     return base;
   }, [data, isAdminView, onlyMine, authorId, authorName, role, myEnterpriseId, myUserId]);
-
-  const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<Challenge | null>(null);
-
-  async function handleSubmitFromModal(payload: {
-    challengeId: string;
-    description: string;
-    experience: string;
-    files: File[];
-  }) {
-    markApplied(String(payload.challengeId));
-    setOpen(false);
-    setSelected(null);
-  }
 
   if (loading) {
     return <div className="p-6 text-gray-500">Carregando desafios...</div>;
@@ -461,17 +435,4 @@ export default function ChallengeCard({
       )}
     </>
   );
-}
-
-function getStatusColor(status: Status) {
-  switch (status) {
-    case "Completed":
-      return "bg-emerald-400";
-    case "In Progress":
-      return "bg-yellow-400";
-    case "Pending":
-      return "bg-red-400";
-    default:
-      return "bg-gray-400";
-  }
 }

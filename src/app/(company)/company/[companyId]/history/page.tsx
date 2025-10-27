@@ -1,24 +1,23 @@
 // src/app/(company)/company/[companyId]/history/page.tsx
 "use client";
 
-import React from "react";
-
 import { getUserRole, getCurrentUser, getUserCompanyId } from "@/lib/auth";
 import CompanyHistoryHistoric from "@/components/history/CompanyHistory";
+import { use, useEffect, useState } from "react";
 
 type PageProps = {
   params: Promise<{ companyId: string }>;
 };
 
 export default function CompanyHistoryPage({ params }: PageProps) {
-  const { companyId } = React.use(params);
+  const { companyId } = use(params);
 
-  const [role, setRole] = React.useState<"admin" | "gestor" | "avaliador" | "usuario">("usuario");
-  const [viewerCompanyId, setViewerCompanyId] = React.useState<string | undefined>();
-  const [viewerUserId, setViewerUserId] = React.useState<string | undefined>();
-  const [loaded, setLoaded] = React.useState(false);
+  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
+  const [viewerCompanyId, setViewerCompanyId] = useState<string | undefined>();
+  const [viewerUserId, setViewerUserId] = useState<string | undefined>();
+  const [loaded, setLoaded] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       const r = await getUserRole();
       const u = await getCurrentUser();

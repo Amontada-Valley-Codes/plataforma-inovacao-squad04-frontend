@@ -1,21 +1,20 @@
-// src/app/(admin)/admin/history/page.tsx
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import CompanyHistory from "@/components/history/CompanyHistory";
 import { getUserRole, getCurrentUser } from "@/lib/auth";
 
 export default function AdminHistoryPage() {
-  const [role, setRole] = React.useState<"admin" | "gestor" | "avaliador" | "usuario">("usuario");
-  const [viewerUserId, setViewerUserId] = React.useState<string | undefined>(undefined); 
-  const [loaded, setLoaded] = React.useState(false);
+  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
+  const [viewerUserId, setViewerUserId] = useState<string | undefined>(undefined); 
+  const [loaded, setLoaded] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       const r = await getUserRole();
       const u = await getCurrentUser();
       setRole(r);
-      setViewerUserId(u?.id != null ? String(u.id) : undefined); // <- converte para string
+      setViewerUserId(u?.id != null ? String(u.id) : undefined);
       setLoaded(true);
     })();
   }, []);

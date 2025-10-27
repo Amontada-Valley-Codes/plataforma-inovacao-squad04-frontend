@@ -1,4 +1,3 @@
-// src/components/companies/CompaniesProfile.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -25,7 +24,7 @@ function getLogo(e: ShowOneEnterpriseResponse | null): string | undefined {
 /* ========= Types ========= */
 
 type Props = {
-  data: ShowOneEnterpriseResponse | null; // ⬅️ agora só detalhe
+  data: ShowOneEnterpriseResponse | null; 
   isOpen: boolean;
   onClose: () => void;
 };

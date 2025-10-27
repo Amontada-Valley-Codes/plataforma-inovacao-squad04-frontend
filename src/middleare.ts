@@ -1,4 +1,5 @@
-// middleware.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextRequest, NextResponse } from "next/server";
 
 type RoleEn = "COMMON" | "ADMINISTRATOR" | "EVALUATOR" | "MANAGER" | "STARTUP";

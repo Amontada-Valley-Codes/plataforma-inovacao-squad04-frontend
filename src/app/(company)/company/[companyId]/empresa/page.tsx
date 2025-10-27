@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import CompanieCard from "@/components/companies/CompanieCard";
 import CompaniesProfileInline from "@/components/companies/CompaniesProfileInline";
 import { getCurrentUser, getUserRole } from "@/lib/auth";
 import { enterpriseService } from "@/api/services/enterprise.service";
