@@ -256,13 +256,6 @@ export default function ChallengeCard({
     setApplied(next);
   }
 
-  function markApplied(challengeId: string) {
-    const next = new Set(applied);
-    next.add(challengeId);
-    persistApplied(next);
-    onApply?.(challengeId);
-  }
-
   const getStatusColor = (status: Status) => {
     switch (status) {
       case "Completed":
