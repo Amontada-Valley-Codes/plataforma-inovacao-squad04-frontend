@@ -8,24 +8,22 @@ export type User = {
   companyId?: string | number;
 };
 
-// Decode simples
 function decodeJwtPayload<T = any>(token: string): T | null {
   try {
     const part = token.split(".")[1];
     if (!part) return null;
 
     // Base64URL -> Base64 + padding
-    const b64 = part
-      .replace(/-/g, "+")
-      .replace(/_/g, "/")
+    const b64 = part.replace(/-/g, "+").replace(/_/g, "/")
       .padEnd(Math.ceil(part.length / 4) * 4, "=");
 
-    const json =
-      typeof window !== "undefined"
-        ? (typeof atob === "function"
-          ? atob(b64)
-          : Buffer.from(b64, "base64").toString("utf-8"))
-        : Buffer.from(b64, "base64").toString("utf-8");
+    // Usa atob quando houver (browser e Edge Runtime têm), senão usa Buffer (Node)
+    const hasAtob = typeof atob === "function";
+    const json = hasAtob
+      ? atob(b64)
+      : (typeof Buffer !== "undefined"
+        ? Buffer.from(b64, "base64").toString("utf-8")
+        : (() => { throw new Error("No atob/Buffer available"); })());
 
     return JSON.parse(json) as T;
   } catch {
@@ -86,4 +84,18 @@ export function redirectByRole(role?: Role, companyId?: string | number): string
     default:
       return "/user/meus-desafios";
   }
+}
+
+export async function getUserCompanyId(): Promise<string | number | undefined> {
+  const token = await getAccessToken();
+  if (!token) return undefined;
+  const payload = decodeJwtPayload<any>(token) ?? {};
+  return payload.companyId ?? payload.enterpriseId ?? undefined;
+}
+
+export async function getUserId(): Promise<string | number | undefined> {
+  const token = await getAccessToken();
+  if (!token) return undefined;
+  const payload = decodeJwtPayload<any>(token) ?? {};
+  return payload.sub ?? undefined;
 }
