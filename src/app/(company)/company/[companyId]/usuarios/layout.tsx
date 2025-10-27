@@ -1,5 +1,4 @@
 import ChallengeFilter from "@/components/header/ChallengeFilter";
-import AppHeader from "@/layout/AppHeader";
 import React from "react";
  // ou o nome do teu topo global
 
