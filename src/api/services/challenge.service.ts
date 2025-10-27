@@ -56,11 +56,21 @@ export const ChallengeService = {
     return data;
   },
 
+  async myHistory(): Promise<ShowAllChallengeResponse[]> {
+    const { data } = await api.get<ShowAllChallengeResponse[]>(
+      ENDPOINTS.CHALLENGE.HISTORICAL.MY_HISTORY
+    );
+    return data;
+  },
+
   async showHistorical(params?: HistoricalParams): Promise<ShowAllChallengeResponse[]> {
     const { data } = await api.get<ShowAllChallengeResponse[]>(
       ENDPOINTS.CHALLENGE.SHOW_CHALLENGE_HISTORICAL_ENTERPRISE,
       { params: params ?? {} }
     );
+    
     return data ?? [];
   },
+
+  
 };

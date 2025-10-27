@@ -31,6 +31,9 @@ export const ENDPOINTS = {
     UPDATE_CHALLENGE: (id: string) => `/challenge/${id}`,
     UPDATE_STATUS: (id: string) => `/challenge/${id}/status`,
     UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visibility`,
+    HISTORICAL: {
+      MY_HISTORY: "/challenge/historical/myhistory",
+    },
   },
 
   CHECKLIST: {
@@ -57,4 +60,5 @@ export const ENDPOINTS = {
   USER: {
     SHOW_ALL: "/user",
   },
+
 } as const;
