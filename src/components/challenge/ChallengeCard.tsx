@@ -115,8 +115,7 @@ export default function ChallengeCard({
   authorId,                      
   authorName,
   canApply = false,
-  startupId,
-  onApply,
+  startupId
 }: Props) {
   const [data, setData] = useState<Challenge[]>([]);
   const { reload } = useStore();
@@ -240,6 +239,7 @@ export default function ChallengeCard({
     return `${STORAGE_PREFIX}:${sid}`;
   }, [startupId]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [applied, setApplied] = useState<Set<string>>(new Set());
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -250,11 +250,6 @@ export default function ChallengeCard({
       setApplied(new Set(arr));
     } catch {}
   }, [storageKey]);
-
-  function persistApplied(next: Set<string>) {
-    localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
-    setApplied(next);
-  }
 
   const getStatusColor = (status: Status) => {
     switch (status) {
