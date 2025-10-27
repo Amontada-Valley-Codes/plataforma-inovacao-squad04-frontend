@@ -47,6 +47,8 @@ function decideDestinyFromToken(jwt: string) {
       return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
     case "COMMON":
       return "/user/meus-desafios";
+    case "STARTUP":
+      return "/startup/desafios";
     default:
       return "/user/meus-desafios";
   }

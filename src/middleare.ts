@@ -1,13 +1,14 @@
 // middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 
-type RoleEn = "COMMON" | "ADMINISTRATOR" | "EVALUATOR" | "MANAGER";
+type RoleEn = "COMMON" | "ADMINISTRATOR" | "EVALUATOR" | "MANAGER" | "STARTUP";
 
 const rules: Record<string, RoleEn[]> = {
     "/admin": ["ADMINISTRATOR"],
     "/manager": ["MANAGER"],
     "/evaluator": ["EVALUATOR"],
     "/company": ["MANAGER", "EVALUATOR"],
+    "/startup": ["STARTUP"],  
     "/user": ["COMMON", "ADMINISTRATOR", "MANAGER", "EVALUATOR"],
 };
 

@@ -1,4 +1,4 @@
-export type Role = "admin" | "gestor" | "avaliador" | "usuario";
+export type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 export type User = {
   id?: number;
@@ -6,6 +6,7 @@ export type User = {
   email?: string;
   role: Role;
   companyId?: string | number;
+  startupId?: string | number; 
 };
 
 function decodeJwtPayload<T = any>(token: string): T | null {
@@ -44,6 +45,8 @@ function mapRoleFromToken(raw?: string): Role {
     case "EVALUATOR":
     case "AVALIADOR":
       return "avaliador";
+    case "STARTUP":                
+      return "startup";
     case "COMMON":
     default:
       return "usuario";
@@ -65,6 +68,7 @@ export async function getCurrentUser(): Promise<User | null> {
     email: payload.email ?? undefined,
     role: mapRoleFromToken(payload.type_user ?? payload.role),
     companyId: payload.companyId ?? payload.enterpriseId ?? undefined,
+    startupId: payload.startupId ?? undefined,
   };
 }
 
@@ -73,7 +77,8 @@ export async function getUserRole(): Promise<Role> {
   return u?.role ?? "usuario";
 }
 
-export function redirectByRole(role?: Role, companyId?: string | number): string {
+export function redirectByRole(role?: Role, companyId?: string | number, startupId?: string | number): string {
+  
   switch (role) {
     case "admin":
       return "/admin/dashboard";
@@ -81,6 +86,8 @@ export function redirectByRole(role?: Role, companyId?: string | number): string
       return companyId ? `/company/${companyId}/dashboard` : "/company";
     case "avaliador":
       return companyId ? `/company/${companyId}/desafios` : "/desafios";
+    case "startup": 
+      return startupId ? `/startup/${startupId}/desafios` : "/startup";
     default:
       return "/user/meus-desafios";
   }
@@ -92,6 +99,15 @@ export async function getUserCompanyId(): Promise<string | number | undefined> {
   const payload = decodeJwtPayload<any>(token) ?? {};
   return payload.companyId ?? payload.enterpriseId ?? undefined;
 }
+
+
+export async function getUserStartupId(): Promise<string | number | undefined> {
+  const token = await getAccessToken();
+  if (!token) return undefined;
+  const payload = decodeJwtPayload<any>(token) ?? {};
+  return payload.startupId ?? undefined;
+}
+
 
 export async function getUserId(): Promise<string | number | undefined> {
   const token = await getAccessToken();
