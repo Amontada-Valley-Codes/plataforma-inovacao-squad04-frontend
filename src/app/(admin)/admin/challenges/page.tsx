@@ -1,9 +1,10 @@
 import ChallengeCard from "@/components/challenge/ChallengeCard";
+import { Suspense } from "react";
 
 export default function challenges() {
   return(
-    <div>
+    <Suspense fallback={<p>carregando...</p>}>
         <ChallengeCard />
-    </div>
+    </Suspense>
   );
 }
