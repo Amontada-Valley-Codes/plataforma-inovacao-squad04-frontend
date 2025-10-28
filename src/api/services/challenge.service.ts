@@ -8,10 +8,13 @@ import {
   ChangeVisibilityResponse,
   CreateChallengePayload,
   CreateChallengeResponse,
+  CreateVotePreScreeningPayload,
+  CreateVotePreScreeningResponse,
   ShowAllChallengeResponse,
   ShowAllPubliChallengeResponse,
   ShowOneChallengeResponse,
   ShowOnePublicChallengeResponse,
+  ShowPercentageVoteResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -72,5 +75,13 @@ export const ChallengeService = {
     return data ?? [];
   },
 
-  
+  async createVote(challengeId: string, payload: CreateVotePreScreeningPayload): Promise<CreateVotePreScreeningResponse> {
+    const { data } = await api.post<CreateVotePreScreeningResponse>(ENDPOINTS.CHALLENGE.VOTE_PRE_SCREENING(challengeId), payload)
+    return data
+  },
+
+  async ShowPercentage(challengeId: string): Promise<ShowPercentageVoteResponse> {
+    const { data } = await api.get<ShowPercentageVoteResponse>(ENDPOINTS.CHALLENGE.SHOW_PRE_SCREENING_VOTES(challengeId))
+    return data
+  }
 };

@@ -68,6 +68,7 @@ const KanbanPage = () => {
     async function fetchChallanges() {
       const response = await ChallengeService.showAllChallenges()
       setChallanges(response)
+      console.log(response)
     }
 
     fetchChallanges()
@@ -75,8 +76,8 @@ const KanbanPage = () => {
 
   const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
 
-  const handleApproveAndMove = (challangeId: string | undefined) => {
-    const challengeToMove = challanges?.find(c => c.id === challangeId);
+  const handleApproveAndMove = async (challengeId: string | undefined) => {
+    const challengeToMove = challanges?.find(c => c.id === challengeId);
     if (!challengeToMove) return;
 
     const currentColumnIndex = columns.findIndex(c => c.id === challengeToMove.status);
@@ -84,18 +85,23 @@ const KanbanPage = () => {
     if (currentColumnIndex < columns.length - 1) {
       const nextColumn = columns[currentColumnIndex + 1];
 
+      if (challengeId) {
+        await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
+        console.log("✅ Status atualizado com sucesso");
+      }
+      
       if (nextColumn.id === "IDEATION") {
         setExpandedCard(challengeToMove)
       } else {
         const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
-        const otherChallenges = challanges?.filter(c => c.id !== challangeId);
+        const otherChallenges = challanges?.filter(c => c.id !== challengeId);
         const newChallenges = [updatedChallenge, ...otherChallenges];
         setChallanges(newChallenges);
       }
     }
   };
 
-  const handleMoveBack = (challengeId: string | undefined) => {
+  const handleMoveBack = async (challengeId: string | undefined) => {
     const cardToMove = challanges?.find(c => c.id === challengeId);
     if (!cardToMove) return;
 
@@ -104,6 +110,12 @@ const KanbanPage = () => {
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
       const updatedChallenges = { ...cardToMove, status: prevColumn.id };
+
+      if (challengeId) {
+        await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
+        console.log("✅ Status atualizado com sucesso");
+      }
+
       const otherChallenges = challanges?.filter(c => c.id !== challengeId);
       const newChallenges = [updatedChallenges, ...otherChallenges];
       setChallanges(newChallenges);

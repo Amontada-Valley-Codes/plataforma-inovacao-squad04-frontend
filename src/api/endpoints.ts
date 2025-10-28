@@ -31,6 +31,8 @@ export const ENDPOINTS = {
     UPDATE_CHALLENGE: (id: string) => `/challenge/${id}`,
     UPDATE_STATUS: (id: string) => `/challenge/${id}/status`,
     UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visibility`,
+    VOTE_PRE_SCREENING: (id: string) => `/challenge/vote/${id}/pre-screening`,
+    SHOW_PRE_SCREENING_VOTES: (id: string) => `/challenge/result/${id}/pre-screening`,
     HISTORICAL: {
       MY_HISTORY: "/challenge/historical/myhistory",
     },
