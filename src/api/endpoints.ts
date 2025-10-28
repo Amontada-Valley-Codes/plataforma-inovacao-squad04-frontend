@@ -58,7 +58,13 @@ export const ENDPOINTS = {
     CREATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
     SHOW_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
     UPDATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
-    CREATE_KPI_EXPERIMENTATION: (id: string) => `/experimentation/${id}/KPIs`
+  },
+
+  KPIS: {
+    CREATE_KPI: (id: string) => `/kp/${id}/KPIs`,
+    SHOW_KPI: (id: string) => `/kp/${id}`,
+    UPDATE_KPI: (id: string) => `kp/${id}`,
+    DELETE_KPI: (id: string) => `kp/${id}`,
   },
 
   DASHBOARD: {
