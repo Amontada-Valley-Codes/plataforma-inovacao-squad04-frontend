@@ -1,7 +1,7 @@
-import AuthVisual from "@/components/lading/AuthVisual";
-import InnovationFunnel from "@/components/lading/InnovationFunnel";
-import LandingPage from "@/components/lading/LadingPage";
-import PlataformaInovacao from "@/components/lading/PlataformaInovação";
+import AuthVisual from "@/components/landing/AuthVisual";
+import InnovationFunnel from "@/components/landing/InnovationFunnel";
+import LandingPage from "@/components/landing/LadingPage";
+import PlataformaInovacao from "@/components/landing/PlataformaInovação";
 
 export default function LadingPage() {
   return (
