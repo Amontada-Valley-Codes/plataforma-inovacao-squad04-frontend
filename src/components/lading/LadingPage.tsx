@@ -1,0 +1,89 @@
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+
+export default function LandingPage() {
+  return (
+    <div className="relative w-full h-screen flex flex-col">
+      {/* Navbar */}
+      <nav className="w-full flex justify-between items-center px-16 py-1 z-20">
+        {/* Logo */}
+        <div className="flex items-center">
+          <Image
+            src="/images/logo-ninna.png"
+            alt="Ninna Logo"
+            width={110}
+            height={70}
+            className="object-contain"
+          />
+        </div>
+
+        {/* Menu */}
+        <div className="flex items-center p-10 gap-10 text-sm font-medium text-white">
+          <Link href="#" className="hover:text-[#A2FF00] transition">
+            Sobre
+          </Link>
+          <Link href="#" className="hover:text-[#A2FF00] transition">
+            Conheça o Sistema
+          </Link>
+          <Link href="#" className="hover:text-[#A2FF00] transition">
+            Parcerias
+          </Link>
+          <Link href="#" className="hover:text-[#A2FF00] transition">
+            Planos
+          </Link>
+          <Link href="#" className="hover:text-[#A2FF00] transition">
+            Contatos
+          </Link>
+          <Link href="/auth/register" className="hover:text-[#A2FF00] transition">
+            Registre-se
+          </Link>
+          <Link
+            href="/auth/login"
+            className="bg-[#A2FF00] text-[#0B005E] px-5 py-2 rounded-full font-semibold hover:opacity-90 transition"
+          >
+            Entrar
+          </Link>
+        </div>
+      </nav>
+
+      {/* Conteúdo principal */}
+      <div className="flex items-center justify-between flex-1 px-25 text-white">
+        {/* Texto à esquerda */}
+        <div className="flex flex-col max-w-[480px]">
+          <h1 className="text-5xl font-bold leading-tight">
+            Gere{" "}
+            <span className="text-[#A2FF00]">inovação</span> de
+            <br />
+            forma{" "}
+            <span className="text-[#A2FF00]">estratégica!</span>
+          </h1>
+
+          <p className="text-2xl mt-6 leading-relaxed text-gray-200">
+            Lance desafios em nossa plataforma de inovação aberta, capte ideias
+            e conecte-se a startups num único ambiente!
+          </p>
+
+          <div className="flex items-center gap-6 mt-8">
+            <button className="bg-[#A2FF00] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition">
+              Conferir Oferta!
+            </button>
+
+          </div>
+        </div>
+
+        {/* Imagem à direita */}
+        <div className="flex justify-end items-center w-1/2">
+          <Image
+            src="/images/ninna-image.svg"
+            alt="ninna visual"
+            width={600}
+            height={600}
+            className="object-contain"
+            priority
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
