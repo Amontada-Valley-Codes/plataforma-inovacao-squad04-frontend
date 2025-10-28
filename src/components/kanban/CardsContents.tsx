@@ -1,9 +1,11 @@
-import { Calendar, CircleUserRound, SquarePen, Trash2 } from "lucide-react";
+import { Calendar, CircleUserRound, SquarePen, Tag, Trash2 } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 import { ShowAllChecklistsResponse } from "@/api/payloads/checklist.payload";
 import { checklistService } from "@/api/services/checklist.service";
 import { cn } from "@/lib/utils";
+import { ShowAllTagsResponse } from "@/api/payloads/tags.payload";
+import { tagsService } from "@/api/services/tags.service";
 
 type CardContentsHeaderProps = {
   challengeTitle: string;
@@ -123,6 +125,174 @@ export const ProgressBarActions = ({percentage}: {percentage: number}) => {
     </div>
   );
 };
+
+type TagsProps = {
+  challengeId: string
+  category: string
+}
+
+export const Tags = ({ category, challengeId }: TagsProps) => {
+  const [tags, setTags] = useState<ShowAllTagsResponse[]>([])
+  const [isAdding, setIsAdding] = useState(false)
+  const [newTag, setNewTag] = useState("")
+  const [editingTag, setEditingTag] = useState("")
+  const [editingTagId, setEditingTagId] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchTags() {
+      const response = await tagsService.showAllTags(challengeId)
+      console.log(response)
+      setTags(response)
+    }
+
+    fetchTags()
+  }, [challengeId])
+
+  const addTag = async (challengeId: string, newTag: string) => {
+    if (newTag.trim() === "") return
+    try {
+      const response = await tagsService.createTag(challengeId, { tag: newTag })
+      setTags((prev) => [...prev, response])
+      setNewTag("")
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const updateTag = async (tagId: string, newTag: string) => {
+    try {
+      const response = await tagsService.updateTag(tagId, { tag: newTag })
+      setTags((prev) => 
+        prev.map((tag) =>
+          tag.id === tagId ? {...tag, tag: response.tag} : tag
+        )
+      )
+      setEditingTagId(null)
+      setEditingTag("")
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const deleteTag = async (tagId: string) => {
+    try {
+      await tagsService.deleteTag(tagId)
+      setTags((prev) => prev.filter((tag) => tag.id !== tagId))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  return (
+    <div className="flex flex-col w-full gap-4">
+      <div className="flex items-center w-full bg-[#D9D9D9] text-[#D9D9D9] font-semibold text-sm rounded-[12px] px-4 py-1 gap-2">
+        <Tag fill="#666" size={16}/>
+        <p className="text-[#666]">TAGS</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <div className="border border-[rgb(11,43,112)] text-[12px] text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1">
+          {getCategoryLabel(category)}
+        </div>
+        {tags.map((tag) => (
+          <div key={tag.id}>
+            {editingTagId === tag.id ? (
+              <div className="flex gap-2 items-center">
+                <input 
+                  key={tag.id}
+                  value={editingTag}
+                  onChange={(e) => setEditingTag(e.target.value)}
+                  onBlur={(e) => {
+                    const relatedTarget = e.relatedTarget as HTMLElement | null
+                    const isDeleteButton = relatedTarget?.dataset?.role === "delete-button"
+
+                    if (isDeleteButton) return 
+
+                    if (editingTag !== tag.tag) {
+                      updateTag(tag.id, editingTag)
+                    } else {
+                      setEditingTag("")
+                      setEditingTagId(null)
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      updateTag(tag.id, editingTag)
+                    } if (e.key === "Escape") {
+                      setEditingTag("")
+                      setEditingTagId(null)
+                    }
+                  }}
+                  className="border border-[rgb(11,43,112)] text-[12px] 
+                  text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1"
+                  autoFocus
+                />
+
+                <button
+                  data-role="delete-button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    deleteTag(tag.id)
+                    setEditingTagId(null) 
+                    setEditingTag("")
+                  }}
+                >
+                  <Trash2
+                    size={16}
+                    className="text-red-600 hover:text-red-800 transition-all 
+                    duration-300 ease-in-out"
+                  />
+                </button>
+              </div>
+            ) : (
+              <div 
+                key={tag.id}
+                onClick={() => {
+                  setEditingTag(tag.tag)
+                  setEditingTagId(tag.id)
+                }} 
+                className="border border-[rgb(11,43,112)] text-[12px] 
+                text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1"
+              >
+                {tag.tag.toUpperCase()}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {isAdding && (
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            placeholder="Nova Tag..."
+            className="flex-1 px-3 py-1.5 text-sm rounded-md border ml-1 border-gray-300 focus:outline-none focus:ring focus:ring-[#0B2B72]"
+          />
+
+          <button
+            onClick={() => {
+              addTag(challengeId, newTag)
+              setIsAdding(false)
+            }}
+            className="flex items-center gap-1 px-2 py-1.5 text-sm rounded-[8px] text-[#666] bg-[#E2E2E2] hover:bg-gray-300 transition"
+          >
+            Adicionar
+          </button>
+        </div>
+      )}
+
+      <button
+        onClick={() => setIsAdding(true)}
+        className="flex items-center gap-1 w-fit px-2 py-1.5 text-sm text-[#666] 
+        bg-[#E2E2E2] hover:bg-gray-300 rounded-[8px] transition"
+      >
+        Adicionar Tag
+      </button>
+    </div>
+  )
+}
 
 type ChecklistProps = {
   challengeId: string;
