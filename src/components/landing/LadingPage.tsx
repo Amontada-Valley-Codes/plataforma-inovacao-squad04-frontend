@@ -31,12 +31,6 @@ export default function LandingPage() {
             Conheça o Sistema
           </Link>
           <Link href="#" className="hover:text-[#A2FF00] transition">
-            Parcerias
-          </Link>
-          <Link href="#" className="hover:text-[#A2FF00] transition">
-            Planos
-          </Link>
-          <Link href="#" className="hover:text-[#A2FF00] transition">
             Contatos
           </Link>
           <Link href="/auth/register" className="hover:text-[#A2FF00] transition">
@@ -66,12 +60,6 @@ export default function LandingPage() {
             </Link>
             <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
               Conheça o Sistema
-            </Link>
-            <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
-              Parcerias
-            </Link>
-            <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
-              Planos
             </Link>
             <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
               Contatos
@@ -116,13 +104,13 @@ export default function LandingPage() {
         </div>
 
         {/* Imagem à direita */}
-        <div className="flex justify-end items-center w-1/2">
+       <div className="hidden md:flex justify-center md:justify-end items-center w-full md:w-1/2">
           <Image
             src="/images/ninna-image.svg"
             alt="ninna visual"
-            width={600}
-            height={600}
-            className="object-contain"
+            width={500}
+            height={500}
+            className="object-contain w-full h-auto max-w-[500px]"
             priority
           />
         </div>
