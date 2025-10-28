@@ -10,7 +10,7 @@ const rules: Record<string, RoleEn[]> = {
     "/evaluator": ["EVALUATOR"],
     "/company": ["MANAGER", "EVALUATOR"],
     "/startup": ["STARTUP"],  
-    "/user": ["COMMON", "ADMINISTRATOR", "MANAGER", "EVALUATOR"],
+    "/user": ["COMMON", "ADMINISTRATOR", "MANAGER", "EVALUATOR", "STARTUP"],
 };
 
 // Edge runtime: use atob/base64url, não Buffer
@@ -73,5 +73,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/manager/:path*", "/evaluator/:path*", "/company/:path*", "/user/:path*"],
+    matcher: ["/admin/:path*", "/manager/:path*", "/evaluator/:path*", "/company/:path*", "/user/:path*", "/startup/:path*"],
 };

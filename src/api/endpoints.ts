@@ -15,10 +15,26 @@ export const ENDPOINTS = {
     SEND: "/invite",
   },
 
-    STARTUP: {
+  STARTUP: {
+    CREATE: "/startup",
     SHOW_ALL: "/startup",
     SHOW_ONE: (id: string) => `/startup/${id}`,
-    CREATE: "/startup",
+    UPDATE_ONE: (id: string) => `/startup/${id}`,
+    DELETE_ONE: (id: string) => `/startup/${id}`,
+
+    PENDING_APPROVE: "/startup/pending/approve",
+    APPROVE: (id: string) => `/startup/${id}/approve`,
+    PUBLIC_CREATE: "/startup/public",
+
+    PATCH_COVER: "/startup/coverImage",
+    PATCH_PROFILE: "/startup/profileImage",
+
+    SEARCH_NAME: (q: string) => `/startup/search/name/startup?q=${encodeURIComponent(q)}`,
+    FILTER_SEGMENT: (s: string) => `/startup/filter/segment?value=${encodeURIComponent(s)}`,
+    FILTER_TECH: (t: string) => `/startup/filter/technology?value=${encodeURIComponent(t)}`,
+    FILTER_PROBLEM: (p: string) => `/startup/filter/problem?value=${encodeURIComponent(p)}`,
+
+    ME: "/startup/user/startupMe",
   },
 
   CHALLENGE: {
