@@ -49,6 +49,13 @@ export const ENDPOINTS = {
     VOTE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}/vote`
   },
 
+  EXPERIMENTATION: {
+    CREATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
+    SHOW_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
+    UPDATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
+    CREATE_KPI_EXPERIMENTATION: (id: string) => `/experimentation/${id}/KPIs`
+  },
+
   DASHBOARD: {
     ADMIN: "/admin/dashboard",
     GESTOR: "/dashboard/gestor",

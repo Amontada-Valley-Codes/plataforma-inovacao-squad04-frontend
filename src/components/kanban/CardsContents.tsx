@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 import { ShowAllChecklistsResponse } from "@/api/payloads/checklist.payload";
 import { checklistService } from "@/api/services/checklist.service";
+import { cn } from "@/lib/utils";
 
 type CardContentsHeaderProps = {
   challengeTitle: string;
@@ -62,10 +63,11 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
 type RatingProps = {
   value?: number;
   onChange?: (value: number) => void;
+  className?: string;
   initialScore?: number;
 };
 
-export const Rating = ({ value, onChange, initialScore = 0 }: RatingProps) => {
+export const Rating = ({ className, value, onChange, initialScore = 0 }: RatingProps) => {
   const [score, setScore] = useState(initialScore);
   const ratingOptions = [1, 2, 3, 4, 5];
 
@@ -79,7 +81,7 @@ export const Rating = ({ value, onChange, initialScore = 0 }: RatingProps) => {
   };
 
   return (
-    <div className="mt-3 flex items-center gap-3">
+    <div className={cn("mt-3 flex items-center gap-3", className)}>
       {ratingOptions.map((num, i) => (
         <div key={i} className="flex flex-col justify-center items-center gap-[2px]">
           <p className="text-[10px]">{num}</p>
