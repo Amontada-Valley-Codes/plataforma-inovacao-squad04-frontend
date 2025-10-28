@@ -87,7 +87,7 @@ export default function RegisterStartup() {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] text-white px-4">
-      <div className="relative w-[140px] h-[90px] mb-4">
+      <div className="relative w-[100px] h-[90px] mb-">
         <Image src="/images/logo/ninna-logo.svg" alt="ninna-logo" fill className="object-contain" />
       </div>
       <h1 className="text-2xl font-semibold mb-2">Cadastro Startup</h1>
@@ -140,7 +140,7 @@ export default function RegisterStartup() {
                 onChange={(e) => handleChange("technologies_used", e.target.value)}
                 onFocus={() => setIsTechnologyOpen(true)}
                 onBlur={() => setIsTechnologyOpen(false)}
-                className="w-full bg-transparent text-sm outline-none appearance-none"
+                className="w-full bg-transparent text-black text-sm outline-none appearance-none"
               >
                 <option value="">Tecnologia Utilizada</option>
                 <option value="AI">AI</option>
@@ -169,7 +169,7 @@ export default function RegisterStartup() {
                 onChange={(e) => handleChange("industry_segment", e.target.value)}
                 onFocus={() => setIsIndustryOpen(true)}
                 onBlur={() => setIsIndustryOpen(false)}
-                className="w-full bg-transparent text-sm outline-none appearance-none"
+                className="w-full bg-transparent text-black text-sm outline-none appearance-none"
               >
                 <option value="">Segmento de indústria</option>
                 <option value="TECHNOLOGY">Tecnologia</option>
@@ -198,7 +198,7 @@ export default function RegisterStartup() {
                 onChange={(e) => handleChange("problems_solved", e.target.value)}
                 onFocus={() => setIsProblemsOpen(true)}
                 onBlur={() => setIsProblemsOpen(false)}
-                className="w-full bg-transparent text-sm outline-none appearance-none"
+                className="w-full bg-transparent text-black text-sm outline-none appearance-none"
               >
                 <option value="">Problema Resolvido</option>
                 <option value="HEALTHCARE">Saúde</option>
@@ -226,7 +226,7 @@ export default function RegisterStartup() {
                 onChange={(e) => handleChange("maturity_stage", e.target.value)}
                 onFocus={() => setIsMaturityOpen(true)}
                 onBlur={() => setIsMaturityOpen(false)}
-                className="w-full bg-transparent text-sm outline-none  appearance-none"
+                className="w-full bg-transparent text-black text-sm outline-none  appearance-none"
               >
                 <option value="">Estágio de Maturidade</option>
                 <option value="IDEATION">Ideação</option>
@@ -281,7 +281,7 @@ export default function RegisterStartup() {
         </div>
 
         {/* Pitch */}
-        <div className="relative w-full mb-3">
+        <div className="relative w-full mb-2">
           <textarea
             placeholder="Pitch"
             value={formData.pitch}
@@ -292,7 +292,7 @@ export default function RegisterStartup() {
         </div>
 
         {/* Descrição */}
-        <div className="relative w-full mb-3">
+        <div className="relative w-full mb-2">
           <textarea
             placeholder="Descrição"
             value={formData.description}
@@ -305,7 +305,7 @@ export default function RegisterStartup() {
         {/* Botão */}
         <button
           type="submit"
-          className="w-full h-10 rounded-xl bg-[#0C0869] hover:bg-[#15358D] text-white text-base font-semibold shadow transition-all duration-300"
+          className="w-full h-10 rounded-xl bg-[#15358D] hover:bg-[#0f39af] text-white text-base font-semibold shadow transition-all duration-300"
         >
           Cadastrar
         </button>
