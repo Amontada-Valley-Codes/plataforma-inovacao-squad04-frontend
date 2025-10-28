@@ -71,6 +71,7 @@ function useCurrentRole(): Role {
             MANAGER: "gestor",
             EVALUATOR: "avaliador",
             COMMON: "usuario",
+            STARTUP: "startup",
           };
           const r = map[type] ?? "usuario";
           localStorage.setItem("role", r);
@@ -110,7 +111,7 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
   if (!companyId && role === "startup") {
     return [
       { icon: <GridIcon />, name: "Desafios Públicos", path: "/startup/desafios" },
-      { icon: <RocketLaunchIcon />, name: "Startup", path: "/startup" },
+      { icon: <RocketLaunchIcon />, name: "Startup", path: "/startup/my-startup" },
       { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
   }
