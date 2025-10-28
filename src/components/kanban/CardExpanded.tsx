@@ -283,14 +283,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
   
   if (!cardData) return null
 
-/*   const currentColumnName = columns.find(c => c.id === cardData.status)?.name */
   const currentColumnIndex = columns.findIndex(c => c.id === cardData.status)
   const isFirstColumn = currentColumnIndex === 0
   const isLastColumn = currentColumnIndex === columns.length - 1
-
-  /* useEffect(() => {
-    currentColumnName = columns.find(c => c.id === cardData.status)?.name
-  }, [currentColumnName]) */
 
   const performMove = async (challengeId: string | undefined, visibilityToSet?: string) => {
     const challengeToMove = challenges.find(c => c.id === challengeId);
@@ -347,7 +342,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
     performMove(challengeId)
   };
 
-  const handleMoveBack = (challengeId: string | undefined) => {
+  const handleMoveBack = async (challengeId: string | undefined) => {
     const challengeToMove = challenges.find(c => c.id === challengeId);
     if (!challengeToMove) return;
 
@@ -356,6 +351,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
       const updatedChallenges = { ...challengeToMove, status: prevColumn.id };
+
+      if (challengeId) {
+        await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
+        console.log("✅ Status atualizado com sucesso");
+      }
+
       const otherChallenges = challenges.filter(c => c.id !== challengeId);
       setChallenges([updatedChallenges, ...otherChallenges]);
 
@@ -401,6 +402,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
               <CardExpandedLayout mainContent={
                   <PreScreening
                     challangeTitle={cardData.name} 
+                    challengeId={cardData.id}
                     category={cardData.area}
                     startDate={cardData.startDate}
                     endDate={cardData.endDate}

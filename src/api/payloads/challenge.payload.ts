@@ -146,3 +146,27 @@ export type ShowOnePublicChallengeResponse = {
   }
   enterpriseName?: string
 }
+
+export type CreateVotePreScreeningPayload = {
+  strategicAlignment: number
+  innovativePotential: number
+  businessRelevance: number
+}
+
+export type CreateVotePreScreeningResponse = {
+  id: string
+  challengeId: string
+  userId: string
+  strategicAlignmentScore: number
+  innovativePotentialScore: number
+  businessRelevanceScore: number
+  createdAt: string
+}
+
+export type ShowPercentageVoteResponse = {
+  percentage: number
+  voters: {
+    name: string,
+    image: null
+  }[]
+}
