@@ -8,15 +8,17 @@ import type {
 
 /* ------------------------------- Helpers ------------------------------- */
 
+// Evita cache agressivo de CDN inserindo um query param
 function withBust(url: string) {
   const sep = url.includes("?") ? "&" : "?";
   return `${url}${sep}v=${Date.now()}`;
 }
 
-/** Remove campos vazios e normaliza formatos sensíveis */
+// Remove campos vazios e normaliza formatos sensíveis
 function cleanPayload(p: UpdateStartupPayload): UpdateStartupPayload {
   const norm: UpdateStartupPayload = {
     ...p,
+    // se existir whatsapp/instagram em string, normaliza formatos comuns
     whatsapp: p.whatsapp ? p.whatsapp.replace(/\D+/g, "") : undefined,
     instagram: p.instagram ? p.instagram.replace(/^@/, "") : undefined,
   };
@@ -30,7 +32,7 @@ function cleanPayload(p: UpdateStartupPayload): UpdateStartupPayload {
   return norm;
 }
 
-/** Calcula diff simples entre original e editado (evita PUT com campos idênticos) */
+// Compara original x editado e devolve só o que mudou (superficial)
 function diffPayload(
   original: Partial<ShowAllStartupsResponse>,
   edited: UpdateStartupPayload
@@ -39,6 +41,8 @@ function diffPayload(
   (Object.keys(edited) as (keyof UpdateStartupPayload)[]).forEach((k) => {
     const before = (original as any)?.[k];
     const after = (edited as any)?.[k];
+
+    // compara como string para evitar false-positives (ex.: 0 vs "0")
     if (String(before ?? "") !== String(after ?? "")) {
       (out as any)[k] = after;
     }
@@ -49,22 +53,44 @@ function diffPayload(
 /* -------------------------------- Service ------------------------------- */
 
 export const startupService = {
+  // Listagem completa (usado pelo StartupCard)
+  async showAllStartups(): Promise<ShowAllStartupsResponse[]> {
+    try {
+      const { data } = await api.get<ShowAllStartupsResponse[]>(
+        ENDPOINTS.STARTUP.SHOW_ALL
+      );
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 404) {
+        console.warn("[STARTUP] GET SHOW_ALL → 404 ([])");
+        return [];
+      }
+      console.error("[STARTUP] GET SHOW_ALL falhou:", {
+        status,
+        url: err?.config?.url,
+        baseURL: err?.config?.baseURL,
+        data: err?.response?.data,
+      });
+      throw err;
+    }
+  },
+
+  // Traz a startup do usuário logado
   async getMyStartup(): Promise<ShowAllStartupsResponse> {
     const url = withBust(ENDPOINTS.STARTUP.ME);
     const { data } = await api.get(url, {
-      headers: {
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      },
+      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
     });
     return data;
   },
 
-  /** Alias para compatibilidade */
+  // Alias para compatibilidade
   async showStartupMe(): Promise<ShowAllStartupsResponse> {
     return this.getMyStartup();
   },
 
+  // Update parcial com limpeza + diff opcional
   async updateOne(
     id: string,
     payload: UpdateStartupPayload,
@@ -95,6 +121,7 @@ export const startupService = {
     return data ?? (await this.getMyStartup());
   },
 
+  // Upload de capa → refetch do /me
   async updateCoverImage(
     file: File,
     opts?: { startupId?: string }
@@ -110,9 +137,7 @@ export const startupService = {
     return await this.getMyStartup();
   },
 
-  /**
-   * Atualiza o Avatar/Perfil (multipart/form-data) e retorna a startup fresca do backend.
-   */
+  // Upload de avatar → refetch do /me
   async updateProfileImage(
     file: File,
     opts?: { startupId?: string }

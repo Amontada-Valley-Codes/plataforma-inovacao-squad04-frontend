@@ -60,10 +60,7 @@ export default function StartupCard({
 
   // --- Filtrar startups conforme role e empresa ---
   const filtered = useMemo(() => {
-    const byCompany =
-      companyIdFilter !== undefined
-        ? startups.filter((s) => s.cnpj === String(companyIdFilter))
-        : startups;
+    const byCompany = startups;
 
     const canSeeAll = role === "admin" || role === "gestor";
     if (canSeeAll) return byCompany;

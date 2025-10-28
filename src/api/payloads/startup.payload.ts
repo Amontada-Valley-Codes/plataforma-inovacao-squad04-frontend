@@ -39,12 +39,13 @@ export type CreateStartupPayload = {
   liderEmail: string
 }
 
+// src/api/payloads/startup.payload.ts
 export type UpdateStartupPayload = Partial<{
   name: string;
   description: string;
-  technologies_used: string;
+  technologies_used: string[]; // era string
   industry_segment: string;
-  founders: string;
+  founders: string[];          // era string
   cnpj: string;
   website: string;
   instagram: string;
