@@ -1,5 +1,5 @@
 import { Tag, CircleCheck, ListCheck } from "lucide-react"
-import { Checklist } from "./CardsContents"
+import { Checklist, Tags } from "./CardsContents"
 import { ideationCommentSections } from "./commentsData"
 import { Comment } from "./Comment"
 
@@ -29,17 +29,7 @@ export const Ideation = ({ challangeTitle, category, challengeId }: CardIdeation
       </div>
 
       <div className="flex flex-col mb-4 gap-4">
-        <div className="flex flex-col w-full gap-4">
-          <div className="flex items-center w-full bg-[#D9D9D9] text-[#D9D9D9] font-semibold text-sm rounded-[12px] px-4 py-1 gap-2">
-            <Tag fill="#666" size={16}/>
-            <p className="text-[#666]">TAGS</p>
-          </div>
-          <div className="flex gap-2">
-            <button className="border border-[#0B2B70] text-[12px] text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1">
-              {category.toUpperCase()}
-            </button>
-          </div>
-        </div>
+        <Tags category={category} challengeId={challengeId}/> 
 
         <div className="flex flex-col w-full gap-4">
           <div className="flex items-center w-full bg-[#D9D9D9] text-[#D9D9D9] font-semibold text-sm rounded-[12px] px-4 py-1 gap-2">

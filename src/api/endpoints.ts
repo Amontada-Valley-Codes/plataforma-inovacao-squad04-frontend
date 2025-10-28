@@ -67,6 +67,14 @@ export const ENDPOINTS = {
     DELETE_KPI: (id: string) => `kp/${id}`,
   },
 
+  TAGS: {
+    CREATE_TAG: (id: string) => `/tags/${id}`,
+    SHOW_ALL_TAGS: (id: string) => `/tags/${id}/challenge`,
+    SHOW_ONE_TAG: (id: string) => `/tags/${id}`,
+    UPDATE_TAG: (id: string) => `/tags/${id}`,
+    DELETE_TAG: (id: string) => `/tags/${id}`
+  },
+
   DASHBOARD: {
     ADMIN: "/admin/dashboard",
     GESTOR: "/dashboard/gestor",
