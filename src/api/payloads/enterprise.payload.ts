@@ -8,6 +8,7 @@ export type CreateEnterprisePayload = {
   address: string
   email: string
   gestorEmail: string
+  numeroGestor: string
 }
 
 export type CreateEnterpriseResponse = {
@@ -28,6 +29,7 @@ export type CreateEnterpriseResponse = {
     message: string
     inviteId: string
     token: string
+    zap: string
     expiresAt: string
   }
 }

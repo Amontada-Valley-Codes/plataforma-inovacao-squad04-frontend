@@ -96,7 +96,7 @@ export default function RegisterForm() {
 
       // 4) redireciona
       showCustomToast("Conta criada com sucesso! Redirecionando…", "success");
-      router.push("/admin/dashboard"); // ajuste se quiser outra rota
+      router.push("/admin/dashboard"); 
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erro ao criar conta.";
       setError(msg);
