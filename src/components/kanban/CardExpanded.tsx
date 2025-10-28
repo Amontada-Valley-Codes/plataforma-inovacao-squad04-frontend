@@ -463,6 +463,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 mainContent={
                   <Experimentation
                     challangeTitle={cardData.name}
+                    challengeId={cardData.id}
                     category={cardData.area}
                     description={cardData.description}
                     startDate={cardData.startDate}
