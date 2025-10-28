@@ -234,25 +234,29 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
               )}
 
               <div className="relative flex h-5 items-end gap-2">
-                <SquarePen 
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setEditingId(item.id)
-                    setEditingText(item.text)
-                  }}
-                  size={16}
-                  className="text-[#0B2B72] 
-                  hover:text-[#0b245a] transition-all duration-300 ease-in-out"
-                />
-                <Trash2
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    deleteItem(item.id)
-                  }} 
-                  size={16}
-                  className="text-red-600 hover:text-red-800 transition-all 
-                  duration-300 ease-in-out"
-                />
+                <button title="Editar Item">
+                  <SquarePen 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setEditingId(item.id)
+                      setEditingText(item.text)
+                    }}
+                    size={16}
+                    className="text-[#0B2B72] 
+                    hover:text-[#0b245a] transition-all duration-300 ease-in-out"
+                  />
+                </button>
+                <button title="Excluir Item">
+                  <Trash2
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteItem(item.id)
+                    }} 
+                    size={16}
+                    className="text-red-600 hover:text-red-800 transition-all 
+                    duration-300 ease-in-out"
+                  />
+                </button>
               </div>
             </div>
           </div>

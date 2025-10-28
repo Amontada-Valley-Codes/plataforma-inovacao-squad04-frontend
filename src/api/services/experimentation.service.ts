@@ -3,8 +3,6 @@ import { ENDPOINTS } from "../endpoints";
 import { 
   CreateExperimentationPayload,
   CreateExperimentationResponse,
-  CreateKPIsPayload,
-  CreateKPIsResponse,
   ShowExperimentationResponse,
   UpdateExperimentationPayload,
   UpdateExperimentationResponse
@@ -25,12 +23,6 @@ export const experimentationService = {
 
   async updateExperimentation(challengeId: string, payload: UpdateExperimentationPayload): Promise<UpdateExperimentationResponse> {
     const response = await api.put(ENDPOINTS.EXPERIMENTATION.UPDATE_EXPERIMENTATION(challengeId), payload)
-    console.log(response.data)
-    return response.data
-  },
-
-  async createKPI(experimentationId: string, payload: CreateKPIsPayload): Promise<CreateKPIsResponse> {
-    const response = await api.post(ENDPOINTS.EXPERIMENTATION.CREATE_KPI_EXPERIMENTATION(experimentationId), payload)
     console.log(response.data)
     return response.data
   }

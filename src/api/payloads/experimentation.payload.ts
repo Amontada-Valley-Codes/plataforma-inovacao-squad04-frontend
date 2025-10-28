@@ -4,6 +4,10 @@ export type CreateExperimentationPayload = {
   deadline: string;
   testEnvironment: string;
   maturityLevel: number;
+  responsible: {
+    empresa: string;
+    startup: string;
+  }[];
 }
 
 export type CreateExperimentationResponse = {
@@ -13,7 +17,12 @@ export type CreateExperimentationResponse = {
   deadline: string;
   testEnvironment: string;
   maturityLevel: number;
+  responsible: {
+    empresa: string;
+    startup: string;
+  }[];
   challengeId: string;
+  usersId: string;
 }
 
 export type ShowExperimentationResponse = {
@@ -23,8 +32,14 @@ export type ShowExperimentationResponse = {
   deadline: string;
   testEnvironment: string;
   maturityLevel: number;
+  responsible: {
+    empresa: string;
+    startup: string;
+  }[];
   challengeId: string;
+  usersId: string;
   Kpis: {
+    id: string;
     name: string;
     target: string;
   }[];
@@ -36,6 +51,10 @@ export type UpdateExperimentationPayload = {
   deadline: string;
   testEnvironment: string;
   maturityLevel: number;
+  responsible: {
+    empresa: string;
+    startup: string;
+  }[];
 }
 
 export type UpdateExperimentationResponse = {
@@ -45,17 +64,10 @@ export type UpdateExperimentationResponse = {
   deadline: string;
   testEnvironment: string;
   maturityLevel: number;
+  responsible: {
+    empresa: string;
+    startup: string;
+  }[];
   challengeId: string;
-}
-
-export type CreateKPIsPayload = {
-  name: string;
-  target: string;
-}
-
-export type CreateKPIsResponse = {
-  id: string;
-  name: string;
-  target: string;
-  experimentationId: string;
+  usersId: string;
 }
