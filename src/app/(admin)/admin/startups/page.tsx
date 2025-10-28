@@ -1,13 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import StartupCard from "@/components/startup/StartupCard";
 
-// Garante que o tipo é igual ao usado no StartupCard
 export type Role = "admin" | "gestor" | "avaliador" | "usuario";
 
-// (se teu getUserRole vier de outro lugar, mantém, mas a ideia é validar)
 import { getUserRole } from "@/lib/auth";
 
 function isRole(v: any): v is Role {

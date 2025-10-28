@@ -1,15 +1,13 @@
-// src/components/companies/CompaniesProfileInline.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { FaRegImage, FaMapMarkedAlt } from "react-icons/fa";
-
 import type { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
 
 type Props = {
-  data: ShowOneEnterpriseResponse | null; // ⬅️ detalhe apenas
+  data: ShowOneEnterpriseResponse | null; 
   editable?: boolean;
 };
 type MediaTarget = "logo" | "cover" | null;

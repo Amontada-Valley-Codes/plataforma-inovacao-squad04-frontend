@@ -1,41 +1,50 @@
-import type { Metadata } from "next";
-import React from "react";
-import { getUserRole, getUserCompanyId, getCurrentUser } from "@/lib/auth";
-import CompanyHistory from "@/components/history/CompanyHistory";
+// src/app/(company)/company/[companyId]/history/page.tsx
+"use client";
 
-type HistoryPageProps = {
+import { getUserRole, getCurrentUser, getUserCompanyId } from "@/lib/auth";
+import CompanyHistoryHistoric from "@/components/history/CompanyHistory";
+import { use, useEffect, useState } from "react";
+
+type PageProps = {
   params: Promise<{ companyId: string }>;
 };
 
-export async function generateMetadata({ params }: HistoryPageProps): Promise<Metadata> {
-  const { companyId } = await params;
-  return {
-    title: `Empresa ${companyId} • Histórico (Ativos)`,
-    description: `Desafios ativos da Empresa ${companyId}`,
-  };
-}
+export default function CompanyHistoryPage({ params }: PageProps) {
+  const { companyId } = use(params);
 
-export default async function HistoryPage({ params }: HistoryPageProps) {
-  const { companyId } = await params;
+  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
+  const [viewerCompanyId, setViewerCompanyId] = useState<string | undefined>();
+  const [viewerUserId, setViewerUserId] = useState<string | undefined>();
+  const [loaded, setLoaded] = useState(false);
 
-  const role = await getUserRole();
-  const viewerCompanyId = await getUserCompanyId();
-  const viewer = await getCurrentUser();
-  const viewerUserId = viewer?.id as number | undefined;
+  useEffect(() => {
+    (async () => {
+      const r = await getUserRole();
+      const u = await getCurrentUser();
+      const c = await getUserCompanyId();
+
+      setRole(r);
+      setViewerCompanyId(c ? String(c) : undefined);
+      setViewerUserId(u?.id ? String(u.id) : undefined);
+      setLoaded(true);
+    })();
+  }, []);
+
+  if (!loaded) {
+    return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
+  }
 
   return (
-    <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4 w-full max-w-screen-xl mx-auto overflow-x-hidden">
-      {/* Breadcrumb */}
+    <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4">
       <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap gap-1">
         <span>Empresa /</span>
-        <span className="font-medium break-all">{companyId}</span> /
-        <span className="font-semibold">Histórico</span>
+        <span className="font-semibold truncate">{companyId}</span>
+        <span>/ Histórico</span>
       </div>
 
-      {/* Conteúdo principal */}
-      <div className="w-full">
-        <CompanyHistory
-          companyId={Number(companyId)}
+      <div className="w-full overflow-x-auto">
+        <CompanyHistoryHistoric
+          companyId={companyId}
           role={role}
           viewerCompanyId={viewerCompanyId}
           viewerUserId={viewerUserId}

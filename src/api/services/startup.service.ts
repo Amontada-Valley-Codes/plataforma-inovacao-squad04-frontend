@@ -1,4 +1,5 @@
-// src/api/services/startup.service.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 import {

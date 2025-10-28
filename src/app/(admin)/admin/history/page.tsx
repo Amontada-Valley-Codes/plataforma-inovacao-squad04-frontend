@@ -1,39 +1,35 @@
-import type { Metadata } from "next";
-import React from "react";
-import { getUserRole, getCurrentUser } from "@/lib/auth";
+"use client";
+
+import { useEffect, useState } from "react";
 import CompanyHistory from "@/components/history/CompanyHistory";
+import { getUserRole, getCurrentUser } from "@/lib/auth";
 
-/**
- * Histórico geral do Admin
- * Exibe desafios ativos (não concluídos) de todas as empresas.
- * Admin pode ver todos; avaliadores e gestores veem filtrados.
- */
+export default function AdminHistoryPage() {
+  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
+  const [viewerUserId, setViewerUserId] = useState<string | undefined>(undefined); 
+  const [loaded, setLoaded] = useState(false);
 
-export const metadata: Metadata = {
-  title: "Histórico Geral • Admin",
-  description: "Desafios ativos e em andamento de todas as empresas",
-};
+  useEffect(() => {
+    (async () => {
+      const r = await getUserRole();
+      const u = await getCurrentUser();
+      setRole(r);
+      setViewerUserId(u?.id != null ? String(u.id) : undefined);
+      setLoaded(true);
+    })();
+  }, []);
 
-export default async function AdminHistoryPage() {
-  const role = await getUserRole();
-  const viewer = await getCurrentUser();
-  const viewerUserId = viewer?.id as number | undefined;
+  if (!loaded) return <div className="w-full p-6 text-sm text-gray-500">Carregando desafios...</div>;
 
   return (
     <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4">
-      {/* Breadcrumb */}
       <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap gap-1">
         <span>Admin /</span>
         <span className="font-semibold truncate">Histórico</span>
       </div>
 
-      {/* Conteúdo */}
       <div className="w-full overflow-x-auto">
-        <CompanyHistory
-          role={role}
-          viewerUserId={viewerUserId}
-          // para admin não precisa de companyId nem viewerCompanyId
-        />
+        <CompanyHistory role={role} viewerUserId={viewerUserId} />
       </div>
     </div>
   );

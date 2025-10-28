@@ -1,3 +1,5 @@
+// src/api/payloads/challenge.payload.ts
+
 export type CreateChallengePayload = {
   name: string
   startDate: string
@@ -110,13 +112,37 @@ export type ChangeVisibilityResponse = {
   usersId: string
 }
 
-export type ShowAllPubliChallengeResponse = {
+export type PublicChallengeItem = {
   id: string
   name: string
   endDate: string
   status: string
   visibility: string
+  startDate?: string
   Enterprise: {
     name: string
   }
+}
+
+export type ShowAllPubliChallengeResponse = PublicChallengeItem[]
+
+export type ShowOnePublicChallengeResponse = {
+  id: string
+  name: string
+  startDate?: string
+  endDate: string
+  area?: string
+  description?: string
+  visibility: string
+  status: string
+  strategic_alignment?: string
+  innovative_potential?: string
+  business_relevance?: string
+  updatedAt?: string
+  enterpriseId?: string
+  usersId?: string
+  Enterprise?: {
+    name: string
+  }
+  enterpriseName?: string
 }

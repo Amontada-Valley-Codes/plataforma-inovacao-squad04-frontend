@@ -1,7 +1,6 @@
 "use client";
 
 import { useModal } from "@/hooks/useModal";
-
 import { PlusCircle } from "lucide-react";
 import AddCompanieForm from "./AddCompaniesForm";
 

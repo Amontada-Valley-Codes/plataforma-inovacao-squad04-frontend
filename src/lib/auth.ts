@@ -1,4 +1,6 @@
-export type Role = "admin" | "gestor" | "avaliador" | "usuario";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+export type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 export type User = {
   id?: number;
@@ -6,26 +8,25 @@ export type User = {
   email?: string;
   role: Role;
   companyId?: string | number;
+  startupId?: string | number; 
 };
 
-// Decode simples
 function decodeJwtPayload<T = any>(token: string): T | null {
   try {
     const part = token.split(".")[1];
     if (!part) return null;
 
     // Base64URL -> Base64 + padding
-    const b64 = part
-      .replace(/-/g, "+")
-      .replace(/_/g, "/")
+    const b64 = part.replace(/-/g, "+").replace(/_/g, "/")
       .padEnd(Math.ceil(part.length / 4) * 4, "=");
 
-    const json =
-      typeof window !== "undefined"
-        ? (typeof atob === "function"
-          ? atob(b64)
-          : Buffer.from(b64, "base64").toString("utf-8"))
-        : Buffer.from(b64, "base64").toString("utf-8");
+    // Usa atob quando houver (browser e Edge Runtime têm), senão usa Buffer (Node)
+    const hasAtob = typeof atob === "function";
+    const json = hasAtob
+      ? atob(b64)
+      : (typeof Buffer !== "undefined"
+        ? Buffer.from(b64, "base64").toString("utf-8")
+        : (() => { throw new Error("No atob/Buffer available"); })());
 
     return JSON.parse(json) as T;
   } catch {
@@ -46,6 +47,8 @@ function mapRoleFromToken(raw?: string): Role {
     case "EVALUATOR":
     case "AVALIADOR":
       return "avaliador";
+    case "STARTUP":                
+      return "startup";
     case "COMMON":
     default:
       return "usuario";
@@ -67,6 +70,7 @@ export async function getCurrentUser(): Promise<User | null> {
     email: payload.email ?? undefined,
     role: mapRoleFromToken(payload.type_user ?? payload.role),
     companyId: payload.companyId ?? payload.enterpriseId ?? undefined,
+    startupId: payload.startupId ?? undefined,
   };
 }
 
@@ -75,7 +79,8 @@ export async function getUserRole(): Promise<Role> {
   return u?.role ?? "usuario";
 }
 
-export function redirectByRole(role?: Role, companyId?: string | number): string {
+export function redirectByRole(role?: Role, companyId?: string | number, startupId?: string | number): string {
+  
   switch (role) {
     case "admin":
       return "/admin/dashboard";
@@ -83,7 +88,32 @@ export function redirectByRole(role?: Role, companyId?: string | number): string
       return companyId ? `/company/${companyId}/dashboard` : "/company";
     case "avaliador":
       return companyId ? `/company/${companyId}/desafios` : "/desafios";
+    case "startup": 
+      return startupId ? `/startup/${startupId}/desafios` : "/startup";
     default:
       return "/user/meus-desafios";
   }
+}
+
+export async function getUserCompanyId(): Promise<string | number | undefined> {
+  const token = await getAccessToken();
+  if (!token) return undefined;
+  const payload = decodeJwtPayload<any>(token) ?? {};
+  return payload.companyId ?? payload.enterpriseId ?? undefined;
+}
+
+
+export async function getUserStartupId(): Promise<string | number | undefined> {
+  const token = await getAccessToken();
+  if (!token) return undefined;
+  const payload = decodeJwtPayload<any>(token) ?? {};
+  return payload.startupId ?? undefined;
+}
+
+
+export async function getUserId(): Promise<string | number | undefined> {
+  const token = await getAccessToken();
+  if (!token) return undefined;
+  const payload = decodeJwtPayload<any>(token) ?? {};
+  return payload.sub ?? undefined;
 }

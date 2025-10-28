@@ -3,12 +3,11 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
-import { MetricsCards } from "@/components/ecommerce/EcommerceMetrics";
+import { MetricsCards } from "@/components/ecommerce/MetricsCard";
 import ActiveCompaniesCard from "@/components/ecommerce/ActiveCompaniesCard";
 import { dashboardService } from "@/api/services/dashboard.service";
 import { adminDasboardResponse } from "@/api/payloads/dashboard.payload";
 
-// Dynamic imports to disable SSR for charts
 const DistributionBySector = dynamic(
   () => import("@/components/ecommerce/DistributionBySectorChart"),
   { ssr: false, loading: () => <p>Carregando gráfico...</p> }
@@ -28,30 +27,15 @@ export default function Ecommerce() {
   const [dashboardData, setDashboardData] = useState<adminDasboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        const data = await dashboardService.getAdminDashboard();
-        setDashboardData(data);
-      } catch (error) {
-        console.error("Erro ao carregar dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboard();
-  }, []);
-
   async function fetchDashboard() {
     try {
-      setLoading(true); // 👈 LIGAR o loading antes de chamar a API
+      setLoading(true); 
       const data = await dashboardService.getAdminDashboard();
       setDashboardData(data);
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false); // 👈 DESLIGAR depois
+      setLoading(false); 
     }
   }
 

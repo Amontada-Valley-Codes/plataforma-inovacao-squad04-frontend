@@ -1,24 +1,31 @@
-import type { Metadata } from "next";
+"use client";
+
 import React from "react";
 import { getUserRole, getUserCompanyId, getCurrentUser } from "@/lib/auth";
 import CompanyHistory from "@/components/history/CompanyHistory";
 
-/**
- * Histórico do usuário comum
- * Mostra apenas desafios públicos da empresa do usuário logado.
- * Filtra automaticamente pelo viewerCompanyId e role="usuario".
- */
+export default function UserHistoryPage() {
+  const [role, setRole] = React.useState<"startup" | "usuario" | "admin" | "gestor" | "avaliador">("usuario");
+  const [viewerCompanyId, setViewerCompanyId] = React.useState<string | undefined>(undefined);
+  const [viewerUserId, setViewerUserId] = React.useState<string | undefined>(undefined);
+  const [loaded, setLoaded] = React.useState(false);
 
-export const metadata: Metadata = {
-  title: "Meu Histórico • Usuário",
-  description: "Histórico de desafios ativos e concluídos do usuário logado",
-};
+  React.useEffect(() => {
+    (async () => {
+      const r = await getUserRole();
+      const c = await getUserCompanyId();
+      const u = await getCurrentUser();
 
-export default async function UserHistoryPage() {
-  const role = await getUserRole(); // deve retornar "usuario"
-  const viewerCompanyId = await getUserCompanyId();
-  const viewer = await getCurrentUser();
-  const viewerUserId = viewer?.id as number | undefined;
+      setRole(r);
+      setViewerCompanyId(c ? String(c) : undefined);
+      setViewerUserId(u?.id ? String(u.id) : undefined);
+      setLoaded(true);
+    })();
+  }, []);
+
+  if (!loaded) {
+    return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
+  }
 
   return (
     <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4 w-full max-w-screen-xl mx-auto overflow-x-hidden">
