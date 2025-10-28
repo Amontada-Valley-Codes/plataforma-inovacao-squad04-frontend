@@ -59,6 +59,11 @@ export default function RegisterForm() {
     return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   };
 
+  useEffect(() => {
+    const t = searchParams.get("token");
+    if (t) setToken(t);
+  }, [searchParams]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -82,6 +87,9 @@ export default function RegisterForm() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { repeatPassword, ...dataToSend } = formData;
 
+      console.log(dataToSend)
+      console.log(token)
+
       // 1) registra com token de convite
       await authService.register({ ...dataToSend, token });
 
@@ -96,7 +104,7 @@ export default function RegisterForm() {
 
       // 4) redireciona
       showCustomToast("Conta criada com sucesso! Redirecionando…", "success");
-      router.push("/admin/dashboard"); // ajuste se quiser outra rota
+      router.push("/admin/dashboard"); 
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erro ao criar conta.";
       setError(msg);
@@ -106,11 +114,6 @@ export default function RegisterForm() {
     }
 
   };
-
-  useEffect(() => {
-    const t = searchParams.get("token");
-    if (t) setToken(t);
-  }, [searchParams]);
 
   return (
     <div

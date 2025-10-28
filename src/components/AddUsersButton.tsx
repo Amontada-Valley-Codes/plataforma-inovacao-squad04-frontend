@@ -11,7 +11,7 @@ export default function AddUsersButton() {
   return (
     <div>
         <button 
-          className="bg-[#15358D] rounded-[12px] h-11 w-11   flex justify-center items-center"
+          className="bg-[#15358D] rounded-[12px] h-11 w-11 flex justify-center items-center"
           onClick={() => setIsOpen(true)}
         >  
           <UserPlus className="text-white" size={20}/>
