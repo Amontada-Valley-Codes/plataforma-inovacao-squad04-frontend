@@ -5,12 +5,12 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 export default function LandingPage() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
+   const [menuOpen, setMenuOpen] = useState(false);
+   
   return (
-    <div className="relative w-full min-h-screen flex flex-col bg-[#0B005E]">
+    <div className="relative w-full h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="w-full flex justify-between items-center px-6 md:px-16 py-3 z-20">
+      <nav className="w-full flex justify-between items-center px-16 py-1 z-20">
         {/* Logo */}
         <div className="flex items-center">
           <Image
@@ -91,36 +91,37 @@ export default function LandingPage() {
       </nav>
 
       {/* Conteúdo principal */}
-      <div className="flex flex-col md:flex-row items-center justify-between flex-1 px-6 md:px-24 text-white mt-6 md:mt-0">
+      <div className="flex items-center justify-between flex-1 px-25 text-white">
         {/* Texto à esquerda */}
-        <div className="flex flex-col max-w-[480px] text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+        <div className="flex flex-col max-w-[480px]">
+          <h1 className="text-5xl font-bold leading-tight">
             Gere{" "}
             <span className="text-[#A2FF00]">inovação</span> de
-            <br className="hidden md:block" />
+            <br />
             forma{" "}
             <span className="text-[#A2FF00]">estratégica!</span>
           </h1>
 
-          <p className="text-lg md:text-2xl mt-6 leading-relaxed text-gray-200">
+          <p className="text-2xl mt-6 leading-relaxed text-gray-200">
             Lance desafios em nossa plataforma de inovação aberta, capte ideias
             e conecte-se a startups num único ambiente!
           </p>
 
-          <div className="flex justify-center md:justify-start items-center gap-6 mt-8">
+          <div className="flex items-center gap-6 mt-8">
             <button className="bg-[#A2FF00] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition">
               Conferir Oferta!
             </button>
+
           </div>
         </div>
 
         {/* Imagem à direita */}
-        <div className="flex justify-center md:justify-end items-center w-full md:w-1/2 mt-10 md:mt-0">
+        <div className="flex justify-end items-center w-1/2">
           <Image
             src="/images/ninna-image.svg"
             alt="ninna visual"
-            width={500}
-            height={500}
+            width={600}
+            height={600}
             className="object-contain"
             priority
           />
