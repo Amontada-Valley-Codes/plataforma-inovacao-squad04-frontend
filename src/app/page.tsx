@@ -1,4 +1,5 @@
 import AuthVisual from "@/components/lading/AuthVisual";
+import InnovationFunnel from "@/components/lading/InnovationFunnel";
 import LandingPage from "@/components/lading/LadingPage";
 import PlataformaInovacao from "@/components/lading/PlataformaInovação";
 
@@ -13,6 +14,7 @@ export default function LadingPage() {
       {/* Seções */}
       <LandingPage />
       <PlataformaInovacao />
+      <InnovationFunnel/>
     </div>
   );
 }
