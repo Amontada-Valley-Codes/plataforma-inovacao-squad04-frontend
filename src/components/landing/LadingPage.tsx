@@ -1,8 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 export default function LandingPage() {
+   const [menuOpen, setMenuOpen] = useState(false);
+   
   return (
     <div className="relative w-full h-screen flex flex-col">
       {/* Navbar */}
@@ -18,19 +22,13 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* Menu */}
-        <div className="flex items-center p-10 gap-10 text-sm font-medium text-white">
+        {/* Menu Desktop */}
+        <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white">
           <Link href="#" className="hover:text-[#A2FF00] transition">
             Sobre
           </Link>
           <Link href="#" className="hover:text-[#A2FF00] transition">
             Conheça o Sistema
-          </Link>
-          <Link href="#" className="hover:text-[#A2FF00] transition">
-            Parcerias
-          </Link>
-          <Link href="#" className="hover:text-[#A2FF00] transition">
-            Planos
           </Link>
           <Link href="#" className="hover:text-[#A2FF00] transition">
             Contatos
@@ -45,6 +43,39 @@ export default function LandingPage() {
             Entrar
           </Link>
         </div>
+
+        {/* Botão Mobile */}
+        <button
+          className="md:hidden text-white"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+
+        {/* Menu Mobile */}
+        {menuOpen && (
+          <div className="absolute top-20 left-0 w-full bg-[#0B005E] flex flex-col items-center gap-6 py-6 text-white text-lg font-medium shadow-lg md:hidden">
+            <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+              Sobre
+            </Link>
+            <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+              Conheça o Sistema
+            </Link>
+            <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+              Contatos
+            </Link>
+            <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+              Registre-se
+            </Link>
+            <Link
+              href="/auth/login"
+              onClick={() => setMenuOpen(false)}
+              className="bg-[#A2FF00] text-[#0B005E] px-6 py-2 rounded-full font-semibold hover:opacity-90 transition"
+            >
+              Entrar
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* Conteúdo principal */}
@@ -73,13 +104,13 @@ export default function LandingPage() {
         </div>
 
         {/* Imagem à direita */}
-        <div className="flex justify-end items-center w-1/2">
+       <div className="hidden md:flex justify-center md:justify-end items-center w-full md:w-1/2">
           <Image
             src="/images/ninna-image.svg"
             alt="ninna visual"
-            width={600}
-            height={600}
-            className="object-contain"
+            width={500}
+            height={500}
+            className="object-contain w-full h-auto max-w-[500px]"
             priority
           />
         </div>

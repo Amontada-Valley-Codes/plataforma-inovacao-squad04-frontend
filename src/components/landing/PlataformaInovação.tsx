@@ -17,7 +17,7 @@ export default function PlataformaInovacao() {
       {/* Bloco de título e descrição */}
       <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl border border-white/40 rounded-2xl p-10 gap-10 backdrop-blur-sm"
         style={{
-        border: "2px solid transparent",
+        border: "3px solid transparent",
         backgroundImage:
         "linear-gradient(#0B0B66, #0B0B66), linear-gradient(90deg, #455BA3, #E6E9EF)",
         backgroundOrigin: "border-box",
