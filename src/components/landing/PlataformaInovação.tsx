@@ -1,74 +1,95 @@
 "use client";
 import Image from "next/image";
 import React from "react";
+import { motion } from "framer-motion";
 
 export default function PlataformaInovacao() {
   return (
     <section
-      className="w-full min-h-screen flex flex-col items-center justify-center text-white px-10 py-20 gap-16"
+      className="
+        w-full min-h-screen flex flex-col items-center justify-center text-white
+        px-4 sm:px-6 lg:px-10 py-16 sm:py-20 lg:py-28 gap-12 sm:gap-14 lg:gap-16
+        overflow-hidden
+      "
       style={{
-        background: `
-          linear-gradient(190deg, 
-            #0C0668 0%, 
-            #111C79 100%)
-        `,
+        backgroundImage: "url('/images/Plataforma.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Bloco de título e descrição */}
-      <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl border border-white/40 rounded-2xl p-10 gap-10 backdrop-blur-sm"
-        style={{
-        border: "3px solid transparent",
-        backgroundImage:
-        "linear-gradient(#0B0B66, #0B0B66), linear-gradient(90deg, #455BA3, #E6E9EF)",
-        backgroundOrigin: "border-box",
-        backgroundClip: "padding-box, border-box",
-    }}>
-        {/* Título */}
-        <h2 className="text-4xl md:text-5xl font-bold leading-snug md:w-1/3">
-          Plataforma <br /> de Inovação
+      {/* Título + Texto */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+        className="flex flex-col items-center text-center max-w-[52rem] gap-6 sm:gap-8"
+      >
+        <h2 className="font-bold leading-tight text-[clamp(2rem,4vw,3.25rem)]">
+          Plataforma de Inovação Aberta
         </h2>
-
-        {/* Texto descritivo */}
-        <p className="text-base md:text-lg leading-relaxed text-gray-200 md:w-2/3">
+        <p className="text-[clamp(0.98rem,1.2vw,1.125rem)] leading-relaxed text-gray-100">
           Plataforma web de inovação aberta voltada para corporações, com foco na
-          gestão de desafios, captação de ideias e conexão com startups. A
-          plataforma deve seguir um funil estruturado de inovação e permitir o
-          atendimento a múltiplas empresas (multiempresa) com áreas restritas e
-          relatórios segmentados.
+          gestão de desafios, captação de ideias e conexão com startups. A plataforma
+          deve seguir um funil estruturado de inovação e permitir o atendimento a
+          múltiplas empresas (multiempresa) com áreas restritas e relatórios segmentados.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Cards abaixo */}
-      <div className="flex flex-wrap justify-center gap-8 w-full max-w-6xl">
-        {/* Card 1 */}
-        <div className="bg-white text-[#0B005E] w-[160px] h-[160px] rounded-xl flex flex-col items-center justify-center gap-1 shadow-lg hover:scale-105 transition-transform">
-          <Image src="/images/gestao.png" alt="Gestão de Desafios" width={90} height={90} />
-          <span className="text-center font-semibold text-lg">Gestão de<br />Desafios</span>
-        </div>
-
-        {/* Card 2 */}
-        <div className="bg-white text-[#0B005E] w-[160px] h-[160px] rounded-xl flex flex-col items-center justify-center gap-1 shadow-lg hover:scale-105 transition-transform">
-          <Image src="/images/ideias.png" alt="Captação de Ideias" width={90} height={90} />
-          <span className="text-center font-semibold text-lg">Captação de<br />Ideias</span>
-        </div>
-
-        {/* Card 3 */}
-        <div className="bg-white text-[#0B005E] w-[160px] h-[160px] rounded-xl flex flex-col items-center justify-center gap-1 shadow-lg hover:scale-105 transition-transform">
-          <Image src="/images/funil.png" alt="Funil de Inovação" width={90} height={90} />
-          <span className="text-center font-semibold text-lg">Funil de<br />Inovação Visual</span>
-        </div>
-
-        {/* Card 4 */}
-        <div className="bg-white text-[#0B005E] w-[160px] h-[160px] rounded-xl flex flex-col items-center justify-center gap-1 shadow-lg hover:scale-105 transition-transform">
-          <Image src="/images/startups.png" alt="Conexão com Startups" width={90} height={90} />
-          <span className="text-center font-semibold text-lg">Conexão com<br />Startups</span>
-        </div>
-
-        {/* Card 5 */}
-        <div className="bg-white text-[#0B005E] w-[160px] h-[160px] rounded-xl flex flex-col items-center justify-center gap-1 shadow-lg hover:scale-105 transition-transform">
-          <Image src="/images/relatorios.png" alt="Avaliação e Relatórios" width={90} height={90} />
-          <span className="text-center font-semibold text-lg">Avaliação e<br />Relatórios</span>
-        </div>
+      {/* Cards */}
+      <div
+        className="
+          grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5
+          gap-4 sm:gap-6 md:gap-8
+          w-full max-w-6xl place-items-center justify-center
+        "
+      >
+        {[
+          { img: "gestao", label: "Gestão de\nDesafios" },
+          { img: "ideias", label: "Captação de\nIdeias" },
+          { img: "funil", label: "Funil de\nInovação Visual" },
+          { img: "startups", label: "Conexão com\nStartups" },
+          { img: "relatorios", label: "Avaliação e\nRelatórios", last: true },
+        ].map((card, i) => (
+          <motion.div
+            key={i}
+            // entrada mais lenta e suave (sem scale)
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.75,
+              delay: i * 0.12,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+            className={`
+              bg-white text-[#0B005E]
+              w-[8.75rem] h-[8.75rem] sm:w-40 sm:h-40 lg:w-44 lg:h-44
+              rounded-xl flex flex-col items-center justify-center
+              shadow-lg transform-gpu will-change-transform
+              transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+              motion-reduce:transition-none
+              md:hover:scale-105 md:hover:shadow-xl
+              ${card.last ? "col-span-2 sm:col-span-1" : ""}
+            `}
+          >
+            <Image
+              src={`/images/${card.img}.png`}
+              alt={card.label}
+              width={96}
+              height={96}
+              className="
+                w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20
+                transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+                motion-reduce:transition-none
+              "
+            />
+            <span className="text-center font-semibold mt-1 text-[0.83rem] sm:text-sm md:text-base whitespace-pre-line">
+              {card.label}
+            </span>
+          </motion.div>
+        ))}
       </div>
     </section>
   );
