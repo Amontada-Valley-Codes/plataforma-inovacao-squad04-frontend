@@ -96,16 +96,16 @@ export default function ContactPage() {
             </label>
             <div className="relative">
               <MessageSquare className="absolute left-3 top-4 text-gray-400" size={20} />
-              <textarea
+                <textarea
                 id="message"
                 name="message"
                 value={form.message}
                 onChange={handleChange}
                 required
                 rows={5}
-                className="w-full pl-10 p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
+                className="w-full pl-10 p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00] resize-none"
                 placeholder="Digite sua mensagem aqui..."
-              />
+                />
             </div>
           </div>
 
