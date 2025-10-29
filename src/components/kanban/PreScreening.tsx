@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { CardContentsHeader } from "./CardsContents"
-import { Building2, Lightbulb, BriefcaseBusiness } from "lucide-react"
+import { Building2, Lightbulb, BriefcaseBusiness, Loader2 } from "lucide-react"
 import { Rating, ProgressBarActions } from "./CardsContents"
 import { ChallengeService } from "@/api/services/challenge.service"
 import { CreateVotePreScreeningPayload, ShowPercentageVoteResponse } from "@/api/payloads/challenge.payload"
@@ -26,13 +26,20 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
   });
   const [results, setResults] = useState<ShowPercentageVoteResponse | null>(null);
   const [isVoting, setIsVoting] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>()
 
   async function fetchResults() {
+    setIsLoading(true)
+    setError(null)
     try {
       const response = await ChallengeService.ShowPercentage(challengeId);
       setResults(response);
     } catch (error) {
       console.error("Falha ao buscar resultados da votação:", error);
+      setError("Falha ao buscar resultados.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -54,6 +61,7 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
     }
 
     setIsVoting(true);
+    setError(null)
     try {
       await ChallengeService.createVote(challengeId, votes);
       
@@ -67,6 +75,18 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
       setIsVoting(false);
     }
   };
+
+  if (error) {
+    return <div className="w-full justify-center items-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full justify-center items-center h-full animate-spin">
+      <Loader2 size={24}/>
+    </div>
+  }
 
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">

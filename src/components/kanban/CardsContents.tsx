@@ -1,4 +1,4 @@
-import { Calendar, CircleUserRound, Heart, SquarePen, Tag, Trash2 } from "lucide-react";
+import { Calendar, CircleUserRound, Heart, Loader2, SquarePen, Tag, Trash2 } from "lucide-react";
 import { useState, useEffect, useCallback } from 'react';
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 import { ShowAllChecklistsResponse } from "@/api/payloads/checklist.payload";
@@ -153,12 +153,23 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
   const [newTag, setNewTag] = useState("")
   const [editingTag, setEditingTag] = useState("")
   const [editingTagId, setEditingTagId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchTags() {
-      const response = await tagsService.showAllTags(challengeId)
-      console.log(response)
-      setTags(response)
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await tagsService.showAllTags(challengeId)
+        console.log(response)
+        setTags(response)
+      } catch (error: any) {
+        console.error("Erro ao buscar tags:", error)
+        setError("Erro ao carregar tags.")
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     fetchTags()
@@ -166,16 +177,19 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
 
   const addTag = async (challengeId: string, newTag: string) => {
     if (newTag.trim() === "") return
+    setError(null)
     try {
       const response = await tagsService.createTag(challengeId, { tag: newTag })
       setTags((prev) => [...prev, response])
       setNewTag("")
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
+      setError("Erro ao adicionar tag.")
     }
   }
 
   const updateTag = async (tagId: string, newTag: string) => {
+    setError(null)
     try {
       const response = await tagsService.updateTag(tagId, { tag: newTag })
       setTags((prev) => 
@@ -185,18 +199,33 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
       )
       setEditingTagId(null)
       setEditingTag("")
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
+      setError("Erro ao atualizar tag.")
     }
   }
 
   const deleteTag = async (tagId: string) => {
+    setError(null)
     try {
       await tagsService.deleteTag(tagId)
       setTags((prev) => prev.filter((tag) => tag.id !== tagId))
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
+      setError("Erro ao deletar tag.")
     }
+  }
+
+  if (error) {
+    return <div className="w-full justify-center items-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full justify-center items-center h-full animate-spin">
+      <Loader2 size={24}/>
+    </div>
   }
 
   return (
@@ -318,64 +347,83 @@ export const Ideias = ({ challengeId }: IdeaisProps) => {
   const [ideias, setIdeias] = useState<ShowAllIdeiasResponse['ideas']>([])
   const [newIdeia, setNewIdeia] = useState("")
   const [isAdding, setIsAdding] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>()
 
   const fetchIdeias = useCallback(async () => {
+    setError(null)
     try {
       const response = await ideiaService.showIdeias(challengeId)
       setIdeias(response.ideas)
       console.log(response.ideas)
-    } catch (error) {
-      console.error()
+    } catch (error: any) {
+      console.error(error)
+      setError("Erro ao carregar sugestões.")
     }
   }, [challengeId])
 
   useEffect(() => {
-    fetchIdeias()
+    const loadIdeias = async () => {
+      setIsLoading(true)
+      await fetchIdeias()
+      setIsLoading(false)
+    }
+    loadIdeias()
   }, [fetchIdeias])
 
   const handleLike = async (ideiaId: string) => {
+    setError(null)
     try {
       await ideiaService.likeIdeia(ideiaId)
       await fetchIdeias()
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
+      setError("Erro ao registrar curtida.")
     }
   }
 
   const handleApprove = async (ideiaId: string) => {
+    setError(null)
     try {
       await ideiaService.approveIdeia(ideiaId)
       await fetchIdeias()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
+      setError("Erro ao aprovar sugestão.")
     }
   }
 
   const handleReject = async (ideiaId: string) => {
+    setError(null)
     try {
       await ideiaService.rejectIdeia(ideiaId)
       await fetchIdeias()
-    } catch (error) {
-      console.error(error)  
+    } catch (error: any) {
+      console.error(error)
+      setError("Erro ao rejeitar sugestão.")
     }
   }
 
   const addIdeia = async (challengeId: string, ideia: string) => {
+    setError(null)
     try {
-      await ideiaService.createIdeia(challengeId, { ideia: ideia })
+      await ideiaService.createIdeia(challengeId, { ideia })
       setNewIdeia("")
-      await fetchIdeias()   
-    } catch (error) {
+      await fetchIdeias()
+    } catch (error: any) {
       console.error(error)
+      setError("Erro ao adicionar sugestão.")
     }
   }
 
   const deleteIdea = async (ideiaId: string) => {
+    setError(null)
     try {
       await ideiaService.deleteIdeia(ideiaId)
       await fetchIdeias()
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
+      setError("Erro ao deletar sugestão.")
     }
   }
 
@@ -395,6 +443,18 @@ export const Ideias = ({ challengeId }: IdeaisProps) => {
       case "REJECTED": return "Reprovado";
       default: return "Desconhecido";
     }
+  }
+
+  if (error) {
+    return <div className="w-full justify-center items-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full justify-center items-center h-full animate-spin">
+      <Loader2 size={24}/>
+    </div>
   }
 
   return (
@@ -495,6 +555,8 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingText, setEditingText] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>()
 
   useEffect(() => {
     async function fetchChecklists() {
@@ -552,6 +614,18 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  if (error) {
+    return <div className="w-full justify-center items-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full justify-center items-center h-full animate-spin">
+      <Loader2 size={24}/>
+    </div>
   }
 
   return (

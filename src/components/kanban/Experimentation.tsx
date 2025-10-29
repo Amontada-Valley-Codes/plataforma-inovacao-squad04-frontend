@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import { CardContentsHeader, Rating } from "./CardsContents"
-import { Target, ClipboardList, Users, ChartNoAxesCombined, ClipboardPen, Trash2, X, Check } from "lucide-react"
+import { Target, ClipboardList, Users, ChartNoAxesCombined, ClipboardPen, Trash2, X, Check, Loader2 } from "lucide-react"
 import { ShowExperimentationResponse, UpdateExperimentationPayload, CreateExperimentationPayload } from "@/api/payloads/experimentation.payload";
 import { experimentationService } from "@/api/services/experimentation.service";
 import { kpisService } from "@/api/services/kpi.service";
@@ -196,6 +196,18 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       console.error("Falha ao salvar as alterações:", err.response?.data || err.message);
     }
   };
+
+  if (error) {
+    return <div className="w-full justify-center items-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full justify-center items-center h-full animate-spin">
+      <Loader2 size={24}/>
+    </div>
+  }
 
   return (
     <div  className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
