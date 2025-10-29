@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ChevronDown, Mail, User, X } from "lucide-react";
+import { ChevronDown, Mail, Phone, User, X } from "lucide-react";
 import { Modal } from "./ui/modal";
 import { useState } from "react";
 import { inviteService } from "../api/services/invite.service";
@@ -14,16 +14,31 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
   const [isFuncOpen, setIsFuncOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const [phone, setPhone] = useState("");
+
+  function formatPhone(value: string) {
+    value = value.replace(/\D/g, "");
+    value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
+    value = value.replace(/(\d{5})(\d)/, "$1-$2");
+    return value;
+  }
 
   const handleSave = async () => {
-    if (!email || !role) {
-      console.log("Preencha email e função");
+    if (!email || !role || !phone) {
+      console.log("Preencha email, telefone e função");
       return;
     }
 
     try {
-      const response = await inviteService.sendInvite({ email, type_user: role });
+      const response = await inviteService.sendInvite({ email, type_user: role, phone });
       console.log("Convite enviado:", response);
+
+      const to = phone;
+      const message = `Olá! Você foi convidado para a empresa.\nConclua seu cadastro aqui: ${response.zap}\n`;
+      const encodedMessage = encodeURIComponent(message)
+      const whatsappURL = `https://wa.me/55${to}?text=${encodedMessage}`;
+      window.open(whatsappURL, "_blank");
+    
       onClose();
     } catch (error: any) {
       console.error("Erro ao enviar convite:", error.response?.data || error.message);
@@ -56,6 +71,17 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
                   className="w-full bg-transparent text-sm outline-none text-[#d8d8d8] placeholder:text-[#98A2B3]"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 h-12 dark:border-gray-800 dark:bg-gray-900">
+                <Phone className="text-[#98A2B3] mr-2" size={18} />
+                <input
+                  type="tel"
+                  placeholder="Telefone do colaborador"
+                  className="w-full bg-transparent text-sm outline-none text-[#d8d8d8] placeholder:text-[#98A2B3]"
+                  value={formatPhone(phone)}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
 
