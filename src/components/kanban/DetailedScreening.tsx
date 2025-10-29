@@ -1,11 +1,12 @@
 "use client"
 import { CardContentsHeader } from "./CardsContents"
 import { useEffect, useState } from "react"
-import { Bug, Lightbulb, Trophy, Building2, ChartNoAxesCombined, ChartPie, TriangleAlert } from "lucide-react"
+import { Bug, Lightbulb, Trophy, Building2, ChartNoAxesCombined, ChartPie, TriangleAlert, Loader2 } from "lucide-react"
 import { Rating, ProgressBarActions } from "./CardsContents"
 import { ShowDetailedScreeningResponse, CreateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
 import { detailedScreeningService } from "@/api/services/detailedScreening.service"
 import { UpdateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
+import { AiOutlineLoading } from "react-icons/ai";
 
 type CardDetailedScreeningContentProps = {
   challangeTitle: string;
@@ -162,6 +163,18 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       console.error("❌ Erro ao registrar voto", err);
     }
   };
+
+  if (error) {
+    return <div className="w-full flex items-center justify-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full flex items-center justify-center h-full animate-spin">
+      <Loader2 size={24}/>
+    </div>
+  }
     
   if (!detailedScreening) {
     return <div className="w-full flex items-center justify-center h-full">Dados não encontrados.</div>;
