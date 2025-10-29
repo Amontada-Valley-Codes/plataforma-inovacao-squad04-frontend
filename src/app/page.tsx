@@ -1,5 +1,6 @@
 import AuthVisual from "@/components/landing/AuthVisual";
 import ContactPage from "@/components/landing/contacts";
+import FeaturesSection from "@/components/landing/Feature";
 import InnovationFunnel from "@/components/landing/InnovationFunnel";
 import LandingPage from "@/components/landing/LadingPage";
 import PlataformaInovacao from "@/components/landing/PlataformaInovação";
@@ -16,6 +17,7 @@ export default function LadingPage() {
       <LandingPage />
       <PlataformaInovacao />
       <InnovationFunnel/>
+      <FeaturesSection/>
       <ContactPage/>
     </div>
   );
