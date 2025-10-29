@@ -1,16 +1,35 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 export default function LandingPage() {
-   const [menuOpen, setMenuOpen] = useState(false);
-   
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownMobileOpen, setDropdownMobileOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="w-full flex justify-between items-center px-16 py-1 z-20">
+      <nav className="w-full flex justify-between items-center px-8 md:px-16 py-3 z-20 relative">
         {/* Logo */}
         <div className="flex items-center">
           <Image
@@ -23,7 +42,7 @@ export default function LandingPage() {
         </div>
 
         {/* Menu Desktop */}
-        <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white">
+        <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white relative">
           <Link href="#" className="hover:text-[#A2FF00] transition">
             Sobre
           </Link>
@@ -33,9 +52,49 @@ export default function LandingPage() {
           <Link href="#" className="hover:text-[#A2FF00] transition">
             Contatos
           </Link>
-          <Link href="/auth/register" className="hover:text-[#A2FF00] transition">
-            Registre-se
-          </Link>
+
+          {/* Dropdown Registre-se */}
+          <div ref={dropdownRef} className="relative">
+            <button
+              onClick={() => setDropdownOpen((prev) => !prev)}
+              className="flex items-center gap-1 hover:text-[#A2FF00] transition"
+            >
+              Registre-se
+              <ChevronDown
+                size={16}
+                className={`transition-transform ${
+                  dropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute left-0 mt-2 w-52 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-hidden z-30 animate-fadeIn">
+                <Link
+                  href="/auth/register"
+                  className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Registre-se
+                </Link>
+                <Link
+                  href="/auth/register-startups"
+                  className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Registrar Startup
+                </Link>
+                <Link
+                  href="/auth/register-companies"
+                  className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Registrar Empresa
+                </Link>
+              </div>
+            )}
+          </div>
+
           <Link
             href="/auth/login"
             className="bg-[#A2FF00] text-[#0B005E] px-5 py-2 rounded-full font-semibold hover:opacity-90 transition"
@@ -54,7 +113,7 @@ export default function LandingPage() {
 
         {/* Menu Mobile */}
         {menuOpen && (
-          <div className="absolute top-20 left-0 w-full bg-[#0B005E] flex flex-col items-center gap-6 py-6 text-white text-lg font-medium shadow-lg md:hidden">
+          <div className="absolute top-20 left-0 w-full bg-[#0B005E] flex flex-col items-center gap-6 py-6 text-white text-lg font-medium shadow-lg md:hidden z-30">
             <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
               Sobre
             </Link>
@@ -64,9 +123,53 @@ export default function LandingPage() {
             <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
               Contatos
             </Link>
-            <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
-              Registre-se
-            </Link>
+
+            {/* Dropdown Registre-se Mobile */}
+            <div className="relative">
+              <button
+                onClick={() => setDropdownMobileOpen((prev) => !prev)}
+                className="flex items-center gap-1 hover:text-[#A2FF00] transition"
+              >
+                Registre-se
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${dropdownMobileOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {dropdownMobileOpen && (
+                <div className="absolute left-0 mt-2 w-52 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-visible z-50">
+                  <Link
+                    href="/auth/register"
+                    className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                    onClick={() => setDropdownMobileOpen(false)}
+                  >
+                    Registre-se
+                  </Link>
+                  <Link
+                    href="/auth/register-startups"
+                    className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                    onClick={() => {
+                      setDropdownMobileOpen(false);
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Registrar Startup
+                  </Link>
+                  <Link
+                    href="/auth/register-companies"
+                    className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                    onClick={() => {
+                      setDropdownMobileOpen(false);
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Registrar Empresa
+                  </Link>
+                </div>
+              )}
+            </div>
+
             <Link
               href="/auth/login"
               onClick={() => setMenuOpen(false)}
@@ -99,12 +202,11 @@ export default function LandingPage() {
             <button className="bg-[#A2FF00] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition">
               Conferir Oferta!
             </button>
-
           </div>
         </div>
 
         {/* Imagem à direita */}
-       <div className="hidden md:flex justify-center md:justify-end items-center w-full md:w-1/2">
+        <div className="hidden md:flex justify-center md:justify-end items-center w-full md:w-1/2">
           <Image
             src="/images/ninna-image.svg"
             alt="ninna visual"
