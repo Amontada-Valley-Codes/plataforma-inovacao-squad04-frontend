@@ -75,6 +75,16 @@ export const ENDPOINTS = {
     DELETE_TAG: (id: string) => `/tags/${id}`
   },
 
+  IDEIA: {
+    CREATE_IDEIA: (id: string) => `/ideia/${id}`,
+    UPDATE_IDEIA: (id: string) => `/ideia/${id}`,
+    DELETE_IDEIA: (id: string) => `/ideia/${id}`,
+    LIKE_IDEIA: (id: string) => `/ideia/${id}/like`,
+    SHOW_IDEIAS: (id: string) => `/ideia/${id}/ideias`,
+    APPROVE_IDEIA: (id: string) => `/ideia/approved/${id}`,
+    REJECT_IDEIA: (id: string) => `/ideia/rejected/${id}`
+  },
+
   DASHBOARD: {
     ADMIN: "/admin/dashboard",
     GESTOR: "/dashboard/gestor",

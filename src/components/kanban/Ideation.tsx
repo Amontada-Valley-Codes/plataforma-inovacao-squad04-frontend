@@ -1,7 +1,5 @@
-import { Tag, CircleCheck, ListCheck } from "lucide-react"
-import { Checklist, Tags } from "./CardsContents"
-import { ideationCommentSections } from "./commentsData"
-import { Comment } from "./Comment"
+import { CircleCheck, ListCheck } from "lucide-react"
+import { Checklist, Ideias, Tags } from "./CardsContents"
 
 type CardIdeationContentProps = {
   challangeTitle: string;
@@ -37,11 +35,7 @@ export const Ideation = ({ challangeTitle, category, challengeId }: CardIdeation
             <p className="text-[#666]">SUGESTÕES</p>
           </div>
           <div>
-            {ideationCommentSections
-            .find((section) => section.id === "sugestoes")
-            ?.comments.map((comment) => (
-              <Comment key={comment.id} comment={comment} />
-            ))}
+            <Ideias challengeId={challengeId}/>
           </div>
         </div>
 
