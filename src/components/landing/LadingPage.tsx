@@ -94,15 +94,15 @@ export default function LandingPage() {
 
           {/* Menu Desktop */}
           <div className="hidden [@media(min-width:913px)]:flex items-center gap-10 text-sm font-medium text-white relative">
-            <Link href="#sobre" className="hover:text-[#A2FF00] transition">Sobre</Link>
-            <Link href="#plataforma-inovacao" className="hover:text-[#A2FF00] transition">Conheça o Sistema</Link>
-            <Link href="#contatos" className="hover:text-[#A2FF00] transition">Contatos</Link>
+            <Link href="#sobre" className="hover:text-[#62D105] transition">Sobre</Link>
+            <Link href="#plataforma-inovacao" className="hover:text-[#62D105] transition">Conheça o Sistema</Link>
+            <Link href="#contatos" className="hover:text-[#62D105] transition">Contatos</Link>
 
             {/* Dropdown Registre-se */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-1 hover:text-[#A2FF00] transition"
+                className="flex items-center gap-1 hover:text-[#62D105] transition"
                 aria-haspopup="menu"
                 aria-expanded={dropdownOpen}
               >
@@ -126,13 +126,13 @@ export default function LandingPage() {
                     className="absolute left-0 mt-2 w-52 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-hidden z-30"
                     role="menu"
                   >
-                    <Link href="/auth/register" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition" role="menuitem">
+                    <Link href="/auth/register" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
                       Registre-se
                     </Link>
-                    <Link href="/auth/register-startups" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition" role="menuitem">
+                    <Link href="/auth/register-startups" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
                       Registrar Startup
                     </Link>
-                    <Link href="/auth/register-companies" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition" role="menuitem">
+                    <Link href="/auth/register-companies" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
                       Registrar Empresa
                     </Link>
                   </motion.div>
@@ -141,7 +141,7 @@ export default function LandingPage() {
             </div>
 
             <motion.div whileTap={{ scale: prefersReducedMotion ? 1 : 0.97 }}>
-              <Link href="/auth/login" className="bg-[#A2FF00] text-[#0B005E] px-5 py-2 rounded-full font-semibold hover:opacity-90 transition inline-flex">
+              <Link href="/auth/login" className="bg-[#62D105] text-[#0B005E] px-5 py-2 rounded-full font-semibold hover:opacity-90 transition inline-flex">
                 Entrar
               </Link>
             </motion.div>
@@ -191,7 +191,7 @@ export default function LandingPage() {
                 <Image src="/images/logo-ninna.png" alt="Logo" width={100} height={60} className="object-contain" priority />
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="text-white hover:text-[#A2FF00] transition"
+                  className="text-white hover:text-[#62D105] transition"
                   aria-label="Fechar menu"
                 >
                   <X size={28} />
@@ -199,15 +199,15 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col gap-5 px-6 py-6 text-lg font-medium">
-                <Link href="#sobre" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">Sobre</Link>
-                <Link href="#plataforma-inovacao" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">Saiba mais</Link>
-                <Link href="#contatos" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">Contatos</Link>
+                <Link href="#sobre" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Sobre</Link>
+                <Link href="#plataforma-inovacao" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Saiba mais</Link>
+                <Link href="#contatos" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Contatos</Link>
 
                 {/* Dropdown Mobile */}
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => setDropdownMobileOpen((prev) => !prev)}
-                    className="flex items-center gap-1 hover:text-[#A2FF00] transition"
+                    className="flex items-center gap-1 hover:text-[#62D105] transition"
                     aria-haspopup="menu"
                     aria-expanded={dropdownMobileOpen}
                   >
@@ -232,13 +232,13 @@ export default function LandingPage() {
                         className="overflow-hidden"
                       >
                         <div className="flex flex-col pl-3 border-l border-white/20 gap-2 mt-2">
-                          <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+                          <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
                             Registre-se
                           </Link>
-                          <Link href="/auth/register-startups" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+                          <Link href="/auth/register-startups" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
                             Registrar Startup
                           </Link>
-                          <Link href="/auth/register-companies" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+                          <Link href="/auth/register-companies" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
                             Registrar Empresa
                           </Link>
                         </div>
@@ -251,7 +251,7 @@ export default function LandingPage() {
                   <Link
                     href="/auth/login"
                     onClick={() => setMenuOpen(false)}
-                    className="mt-4 bg-[#A2FF00] text-[#0B005E] px-6 py-3 rounded-full font-semibold hover:opacity-90 transition w-fit inline-flex"
+                    className="mt-4 bg-[#62D105] text-[#0B005E] px-6 py-3 rounded-full font-semibold hover:opacity-90 transition w-fit inline-flex"
                   >
                     Entrar
                   </Link>
@@ -273,9 +273,9 @@ export default function LandingPage() {
             animate="show"
           >
             <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl font-bold leading-tight">
-              Gere <span className="text-[#A2FF00]">inovação</span> de
+              Gere <span className="text-[#62D105]">inovação</span> de
               <br />
-              forma <span className="text-[#A2FF00]">estratégica!</span>
+              forma <span className="text-[#62D105]">estratégica!</span>
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-lg sm:text-2xl mt-6 leading-relaxed text-gray-200">
@@ -288,7 +288,7 @@ export default function LandingPage() {
                 whileHover={{ y: prefersReducedMotion ? 0 : -2 }}
                 whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
                 onClick={() => document.getElementById("plataforma-inovacao")?.scrollIntoView({ behavior: "smooth" })}
-                className="bg-[#A2FF00] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition"
+                className="bg-[#62D105] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition"
               >
                 Descubra Mais
               </motion.button>

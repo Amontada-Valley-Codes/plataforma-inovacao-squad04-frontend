@@ -39,26 +39,26 @@ export default function PlataformaInovacao() {
       </motion.div>
 
       {/* Cards */}<div
-  className="
+        className="
     w-fit mx-auto                             /* <-- grid fica do tamanho do conteúdo e centraliza */
     grid grid-cols-2 md:grid-cols-4           /* <-- 2 no mobile, 4 no md+ */
     gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-6     /* <-- gaps fluidos */
     justify-items-center                       /* <-- itens centralizados dentro da célula */
   "
->
-  {[ 
-    { img: "gestao", label: "Gestão de\nDesafios" },
-    { img: "ideias", label: "Captação de\nIdeias" },
-    { img: "funil", label: "Funil de\nInovação Visual" },
-    { img: "startups", label: "Conexão com\nStartups" },
-  ].map((card, i) => (
-    <motion.div
-      key={i}
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.75, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      className="
+      >
+        {[
+          { img: "gestao", label: "Gestão de\nDesafios" },
+          { img: "ideias", label: "Captação de\nIdeias" },
+          { img: "funil", label: "Funil de\nInovação Visual" },
+          { img: "startups", label: "Conexão com\nStartups" },
+        ].map((card, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+            className="
         bg-white text-[#0B005E]
         w-[8.75rem] h-[8.75rem] sm:w-40 sm:h-40 lg:w-44 lg:h-44
         rounded-xl flex flex-col items-center justify-center
@@ -67,23 +67,23 @@ export default function PlataformaInovacao() {
         motion-reduce:transition-none
         md:hover:scale-105 md:hover:shadow-xl
       "
-    >
-      <Image
-        src={`/images/${card.img}.png`}
-        alt={card.label}
-        width={96}
-        height={96}
-        className="
+          >
+            <Image
+              src={`/images/${card.img}.png`}
+              alt={card.label}
+              width={96}
+              height={96}
+              className="
           w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20
           transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
           motion-reduce:transition-none
         "
-      />
-      <span className="text-center font-semibold mt-1 text-[0.83rem] sm:text-sm md:text-base whitespace-pre-line">
-        {card.label}
-      </span>
-    </motion.div>
-  ))}
+            />
+            <span className="text-center font-semibold mt-1 text-[0.83rem] sm:text-sm md:text-base whitespace-pre-line">
+              {card.label}
+            </span>
+          </motion.div>
+        ))}
 
       </div>
     </section>
