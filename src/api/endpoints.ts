@@ -96,6 +96,14 @@ export const ENDPOINTS = {
     GESTOR: "/dashboard/gestor",
   },
 
+  COMMENTS_FUNNEL: {
+    CREATE_COMMENT: (id: string) => `/comments-funnel/${id}`,
+    UPDATE_COMMENT: (id: string) => `/comments-funnel/${id}`,
+    DELETE_COMMENT: (id: string) => `/comments-funnel/${id}`,
+    LIKED_COMMENT: (id: string) => `/comments-funnel/${id}/like`,
+    FILTERED_COMMENT: (id: string, context: string) => `/comments-funnel/filter/${context}/${id}`
+  },
+
   USER: {
     SHOW_ALL: "/user",
   },
