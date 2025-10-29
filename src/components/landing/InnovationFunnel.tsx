@@ -7,7 +7,7 @@ import React from "react";
 export default function FunilInovacao() {
   return (
     <section
-      className="w-full min-h-screen flex flex-col items-center justify-center text-white px-4 py-6g"
+      className="w-full min-h-screen flex flex-col items-center justify-center text-white px-4 py-6"
     style={{
         background: `
           linear-gradient(190deg, 
