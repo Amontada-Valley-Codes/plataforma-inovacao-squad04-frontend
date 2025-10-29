@@ -17,7 +17,7 @@ export default function FunilInovacao() {
     >
       {/* Background com imagem e gradiente */}
       <Image
-        src="/images/gerenciar-desafios.jpg"
+        src="/images/gerencie.svg"
         alt=""
         fill
         priority
@@ -28,22 +28,41 @@ export default function FunilInovacao() {
       {/* Conteúdo principal */}
       <div className="w-full max-w-[1100px] px-6 sm:px-8 lg:px-16 mx-auto flex flex-col gap-10">
         {/* Título + Subtítulo */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          viewport={{ once: true }}
-          className="text-center mx-auto mb-4 md:mb-6 w-full max-w-[1400px]"
-        >
-          <h2 className="font-bold leading-tight text-[clamp(32px,2.8vw,36px)] mb-2 whitespace-nowrap">
-            Gerencie seus desafios de inovação com eficácia
-          </h2>
-          <p className="text-[clamp(14px,2vw,18px)] text-gray-200 leading-relaxed">
-            Utilize o <span className="font-semibold text-white">PIAC</span> para
-            criar e organizar desafios, acompanhar as submissões de ideias,
-            conectar startups e analisar resultados facilmente!
-          </p>
-        </motion.div>
+        {/* Título + Subtítulo */}
+<motion.div
+  initial={{ opacity: 0, y: 40 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+  viewport={{ once: true }}
+  className="text-center mx-auto mb-4 md:mb-6 w-full max-w-[1400px]"
+>
+  <h2
+    className="
+      font-bold leading-tight tracking-tight
+      text-[clamp(24px,6vw,36px)]
+      sm:text-[clamp(28px,4.2vw,40px)]
+      mb-2
+      break-words
+    "
+    style={{ textWrap: 'balance' } as React.CSSProperties}
+  >
+    Gerencie seus desafios de inovação com eficácia
+  </h2>
+
+  <p
+    className="
+      text-[clamp(14px,3.8vw,18px)]
+      sm:text-[clamp(15px,2.2vw,18px)]
+      text-gray-200 leading-relaxed
+      max-w-[60ch] mx-auto
+    "
+    style={{ textWrap: 'balance' } as React.CSSProperties}
+  >
+    Utilize o <span className="font-semibold text-white">PIAC</span> para
+    criar e organizar desafios, acompanhar as submissões de ideias,
+    conectar startups e analisar resultados facilmente!
+  </p>
+</motion.div>
 
         {/* Grid principal */}
         <div
@@ -78,37 +97,49 @@ export default function FunilInovacao() {
           </motion.div>
 
           {/* Direita: Ilustração + CTA */}
-          <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center justify-center text-center"
-          >
-            <Image
-              src="/images/Innovation.png"
-              alt="Pessoa com notebook"
-              width={420}
-              height={420}
-              className="object-contain mb-4 max-w-[360px] w-full -mt-14"
-              sizes="(max-width: 1024px) 80vw, 360px"
-            />
+          {/* Direita: Ilustração + CTA */}
+<motion.div
+  initial={{ opacity: 0, x: 60 }}
+  whileInView={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+  viewport={{ once: true }}
+  className="
+    flex flex-col items-center justify-center
+    text-center w-full
+  "
+>
+  {/* Imagem: aparece só em telas grandes */}
+  <Image
+    src="/images/Innovation.png"
+    alt="Pessoa com notebook"
+    width={420}
+    height={420}
+    className="hidden lg:block object-contain mb-4 max-w-[360px] w-full -mt-14 mx-auto"
+    sizes="(max-width: 1024px) 80vw, 360px"
+  />
 
-            <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-              <Link
-                href="/auth/register-startups"
-                className="
-                  inline-block rounded-full px-8 md:px-12 py-3
-                  text-[clamp(14px,1.8vw,18px)] font-semibold
-                  bg-[#62D105] text-[#0C0668]
-                  shadow-lg transition-transform duration-200
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#62D105] focus:ring-offset-transparent -mt-8
-                "
-              >
-                Registre sua Corporação
-              </Link>
-            </motion.div>
-          </motion.div>
+  {/* Botão: sempre centralizado horizontalmente */}
+  <motion.div
+    whileHover={{ scale: 1.05 }}
+    transition={{ duration: 0.2 }}
+    className="flex justify-center w-full"
+  >
+    <Link
+      href="/auth/register-startups"
+      className="
+        inline-block rounded-full px-8 md:px-12 py-3
+        text-[clamp(14px,1.8vw,18px)] font-semibold
+        bg-[#62D105] text-[#0C0668]
+        shadow-lg transition-transform duration-200
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#62D105]
+        focus:ring-offset-transparent
+      "
+    >
+      Registre sua Corporação
+    </Link>
+  </motion.div>
+</motion.div>
+
         </div>
       </div>
     </section>
