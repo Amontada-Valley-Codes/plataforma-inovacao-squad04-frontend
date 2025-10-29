@@ -9,7 +9,9 @@ export default function LandingPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownMobileOpen, setDropdownMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
+  // Fecha dropdown clicando fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -20,7 +22,7 @@ export default function LandingPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fechar menu com tecla ESC
+  // ESC fecha menu mobile
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenuOpen(false);
@@ -29,11 +31,21 @@ export default function LandingPage() {
     return () => document.removeEventListener("keydown", handleEsc);
   }, []);
 
+  // Observa scroll para aplicar blur/sombra
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <div className="relative w-full h-screen flex flex-col">
-      {/* Navbar */}
-      <nav className="w-full z-20 relative">
-        <div className="mx-auto max-w-7xl flex justify-between items-center px-8 md:px-32 py-3">
+      {/* Navbar fixa */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 
+        ${scrolled ? "bg-[#0B005E]/90 backdrop-blur-md shadow-md" : "bg-transparent"}`}
+      >
+        <div className="mx-auto max-w-7xl flex justify-between items-center px-8 md:px-32 py-0 h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Image
@@ -72,13 +84,22 @@ export default function LandingPage() {
 
               {dropdownOpen && (
                 <div className="absolute left-0 mt-2 w-52 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-hidden z-30 animate-fadeIn">
-                  <Link href="/auth/register" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition">
+                  <Link
+                    href="/auth/register"
+                    className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                  >
                     Registre-se
                   </Link>
-                  <Link href="/auth/register-startups" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition">
+                  <Link
+                    href="/auth/register-startups"
+                    className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                  >
                     Registrar Startup
                   </Link>
-                  <Link href="/auth/register-companies" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition">
+                  <Link
+                    href="/auth/register-companies"
+                    className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#A2FF00] transition"
+                  >
                     Registrar Empresa
                   </Link>
                 </div>
@@ -103,7 +124,10 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Overlay escurecido com blur */}
+      {/* Espaço para compensar nav fixa */}
+      <div className="h-[80px]" />
+
+      {/* Overlay escurecido (mobile) */}
       {menuOpen && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
@@ -111,11 +135,10 @@ export default function LandingPage() {
         />
       )}
 
-      {/* Drawer lateral (menu mobile moderno) */}
+      {/* Drawer Mobile */}
       <div
-        className={`fixed top-0 right-0 h-full w-[80%] sm:w-[60%] bg-[#0B005E] text-white z-40 shadow-2xl transform transition-transform duration-300 ease-out ${
-          menuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[80%] sm:w-[60%] bg-[#0B005E] text-white z-40 shadow-2xl transform transition-transform duration-300 ease-out ${menuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex justify-between items-center px-6 py-5 border-b border-white/10">
           <Image
@@ -138,7 +161,7 @@ export default function LandingPage() {
             Sobre
           </Link>
           <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
-            Conheça o Sistema
+            Saiba mais
           </Link>
           <Link href="#" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
             Contatos
@@ -159,13 +182,25 @@ export default function LandingPage() {
 
             {dropdownMobileOpen && (
               <div className="flex flex-col pl-3 border-l border-white/20 gap-2 mt-1">
-                <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+                <Link
+                  href="/auth/register"
+                  onClick={() => setMenuOpen(false)}
+                  className="hover:text-[#A2FF00] transition"
+                >
                   Registre-se
                 </Link>
-                <Link href="/auth/register-startups" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+                <Link
+                  href="/auth/register-startups"
+                  onClick={() => setMenuOpen(false)}
+                  className="hover:text-[#A2FF00] transition"
+                >
                   Registrar Startup
                 </Link>
-                <Link href="/auth/register-companies" onClick={() => setMenuOpen(false)} className="hover:text-[#A2FF00] transition">
+                <Link
+                  href="/auth/register-companies"
+                  onClick={() => setMenuOpen(false)}
+                  className="hover:text-[#A2FF00] transition"
+                >
                   Registrar Empresa
                 </Link>
               </div>
@@ -182,7 +217,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Conteúdo principal */}
+      {/* HERO idêntico ao original */}
       <div className="flex-1 w-full">
         <div className="mx-auto max-w-7xl flex items-center justify-between h-full px-8 md:px-32 pt-0 text-white">
           {/* Texto */}
@@ -199,8 +234,15 @@ export default function LandingPage() {
             </p>
 
             <div className="flex items-center gap-6 mt-8">
-              <button className="bg-[#A2FF00] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition">
-                Conheça o Sistema!
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("plataforma-inovacao")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="bg-[#A2FF00] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition"
+              >
+                Descubra Mais
               </button>
             </div>
           </div>

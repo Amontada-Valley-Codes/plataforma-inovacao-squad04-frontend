@@ -3,7 +3,8 @@ import ContactPage from "@/components/landing/contacts";
 import FeaturesSection from "@/components/landing/Feature";
 import InnovationFunnel from "@/components/landing/InnovationFunnel";
 import LandingPage from "@/components/landing/LadingPage";
-import PlataformaInovacao from "@/components/landing/PlataformaInovação";
+import PlataformaInovacao from "@/components/landing/PlataformaInovacao";
+
 
 export default function LadingPage() {
   return (
