@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
+import { Mail, User, MessageSquare, Send, CheckCircle, Loader2 } from "lucide-react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -25,7 +26,7 @@ export default function ContactPage() {
       .then(() => {
         setStatus("success");
         setForm({ name: "", email: "", message: "" });
-        setTimeout(() => setStatus("idle"), 3000); // volta ao normal após 3s
+        setTimeout(() => setStatus("idle"), 3000);
       })
       .catch(() => {
         setStatus("error");
@@ -49,54 +50,66 @@ export default function ContactPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Nome */}
           <div>
             <label htmlFor="name" className="block text-sm mb-2">
               Nome
             </label>
-            <input
-              id="name"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
-              placeholder="Seu nome completo"
-            />
+            <div className="relative">
+              <User className="absolute left-3 top-4 text-gray-400" size={20} />
+              <input
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full pl-10 p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
+                placeholder="Seu nome completo"
+              />
+            </div>
           </div>
 
+          {/* E-mail */}
           <div>
             <label htmlFor="email" className="block text-sm mb-2">
               E-mail
             </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
-              placeholder="Seu e-mail"
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-4 text-gray-400" size={20} />
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                className="w-full pl-10 p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
+                placeholder="Seu e-mail"
+              />
+            </div>
           </div>
 
+          {/* Mensagem */}
           <div>
             <label htmlFor="message" className="block text-sm mb-2">
               Mensagem
             </label>
-            <textarea
-              id="message"
-              name="message"
-              value={form.message}
-              onChange={handleChange}
-              required
-              rows={5}
-              className="w-full p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
-              placeholder="Digite sua mensagem aqui..."
-            />
+            <div className="relative">
+              <MessageSquare className="absolute left-3 top-4 text-gray-400" size={20} />
+              <textarea
+                id="message"
+                name="message"
+                value={form.message}
+                onChange={handleChange}
+                required
+                rows={5}
+                className="w-full pl-10 p-3 rounded-lg bg-[#0B005E] border border-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-[#A2FF00]"
+                placeholder="Digite sua mensagem aqui..."
+              />
+            </div>
           </div>
 
-          {/* Botão com animação */}
+          {/* Botão */}
           <button
             type="submit"
             disabled={status === "loading" || status === "success"}
@@ -108,15 +121,22 @@ export default function ContactPage() {
                 : "hover:opacity-90"
             }`}
           >
-            {status === "loading" && (
-              <span className="w-5 h-5 border-2 border-[#0B005E] border-t-transparent rounded-full animate-spin"></span>
+            {status === "loading" ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                Enviando...
+              </>
+            ) : status === "success" ? (
+              <>
+                <CheckCircle size={20} />
+                Enviado!
+              </>
+            ) : (
+              <>
+                <Send size={20} />
+                Enviar Mensagem
+              </>
             )}
-
-            {status === "loading"
-              ? "Enviando..."
-              : status === "success"
-              ? "Enviado "
-              : "Enviar Mensagem"}
           </button>
         </form>
       </div>
