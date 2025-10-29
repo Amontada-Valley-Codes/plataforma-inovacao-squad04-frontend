@@ -18,10 +18,10 @@ export default function ContactPage() {
 
     emailjs
       .send(
-        "service_uohjslh", // ✅ seu Service ID
-        "template_sxmev45", // ✅ seu Template ID
+        "service_uohjslh",
+        "template_sxmev45",
         form,
-        "C9fF9UztfXH_DxUC3" // ✅ sua Public Key
+        "C9fF9UztfXH_DxUC3" 
       )
       .then(() => {
         setStatus("success");
