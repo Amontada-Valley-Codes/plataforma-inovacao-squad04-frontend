@@ -1,11 +1,13 @@
-import { Calendar, CircleUserRound, SquarePen, Tag, Trash2 } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { Calendar, CircleUserRound, Heart, SquarePen, Tag, Trash2 } from "lucide-react";
+import { useState, useEffect, useCallback } from 'react';
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 import { ShowAllChecklistsResponse } from "@/api/payloads/checklist.payload";
 import { checklistService } from "@/api/services/checklist.service";
 import { cn } from "@/lib/utils";
 import { ShowAllTagsResponse } from "@/api/payloads/tags.payload";
 import { tagsService } from "@/api/services/tags.service";
+import { ShowAllIdeiasResponse } from "@/api/payloads/ideia.payload";
+import { ideiaService } from "@/api/services/ideia.service";
 
 type CardContentsHeaderProps = {
   challengeTitle: string;
@@ -27,6 +29,20 @@ export const getVisibilityLabel = (visibility: string) => {
       return "PRIVADO"
   }
 }
+
+export const toTitleCase = (text: string): string => {
+  if (!text) {
+    return "";
+  }
+
+  return text
+    .toLowerCase()
+    .split(' ')
+    .map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+};
 
 export const CardContentsHeader = ({ challengeTitle, category, creator, startDate, endDate, visibility }: CardContentsHeaderProps) => {
 
@@ -55,7 +71,7 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
         </div>
         <div className="flex items-center gap-2">
           <CircleUserRound size={20}/>
-          <p>{creator}</p>
+          <p>{toTitleCase(creator)}</p>
         </div>
       </div>
     </div>
@@ -294,6 +310,181 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
   )
 }
 
+type IdeaisProps = {
+  challengeId: string
+}
+
+export const Ideias = ({ challengeId }: IdeaisProps) => {
+  const [ideias, setIdeias] = useState<ShowAllIdeiasResponse['ideas']>([])
+  const [newIdeia, setNewIdeia] = useState("")
+  const [isAdding, setIsAdding] = useState(false)
+
+  const fetchIdeias = useCallback(async () => {
+    try {
+      const response = await ideiaService.showIdeias(challengeId)
+      setIdeias(response.ideas)
+      console.log(response.ideas)
+    } catch (error) {
+      console.error()
+    }
+  }, [challengeId])
+
+  useEffect(() => {
+    fetchIdeias()
+  }, [fetchIdeias])
+
+  const handleLike = async (ideiaId: string) => {
+    try {
+      await ideiaService.likeIdeia(ideiaId)
+      await fetchIdeias()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleApprove = async (ideiaId: string) => {
+    try {
+      await ideiaService.approveIdeia(ideiaId)
+      await fetchIdeias()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleReject = async (ideiaId: string) => {
+    try {
+      await ideiaService.rejectIdeia(ideiaId)
+      await fetchIdeias()
+    } catch (error) {
+      console.error(error)  
+    }
+  }
+
+  const addIdeia = async (challengeId: string, ideia: string) => {
+    try {
+      await ideiaService.createIdeia(challengeId, { ideia: ideia })
+      setNewIdeia("")
+      await fetchIdeias()   
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const deleteIdea = async (ideiaId: string) => {
+    try {
+      await ideiaService.deleteIdeia(ideiaId)
+      await fetchIdeias()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING": return "bg-yellow-300";
+      case "APPROVED": return "bg-green-500";
+      case "REJECTED": return "bg-red-500";
+      default: return "bg-gray-300";
+    }
+  }
+
+  const getStatusTitle = (status: string) => {
+     switch (status) {
+      case "PENDING": return "Pendente";
+      case "APPROVED": return "Aprovado";
+      case "REJECTED": return "Reprovado";
+      default: return "Desconhecido";
+    }
+  }
+
+  return (
+    <div className="flex items-start flex-col w-full gap-3 py-3">   
+      {ideias.map((ideia) => (
+        <div className="flex- w-full" key={ideia.id}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-4">
+              <span className="font-semibold text-base text-[#0B2B72]">{toTitleCase(ideia.userName)}</span>
+
+              <div 
+                className={`h-2 w-2 rounded-full ${getStatusColor(ideia.status)}`}
+                title={getStatusTitle(ideia.status)}
+              />
+            </div>
+
+            <Trash2
+              onClick={() => deleteIdea(ideia.id)}
+              size={16}
+              className="text-red-600 hover:text-red-800 transition-all 
+              duration-300 ease-in-out"
+            />
+          </div>
+          <p className="text-base text-gray-600">{ideia.ideia}</p>
+          <div className="flex justify-between items-center mt-3">
+            <div className="flex gap-1 items-center">
+              <Heart
+                size={18}
+                onClick={() => handleLike(ideia.id)}
+                className={`text-[#666] cursor-pointer`}
+              />
+              <span
+                className={`text-sm text-[#666]`}
+              >
+                {ideia.likesCount}
+              </span>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleReject(ideia.id)}
+                className="w-26 px-2 py-1 rounded-md font-semibold text-sm border border-[#0B2B72] text-[#0B2B72]"
+              >
+                Rejeitar
+              </button>
+
+              <button
+                onClick={() => handleApprove(ideia.id)}
+                className="w-26 px-2 py-1 rounded-md font-semibold text-white text-sm bg-[#0B2B72]"
+              >
+                Aprovar
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+      {isAdding && (
+        <div className="flex items-center gap-2 mt-4">
+          <input
+            type="text"
+            value={newIdeia}
+            onChange={(e) => setNewIdeia(e.target.value)}
+            placeholder="Nova sugestão.."
+            className="flex-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none ml-1 focus:ring focus:ring-[#0B2B72]"
+          />
+          <button
+            onClick={() => {
+              addIdeia(challengeId, newIdeia)
+              setIsAdding(false)
+            }}
+            className="flex items-center gap-1 px-2 py-1.5 text-sm rounded-[8px] text-[#666] bg-[#E2E2E2] hover:bg-gray-300 transition"
+          >
+            Adicionar
+          </button>
+        </div>
+      )}
+      {!isAdding && (
+        <button
+          onClick={() => setIsAdding(true)}
+          className="flex items-center gap-1 px-2 py-1.5 text-sm text-[#666] 
+          bg-[#E2E2E2] hover:bg-gray-300 rounded-[8px] transition mt-4"
+        >
+          Adicionar Sugestão
+        </button>
+      )}
+    </div>
+  );
+};
+
+
 type ChecklistProps = {
   challengeId: string;
 }
@@ -364,7 +555,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
   }
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full">
 
       <div className="flex flex-col gap-2 w-full">
         {items.map(item => (
@@ -440,7 +631,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             placeholder="Novo item..."
-            className="flex-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B2B72]"
+            className="flex-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none ml-1 focus:ring focus:ring-[#0B2B72]"
           />
           <button
             onClick={() => {
@@ -457,7 +648,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
           onClick={() => setIsAdding(true)}
           className="flex items-center gap-1 px-2 py-1.5 text-sm text-[#666] bg-[#E2E2E2] hover:bg-gray-300 rounded-[8px] transition mt-4"
         >
-          Adicionar
+          Adicionar Item
         </button>
       )}
     </div>
