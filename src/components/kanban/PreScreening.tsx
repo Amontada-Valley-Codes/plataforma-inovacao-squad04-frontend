@@ -83,8 +83,8 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
   }
 
   if (isLoading) {
-    return <div className="w-full justify-center items-center h-full animate-spin">
-      <Loader2 size={24}/>
+    return <div className="justify-center items-center h-full">
+      <Loader2 size={24} className="animate-spin"/>
     </div>
   }
 
