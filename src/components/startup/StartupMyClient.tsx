@@ -1,4 +1,5 @@
-// src/app/(startup)/startup/my-startup/page.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 import React, { useEffect } from "react";
 import { useStartupMe } from "@/hooks/useStartupMe";

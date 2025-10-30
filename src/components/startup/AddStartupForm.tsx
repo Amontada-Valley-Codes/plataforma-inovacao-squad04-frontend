@@ -55,6 +55,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
     website: "",
     description: "",
     liderEmail: "",
+    liderPhone: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -133,6 +134,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
           pitch: formData.pitch,
           description: formData.description,
           liderEmail: formData.liderEmail,
+          liderPhone: formData.liderPhone,
           useful_links: {
             github: formData.github,
             linkedin: formData.linkedin,
@@ -140,10 +142,13 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
           },
         };
 
-        await Promise.all([
-          startupService.createStartup(payload),
-          new Promise((resolve) => setTimeout(resolve, 1500)),
-        ]);
+        const response = await startupService.createStartup(payload);
+
+        const to = formData.liderPhone.replace(/\D/g, "");
+        const message = `Olá! Sua empresa foi cadastrada com sucesso.\nConclua seu cadastro aqui: ${response.token.zap}\n`;
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappURL = `https://wa.me/55${to}?text=${encodedMessage}`;
+        window.open(whatsappURL, "_blank");
 
         showCustomToast("Startup cadastrada com sucesso!", "success");
         setSuccess(true);
@@ -416,6 +421,23 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
                 placeholder="Email do líder"
                 value={formData.liderEmail}
                 onChange={(e) => handleChange("liderEmail", e.target.value)}
+                className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
+              />
+            </div>
+            {errors.liderEmail && (
+              <p className="text-xs text-red-500 mt-1">{errors.liderEmail}</p>
+            )}
+          </div>
+          
+          {/* Líder Phone */}
+          <div>
+            <div className={inputClass("founders")}>
+              <User className="text-[#98A2B3] mr-2" size={16} />
+              <input
+                type="tel"
+                placeholder="Telefone do líder"
+                value={formData.liderPhone}
+                onChange={(e) => handleChange("liderPhone", e.target.value)}
                 className="w-full bg-transparent outline-none text-[#344054] dark:text-[#ced3db]"
               />
             </div>

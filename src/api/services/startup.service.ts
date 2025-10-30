@@ -1,24 +1,22 @@
-// src/api/services/startup.service.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 import type {
+  CreateStartupPayload,
+  CreateStartupResponse,
   ShowAllStartupsResponse,
   UpdateStartupPayload,
 } from "../payloads/startup.payload";
 
-/* ------------------------------- Helpers ------------------------------- */
-
-// Evita cache agressivo de CDN inserindo um query param
 function withBust(url: string) {
   const sep = url.includes("?") ? "&" : "?";
   return `${url}${sep}v=${Date.now()}`;
 }
 
-// Remove campos vazios e normaliza formatos sensíveis
 function cleanPayload(p: UpdateStartupPayload): UpdateStartupPayload {
   const norm: UpdateStartupPayload = {
     ...p,
-    // se existir whatsapp/instagram em string, normaliza formatos comuns
     whatsapp: p.whatsapp ? p.whatsapp.replace(/\D+/g, "") : undefined,
     instagram: p.instagram ? p.instagram.replace(/^@/, "") : undefined,
   };
@@ -32,7 +30,6 @@ function cleanPayload(p: UpdateStartupPayload): UpdateStartupPayload {
   return norm;
 }
 
-// Compara original x editado e devolve só o que mudou (superficial)
 function diffPayload(
   original: Partial<ShowAllStartupsResponse>,
   edited: UpdateStartupPayload
@@ -42,7 +39,6 @@ function diffPayload(
     const before = (original as any)?.[k];
     const after = (edited as any)?.[k];
 
-    // compara como string para evitar false-positives (ex.: 0 vs "0")
     if (String(before ?? "") !== String(after ?? "")) {
       (out as any)[k] = after;
     }
@@ -50,10 +46,8 @@ function diffPayload(
   return out;
 }
 
-/* -------------------------------- Service ------------------------------- */
 
 export const startupService = {
-  // Listagem completa (usado pelo StartupCard)
   async showAllStartups(): Promise<ShowAllStartupsResponse[]> {
     try {
       const { data } = await api.get<ShowAllStartupsResponse[]>(
@@ -76,7 +70,6 @@ export const startupService = {
     }
   },
 
-  // Traz a startup do usuário logado
   async getMyStartup(): Promise<ShowAllStartupsResponse> {
     const url = withBust(ENDPOINTS.STARTUP.ME);
     const { data } = await api.get(url, {
@@ -85,12 +78,10 @@ export const startupService = {
     return data;
   },
 
-  // Alias para compatibilidade
   async showStartupMe(): Promise<ShowAllStartupsResponse> {
     return this.getMyStartup();
   },
 
-  // Update parcial com limpeza + diff opcional
   async updateOne(
     id: string,
     payload: UpdateStartupPayload,
@@ -121,7 +112,6 @@ export const startupService = {
     return data ?? (await this.getMyStartup());
   },
 
-  // Upload de capa → refetch do /me
   async updateCoverImage(
     file: File,
     opts?: { startupId?: string }
@@ -137,7 +127,6 @@ export const startupService = {
     return await this.getMyStartup();
   },
 
-  // Upload de avatar → refetch do /me
   async updateProfileImage(
     file: File,
     opts?: { startupId?: string }
@@ -152,4 +141,20 @@ export const startupService = {
     await api.patch(ENDPOINTS.STARTUP.PATCH_PROFILE, form);
     return await this.getMyStartup();
   },
+
+  async createStartup(
+    payload: CreateStartupPayload
+  ): Promise<CreateStartupResponse> {
+    try {
+      const response = await api.post(ENDPOINTS.STARTUP.CREATE, payload);
+      console.log(response.data);
+      return response.data;
+    } catch (err: any) {
+      console.error("[STARTUP] POST /api/startup falhou:", {
+        status: err?.response?.status,
+        url: err?.config?.url,
+        data: err?.response?.data,
+      });
+      throw err
+    }}
 };
