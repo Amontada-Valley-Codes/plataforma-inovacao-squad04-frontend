@@ -84,7 +84,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative w-full h-screen flex flex-col bg-[url('/images/bg-details.svg')] bg-cover bg-center">
+    <div className="relative w-full h-screen flex flex-col bg-cover bg-center">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B005E]/40 via-[#0B005E]/20 to-[#0B005E]/60" />
 
       {/* NAVBAR */}
