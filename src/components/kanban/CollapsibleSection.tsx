@@ -6,6 +6,8 @@ import { Comment } from './Comment';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { FilteredCommentReponse, CreateCommentPayload } from '@/api/payloads/commentsFunel.payload';
 import { commentsService } from '@/api/services/commentsFunnel.service';
+import { showCustomToast } from './KanbanToaster';
+import { Toaster } from 'react-hot-toast';
 
 
 type CollapsibleSectionProps = {
@@ -56,12 +58,14 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
       fetchComments()
     } catch (err) {
       console.error('Erro ao criar comentário:', err)
-      alert('Erro ao enviar comentário.')
+      showCustomToast('Erro ao enviar comentário.', "error")
     }
   }
 
   return (
     <div className="border-b border-gray-200 last:border-b-0">
+      <Toaster position="top-right" reverseOrder={false} />
+
       {/* header clicavel para abrir/fechar a seçao */}
       <button
         onClick={() => setIsOpen(!isOpen)}

@@ -7,6 +7,8 @@ import { Target, ClipboardList, Users, ChartNoAxesCombined, ClipboardPen, Trash2
 import { ShowExperimentationResponse, UpdateExperimentationPayload, CreateExperimentationPayload } from "@/api/payloads/experimentation.payload";
 import { experimentationService } from "@/api/services/experimentation.service";
 import { kpisService } from "@/api/services/kpi.service";
+import { showCustomToast } from "./KanbanToaster";
+import { Toaster } from "react-hot-toast";
 
 type CardExperimentationContentProps = {
   challangeTitle: string;
@@ -91,7 +93,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
   const updateKpi = async (kpiId: string, newName: string, newTarget: string) => {
     if (!newName.trim() || !newTarget.trim()) {
-      alert("Nome e Meta do KPI não podem estar vazios.");
+      showCustomToast("Nome e Meta do KPI não podem estar vazios.", "error");
       return;
     }
 
@@ -220,6 +222,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
   return (
     <div  className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <CardContentsHeader
         challengeTitle={challangeTitle}
         category={category}

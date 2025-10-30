@@ -8,6 +8,9 @@ import { Rating, ProgressBarActions } from "./CardsContents"
 import { ShowDetailedScreeningResponse, CreateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
 import { detailedScreeningService } from "@/api/services/detailedScreening.service"
 import { UpdateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
+import { showCustomToast } from "./KanbanToaster"
+import { Toaster } from "react-hot-toast"
+
 
 type CardDetailedScreeningContentProps = {
   challangeTitle: string;
@@ -147,7 +150,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
   const handleVote = async () => {
     if (!detailedScreening) {
-      console.log("❌ Erro ao registrar voto: dados não carregados.");
+      showCustomToast("Erro ao registrar voto: dados não carregados.", "error");
       return
     }
 
@@ -158,10 +161,10 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       );
       console.log(response.message);
       setDetailedScreening(prev => prev ? { ...prev, porcentagemMedia: response.porcentagemMedia } : prev);
-      console.log("✅ " + response.message);
+      showCustomToast(response.message, "success");
     } catch (err) {
       console.error(err);
-      console.error("❌ Erro ao registrar voto", err);
+      showCustomToast("Você ja votou.", "error");
     }
   };
 
