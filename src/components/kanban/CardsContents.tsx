@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Calendar, Check, CircleUserRound, Heart, Loader2, SquarePen, Tag, Trash2, X } from "lucide-react";
 import { useState, useEffect, useCallback } from 'react';
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
@@ -561,8 +563,8 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingText, setEditingText] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>()
+  const [isLoading] = useState(false)
+  const [error] = useState<string | null>()
 
   useEffect(() => {
     async function fetchChecklists() {

@@ -35,6 +35,7 @@ export default function RegisterStartup() {
     phone: "",
   });
 
+  
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isTechnologyOpen, setIsTechnologyOpen] = useState(false);
   const [isIndustryOpen, setIsIndustryOpen] = useState(false);
@@ -86,7 +87,7 @@ export default function RegisterStartup() {
       }`;
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] text-white px-4">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] text-white px-4 border-l-2 border-[#C7E6FE]">
       <div className="relative w-[100px] h-[90px] mb-">
         <Image src="/images/logo/ninna-logo.svg" alt="ninna-logo" fill className="object-contain" />
       </div>

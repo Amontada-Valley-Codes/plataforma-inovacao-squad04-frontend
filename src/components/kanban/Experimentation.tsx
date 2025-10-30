@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client"
 import { useEffect, useState } from "react";
 import { CardContentsHeader, Rating } from "./CardsContents"
@@ -54,7 +56,6 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
         setExperimentation(response); 
         setKpis(response?.Kpis || []);
-        const responsible = experimentation?.responsible?.[0] ?? { empresa: "", startup: "" };
 
         
       } catch (err: any) {
