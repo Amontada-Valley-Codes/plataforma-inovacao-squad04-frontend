@@ -3,7 +3,7 @@
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import Image from "next/image";
-import { Linkedin, Instagram, Phone } from "lucide-react";
+import { Linkedin, Instagram, Phone, Loader2 } from "lucide-react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -93,19 +93,21 @@ export default function ContactPage() {
             <button
               type="submit"
               disabled={status === "loading" || status === "success"}
-              className={`w-full py-3 rounded-lg font-semibold text-white transition-all duration-300 ${
+              className={`w-full py-3 rounded-lg font-semibold text-white flex justify-center items-center gap-2 transition-all duration-300 ${
                 status === "loading"
                   ? "bg-[#3b3b80] cursor-wait"
                   : status === "success"
-                  ? "bg-[#44E043] text-blue-900"
+                  ? "bg-[#3b3b80] text-blue-900"
                   : "bg-gradient-to-r from-[#1A26B8] to-[#0B0450] hover:opacity-90"
               }`}
             >
-              {status === "loading"
-                ? "Enviando..."
-                : status === "success"
-                ? "Mensagem Enviada!"
-                : "Enviar Mensagem"}
+              {status === "loading" ? (
+                <Loader2 className="animate-spin w-6 h-6" />
+              ) : status === "success" ? (
+                "Mensagem Enviada!"
+              ) : (
+                "Enviar Mensagem"
+              )}
             </button>
           </form>
         </div>
@@ -113,16 +115,20 @@ export default function ContactPage() {
 
       {/* RODAPÉ */}
       <div className="flex flex-col items-center gap-3 py-6">
-        <div className="flex gap-4 text-white">
-          <a href="#" className="hover:text-[#A2FF00]">
-            <Linkedin size={20} />
-          </a>
-          <a href="#" className="hover:text-[#A2FF00]">
-            <Phone size={20} />
-          </a>
-          <a href="#" className="hover:text-[#A2FF00]">
-            <Instagram size={20} />
-          </a>
+        <div className="flex gap-6 text-white">
+          {[
+            { icon: <Linkedin size={22} />, href: "#" },
+            { icon: <Phone size={22} />, href: "#" },
+            { icon: <Instagram size={22} />, href: "#" },
+          ].map((item, i) => (
+            <a
+              key={i}
+              href={item.href}
+              className="transition-all duration-300 transform hover:-translate-y-1 hover:text-[#A2FF00]"
+            >
+              {item.icon}
+            </a>
+          ))}
         </div>
       </div>
     </section>
