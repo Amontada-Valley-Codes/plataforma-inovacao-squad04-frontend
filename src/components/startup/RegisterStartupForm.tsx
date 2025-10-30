@@ -35,6 +35,7 @@ export default function RegisterStartup() {
     phone: "",
   });
 
+  
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isTechnologyOpen, setIsTechnologyOpen] = useState(false);
   const [isIndustryOpen, setIsIndustryOpen] = useState(false);
