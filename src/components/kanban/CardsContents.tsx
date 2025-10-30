@@ -10,11 +10,11 @@ import { ShowAllIdeiasResponse } from "@/api/payloads/ideia.payload";
 import { ideiaService } from "@/api/services/ideia.service";
 
 type CardContentsHeaderProps = {
-  challengeTitle: string;
-  category: string;
-  creator: string;
-  startDate: string;
-  endDate: string;
+  challengeTitle?: string;
+  category?: string;
+  creator?: string;
+  startDate?: string;
+  endDate?: string;
   visibility?: string;
 }
 
@@ -50,9 +50,11 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
     <div className="mb-4">
       <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-1">{challengeTitle}</h1>
       <div className="flex gap-2 mb-2">
-        <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
-          {getCategoryLabel(category)}
-        </button>
+        {category && (
+          <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
+            {getCategoryLabel(category)}
+          </button>
+        )}
 
         {visibility && (
           <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
@@ -62,17 +64,21 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
       </div>
 
       <div className="flex gap-4 text-gray-600">
-        <div className="flex items-center gap-2">
-          <Calendar size={16}/>
-          <p>
-            {shortDateFormatter.format(new Date(startDate))} -{" "}
-            {dateFormatter.format(new Date(endDate))}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <CircleUserRound size={20}/>
-          <p>{toTitleCase(creator)}</p>
-        </div>
+        {endDate && startDate && (
+          <div className="flex items-center gap-2">
+            <Calendar size={16}/>
+            <p>
+              {shortDateFormatter.format(new Date(startDate))} -{" "}
+              {dateFormatter.format(new Date(endDate))}
+            </p>
+          </div>
+        )}
+        {creator && (
+          <div className="flex items-center gap-2">
+            <CircleUserRound size={20}/>
+            <p>{toTitleCase(creator)}</p>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -223,8 +229,8 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
   }
 
   if (isLoading) {
-    return <div className="w-full justify-center items-center h-full animate-spin">
-      <Loader2 size={24}/>
+    return <div className="w-full justify-center items-center h-full">
+      <Loader2 size={24} className="animate-spin"/>
     </div>
   }
 
@@ -452,8 +458,8 @@ export const Ideias = ({ challengeId }: IdeaisProps) => {
   }
 
   if (isLoading) {
-    return <div className="w-full justify-center items-center h-full animate-spin">
-      <Loader2 size={24}/>
+    return <div className="w-full justify-center items-center h-full">
+      <Loader2 size={24} className="animate-spin"/>
     </div>
   }
 
@@ -623,8 +629,8 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
   }
 
   if (isLoading) {
-    return <div className="w-full justify-center items-center h-full animate-spin">
-      <Loader2 size={24}/>
+    return <div className="w-full justify-center items-center h-full">
+      <Loader2 size={24} className="animate-spin"/>
     </div>
   }
 
@@ -633,7 +639,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
 
       <div className="flex flex-col gap-2 w-full">
         {items.map(item => (
-          <div key={item.id} className="flex items-center gap-2 text-sm cursor-pointer select-none">
+          <div key={item.id} className="flex items-center gap-2 text-sm  mt-4 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={item.completed}
