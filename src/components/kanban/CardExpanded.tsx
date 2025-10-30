@@ -153,7 +153,7 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
     <div className="relative flex flex-col justify-between w-full h-full">
       <div className="w-full flex flex-col">
         <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
-        <div className="relative flex w-full justify-around">
+        <div className="relative flex w-full justify-around mb-4">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setVisibility("PRIVATE")}

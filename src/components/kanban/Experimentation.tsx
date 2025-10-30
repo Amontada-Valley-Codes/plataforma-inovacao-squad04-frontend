@@ -52,6 +52,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
         setExperimentation(response); 
         setKpis(response?.Kpis || []);
+        const responsible = experimentation?.responsible?.[0] ?? { empresa: "", startup: "" };
+
         
       } catch (err: any) {
         console.error(err);
@@ -73,6 +75,10 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     if (!newName.trim() || !newTarget.trim()) return
 
     try {
+      newTarget = newTarget.trim().endsWith('%') 
+      ? newTarget.trim() 
+      : `${newTarget.trim()}%`;
+
       const newKpi = await kpisService.createKpi(experimentationId, { name: newName, target: newTarget })
       setKpis((prev) => [...prev, newKpi])
       setName('') 
@@ -89,6 +95,10 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     }
 
     try {
+      newTarget = newTarget.trim().endsWith('%') 
+      ? newTarget.trim() 
+      : `${newTarget.trim()}%`;
+
       await kpisService.updateKpi(kpiId, { name: newName, target: newTarget });
       
       setKpis(prevKpis => 
@@ -107,10 +117,6 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   };
 
   const handleDeleteKpi = async (kpiId: string) => {
-    
-    if (!window.confirm("Tem certeza que deseja excluir este KPI?")) {
-      return;
-    }
 
     try {
       await kpisService.deleteKpi(kpiId);
@@ -197,6 +203,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     }
   };
 
+  const responsible = experimentation?.responsible?.[0] ?? { empresa: "", startup: "" };
+
   if (error) {
     return <div className="w-full justify-center items-center h-full">
       {error}
@@ -258,7 +266,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
               <input 
                 type="date" 
                 placeholder="Prazo"
-                value={experimentation?.deadline}
+                value={experimentation?.deadline ?? ""}
                 onChange={(e) => handleChange("deadline", e.target.value)}
                 className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
               />
@@ -419,6 +427,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
             <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
               <input 
                 type="text" 
+                value={responsible.empresa}
+                onChange={(e) => handleChangeResponsible("empresa", e.target.value)}
                 placeholder="Empresa"
                 className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
               />
@@ -429,6 +439,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
             <div className="flex-1 flex items-center rounded-lg border p-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
               <input 
                 type="text" 
+                value={responsible.startup}
+                onChange={(e) => handleChangeResponsible("startup", e.target.value)}
                 placeholder="Startup"
                 className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
               />

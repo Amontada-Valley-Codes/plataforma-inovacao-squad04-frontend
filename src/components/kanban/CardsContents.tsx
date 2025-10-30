@@ -1,4 +1,4 @@
-import { Calendar, CircleUserRound, Heart, Loader2, SquarePen, Tag, Trash2 } from "lucide-react";
+import { Calendar, Check, CircleUserRound, Heart, Loader2, SquarePen, Tag, Trash2, X } from "lucide-react";
 import { useState, useEffect, useCallback } from 'react';
 import { dateFormatter, getCategoryLabel, shortDateFormatter } from "./Kanban";
 import { ShowAllChecklistsResponse } from "@/api/payloads/checklist.payload";
@@ -638,7 +638,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
     <div className="w-full">
 
       <div className="flex flex-col gap-2 w-full">
-        {items.map(item => (
+        {items.map(item => (   
           <div key={item.id} className="flex items-center gap-2 text-sm  mt-4 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -646,59 +646,77 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
               onChange={() => toggleItem(item.id)}
               className="w-4 h-4 accent-gray-600 rounded"
             />
-            <div className="flex items-center w-[60%] justify-between">
+            <div className="flex items-center w-[60%] gap-2 justify-between">
               {editingId === item.id ? (
-                <input
-                  value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)}
-                  onBlur={() => {
-                    if (editingText.trim()) updateItem(item.id, editingText)
-                    setEditingId(null)
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      updateItem(item.id, editingText)
+                <>
+                  <input
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    onBlur={() => {
                       setEditingId(null)
-                    }
-                    if (e.key === 'Escape') {
-                      setEditingId(null)
-                      setEditingText('')
-                    }
-                  }}
-                  className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
-                  autoFocus
-                />
-              ) : (
-                <span className={item.completed ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}>
-                  {item.text}
-                </span>
-              )}
-
-              <div className="relative flex h-5 items-end gap-2">
-                <button title="Editar Item">
-                  <SquarePen 
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setEditingId(item.id)
-                      setEditingText(item.text)
                     }}
-                    size={16}
-                    className="text-[#0B2B72] 
-                    hover:text-[#0b245a] transition-all duration-300 ease-in-out"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        if (editingText.trim()) updateItem(item.id, editingText)
+                        setEditingId(null)
+                      }
+                      if (e.key === 'Escape') {
+                        setEditingId(null)
+                        setEditingText('')
+                      }
+                    }}
+                    className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
+                    autoFocus
                   />
-                </button>
-                <button title="Excluir Item">
-                  <Trash2
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      deleteItem(item.id)
+                  <button 
+                    onClick={() => {
+                      if (editingText.trim()) updateItem(item.id, editingText)
                     }} 
-                    size={16}
-                    className="text-red-600 hover:text-red-800 transition-all 
-                    duration-300 ease-in-out"
-                  />
-                </button>
-              </div>
+                    className="p-2 text-green-600 hover:text-green-800" 
+                    title="Salvar"
+                  >
+                    <Check size={16} />
+                  </button>
+                  <button 
+                    onClick={() => setEditingId(null)} 
+                    className="p-2 text-gray-600 hover:text-gray-800" 
+                    title="Cancelar"
+                  >
+                    <X size={16} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className={item.completed ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}>
+                    {item.text}
+                  </span>
+                  <div className="relative flex h-5 items-end gap-2">
+                    <button title="Editar Item">
+                      <SquarePen 
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditingId(item.id)
+                          setEditingText(item.text)
+                        }}
+                        size={16}
+                        className="text-[#0B2B72] 
+                        hover:text-[#0b245a] transition-all duration-300 ease-in-out"
+                      />
+                    </button>
+                    <button title="Excluir Item">
+                      <Trash2
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deleteItem(item.id)
+                        }} 
+                        size={16}
+                        className="text-red-600 hover:text-red-800 transition-all 
+                        duration-300 ease-in-out"
+                      />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ))}
