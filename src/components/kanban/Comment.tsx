@@ -3,7 +3,7 @@ import { commentsService } from "@/api/services/commentsFunnel.service";
 import { useState } from "react";
 import { toTitleCase } from "./CardsContents";
 import { shortDateFormatter } from "./Kanban";
-import { Heart, ThumbsUp, Trash2 } from "lucide-react";
+import { Heart, Trash2 } from "lucide-react";
 
 type CommentProps = {
   commentData: FilteredCommentReponse;

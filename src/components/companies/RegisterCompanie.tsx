@@ -3,7 +3,6 @@
   import { useState } from "react";
   import Image from "next/image";
   import { Building2, FileText, Layers, User, Mail, MapPin, AlignLeft } from "lucide-react";
-  import { enterpriseService } from "@/api/services/enterprise.service";
 
   export default function RegisterCompany() {
     const [formData, setFormData] = useState({
@@ -22,14 +21,6 @@
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-
-      try {
-        const data = await enterpriseService.createEnterprise(formData);
-        localStorage.setItem("access_token", data?.token?.token ?? "");
-        console.log("✅ Dados enviados:", data.token.message);
-      } catch (err) {
-        console.error("❌ Erro ao enviar:", err);
-      }
     };
 
     return (

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */ 
+
 "use client"
 import { CardContentsHeader } from "./CardsContents"
 import { useEffect, useState } from "react"
@@ -6,7 +8,6 @@ import { Rating, ProgressBarActions } from "./CardsContents"
 import { ShowDetailedScreeningResponse, CreateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
 import { detailedScreeningService } from "@/api/services/detailedScreening.service"
 import { UpdateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
-import { AiOutlineLoading } from "react-icons/ai";
 
 type CardDetailedScreeningContentProps = {
   challangeTitle: string;
