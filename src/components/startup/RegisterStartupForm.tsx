@@ -40,7 +40,6 @@ export default function RegisterStartup() {
   const [isIndustryOpen, setIsIndustryOpen] = useState(false);
   const [isProblemsOpen, setIsProblemsOpen] = useState(false);
   const [isMaturityOpen, setIsMaturityOpen] = useState(false);
-
   const handleChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: "" });
