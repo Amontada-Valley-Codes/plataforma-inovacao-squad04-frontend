@@ -416,7 +416,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                   />
                 }
-                commentsContent={<CommentsPanel sections={challangeCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={challangeCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -438,7 +438,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                   />
                 }
-                commentsContent={<CommentsPanel sections={preScreeningCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={preScreeningCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -460,7 +460,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   />
                 }
                 commentsContent={
-                  <CommentsPanel sections={detailedScreeningCommentSections}/>
+                  <CommentsPanel challengeId={cardData.id} sections={detailedScreeningCommentSections}/>
                 }
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
@@ -482,7 +482,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     startDate={cardData.startDate}
                   />
                 }
-                commentsContent={<CommentsPanel sections={ideationCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={ideationCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -504,7 +504,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     visibility={cardData.visibility}
                   />
                 }
-                commentsContent={<CommentsPanel sections={experimentationCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={experimentationCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}

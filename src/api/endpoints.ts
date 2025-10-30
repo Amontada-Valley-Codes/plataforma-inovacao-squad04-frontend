@@ -111,7 +111,7 @@ export const ENDPOINTS = {
     UPDATE_COMMENT: (id: string) => `/comments-funnel/${id}`,
     DELETE_COMMENT: (id: string) => `/comments-funnel/${id}`,
     LIKED_COMMENT: (id: string) => `/comments-funnel/${id}/like`,
-    FILTERED_COMMENT: (id: string, context: string) => `/comments-funnel/filter/${context}/${id}`
+    FILTERED_COMMENT: (id: string, context: string) => `/comments-funnel/filter/context/${id}?context=${encodeURIComponent(context)}`
   },
 
   USER: {
