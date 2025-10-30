@@ -115,7 +115,7 @@ export default function LandingPage() {
           </button>
 
           {/* Menu Desktop */}
-          <div className="hidden [@media(min-width:913px)]:flex items-center gap-10 text-sm font-medium text-white relative">
+          <div className="hidden [@media(min-width:1260px)]:flex items-center gap-10 text-sm font-medium text-white relative">
             <Link href="#sobre" className="hover:text-[#62D105] transition">Sobre</Link>
             <Link href="#plataforma-inovacao" className="hover:text-[#62D105] transition">Conheça o Sistema</Link>
             <Link href="#funil-inovacao" className="hover:text-[#62D105] transition">Funil de Inovação</Link>
@@ -242,7 +242,7 @@ export default function LandingPage() {
 
           {/* Botão Mobile */}
           <button
-            className="text-white [@media(min-width:913px)]:hidden"
+            className="text-white [@media(min-width:1260px)]:hidden"
             onClick={() => setMenuOpen(true)}
             aria-label="Abrir menu"
             aria-controls="mobile-drawer"
