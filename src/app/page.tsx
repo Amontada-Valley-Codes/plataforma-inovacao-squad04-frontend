@@ -19,8 +19,8 @@ export default function LadingPage() {
       <LandingPage />
       <PlataformaInovacao />
       <InnovationFunnel/>
-      <FeaturesSection/>
       <HeroSection/>
+      <FeaturesSection/>
       <ContactPage/>
     </div>
   );

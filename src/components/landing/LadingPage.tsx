@@ -294,7 +294,7 @@ export default function LandingPage() {
                 onClick={() => document.getElementById("plataforma-inovacao")?.scrollIntoView({ behavior: "smooth" })}
                 className="bg-[#62D105] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition"
               >
-                Descubra Mais
+                Saiba Mais
               </motion.button>
             </motion.div>
           </motion.div>
