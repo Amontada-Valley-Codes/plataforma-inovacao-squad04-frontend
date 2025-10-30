@@ -91,9 +91,8 @@ export default function LandingPage() {
       <motion.nav
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 0.4 } }}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled ? "bg-[#0B005E]/90 backdrop-blur-md shadow-md" : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-[#0B005E]/90 backdrop-blur-md shadow-md" : "bg-transparent"
+          }`}
         role="navigation"
         aria-label="Navegação principal"
       >
@@ -160,16 +159,16 @@ export default function LandingPage() {
                     >
                       Sobre
                     </Link>
-                    
+
                     <Link
-                      href="/auth/login"
+                      href="/challenges-publicos"
                       className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"
                       role="menuitem"
                       onClick={() => setStartupOpen(false)}
                     >
                       Visualizar Desafios
                     </Link>
-                    
+
                     <Link
                       href="/auth/register-startups"
                       className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"

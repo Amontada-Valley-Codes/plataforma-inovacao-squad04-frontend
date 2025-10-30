@@ -92,6 +92,15 @@ function useCurrentRole(): Role {
 }
 
 function buildNavItems(role: Role, pathname: string, companyIdFromToken: string | null): NavItem[] {
+
+  if (pathname.startsWith("/challenges-publicos")) {
+    return [
+      { icon: <GridIcon />, name: "Desafios Públicos", path: "/challenges-publicos" },
+      { icon: <RocketLaunchIcon />, name: "Startup", path: "/startup/my-startup" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
+    ];
+  }
+  
   let companyId = extractCompanyIdFromPath(pathname);
   if (!companyId && companyIdFromToken) {
     companyId = companyIdFromToken;
