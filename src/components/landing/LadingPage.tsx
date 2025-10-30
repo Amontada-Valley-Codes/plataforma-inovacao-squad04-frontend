@@ -13,15 +13,32 @@ import {
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false); // Registre-se
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Registre-se (desktop)
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [startupOpen, setStartupOpen] = useState(false);   // Startups
+  const [startupOpen, setStartupOpen] = useState(false);   // Startups (desktop)
   const startupRef = useRef<HTMLDivElement>(null);
 
-  const [dropdownMobileOpen, setDropdownMobileOpen] = useState(false);
+  const [dropdownMobileOpen, setDropdownMobileOpen] = useState(false); // Registre-se (mobile)
+  const [startupMobileOpen, setStartupMobileOpen] = useState(false);   // Startups (mobile)
+
   const [scrolled, setScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+
+  // ---------- Helpers de scroll com offset ----------
+  const ease = cubicBezier(0.22, 1, 0.36, 1);
+  const NAV_OFFSET_DESKTOP = 64; // altura aproximada da navbar no desktop (h-16 + padding)
+  const NAV_OFFSET_MOBILE  = 64; // altura ligeiramente maior no mobile
+
+  const getOffset = () => (window.innerWidth < 913 ? NAV_OFFSET_MOBILE : NAV_OFFSET_DESKTOP);
+
+  function scrollToWithOffset(id: string) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const off = getOffset();
+    const y = el.getBoundingClientRect().top + window.scrollY - off;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
 
   // Fecha dropdowns clicando fora
   useEffect(() => {
@@ -46,6 +63,7 @@ export default function LandingPage() {
         setDropdownOpen(false);
         setStartupOpen(false);
         setDropdownMobileOpen(false);
+        setStartupMobileOpen(false);
       }
     };
     document.addEventListener("keydown", handleEsc);
@@ -60,8 +78,6 @@ export default function LandingPage() {
   }, []);
 
   // Variants SEM bug de tipos no framer v11
-  const ease = cubicBezier(0.22, 1, 0.36, 1);
-
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 18 },
     show: { opacity: 1, y: 0, transition: { duration: 0.55, ease } },
@@ -84,7 +100,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative w-full h-screen flex flex-col bg-[url('/images/bg-details.svg')] bg-cover bg-center">
+    <div className="relative w-full h-screen flex flex-col bg-cover bg-center">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B005E]/40 via-[#0B005E]/20 to-[#0B005E]/60" />
 
       {/* NAVBAR */}
@@ -114,7 +130,7 @@ export default function LandingPage() {
           </button>
 
           {/* Menu Desktop */}
-          <div className="hidden [@media(min-width:1260px)]:flex items-center gap-10 text-sm font-medium text-white relative">
+          <div className="hidden [@media(min-width:913px)]:flex items-center gap-10 text-sm font-medium text-white relative">
             <Link href="#sobre" className="hover:text-[#62D105] transition">Sobre</Link>
             <Link href="#plataforma-inovacao" className="hover:text-[#62D105] transition">Conheça o Sistema</Link>
             <Link href="#funil-inovacao" className="hover:text-[#62D105] transition">Funil de Inovação</Link>
@@ -124,7 +140,7 @@ export default function LandingPage() {
               <button
                 onClick={() => {
                   setStartupOpen((p) => !p);
-                  setDropdownOpen(false); // fecha "Registre-se" se estiver aberto
+                  setDropdownOpen(false);
                 }}
                 className="flex items-center gap-1 hover:text-[#62D105] transition"
                 aria-haspopup="menu"
@@ -169,6 +185,7 @@ export default function LandingPage() {
                       Visualizar Desafios
                     </Link>
 
+
                     <Link
                       href="/auth/register-startups"
                       className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"
@@ -182,15 +199,28 @@ export default function LandingPage() {
               </AnimatePresence>
             </div>
 
-            <Link href="#resumo" className="hover:text-[#62D105] transition">Resumo</Link>
-            <Link href="#contatos" className="hover:text-[#62D105] transition">Contatos</Link>
+            <Link
+              href="#resumo"
+              onClick={(e) => { e.preventDefault(); scrollToWithOffset("resumo"); }}
+              className="hover:text-[#62D105] transition"
+            >
+              Resumo
+            </Link>
 
-            {/* Dropdown Registre-se */}
+            <Link
+              href="#contatos"
+              onClick={(e) => { e.preventDefault(); scrollToWithOffset("contatos"); }}
+              className="hover:text-[#62D105] transition"
+            >
+              Contatos
+            </Link>
+
+            {/* Dropdown Registre-se (desktop) */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => {
                   setDropdownOpen((prev) => !prev);
-                  setStartupOpen(false); // fecha "Startups" se estiver aberto
+                  setStartupOpen(false);
                 }}
                 className="flex items-center gap-1 hover:text-[#62D105] transition"
                 aria-haspopup="menu"
@@ -215,9 +245,6 @@ export default function LandingPage() {
                     className="absolute left-0 mt-2 w-52 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-hidden z-30"
                     role="menu"
                   >
-                    <Link href="/auth/register" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
-                      Registre-se
-                    </Link>
                     <Link href="/auth/register-startups" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
                       Registrar Startup
                     </Link>
@@ -255,7 +282,7 @@ export default function LandingPage() {
       {/* Espaço para compensar nav fixa */}
       <div className="h-[80px]" />
 
-      {/* Overlay escurecido (mobile) + Drawer Mobile */}
+      {/* Overlay + Drawer Mobile */}
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -291,15 +318,106 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col gap-5 px-6 py-6 text-lg font-medium">
-                <Link href="#sobre" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Sobre</Link>
-                <Link href="#plataforma-inovacao" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Saiba mais</Link>
-                <Link href="#funil-inovacao" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Funil de Inovação</Link>
+                <a
+                  href="#sobre"
+                  onClick={(e) => { e.preventDefault(); scrollToWithOffset("sobre"); setMenuOpen(false); }}
+                  className="hover:text-[#62D105] transition"
+                >
+                  Sobre
+                </a>
 
-                {/* Startups no mobile (simples) */}
-                <Link href="#startups" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Startups</Link>
+                <a
+                  href="#plataforma-inovacao"
+                  onClick={(e) => { e.preventDefault(); scrollToWithOffset("plataforma-inovacao"); setMenuOpen(false); }}
+                  className="hover:text-[#62D105] transition"
+                >
+                  Saiba mais
+                </a>
 
-                <Link href="#resumo" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Resumo</Link>
-                <Link href="#contatos" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Contatos</Link>
+                <a
+                  href="#funil-inovacao"
+                  onClick={(e) => { e.preventDefault(); scrollToWithOffset("funil-inovacao"); setMenuOpen(false); }}
+                  className="hover:text-[#62D105] transition"
+                >
+                  Funil de Inovação
+                </a>
+
+                {/* Startups (MOBILE DROPDOWN) */}
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => setStartupMobileOpen((prev) => !prev)}
+                    className="flex items-center gap-1 hover:text-[#62D105] transition"
+                    aria-haspopup="menu"
+                    aria-expanded={startupMobileOpen}
+                  >
+                    Startups
+                    <motion.span
+                      animate={{ rotate: startupMobileOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="inline-flex"
+                    >
+                      <ChevronDown size={16} />
+                    </motion.span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {startupMobileOpen && (
+                      <motion.div
+                        key="mobile-startups-dropdown"
+                        variants={pop}
+                        initial="hidden"
+                        animate="show"
+                        exit="exit"
+                        className="overflow-hidden"
+                      >
+                        <div className="flex flex-col pl-3 border-l border-white/20 gap-2 mt-2">
+                          <a
+                            href="#startups"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              scrollToWithOffset("startups");
+                              setMenuOpen(false);
+                              setStartupMobileOpen(false);
+                            }}
+                            className="hover:text-[#62D105] transition"
+                          >
+                            Sobre
+                          </a>
+                          <Link
+                            href="/auth/login"
+                            onClick={() => { setMenuOpen(false); setStartupMobileOpen(false); }}
+                            className="hover:text-[#62D105] transition"
+                          >
+                            Visualizar Desafios
+                          </Link>
+                          <Link
+                            href="/auth/register-startups"
+                            onClick={() => { setMenuOpen(false); setStartupMobileOpen(false); }}
+                            className="hover:text-[#62D105] transition"
+                          >
+                            Registrar Startup
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <a
+                  href="#resumo"
+                  onClick={(e) => { e.preventDefault(); scrollToWithOffset("resumo"); setMenuOpen(false); }}
+                  className="hover:text-[#62D105] transition"
+                >
+                  Resumo
+                </a>
+
+                <a
+                  href="#contatos"
+                  onClick={(e) => { e.preventDefault(); scrollToWithOffset("contatos"); setMenuOpen(false); }}
+                  className="hover:text-[#62D105] transition"
+                >
+                  Contatos
+                </a>
 
                 {/* Dropdown Mobile Registre-se */}
                 <div className="flex flex-col gap-2">
@@ -330,9 +448,6 @@ export default function LandingPage() {
                         className="overflow-hidden"
                       >
                         <div className="flex flex-col pl-3 border-l border-white/20 gap-2 mt-2">
-                          <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
-                            Registre-se
-                          </Link>
                           <Link href="/auth/register-startups" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
                             Registrar Startup
                           </Link>
@@ -385,7 +500,7 @@ export default function LandingPage() {
               <motion.button
                 whileHover={{ y: prefersReducedMotion ? 0 : -2 }}
                 whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
-                onClick={() => document.getElementById("plataforma-inovacao")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() => scrollToWithOffset("plataforma-inovacao")}
                 className="bg-[#62D105] text-[#0B005E] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition"
               >
                 Saiba Mais
@@ -416,6 +531,20 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+
+      {/* CSS global para scroll suave + margem por seção */}
+      <style jsx global>{`
+        html { scroll-behavior: smooth; }
+        /* Compensação da navbar fixa para âncoras */
+        #sobre, #plataforma-inovacao, #funil-inovacao, #startups, #resumo, #contatos {
+          scroll-margin-top: ${NAV_OFFSET_MOBILE}px;
+        }
+        @media (min-width: 913px) {
+          #sobre, #plataforma-inovacao, #funil-inovacao, #startups, #resumo, #contatos {
+            scroll-margin-top: ${NAV_OFFSET_DESKTOP}px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -27,7 +27,7 @@ export const commentsService = {
     return response.data;
   },
 
-  async filteredComment(challengeId: string, context: string): Promise<FilteredCommentReponse> {
+  async filteredComment(challengeId: string, context: string): Promise<FilteredCommentReponse[]> {
     const response = await api.get(ENDPOINTS.COMMENTS_FUNNEL.FILTERED_COMMENT(challengeId, context));
     console.log(response.data);
     return response.data;

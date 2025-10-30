@@ -4,7 +4,7 @@ import { Modal } from "../ui/modal"
 import ForwardButton from "./ForwardButton"
 import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
-import { MoreVertical, X } from "lucide-react"
+import { Loader2, MoreVertical, X } from "lucide-react"
 import { CommentsPanel } from "./CommentsPanel"
 import {
   challangeCommentSections,
@@ -43,7 +43,7 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
   return (
     <div className={cn("flex flex-col lg:flex-row flex-1 min-h-0 bg-white w-full rounded-b-2xl overflow-y-auto", className)}>
       <div className="flex flex-col w-full lg:w-[55%] bg-white rounded-b-2xl">
-        <div className="flex-1 lg:overflow-y-auto px-8 py-6 scrollbar-hidden">
+        <div className="flex-1 lg:overflow-y-auto px-8 py-6 scrollbar-hidden w-full">
           {mainContent}
         </div>
 
@@ -116,19 +116,42 @@ type FormResolutionCardsProps = {
 
 export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
   const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchStartups() {
-      const response = await startupService.showAllStartups()
-      setStartups(response)
+      try {
+        setIsLoading(true)
+        setError(null)
+        const response = await startupService.showAllStartups()
+        setStartups(response)
+      } catch (error: any) {
+        console.error(error)
+        setError("Erro ao carregar startups.")
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     fetchStartups()
   }, [])
 
+  if (error) {
+    return <div className="w-full flex items-center justify-center h-full">
+      {error}
+    </div>
+  }
+
+  if (isLoading) {
+    return <div className="w-full justify-center items-center h-full">
+      <Loader2 size={24} className="animate-spin"/>
+    </div>
+  }
+
   return (
     <div className="relative flex flex-col justify-between w-full h-full">
-      <div>
+      <div className="w-full flex flex-col">
         <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
         <div className="relative flex w-full justify-around">
           <div className="flex items-center gap-2">
@@ -249,10 +272,13 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
             )}
           </div>
         )} 
-        {visibility === "PUBLIC" && (
-          <p className="text-center text-sm text-[#666] font-semibold mt-4">Startups podem se candidatar</p>
-        )}
       </div>
+
+      {visibility === "PUBLIC" && (
+        <div className="flex items-center justify-center p-4">
+          <p className="text-center text-sm text-[#666] font-semibold">Startups podem se candidatar</p>
+        </div>
+      )}
       
       <div className="sticky bottom-0 left-0 w-full bg-white border-t flex gap-4 items-center justify-center py-3">
         <button
@@ -390,7 +416,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                   />
                 }
-                commentsContent={<CommentsPanel sections={challangeCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={challangeCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -412,7 +438,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                   />
                 }
-                commentsContent={<CommentsPanel sections={preScreeningCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={preScreeningCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -434,7 +460,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   />
                 }
                 commentsContent={
-                  <CommentsPanel sections={detailedScreeningCommentSections}/>
+                  <CommentsPanel challengeId={cardData.id} sections={detailedScreeningCommentSections}/>
                 }
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
@@ -447,12 +473,16 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
               <CardExpandedLayout
                 mainContent={
                   <Ideation
-                    challangeTitle={cardData.name}
+                    challengeTitle={cardData.name}
                     challengeId={cardData.id}
                     category={cardData.area}
+                    creator={cardData.Users.name}
+                    visibility={cardData.visibility}
+                    endDate={cardData.endDate}
+                    startDate={cardData.startDate}
                   />
                 }
-                commentsContent={<CommentsPanel sections={ideationCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={ideationCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -474,7 +504,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     visibility={cardData.visibility}
                   />
                 }
-                commentsContent={<CommentsPanel sections={experimentationCommentSections}/>}
+                commentsContent={<CommentsPanel challengeId={cardData.id} sections={experimentationCommentSections}/>}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -488,7 +518,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             onClose={() => setIsCardOpen(false)}
           >
             <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-100">
-              <div className="bg-white px-4 pt-4 rounded-2xl w-[90vw] md:w-[40vw] h-[70vh] overflow-hidden flex flex-col">
+              <div className="bg-white px-4 pt-4 rounded-2xl w-[90vw] md:w-[40vw] overflow-hidden flex flex-col">
                 <FormResolutionCard
                   setIsOpen={setIsCardOpen}
                   performMove={performMove}

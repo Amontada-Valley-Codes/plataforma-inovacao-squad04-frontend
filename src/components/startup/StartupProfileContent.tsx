@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -204,20 +206,6 @@ export default function StartupProfileContent({ data, onClose, isPage, onMutateM
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
-  // ---- whitelist para o PUT (evita 400 do backend) ----
-  const ALLOWED_UPDATE_KEYS = [
-    "name",
-    "description",
-    "technologies_used",
-    "founders",
-    "industry_segment",
-    "cnpj",
-    "website",
-  ] as const;
-
-  // Permite alternar casing conforme DTO do back:
-  // - snake (padrão): name, description, technologies_used, ...
-  // - camel: name, description, technologiesUsed, ...
   const PUT_CASING = (process.env.NEXT_PUBLIC_STARTUP_PUT_CASING || "snake").toLowerCase();
 
   function buildUpdatePayload(src: typeof form) {
@@ -398,20 +386,7 @@ setIsEditing(false);
   };
 
   const bodyScrollClasses = isPage ? "overflow-visible" : "overflow-y-auto max-h-[calc(95vh-56px)]";
-
-  // links normalizados (usados quando NÃO está editando)
-  const linkInstagram = normalizeInstagram(form.instagram);
-  const linkWhatsapp = normalizeWhatsapp(form.whatsapp);
-  const linkLinkedin = normalizeLinkedin(form.linkedin);
-  const linkSite = normalizeHttp(form.website);
-  const linkEmail = normalizeEmail(form.email);
-  const linkMaps = normalizeMaps({
-    lat: form.latitude as any,
-    lng: form.longitude as any,
-    address: form.address,
-    mapsUrl: form.maps_url,
-  });
-
+  
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg w-full max-w-full md:max-w-5xl relative overflow-hidden max-h-[95vh] md:max-h-none flex flex-col">
       {/* Banner */}

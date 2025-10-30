@@ -204,8 +204,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   }
 
   if (isLoading) {
-    return <div className="w-full justify-center items-center h-full animate-spin">
-      <Loader2 size={24}/>
+    return <div className="w-full justify-center items-center h-full">
+      <Loader2 size={24} className="animate-spin"/>
     </div>
   }
 
