@@ -5,6 +5,8 @@ import { Building2, Lightbulb, BriefcaseBusiness, Loader2 } from "lucide-react"
 import { Rating, ProgressBarActions } from "./CardsContents"
 import { ChallengeService } from "@/api/services/challenge.service"
 import { CreateVotePreScreeningPayload, ShowPercentageVoteResponse } from "@/api/payloads/challenge.payload"
+import { showCustomToast } from "./KanbanToaster"
+import { Toaster } from "react-hot-toast"
 
 type CardPreScreeningContentProps = {
   challangeTitle: string;
@@ -56,7 +58,7 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
 
   const handleVote = async () => {
     if (votes.strategicAlignment === 0 || votes.innovativePotential === 0 || votes.businessRelevance === 0) {
-      alert("Por favor, preencha todas as três notas (de 1 a 5).");
+      showCustomToast("Por favor, preencha todas as três notas (de 1 a 5).", "error");
       return;
     }
 
@@ -65,12 +67,12 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
     try {
       await ChallengeService.createVote(challengeId, votes);
       
-      alert("Voto registrado com sucesso!");
+      showCustomToast("Voto registrado com sucesso!", "success");
       fetchResults();
 
     } catch (error: any) {
       console.error("Erro ao votar:", error.response?.data || error.message);
-      alert(`Erro ao votar: ${error.response?.data?.message || 'Tente novamente.'}`);
+      showCustomToast(`Erro ao votar: ${error.response?.data?.message || 'Tente novamente.'}`, "error");
     } finally {
       setIsVoting(false);
     }
@@ -90,6 +92,8 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
 
   return (
     <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+      <Toaster position="top-right" reverseOrder={false} />
+
       {/* header */}
       <CardContentsHeader
         challengeTitle={challangeTitle}

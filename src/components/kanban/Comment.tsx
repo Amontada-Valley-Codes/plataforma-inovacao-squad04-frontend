@@ -4,6 +4,8 @@ import { useState } from "react";
 import { toTitleCase } from "./CardsContents";
 import { shortDateFormatter } from "./Kanban";
 import { Heart, ThumbsUp, Trash2 } from "lucide-react";
+import { showCustomToast } from "./KanbanToaster";
+import { Toaster } from "react-hot-toast";
 
 type CommentProps = {
   commentData: FilteredCommentReponse;
@@ -32,12 +34,14 @@ export const Comment = ({ commentData, onCommentDeleted }: CommentProps) => {
       onCommentDeleted();
     } catch (err) {
       console.error("Erro ao deletar:", err);
-      alert("Não foi possível excluir o comentário.");
+      showCustomToast("Não foi possível excluir o comentário.", "error");
     }
   };
 
   return (
     <div className="flex items-start gap-3 py-3">
+      <Toaster position="top-right" reverseOrder={false} />
+
       {commentData.users.image ? (
         <img 
           src={commentData.users.image} 
