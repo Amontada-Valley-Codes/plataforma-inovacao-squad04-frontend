@@ -130,9 +130,6 @@ export default function LandingPage() {
                     className="absolute left-0 mt-2 w-52 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-hidden z-30"
                     role="menu"
                   >
-                    <Link href="/auth/register" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
-                      Registre-se
-                    </Link>
                     <Link href="/auth/register-startups" className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition" role="menuitem">
                       Registrar Startup
                     </Link>
@@ -236,9 +233,6 @@ export default function LandingPage() {
                         className="overflow-hidden"
                       >
                         <div className="flex flex-col pl-3 border-l border-white/20 gap-2 mt-2">
-                          <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
-                            Registre-se
-                          </Link>
                           <Link href="/auth/register-startups" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">
                             Registrar Startup
                           </Link>
