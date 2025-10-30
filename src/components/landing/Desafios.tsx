@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 export default function HeroSection() {
   return (
     <section
+      id="startups"
       className="w-full text-white overflow-hidden"
       style={{ background: "linear-gradient(190deg,#0C0668 0%,#111C79 100%)" }}
     >

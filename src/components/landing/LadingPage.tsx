@@ -3,31 +3,50 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence, useReducedMotion, cubicBezier, type Variants } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  cubicBezier,
+  type Variants,
+} from "framer-motion";
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Registre-se
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [startupOpen, setStartupOpen] = useState(false);   // Startups
+  const startupRef = useRef<HTMLDivElement>(null);
+
   const [dropdownMobileOpen, setDropdownMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  // Fecha dropdown clicando fora
+  // Fecha dropdowns clicando fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setDropdownOpen(false);
+      }
+      if (startupRef.current && !startupRef.current.contains(target)) {
+        setStartupOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ESC fecha menu mobile
+  // ESC fecha menus
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        setDropdownOpen(false);
+        setStartupOpen(false);
+        setDropdownMobileOpen(false);
+      }
     };
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
@@ -40,7 +59,7 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Variants SEM bug de tipos no v11
+  // Variants SEM bug de tipos no framer v11
   const ease = cubicBezier(0.22, 1, 0.36, 1);
 
   const fadeUp: Variants = {
@@ -65,17 +84,16 @@ export default function LandingPage() {
   };
 
   return (
-    <div
-      className="
-    relative w-full h-screen flex flex-col
-    bg-[url('/images/bg-details.svg')] bg-cover bg-center"
-    >
+    <div className="relative w-full h-screen flex flex-col bg-[url('/images/bg-details.svg')] bg-cover bg-center">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B005E]/40 via-[#0B005E]/20 to-[#0B005E]/60" />
+
+      {/* NAVBAR */}
       <motion.nav
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 0.4 } }}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "bg-[#0B005E]/90 backdrop-blur-md shadow-md" : "bg-transparent"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          scrolled ? "bg-[#0B005E]/90 backdrop-blur-md shadow-md" : "bg-transparent"
+        }`}
         role="navigation"
         aria-label="Navegação principal"
       >
@@ -100,12 +118,81 @@ export default function LandingPage() {
           <div className="hidden [@media(min-width:913px)]:flex items-center gap-10 text-sm font-medium text-white relative">
             <Link href="#sobre" className="hover:text-[#62D105] transition">Sobre</Link>
             <Link href="#plataforma-inovacao" className="hover:text-[#62D105] transition">Conheça o Sistema</Link>
+            <Link href="#funil-inovacao" className="hover:text-[#62D105] transition">Funil de Inovação</Link>
+
+            {/* STARTUPS (DROPDOWN) */}
+            <div ref={startupRef} className="relative">
+              <button
+                onClick={() => {
+                  setStartupOpen((p) => !p);
+                  setDropdownOpen(false); // fecha "Registre-se" se estiver aberto
+                }}
+                className="flex items-center gap-1 hover:text-[#62D105] transition"
+                aria-haspopup="menu"
+                aria-expanded={startupOpen}
+                aria-controls="dropdown-startups"
+              >
+                Startup
+                <motion.span
+                  animate={{ rotate: startupOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2, type: "tween" }}
+                  className="inline-flex"
+                >
+                  <ChevronDown size={16} />
+                </motion.span>
+              </button>
+
+              <AnimatePresence>
+                {startupOpen && (
+                  <motion.div
+                    id="dropdown-startups"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.18 } }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.15 } }}
+                    className="absolute left-0 mt-2 w-56 bg-[#0B005E] border border-white/10 rounded-xl shadow-lg overflow-hidden z-30"
+                    role="menu"
+                  >
+                    <Link
+                      href="#startups"
+                      className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"
+                      role="menuitem"
+                      onClick={() => setStartupOpen(false)}
+                    >
+                      Sobre
+                    </Link>
+                    
+                    <Link
+                      href="/auth/login"
+                      className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"
+                      role="menuitem"
+                      onClick={() => setStartupOpen(false)}
+                    >
+                      Visualizar Desafios
+                    </Link>
+                    
+                    <Link
+                      href="/auth/register-startups"
+                      className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"
+                      role="menuitem"
+                      onClick={() => setStartupOpen(false)}
+                    >
+                      Registrar Startup
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link href="#resumo" className="hover:text-[#62D105] transition">Resumo</Link>
             <Link href="#contatos" className="hover:text-[#62D105] transition">Contatos</Link>
 
             {/* Dropdown Registre-se */}
             <div ref={dropdownRef} className="relative">
               <button
-                onClick={() => setDropdownOpen((prev) => !prev)}
+                onClick={() => {
+                  setDropdownOpen((prev) => !prev);
+                  setStartupOpen(false); // fecha "Startups" se estiver aberto
+                }}
                 className="flex items-center gap-1 hover:text-[#62D105] transition"
                 aria-haspopup="menu"
                 aria-expanded={dropdownOpen}
@@ -123,7 +210,6 @@ export default function LandingPage() {
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.div
-                    key="desktop-dropdown"
                     initial={{ opacity: 0, y: 8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.18 } }}
                     exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.15 } }}
@@ -145,7 +231,10 @@ export default function LandingPage() {
             </div>
 
             <motion.div whileTap={{ scale: prefersReducedMotion ? 1 : 0.97 }}>
-              <Link href="/auth/login" className="bg-[#62D105] text-[#0B005E] px-5 py-2 rounded-full font-semibold hover:opacity-90 transition inline-flex">
+              <Link
+                href="/auth/login"
+                className="bg-[#62D105] text-[#0B005E] px-5 py-2 rounded-full font-semibold hover:opacity-90 transition inline-flex"
+              >
                 Entrar
               </Link>
             </motion.div>
@@ -205,9 +294,15 @@ export default function LandingPage() {
               <div className="flex flex-col gap-5 px-6 py-6 text-lg font-medium">
                 <Link href="#sobre" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Sobre</Link>
                 <Link href="#plataforma-inovacao" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Saiba mais</Link>
+                <Link href="#funil-inovacao" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Funil de Inovação</Link>
+
+                {/* Startups no mobile (simples) */}
+                <Link href="#startups" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Startups</Link>
+
+                <Link href="#resumo" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Resumo</Link>
                 <Link href="#contatos" onClick={() => setMenuOpen(false)} className="hover:text-[#62D105] transition">Contatos</Link>
 
-                {/* Dropdown Mobile */}
+                {/* Dropdown Mobile Registre-se */}
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => setDropdownMobileOpen((prev) => !prev)}

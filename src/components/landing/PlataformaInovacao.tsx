@@ -31,10 +31,10 @@ export default function PlataformaInovacao() {
           Plataforma de Inovação Aberta
         </h2>
         <p className="text-[clamp(0.98rem,1.2vw,1.125rem)] leading-relaxed text-gray-100">
-          Plataforma web de inovação aberta voltada para corporações, com foco na
-          gestão de desafios, captação de ideias e conexão com startups. A plataforma
-          deve seguir um funil estruturado de inovação e permitir o atendimento a
-          múltiplas empresas (multiempresa) com áreas restritas e conexões com startups.
+          Desenvolvemos uma plataforma voltada para corporações que querem 
+          transformar desafios em oportunidades de forma organizada e intuitiva. 
+          Nossa plataforma deve seguir um funil estruturado de inovação e permitir o atendimento a
+          múltiplos desafios com áreas restritas e conexões com startups.
         </p>
       </motion.div>
 

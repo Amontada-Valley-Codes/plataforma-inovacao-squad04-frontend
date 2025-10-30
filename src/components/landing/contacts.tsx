@@ -31,7 +31,8 @@ export default function ContactPage() {
   };
 
   return (
-    <div
+    <section
+      id="contatos"
       className="min-h-screen flex flex-col justify-between text-white"
       style={{
         background: `linear-gradient(190deg, #0C0668 0%, #111C79 100%)`,
@@ -124,6 +125,6 @@ export default function ContactPage() {
           </a>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
