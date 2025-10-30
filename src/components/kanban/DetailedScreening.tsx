@@ -237,7 +237,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
                 <textarea
                   className="w-full flex-1 bg-transparent outline-none resize-none overflow-y-auto"
-                  placeholder="Qual o resultado esperado?"
+                  placeholder="Descreva o problema"
                   value={detailedScreening.problema}
                   onChange={(e) => handleChange("problema", e.target.value)}
                   rows={6}
@@ -252,7 +252,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
                 <textarea
                   className="w-full flex-1 bg-transparent outline-none resize-none h-full overflow-y-auto"
-                  placeholder="Qual o resultado esperado?"
+                  placeholder="Descreva a solução?"
                   value={detailedScreening.solucao}
                   onChange={(e) => handleChange("solucao", e.target.value)}
                   rows={6}
