@@ -28,7 +28,7 @@ export default function LandingPage() {
   // ---------- Helpers de scroll com offset ----------
   const ease = cubicBezier(0.22, 1, 0.36, 1);
   const NAV_OFFSET_DESKTOP = 64; // altura aproximada da navbar no desktop (h-16 + padding)
-  const NAV_OFFSET_MOBILE  = 64; // altura ligeiramente maior no mobile
+  const NAV_OFFSET_MOBILE = 64; // altura ligeiramente maior no mobile
 
   const getOffset = () => (window.innerWidth < 913 ? NAV_OFFSET_MOBILE : NAV_OFFSET_DESKTOP);
 
@@ -384,9 +384,10 @@ export default function LandingPage() {
                             Sobre
                           </a>
                           <Link
-                            href="/auth/login"
-                            onClick={() => { setMenuOpen(false); setStartupMobileOpen(false); }}
-                            className="hover:text-[#62D105] transition"
+                            href="/challenges-publicos"
+                            className="block px-4 py-3 hover:bg-[#1A26B8] hover:text-[#62D105] transition"
+                            role="menuitem"
+                            onClick={() => setStartupOpen(false)}
                           >
                             Visualizar Desafios
                           </Link>

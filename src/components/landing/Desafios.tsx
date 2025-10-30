@@ -110,17 +110,15 @@ export default function HeroSection() {
           >
             <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
               <Link
-                href="#"
-                className="
-        inline-flex items-center justify-center
-        shrink min-w-0 whitespace-nowrap
-        rounded-full px-6 py-2.5
-        bg-white text-[#00145A] font-semibold text-[13px]
-        shadow-[0_6px_18px_rgba(0,0,0,0.15)] transition
-        [@media(max-width:630px)]:px-4
-        [@media(max-width:630px)]:py-2
-        [@media(max-width:630px)]:text-[12px]
-      "
+                href="/challenges-publicos"
+                onClickCapture={(e) => e.stopPropagation()}
+                className="pointer-events-auto inline-flex items-center justify-center
+             shrink min-w-0 whitespace-nowrap rounded-full px-6 py-2.5
+             bg-white text-[#00145A] font-semibold text-[13px]
+             shadow-[0_6px_18px_rgba(0,0,0,0.15)] transition
+             [@media(max-width:630px)]:px-4
+             [@media(max-width:630px)]:py-2
+             [@media(max-width:630px)]:text-[12px]"
               >
                 <span className="truncate">Visualizar Desafios</span>
               </Link>
@@ -128,18 +126,16 @@ export default function HeroSection() {
 
             <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
               <Link
-                href="#"
-                className="
-        inline-flex items-center justify-center
-        shrink min-w-0 whitespace-nowrap
-        rounded-full px-6 py-2.5
-        bg-[#62D105] text-[#0B005E] font-semibold text-[13px]
-        shadow-[0_6px_18px_rgba(0,0,0,0.15)] transition
-        [@media(max-width:630px)]:px-4
-        [@media(max-width:630px)]:py-2
-        [@media(max-width:630px)]:text-[12px]
-      "
-              >
+                href="/auth/register-startups"
+                onClickCapture={(e) => e.stopPropagation()}
+                    className="pointer-events-auto inline-flex items-center justify-center
+                      shrink min-w-0 whitespace-nowrap rounded-full px-6 py-2.5
+                      bg-[#62D105] text-[#0B005E] font-semibold text-[13px]
+                      shadow-[0_6px_18px_rgba(0,0,0,0.15)] transition
+                      [@media(max-width:630px)]:px-4
+                      [@media(max-width:630px)]:py-2
+                      [@media(max-width:630px)]:text-[12px]"
+                        >
                 <span className="truncate">Registre sua Startup</span>
               </Link>
             </motion.div>

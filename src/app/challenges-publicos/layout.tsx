@@ -27,6 +27,11 @@ export default function ChallengesPublicLayout({
       const handleClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         if (target.closest("#login-required-modal")) return;
+
+
+        const link = target.closest("a[href]");
+        if (link) return;
+
         e.preventDefault();
         e.stopPropagation();
         setShowModal(true);
