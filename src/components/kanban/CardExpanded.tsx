@@ -27,19 +27,22 @@ import { PreScreening } from "./PreScreening"
 import { DetailedScreening } from "./DetailedScreening"
 import { Ideation } from "./Ideation"
 import { Experimentation } from "./Experimentation"
+import ApproveButton from "./ApproveButton"
+import DisapproveButton from "./Disapprove"
 
 type CardExpandedLayoutProps = {
   className?: string;
   mainContent: React.ReactNode;
   commentsContent: React.ReactNode;
   challengeId: string | undefined;
+  challengeStatus?: string;
   isFirstColumn: boolean;
   isLastColumn: boolean;
   handleMoveBack: (challengeId: string | undefined) => void;
   handleApproveAndMove: (challengeId: string | undefined) => void;
 }
 
-const CardExpandedLayout = ({ className, mainContent, commentsContent, challengeId, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack }: CardExpandedLayoutProps) => {
+const CardExpandedLayout = ({ className, mainContent, commentsContent, challengeId, challengeStatus, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack }: CardExpandedLayoutProps) => {
   const { isDesktop } = useBreakpoints()
 
   return (
@@ -53,8 +56,10 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
           <div className="sticky bottom-0 left-0 w-full bg-white dark:bg-gray-900 dark:border-t-0 border-t flex justify-center py-4 px-8">
             <div className={`w-full flex items-center gap-12 ${
               !isFirstColumn && !isLastColumn ?
-              "justify-center"
-              : isLastColumn
+              "justify-between"
+              : challengeStatus
+              ? "justify-between"
+              : isLastColumn 
               ? "justify-start"
               : "justify-end"
             }`}>
@@ -63,6 +68,12 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
               )}
               {!isLastColumn && handleApproveAndMove && (
                 <ForwardButton className="w-45" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
+              )}
+              {challengeStatus && challengeId &&(
+                <div className="flex gap-2 items-center justify-center">
+                  <DisapproveButton challengeId={challengeId}/>
+                  <ApproveButton challengeId={challengeId}/>
+                </div>
               )}
             </div>
           </div>
@@ -77,8 +88,10 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
         <div className="sticky bottom-0 left-0 w-full bg-white border-t flex justify-center py-4 px-8">
           <div className={`w-full flex items-center gap-12 ${
             !isFirstColumn && !isLastColumn ?
-            "justify-center"
-            : isLastColumn
+            "justify-between"
+            : challengeStatus
+            ? "justify-between"
+            : isLastColumn 
             ? "justify-start"
             : "justify-end"
           }`}>
@@ -87,6 +100,12 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
             )}
             {!isLastColumn && handleApproveAndMove && (
               <ForwardButton className="w-45 py-3" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
+            )}
+            {challengeStatus && challengeId &&(
+              <div className="flex items-center justify-center">
+                <ApproveButton challengeId={challengeId}/>
+                <DisapproveButton challengeId={challengeId}/>
+              </div>
             )}
           </div>
         </div>
@@ -508,6 +527,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 }
                 commentsContent={<CommentsPanel challengeId={cardData.id} sections={experimentationCommentSections}/>}
                 challengeId={cardData.id}
+                challengeStatus={cardData.status}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
