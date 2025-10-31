@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { FaRegImage, FaMapMarkedAlt } from "react-icons/fa";
 import type { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
@@ -46,12 +46,6 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
 
   const enterpriseId = useMemo(() => getId(company), [company]);
   if (!company) return null;
-
-  async function refresh() {
-    if (!enterpriseId) return;
-    const fresh = await enterpriseService.showOneEnterprise(enterpriseId);
-    setCompany(fresh);
-  }
 
   async function savePatchInfo(patch: {
     sector?: string;
