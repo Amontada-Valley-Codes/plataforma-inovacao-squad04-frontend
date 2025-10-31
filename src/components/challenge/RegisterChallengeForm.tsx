@@ -74,8 +74,8 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
     try {
       setLoading(true);
 
-      const dataInicioISO = new Date(formData.dataInicio).toISOString();
-      const dataFimISO = new Date(formData.dataFim).toISOString();
+      const dataInicioISO = new Date(formData.dataInicio).toISOString().split("T")[0];
+      const dataFimISO = new Date(formData.dataFim).toISOString().split("T")[0];
 
       const payload = {
         name: formData.titulo,
