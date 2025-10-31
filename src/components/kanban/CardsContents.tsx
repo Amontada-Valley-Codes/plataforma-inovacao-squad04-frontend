@@ -50,7 +50,7 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
 
   return (
     <div className="mb-4">
-      <h1 className="text-[28px] text-[#0B2B70] font-semibold mb-1">{challengeTitle}</h1>
+      <h1 className="text-[28px] text-[#0B2B70] dark:text-white font-semibold mb-1">{challengeTitle}</h1>
       <div className="flex gap-2 mb-2">
         {category && (
           <button className="bg-[#0B2B70] text-[10px] text-white font-semibold w-fit rounded-[8px] px-4 py-1">
@@ -65,7 +65,7 @@ export const CardContentsHeader = ({ challengeTitle, category, creator, startDat
         )}
       </div>
 
-      <div className="flex gap-4 text-gray-600">
+      <div className="flex gap-4 text-gray-600 dark:text-white">
         {endDate && startDate && (
           <div className="flex items-center gap-2">
             <Calendar size={16}/>
@@ -243,7 +243,7 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
         <p className="text-[#666]">TAGS</p>
       </div>
       <div className="flex flex-wrap gap-2">
-        <div className="border border-[rgb(11,43,112)] text-[12px] text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1">
+        <div className="border dark:bg-[#0B2B70] border-[rgb(11,43,112)] text-[12px] text-white font-semibold w-fit rounded-[8px] px-3 py-1">
           {getCategoryLabel(category)}
         </div>
         {tags.map((tag) => (
@@ -304,8 +304,8 @@ export const Tags = ({ category, challengeId }: TagsProps) => {
                   setEditingTag(tag.tag)
                   setEditingTagId(tag.id)
                 }} 
-                className="border border-[rgb(11,43,112)] text-[12px] 
-                text-[#0B2B70] font-semibold w-fit rounded-[8px] px-3 py-1"
+                className="border bg-[#0B2B70] border-[rgb(11,43,112)] text-[12px] 
+                text-white font-semibold w-fit rounded-[8px] px-3 py-1"
               >
                 {tag.tag.toUpperCase()}
               </div>
@@ -471,7 +471,7 @@ export const Ideias = ({ challengeId }: IdeaisProps) => {
         <div className="flex- w-full" key={ideia.id}>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-4">
-              <span className="font-semibold text-base text-[#0B2B72]">{toTitleCase(ideia.userName)}</span>
+              <span className="font-semibold text-base text-[#0B2B72] dark:text-white">{toTitleCase(ideia.userName)}</span>
 
               <div 
                 className={`h-2 w-2 rounded-full ${getStatusColor(ideia.status)}`}
@@ -486,16 +486,16 @@ export const Ideias = ({ challengeId }: IdeaisProps) => {
               duration-300 ease-in-out"
             />
           </div>
-          <p className="text-base text-gray-600">{ideia.ideia}</p>
+          <p className="text-base text-gray-600 dark:text-white">{ideia.ideia}</p>
           <div className="flex justify-between items-center mt-3">
             <div className="flex gap-1 items-center">
               <Heart
                 size={18}
                 onClick={() => handleLike(ideia.id)}
-                className={`text-[#666] cursor-pointer`}
+                className={`text-[#666] dark:text-white cursor-pointer`}
               />
               <span
-                className={`text-sm text-[#666]`}
+                className={`text-sm text-[#666] dark:text-white`}
               >
                 {ideia.likesCount}
               </span>
@@ -504,7 +504,7 @@ export const Ideias = ({ challengeId }: IdeaisProps) => {
             <div className="flex gap-2">
               <button
                 onClick={() => handleReject(ideia.id)}
-                className="w-26 px-2 py-1 rounded-md font-semibold text-sm border border-[#0B2B72] text-[#0B2B72]"
+                className="w-26 px-2 py-1 rounded-md font-semibold text-sm border border-[#0B2B72] dark:bg-white text-[#0B2B72]"
               >
                 Rejeitar
               </button>
@@ -646,7 +646,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
               type="checkbox"
               checked={item.completed}
               onChange={() => toggleItem(item.id)}
-              className="w-4 h-4 accent-gray-600 rounded"
+              className="w-4 h-4 accent-gray-600 dark:accent-white rounded"
             />
             <div className="flex items-center w-[60%] gap-2 justify-between">
               {editingId === item.id ? (
@@ -681,7 +681,7 @@ export const Checklist = ({ challengeId }: ChecklistProps) => {
                   </button>
                   <button 
                     onClick={() => setEditingId(null)} 
-                    className="p-2 text-gray-600 hover:text-gray-800" 
+                    className="p-2 text-gray-600 dark:text-white hover:text-gray-800" 
                     title="Cancelar"
                   >
                     <X size={16} />

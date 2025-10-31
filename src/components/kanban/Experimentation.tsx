@@ -234,7 +234,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       />
       
       <div className="flex flex-col gap-1 mb-6">
-        <h1 className="flex gap-1 items-center text-black text-lg">
+        <h1 className="flex gap-1 items-center dark:text-white text-black text-lg">
           <Target size={16}/>
           Objetivo
         </h1>
@@ -250,7 +250,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       </div>
 
       <div className="flex flex-col gap-1 mb-6">
-        <h1 className="flex gap-1 items-center text-black text-lg">
+        <h1 className="flex gap-1 items-center dark:text-white text-black text-lg">
           <ClipboardList size={16}/>
           Escopo Resumido
         </h1>
@@ -289,7 +289,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
             </div>
           </div>
         </div>
-        <h1 className="flex gap-1 items-center mt-1 text-black text-sm">
+        <h1 className="flex gap-1 items-center mt-1 dark:text-white text-black text-sm">
           Nível de Maturidade
         </h1>
         <Rating 
@@ -305,7 +305,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       </div>
 
       <div className="flex flex-col gap-1 mb-6">
-        <h1 className="flex gap-1 items-center text-black text-lg">
+        <h1 className="flex gap-1 items-center dark:text-white text-black text-lg">
           <ChartNoAxesCombined size={16}/>
           KPIs de Sucesso
         </h1>
@@ -423,7 +423,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       </div>
 
       <div className="flex w-full flex-col gap-1 mb-6">
-        <h1 className="flex gap-1 items-center text-black text-lg">
+        <h1 className="flex gap-1 items-center dark:text-white text-black text-lg">
           <Users size={16}/>
           Responsáveis
         </h1>
