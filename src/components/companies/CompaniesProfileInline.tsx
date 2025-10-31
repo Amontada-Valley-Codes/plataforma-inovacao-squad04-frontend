@@ -12,7 +12,6 @@ type Props = {
 };
 type MediaTarget = "logo" | "cover" | null;
 
-/* ===== Helpers ===== */
 function getId(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
   return e?.id ? String(e.id) : undefined;
 }
