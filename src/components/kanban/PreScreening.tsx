@@ -109,11 +109,11 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
       <div>
         {/* alinhamento estrategico */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <Building2 size={16}/>
             Alinhamento Estratégico
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {strategicAlignment}
           </p>
           <Rating
@@ -124,11 +124,11 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
 
         {/* potencial inovador */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <Lightbulb size={16}/>
             Potência Inovador
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {innovativePotential}
           </p>
           <Rating
@@ -139,11 +139,11 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
 
         {/* relevancia do negocio */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <BriefcaseBusiness size={16}/>
             Relevância para o negócio
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {businessRelevance}
           </p>
           <Rating

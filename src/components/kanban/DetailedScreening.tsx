@@ -214,7 +214,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
             <div className="flex flex-col items-center">
               <button 
                 className={`w-8 h-8 rounded-full  font-semibold flex items-center justify-center ${
-                  page === '2' ? "bg-[#0B2B72] text-white" : "border-gray-400 border-2 text-gray-500"
+                  page === '2' ? "bg-[#0B2B72] text-white" : "border-gray-400 dark:placeholder:text-white border-2 text-gray-500"
                 }`}
                 onClick={() => setPage('2')}
               >
@@ -229,12 +229,12 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       {/* pagina 1 - resumo */}
       {page === '1' && detailedScreening && (
         <div className="w-full flex flex-col h-full">
-          <h1 className="text-[#0B2B72] text-2xl font-semibold mb-4">Canvas Rápido</h1>
+          <h1 className="text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">Canvas Rápido</h1>
 
           <div className="flex-1 flex flex-col gap-3">
             <div className="flex flex-col md:flex-row gap-3 flex-1">
-              <div className="w-full md:w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
-                <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
+              <div className="w-full md:w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] dark:border-[#737373] px-4 py-2">
+                <h1 className="flex items-center justify-between text-[#0B2B72] dark:text-white text-lg font-semibold mb-2">
                   Problema
                   <Bug size={20}/>
                 </h1>
@@ -248,8 +248,8 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
                 />
               </div>
 
-              <div className="w-full md:w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
-                <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
+              <div className="w-full md:w-1/2 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] dark:border-[#737373] px-4 py-2">
+                <h1 className="flex items-center justify-between text-[#0B2B72] dark:text-white text-lg font-semibold mb-2">
                   Solução
                   <Lightbulb size={20}/>
                 </h1>
@@ -264,8 +264,8 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
               </div>
             </div>
 
-            <div className="flex-1 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] px-4 py-2">
-              <h1 className="flex items-center justify-between text-[#0B2B72] text-lg font-semibold mb-2">
+            <div className="flex-1 flex flex-col rounded-[12px] border-2 border-[#E5E7EB] dark:border-[#737373] px-4 py-2">
+              <h1 className="flex items-center justify-between text-[#0B2B72] dark:text-white text-lg font-semibold mb-2">
                 Resultado Esperado
                 <Trophy size={20}/>
               </h1>
@@ -294,7 +294,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
             <form action="">
               {/* viabilidade tecnica */}
               <div className="flex flex-col mb-6">
-                <h1 className="flex gap-1 items-center text-black text-lg">
+                <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
                   Viabilidade Técnica
                 </h1>
                 <div className="flex flex-col gap-2">
@@ -303,39 +303,39 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
                     {/* Input: API's/Documentação */}
                     <div className="flex flex-col gap-1 text-sm">
                       <div className="flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                        <Building2 className="text-[#98A2B3] mr-2" size={18} />
+                        <Building2 className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                         <input 
                           type="text" 
                           placeholder="APIs / documentação"
                           value={detailedScreening.api}
                           onChange={(e) => handleChange("api", e.target.value)}
-                          className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                          className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                         />
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-1 text-sm">
                       <div className="flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                        <Building2 className="text-[#98A2B3] mr-2" size={18} />
+                        <Building2 className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                         <input 
                           type="text" 
                           placeholder="Stacks Compatíveis"
                           value={detailedScreening.stackes}
                           onChange={(e) => handleChange("stackes", e.target.value)}
-                          className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                          className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                         />
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-1 text-sm">
                       <div className="flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                        <Building2 className="text-[#98A2B3] mr-2" size={18} />
+                        <Building2 className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                         <input 
                           type="text" 
                           placeholder="Nº de sprints esperadas"
                           value={detailedScreening.numeroDeSprints}
                           onChange={(e) => handleChange("numeroDeSprints", e.target.value)}
-                          className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                          className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                         />
                       </div>
                     </div>
@@ -370,46 +370,46 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
               {/* impacto financeiro */}
               <div className="flex flex-col mb-6">
-                <h1 className="flex gap-1 items-center   text-black text-lg mb-2">
+                <h1 className="flex gap-1 items-center dark:text-white  text-black text-lg mb-2">
                   Impacto Financeiro
                 </h1>
                 <div className="flex flex-col gap-2">
 
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <ChartNoAxesCombined className="text-[#98A2B3] mr-2" size={18} />
+                      <ChartNoAxesCombined className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         value={detailedScreening.investimento}
                         onChange={(e) => handleChange("investimento", e.target.value)}
                         placeholder="Investimento inicial estimado (CAPEX)"
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <ChartNoAxesCombined className="text-[#98A2B3] mr-2" size={18} />
+                      <ChartNoAxesCombined className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         value={detailedScreening.custo}
                         onChange={(e) => handleChange("custo", e.target.value)}
                         placeholder="Custo mensal estimado (OPEX)"
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <ChartNoAxesCombined className="text-[#98A2B3] mr-2" size={18} />
+                      <ChartNoAxesCombined className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         placeholder="Benefício esperado (mensal)"
                         value={detailedScreening.beneficiosMensal}
                         onChange={(e) => handleChange("beneficiosMensal", e.target.value)}
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>
@@ -424,13 +424,13 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
               </div>
 
               <div className="flex flex-col mb-6">
-                <h1 className="flex gap-1 items-center text-black text-lg mb-2">
+                <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-2">
                   Aderência Estratégica
                 </h1>
                 <div className="flex flex-col gap-2">
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <ChartPie className="text-[#98A2B3] mr-2" size={18} />
+                      <ChartPie className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         placeholder="Pilar Estratégico"
@@ -451,59 +451,59 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
               {/* riscos */}
               <div className="flex flex-col mb-6">
-                <h1 className="flex gap-1 items-center text-black text-lg mb-2">
+                <h1 className="flex gap-1 items-center text-black  dark:text-white text-lg mb-2">
                   Riscos
                 </h1>
                 <div className="flex flex-col gap-2">
                   
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
+                      <TriangleAlert className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         placeholder="Principal risco identificado"
                         value={detailedScreening.principalRisco}
                         onChange={(e) => handleChange("principalRisco", e.target.value)}
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
+                      <TriangleAlert className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         placeholder="Mitigação Proposta"
                         value={detailedScreening.mitigacao}
                         onChange={(e) => handleChange("mitigacao", e.target.value)}
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
+                      <TriangleAlert className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="text" 
                         placeholder="Responsável"
                         value={detailedScreening.responsavel}
                         onChange={(e) => handleChange("responsavel", e.target.value)}
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-4 text-sm items-center">
                     <div className="flex-1 flex items-center rounded-lg border px-3 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-                      <TriangleAlert className="text-[#98A2B3] mr-2" size={18} />
+                      <TriangleAlert className="text-[#98A2B3] dark:text-white mr-2" size={18} />
                       <input 
                         type="date"
                         placeholder="Prazo"
                         value={detailedScreening.prazo?.split("T")[0] || ""}
                         onChange={(e) => handleChange("prazo", e.target.value)}
-                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+                        className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
                       />
                     </div>
                   </div>

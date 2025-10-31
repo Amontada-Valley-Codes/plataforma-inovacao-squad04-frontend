@@ -69,15 +69,15 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
       {/* header clicavel para abrir/fechar a seçao */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center gap-2 py-4 text-left transition-colors hover:bg-gray-50/50"
+        className="flex w-full items-center gap-2 py-4 text-left transition-colors dark:hover:bg-gray-800 hover:bg-gray-50/50"
       >
         <ChevronDown
           size={20}
           className={`text-gray-600 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
         />
         <div>
-          <h3 className="font-semibold text-black text-base">{section.title}</h3>
-          <span className="text-sm text-gray-600">Comentar</span>
+          <h3 className="font-semibold text-black dark:text-white text-base">{section.title}</h3>
+          <span className="text-sm text-gray-600 dark:text-white">Comentar</span>
         </div>
       </button>
 
@@ -104,7 +104,7 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
           }
 
           {!isLoading && !error && comments.length === 0 && (
-            <p className="text-sm text-gray-500 italic py-2">
+            <p className="text-sm text-gray-500 dark:text-white italic py-2">
               Nenhum comentário nesta seção ainda.
             </p>
           )}
@@ -116,7 +116,7 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
                 placeholder="Escreva um comentário..."
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
-                className="w-full rounded-[8px] border border-gray-300 bg-white px-4 py-1.5 text-sm focus:outline-none focus:ring focus:ring-[#0B2B72]"
+                className="w-full rounded-[8px] border border-gray-300 bg-white dark:bg-gray-800 px-4 py-1.5 text-sm focus:outline-none focus:ring focus:ring-[#0B2B72]"
               />
               <button
                 type="submit"
