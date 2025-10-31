@@ -24,7 +24,7 @@
     };
 
     return (
-      <div className="flex flex-col justify-center items-center bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] border-l-2 border-[#C7E6FE]">
+      <div className="flex flex-col justify-center items-center bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] md:border-l-2 border-[#C7E6FE]">
         <div className="relative w-[140px] h-[90px] mb-4">
           <Image src="/images/logo/ninna-logo.svg" alt="ninna-logo" fill className="object-contain" />
         </div>

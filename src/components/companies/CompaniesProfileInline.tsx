@@ -124,7 +124,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                 className="absolute inset-0 w-full h-full object-cover"
               />
             )}
-            {editable && (
+{/*             {editable && (
               <button
                 type="button"
                 onClick={() => {
@@ -136,7 +136,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
               >
                 <span className="text-white text-4xl font-bold leading-none">+</span>
               </button>
-            )}
+            )} */}
           </div>
 
           {/* Logo */}
@@ -357,7 +357,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
             </section>
 
             {/* Mídia: upload de arquivos */}
-            {editMedia && (
+            {/* {editMedia && (
               <section id="media" className="space-y-3 mt-10">
                 <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">Mídia</h3>
                 <MediaForm
@@ -375,7 +375,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                   busy={busy}
                 />
               </section>
-            )}
+            )} */}
           </div>
         </div>
       </div>
