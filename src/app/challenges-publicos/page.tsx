@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Tag, Calendar, Eye, EyeOff, MoreHorizontal, User as UserIcon } from "lucide-react";
+import { Tag, Calendar, Eye, EyeOff, User as UserIcon } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
 
 interface PublicChallengeCard {
