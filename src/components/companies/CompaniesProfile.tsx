@@ -156,13 +156,13 @@ export default function CompaniesProfile({ data, isOpen, onClose }: Props) {
                 <h2 className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-800">
                   {company.name ?? "Nome da Empresa"}
                 </h2>
-                <button
+{/*                 <button
                   onClick={() => setEditMedia((v) => !v)}
                   className="px-3 py-1.5 rounded-xl border text-sm"
                   disabled={busy}
                 >
                   {editMedia ? "Cancelar mídia" : "Editar mídia"}
-                </button>
+                </button> */}
               </div>
 
               {!editMedia ? null : (

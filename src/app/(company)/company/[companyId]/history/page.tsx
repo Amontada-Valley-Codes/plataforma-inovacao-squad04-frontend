@@ -4,6 +4,8 @@
 import { getUserRole, getCurrentUser, getUserCompanyId } from "@/lib/auth";
 import CompanyHistoryHistoric from "@/components/history/CompanyHistory";
 import { use, useEffect, useState } from "react";
+import { ShowAllEnterpriseResponse, ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
+import { enterpriseService } from "@/api/services/enterprise.service";
 
 type PageProps = {
   params: Promise<{ companyId: string }>;
@@ -16,6 +18,20 @@ export default function CompanyHistoryPage({ params }: PageProps) {
   const [viewerCompanyId, setViewerCompanyId] = useState<string | undefined>();
   const [viewerUserId, setViewerUserId] = useState<string | undefined>();
   const [loaded, setLoaded] = useState(false);
+  const [enterpriseName, setEnterpriseName] = useState<ShowOneEnterpriseResponse["name"]>()
+
+  const fetchEnterprise = async () => {
+    try {
+      const response = await enterpriseService.getMyEnterprise()
+      setEnterpriseName(response?.name)
+    } catch (error) {
+      console.error
+    }
+  }
+
+  useEffect(() => {
+    fetchEnterprise()
+  }, [])
 
   useEffect(() => {
     (async () => {
@@ -38,7 +54,7 @@ export default function CompanyHistoryPage({ params }: PageProps) {
     <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4">
       <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap gap-1">
         <span>Empresa /</span>
-        <span className="font-semibold truncate">{companyId}</span>
+        <span className="font-semibold truncate">{enterpriseName}</span>
         <span>/ Histórico</span>
       </div>
 

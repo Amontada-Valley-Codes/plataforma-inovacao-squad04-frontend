@@ -1,16 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useRouter } from "next/navigation";
 import { authService } from "@/api/services/auth.service";
 import { LogOut } from "lucide-react";
+import { ShowLoggedUserResponse } from "@/api/payloads/user.payload";
+import { userService } from "@/api/services/user.service";
 
 export default function UserDropdown() {
+  const [user, setUser] = useState<ShowLoggedUserResponse>()
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter()
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await userService.showLoggedUser()
+        setUser(response)
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -26,6 +43,21 @@ export default function UserDropdown() {
     router.push("/auth/login");
   }
 
+  function translateRole(role?: string): string {
+    switch ((role ?? "").toUpperCase()) {
+      case "ADMIN":
+        return "Administrador";
+      case "MANAGER":
+        return "Gestor";
+      case "COMMON":
+        return "Usuário";
+      case "EVALUATOR":
+        return "Avaliador";
+      default:
+        return "Usuário";
+    }
+  }
+
   return (
     <div className="relative">
       <button
@@ -33,17 +65,14 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image
-            width={44}
-            height={44}
-            src="/images/user/owner.jpg"
-            alt="User"
-          />
+          <div className="flex items-center justify-center size-full rounded-full bg-gray-300">
+            {user?.name.toUpperCase().charAt(0)}
+          </div>
         </span>
 
         <div className="text-left">
-          <span className="block mr-1 font-semibold text-theme-sm">Gabriel</span>
-          <span className="block mr-1 font-semibold text-xs text-[#6B7280]">Colaborador</span>
+          <span className="block mr-1 font-semibold text-theme-sm">{user?.name}</span>
+          <span className="block mr-1 font-semibold text-xs text-[#6B7280]">{translateRole(user?.type_user)}</span>
         </div>
 
         <svg
@@ -73,10 +102,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Gabriel Xavier
+            {user?.name}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            gabrielxav@empresa.com
+            {user?.email}
           </span>
         </div>
 

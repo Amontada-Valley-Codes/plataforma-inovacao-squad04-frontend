@@ -116,6 +116,7 @@ export const ENDPOINTS = {
 
   USER: {
     SHOW_ALL: "/user",
+    SHOW_LOGGED: "/user/profile/myProfile"
   },
 
 } as const;

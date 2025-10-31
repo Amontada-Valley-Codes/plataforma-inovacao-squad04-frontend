@@ -550,7 +550,7 @@ const CardExpandedHeader = ({ onClose, columns, currentColumnId, }: CardExpanded
   const { isMobile } = useBreakpoints()
 
   return (
-    <div className="relative w-full flex justify-start md:justify-center items-center px-8 md:px-16 border-b-2 border-[#A9A9A9]">
+    <div className="relative w-full flex justify-start md:justify-center items-center px-8 md:px-16 border-b drop-shadow-md border-[#A9A9A9]">
       {!isMobile && (
         <div className="flex justify-center items-center h-full gap-5">
           {columns.map((column) => (
