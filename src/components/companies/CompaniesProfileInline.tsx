@@ -230,7 +230,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
             {/* Redes sociais */}
             <section id="social" className="space-y-3 mt-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100">
+                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-900">
                   Redes Sociais
                 </h3>
                 {editable && (
@@ -250,7 +250,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                     href={company.instagram ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
+                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] dark:bg-gray-800 text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
                   >
                     Instagram
                   </a>
@@ -258,7 +258,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                     href={company.whatsapp ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
+                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] dark:bg-gray-800 text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
                   >
                     WhatsApp
                   </a>
@@ -266,7 +266,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                     href={company.linkedin ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
+                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] dark:bg-gray-800 text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
                   >
                     LinkedIn
                   </a>
@@ -309,7 +309,7 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
                   className="mt-4 w-full h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-sm hover:shadow-md transition"
                   title={company.locationUrl ?? "—"}
                 >
-                  <FaMapMarkedAlt className="text-blue-700 dark:text-blue-300 text-4xl" />
+                  <FaMapMarkedAlt className="text-blue-700 dark:text-blue-800 text-4xl" />
                 </a>
               ) : (
                 <LocationForm
