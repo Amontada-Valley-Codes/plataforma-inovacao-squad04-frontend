@@ -5,32 +5,16 @@
 import React from "react";
 import { Tag, Calendar, MoreHorizontal, Eye, EyeOff, Archive } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
+import { ShowAllChallengeResponse } from "@/api/payloads/challenge.payload";
+import { getCategoryLabel, shortDateFormatter } from "../kanban/Kanban";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 // Ajuste aqui conforme seu payload real:
-type Status = "Completed" | "Archived" | "In Progress" | "Pending" | string;
+type Status = "APPROVE" | "DISAPPROVE" | "In Progress" | "Pending" | string;
 type Visibility = "Public" | "Private" | string;
 
-type Challenge = {
-  id: string;
-  name?: string;
-  ChallengeTitle?: string;
-  authorName?: string;
-  Author?: string;
-  category?: string;
-  Category?: string;
-  status: Status;
-  Status?: Status;
-  createdAt?: string;
-  updatedAt?: string;
-  Date?: string;
-  visibility: Visibility;
-  Visibility?: Visibility;
-  enterpriseId?: string;
-  usersId?: string;
-  createdById?: string;
-};
+type Challenge = ShowAllChallengeResponse
 
 type Props = {
   companyId?: string; 
@@ -49,24 +33,27 @@ export default function CompanyHistoryHistoric({
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const normalize = (c: any): Challenge => ({
+  const normalize = (c: Challenge): Challenge => ({
     id: String(c.id),
-    name: c.name ?? c.ChallengeTitle,
-    ChallengeTitle: c.ChallengeTitle ?? c.name,
-    authorName: c.authorName ?? c.Author,
-    Author: c.Author ?? c.authorName,
-    category: c.category ?? c.Category,
-    Category: c.Category ?? c.category,
-    status: (c.status ?? c.Status) as Status,
-    Status: (c.Status ?? c.status) as Status,
+    name: c.name,
+    Users: { 
+      name: c.Users?.name ?? "Autor Desconhecido", 
+      image: c.Users?.image ?? null
+    },
+    area: c.area,
+    business_relevance: c.business_relevance,
     createdAt: c.createdAt,
-    updatedAt: c.updatedAt,
-    Date: c.Date ?? c.createdAt,
-    visibility: (c.visibility ?? c.Visibility) as Visibility,
-    Visibility: (c.Visibility ?? c.visibility) as Visibility,
+    description: c.description,
+    endDate: c.endDate,
     enterpriseId: c.enterpriseId,
+    innovative_potential: c.innovative_potential,
+    startDate: c.startDate,
+    status: c.status,
+    strategic_alignment: c.strategic_alignment,
+    updatedAt: c.updatedAt,
     usersId: c.usersId,
-    createdById: c.createdById ?? c.usersId,
+    visibility: c.visibility,
+    enterpriseName: c.enterpriseName
   });
 
   React.useEffect(() => {
@@ -103,7 +90,7 @@ export default function CompanyHistoryHistoric({
         // Garantia: mantém apenas Completed ou Archived (se o backend já filtrar, isso não atrapalha)
         const historicalOnly = (data ?? []).filter((c: any) => {
           const s = String(c.status ?? c.Status ?? "");
-          return s === "Completed" || s === "Archived";
+          return s === "APPROVE" || s === "DISAPPROVE";
         });
 
         // Escopos extras client-side (defensivo)
@@ -117,9 +104,10 @@ export default function CompanyHistoryHistoric({
           scoped = scoped.filter((c) => String(c.enterpriseId) === String(companyId));
         }
         // Para "usuario" não há filtro extra: o endpoint já limita ao próprio usuário.
-
+        console.log(data)
         setItems(scoped.map(normalize));
       } catch (e: any) {
+        console.error(error)
         setError(e?.message ?? "Erro ao carregar histórico.");
       } finally {
         setLoading(false);
@@ -129,14 +117,23 @@ export default function CompanyHistoryHistoric({
 
   const getStatusColor = (status: Status) => {
     switch (status) {
-      case "Completed":
+      case "APPROVE":
         return "bg-emerald-500";
-      case "Archived":
+      case "DISAPPROVE":
         return "bg-gray-500";
       default:
         return "bg-slate-400";
     }
   };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "APPROVE":
+        return "Aprovado"
+      case "DISAPPROVE":
+        return "Recusado"
+    }
+  }
 
   if (loading) {
     return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
@@ -157,12 +154,12 @@ export default function CompanyHistoryHistoric({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
       {items.map((challenge) => {
-        const title = challenge.ChallengeTitle ?? challenge.name ?? "Desafio";
-        const author = challenge.Author ?? challenge.authorName ?? "—";
-        const category = challenge.Category ?? challenge.category ?? "—";
-        const status = (challenge.Status ?? challenge.status) as Status;
-        const isPublic = (challenge.Visibility ?? challenge.visibility) === "Public";
-        const when = challenge.Date ?? challenge.updatedAt ?? challenge.createdAt ?? "—";
+        const title = challenge.name
+        const author = challenge.Users.name
+        const category = challenge.area
+        const status =challenge.status
+        const isPublic = challenge.visibility === "PUBLIC";
+        const when = challenge.startDate ?? challenge.updatedAt ?? challenge.createdAt ?? "—";
 
         return (
           <div
@@ -175,7 +172,6 @@ export default function CompanyHistoryHistoric({
                 <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-300">
                   {title}
                 </h2>
-                <p className="text-gray-500 dark:text-[#ced3db] text-sm">{author}</p>
               </div>
               <button aria-label="Mais opções">
                 <MoreHorizontal className="text-gray-400 dark:text-[#ced3db] hover:text-gray-600 cursor-pointer" />
@@ -185,14 +181,14 @@ export default function CompanyHistoryHistoric({
             {/* Metas */}
             <div className="mt-4 space-y-2">
               <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-                <Tag size={16} /> {category}
+                <Tag size={16} /> {getCategoryLabel(category)}
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
                 <span className={`w-3 h-3 rounded-full ${getStatusColor(status)}`} />
-                {status}
+                {getStatusLabel(status)}
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-                <Calendar size={16} /> {when}
+                <Calendar size={16} /> {shortDateFormatter.format(new Date(when))}
               </div>
             </div>
 
