@@ -8,7 +8,6 @@ export type Challenge = {
   Visibility: string;
   companyId?: number; // opcional, para vincular a uma empresa
 };
-
 export const challengesData: Challenge[] = [
   {
     id: 1,
