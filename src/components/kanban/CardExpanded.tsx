@@ -44,13 +44,13 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
 
   return (
     <div className={cn("flex flex-col lg:flex-row flex-1 min-h-0 bg-white w-full rounded-b-2xl overflow-y-auto", className)}>
-      <div className="flex flex-col w-full lg:w-[55%] bg-white rounded-b-2xl">
+      <div className="flex flex-col w-full lg:w-[55%] bg-white dark:bg-gray-900 rounded-b-2xl">
         <div className="flex-1 lg:overflow-y-auto px-8 py-6 scrollbar-hidden w-full">
           {mainContent}
         </div>
 
         {isDesktop && (
-          <div className="sticky bottom-0 left-0 w-full bg-white border-t flex justify-center py-4 px-8">
+          <div className="sticky bottom-0 left-0 w-full bg-white dark:bg-gray-900 dark:border-t-0 border-t flex justify-center py-4 px-8">
             <div className={`w-full flex items-center gap-12 ${
               !isFirstColumn && !isLastColumn ?
               "justify-center"
@@ -69,7 +69,7 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
         )}
       </div>
 
-      <div className="flex w-full lg:w-[45%] h-full bg-[#D9D9D9]">
+      <div className="flex w-full lg:w-[45%] h-full bg-[#D9D9D9] dark:bg-gray-900">
         {commentsContent}
       </div>
 
@@ -152,9 +152,9 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
   }
 
   return (
-    <div className="relative flex flex-col justify-between w-full h-full">
-      <div className="w-full flex flex-col">
-        <h1 className="text-xl text-[#0B2B72] font-semibold mb-4">Forma de Resolução</h1>
+    <div className="relative flex flex-col dark:bg-gray-800 justify-between w-full h-full">
+      <div className="w-full flex flex-col dark:bg-gray-800">
+        <h1 className="text-xl text-[#0B2B72] dark:text-white font-semibold mb-4">Forma de Resolução</h1>
         <div className="relative flex w-full justify-around mb-4">
           <div className="flex items-center gap-2">
             <button
@@ -169,7 +169,7 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 
               </div>
             </button>
-            <label className="text-sm text-[#666] font-semibold">PRIVADO</label>
+            <label className="text-sm text-[#666] dark:text-white font-semibold">PRIVADO</label>
           </div>
 
           <div className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 
               </div>
             </button>
-            <label className="text-sm text-[#666] font-semibold">PUBLICO</label>
+            <label className="text-sm text-[#666] dark:text-white font-semibold">PUBLICO</label>
           </div>
         </div>
         {(visibility === "PRIVATE" || visibility === "INTERNAL") && (
@@ -204,7 +204,7 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 
                   </div>
                 </button>
-                <label className="text-xs text-[#666] font-semibold">Convidar startup especifica</label>
+                <label className="text-xs text-[#666] dark:text-white font-semibold">Convidar startup especifica</label>
               </div>
 
               <div className="flex items-center w-45 gap-2">
@@ -220,15 +220,15 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 
                   </div>
                 </button>
-                <label className="text-xs text-[#666] font-semibold">Resolver internamente</label>
+                <label className="text-xs text-[#666] dark:text-white font-semibold">Resolver internamente</label>
               </div>
             </div>
             {visibility === "PRIVATE" && (
               <div className="flex flex-col w-full gap-2 overflow-y-auto scrollbar-hidden max-h-[300px]">
                 <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
                 {startups.map((startup) => (
-                  <div key={startup.id} className={`flex rounded-2xl w-full justify-between bg-gray-100 flex-col`}>
-                    <div className={`relative bg-gray-200 rounded-t-2xl h-30 w-full`}>
+                  <div key={startup.id} className={`flex rounded-2xl w-full justify-between bg-gray-100 dark:bg-gray-700 flex-col`}>
+                    <div className={`relative bg-gray-200 dark:bg-gray-900/40 rounded-t-2xl h-30 w-full`}>
                       {startup.logo && (
                         <Image
                           src={startup.logo}
@@ -243,15 +243,15 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
                     <div className="flex flex-col w-full justify-between gap-2 p-4">
                       <div className="flex w-full justify-between">
                         <div className="flex flex-col gap-1">
-                          <h1 className="text-black text-lg font-semibold">
+                          <h1 className="text-black dark:text-white text-lg font-semibold">
                             {startup.name}
                           </h1>
-                          <h2 className="text-[#666] text-sm">
+                          <h2 className="text-[#666] dark:text-white text-sm">
                             {getCategoryLabel(startup.industry_segment)}
                           </h2>
                         </div>
 
-                        <div className="flex flex-col gap-2 text-black">
+                        <div className="flex flex-col gap-2 dark:text-white text-black">
                           <div className="flex items-center gap-1">
                             <MoreVertical size={20}/>
                           </div>
@@ -278,11 +278,11 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
 
       {visibility === "PUBLIC" && (
         <div className="flex items-center justify-center p-4">
-          <p className="text-center text-sm text-[#666] font-semibold">Startups podem se candidatar</p>
+          <p className="text-center text-sm text-[#666 dark:text-white] font-semibold">Startups podem se candidatar</p>
         </div>
       )}
       
-      <div className="sticky bottom-0 left-0 w-full bg-white border-t flex gap-4 items-center justify-center py-3">
+      <div className="sticky bottom-0 left-0 w-full bg-white dark:bg-gray-800 border-t flex gap-4 items-center justify-center py-3">
         <button
           className="flex w-30 justify-center px-1 py-2
           rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
@@ -401,7 +401,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
         onClose={onClose}
       >
         <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl w-[95vw] md:w-[80vw] h-[90vh] overflow-hidden flex flex-col">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-[95vw] md:w-[80vw] h-[90vh] overflow-hidden flex flex-col">
             <CardExpandedHeader onClose={onClose} columns={columns} currentColumnId={cardData?.status}/>
             {cardData.status === "GENERATION" && (
               <CardExpandedLayout
@@ -520,7 +520,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             onClose={() => setIsCardOpen(false)}
           >
             <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-100">
-              <div className="bg-white px-4 pt-4 rounded-2xl w-[90vw] md:w-[40vw] overflow-hidden flex flex-col">
+              <div className="bg-white dark:bg-gray-800 px-4 pt-4 rounded-2xl w-[90vw] md:w-[40vw] overflow-hidden flex flex-col">
                 <FormResolutionCard
                   setIsOpen={setIsCardOpen}
                   performMove={performMove}
@@ -550,12 +550,12 @@ const CardExpandedHeader = ({ onClose, columns, currentColumnId, }: CardExpanded
   const { isMobile } = useBreakpoints()
 
   return (
-    <div className="relative w-full flex justify-start md:justify-center items-center px-8 md:px-16 border-b drop-shadow-md border-[#A9A9A9]">
+    <div className="relative w-full flex justify-start md:justify-center items-center px-8 md:px-16 border-b-2 border-[#A9A9A9] dark:border-gray-800">
       {!isMobile && (
         <div className="flex justify-center items-center h-full gap-5">
           {columns.map((column) => (
             <div key={column.id} className={`flex justify-center p-2 lg:p-3 items-center h-full text-sm lg:text-base font-semibold 
-            ${column.id === currentColumnId ? "bg-[#D9D9D9] text-[#848484]" : "text-[#666]"}`}>
+            ${column.id === currentColumnId ? "bg-[#D9D9D9] dark:text-white dark:bg-gray-800 text-[#848484]" : "text-[#666]"}`}>
               {column.name}
             </div>
           ))}

@@ -12,16 +12,16 @@ export const CommentsPanel = ({ sections, challengeId }: CommentsPanelProps) => 
 
   if (!sections || sections.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full p-4 text-center text-gray-500 bg-gray-100">
+      <div className="flex items-center justify-center h-full p-4 text-center text-gray-500 dark:text-white bg-gray-100 dark:bg-gray-900">
         Nenhuma seção de comentários foi definida para esta fase do processo.
       </div>
     );
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#D9D9D9]">
+    <div className="flex h-full w-full flex-col bg-[#d9d9d9] dark:bg-gray-900">
       <div className="flex-shrink-0 flex items-center justify-between border-b border-gray-300 p-4">
-        <h2 className="flex items-center gap-1 text-lg font-bold text-black">
+        <h2 className="flex items-center gap-1 text-lg font-bold text-black dark:text-white">
           <SlidersHorizontal/>
           Comentários
         </h2>

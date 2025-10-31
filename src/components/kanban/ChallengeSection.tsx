@@ -30,44 +30,44 @@ export const ChallengeSection = ({ challangeTitle, category, description, strate
       <div>
         {/* descrição */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <Menu size={16}/>
             Descrição
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {description}
           </p>
         </div>
 
         {/* alinhamento estrategico */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <Building2 size={16}/>
             Alinhamento Estratégico
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {strategicAlignment}
           </p>
         </div>
 
         {/* potencial inovador */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <Lightbulb size={16}/>
             Potência Inovador
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {innovativePotential}
           </p>
         </div>
 
         {/* relevancia do negocio */}
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black text-lg">
+          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <BriefcaseBusiness size={16}/>
             Relevância para o negócio
           </h1>
-          <p className="text-sm text-gray-600 font-medium text-justify">
+          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
             {businessRelevance}
           </p>
         </div>
