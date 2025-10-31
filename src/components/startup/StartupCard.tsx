@@ -2,7 +2,6 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import {
   LayoutGrid,
   List as ListIcon,
@@ -120,7 +119,7 @@ export default function StartupCard({
     startup: ShowAllStartupsResponse,
     children: React.ReactNode,
   ) => {
-    if (role === "admin") {
+    if (role === "admin" || role === "gestor") {
       const handlers = {
         onClick: () => {
           setSelectedStartup(startup);
@@ -137,11 +136,6 @@ export default function StartupCard({
       };
       return <div {...handlers}>{children}</div>;
     }
-    return (
-      <Link href={`/startup/${startup.id}?role=${role}`} className="block" prefetch={false}>
-        {children}
-      </Link>
-    );
   };
 
   return (
