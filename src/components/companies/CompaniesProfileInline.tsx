@@ -26,9 +26,11 @@ function getLogo(e: ShowOneEnterpriseResponse | null | undefined): string | unde
 export default function CompaniesProfileInline({ data, editable = false }: Props) {
   const [company, setCompany] = useState<ShowOneEnterpriseResponse | null>(data);
   const [editInfo, setEditInfo] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editMedia, setEditMedia] = useState(false);
   const [editSocial, setEditSocial] = useState(false);
   const [editLocation, setEditLocation] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mediaTarget, setMediaTarget] = useState<MediaTarget>(null);
   const [busy, setBusy] = useState(false);
 
@@ -67,34 +69,6 @@ export default function CompaniesProfileInline({ data, editable = false }: Props
       alert("Informações atualizadas.");
     } catch {
       alert("Falha ao salvar as informações.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function saveCoverFile(file: File) {
-    if (!editable) return;
-    setBusy(true);
-    try {
-      await enterpriseService.updateCoverImage(file);
-      await refresh();
-      alert("Capa atualizada.");
-    } catch {
-      alert("Falha ao atualizar a capa.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function saveProfileFile(file: File) {
-    if (!editable) return;
-    setBusy(true);
-    try {
-      await enterpriseService.updateProfileImage(file);
-      await refresh();
-      alert("Imagem de perfil atualizada.");
-    } catch {
-      alert("Falha ao atualizar a imagem de perfil.");
     } finally {
       setBusy(false);
     }
@@ -446,48 +420,6 @@ function InfoForm({
           <textarea className="w-full rounded-xl border px-3 py-[10px] min-h-28" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </Row>
       </div>
-      <div className="md:col-span-2">
-        <Actions onCancel={onCancel} busy={busy} />
-      </div>
-    </form>
-  );
-}
-
-function MediaForm({
-  initialTarget = null,
-  onSave,
-  onCancel,
-  busy,
-}: {
-  initialTarget?: MediaTarget;
-  onSave: (p: { logoFile?: File; coverFile?: File }) => Promise<void>;
-  onCancel: () => void;
-  busy?: boolean;
-}) {
-  const [logoFile, setLogoFile] = useState<File | undefined>();
-  const [coverFile, setCoverFile] = useState<File | undefined>();
-  const logoRef = useRef<HTMLInputElement | null>(null);
-  const coverRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (initialTarget === "logo") logoRef.current?.focus();
-    if (initialTarget === "cover") coverRef.current?.focus();
-  }, [initialTarget]);
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSave({ logoFile, coverFile });
-      }}
-      className="grid md:grid-cols-2 gap-4 mt-3"
-    >
-      <Row label="Logo (arquivo)">
-        <input ref={logoRef} type="file" accept="image/*" className="rounded-xl border px-3 py-[10px]" onChange={(e) => setLogoFile(e.target.files?.[0])} />
-      </Row>
-      <Row label="Capa (arquivo)">
-        <input ref={coverRef} type="file" accept="image/*" className="rounded-xl border px-3 py-[10px]" onChange={(e) => setCoverFile(e.target.files?.[0])} />
-      </Row>
       <div className="md:col-span-2">
         <Actions onCancel={onCancel} busy={busy} />
       </div>

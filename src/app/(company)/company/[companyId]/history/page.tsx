@@ -4,7 +4,7 @@
 import { getUserRole, getCurrentUser, getUserCompanyId } from "@/lib/auth";
 import CompanyHistoryHistoric from "@/components/history/CompanyHistory";
 import { use, useEffect, useState } from "react";
-import { ShowAllEnterpriseResponse, ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
+import { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
 
 type PageProps = {
@@ -25,7 +25,7 @@ export default function CompanyHistoryPage({ params }: PageProps) {
       const response = await enterpriseService.getMyEnterprise()
       setEnterpriseName(response?.name)
     } catch (error) {
-      console.error
+      console.log(error)
     }
   }
 
