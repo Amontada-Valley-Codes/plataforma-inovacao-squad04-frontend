@@ -12,7 +12,6 @@ type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
 // Ajuste aqui conforme seu payload real:
 type Status = "APPROVE" | "DISAPPROVE" | "In Progress" | "Pending" | string;
-type Visibility = "Public" | "Private" | string;
 
 type Challenge = ShowAllChallengeResponse
 
@@ -155,7 +154,6 @@ export default function CompanyHistoryHistoric({
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
       {items.map((challenge) => {
         const title = challenge.name
-        const author = challenge.Users.name
         const category = challenge.area
         const status =challenge.status
         const isPublic = challenge.visibility === "PUBLIC";
