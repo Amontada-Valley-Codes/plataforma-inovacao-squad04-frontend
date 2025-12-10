@@ -14,11 +14,11 @@ const rules: Record<string, RoleEn[]> = {
 const isPublic = (p: string) =>
   p === "/" ||
   p.startsWith("/login") ||
-  p.startsWith("/register") ||   // 🔓 registro via convite
+  p.startsWith("/register") ||   
   p.startsWith("/public") ||
   p.startsWith("/_next") ||
   p.startsWith("/favicon") ||
-  p.startsWith("/api/dev/set-cookie"); // rota local de suporte
+  p.startsWith("/api/dev/set-cookie"); 
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

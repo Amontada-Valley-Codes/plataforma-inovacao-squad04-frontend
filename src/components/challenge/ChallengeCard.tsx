@@ -359,7 +359,7 @@ export default function ChallengeCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
           {filtered.map((challenge) => {
             const isPublic = (challenge.visibility || "").toLowerCase() === "public";
-            const alreadyApplied = new Set<string>([]).has(challenge.id); // se quiser manter o localStorage, troque por state 'applied'
+            const alreadyApplied = new Set<string>([]).has(challenge.id);
 
             return (
               <div
@@ -384,9 +384,6 @@ export default function ChallengeCard({
                       {challenge.Users?.name || "Autor desconhecido"}
                     </p>
                   </div>
-                  <button aria-label="Mais opções">
-                    <MoreHorizontal className="text-gray-400 dark:text-[#ced3db] hover:text-gray-600 cursor-pointer" />
-                  </button>
                 </div>
 
                   <div className="space-y-1">
