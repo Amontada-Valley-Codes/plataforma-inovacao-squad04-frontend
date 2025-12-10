@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Tag, Calendar, Eye, EyeOff, MoreHorizontal, AlertTriangle } from "lucide-react";
+import { Tag, Calendar, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { getUserRole } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
 import ApplyButton from "./ApplyButton";
