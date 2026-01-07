@@ -1,11 +1,11 @@
 'use client'
 
-import { MoreDotIcon } from "@/icons";
 import ReactApexChart from "react-apexcharts";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useState } from "react";
 import { ApexOptions } from "apexcharts";
+import { MoreVerticalIcon } from "lucide-react";
 
 type DistributionBySectorProps = {
   distribuicaoPorSetor: Record<string, number>;
@@ -49,7 +49,7 @@ export default function DistributionBySector({ distribuicaoPorSetor }: Distribut
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Distribuição por setor</h3>
         <div className="relative inline-block">
           <button onClick={toggleDropdown}>
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
+            <MoreVerticalIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
           </button>
           <Dropdown isOpen={isOpen} onClose={closeDropdown} className="w-40 p-2">
             <DropdownItem onItemClick={closeDropdown} className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
