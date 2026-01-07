@@ -4,7 +4,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle, Loader2, EyeClosedIcon } from "lucide-react";
 import Link from "next/link";
 import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
@@ -163,7 +163,7 @@ export default function LoginForm() {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showPassword ? <EyeIcon size={18} /> : <EyeCloseIcon size={18} />}
+            {showPassword ? <EyeIcon size={18} /> : <EyeClosedIcon size={18} />}
           </button>
         </div>
 

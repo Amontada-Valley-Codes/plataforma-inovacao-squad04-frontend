@@ -6,15 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import {
-  GridIcon,
-  HorizontaLDots,
-  ClipboardDocumentListIcon,
-  HistoryIcon,
-  RocketLaunchIcon,
-  BuildingOffice2Icon,
-} from "../icons/index";
-import { SquareKanban } from "lucide-react";
+import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
@@ -95,8 +87,8 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
 
   if (pathname.startsWith("/challenges-publicos")) {
     return [
-      { icon: <GridIcon />, name: "Desafios Públicos", path: "/challenges-publicos" },
-      { icon: <RocketLaunchIcon />, name: "Startup", path: "/startup/my-startup" },
+      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/challenges-publicos" },
+      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
       { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
   }
@@ -108,10 +100,10 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
 
   if (role === "admin") {
     return [
-      { icon: <GridIcon />, name: "Dashboard", path: "/admin/dashboard" },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: "/admin/challenges" },
-      { icon: <RocketLaunchIcon />, name: "Startups", path: "/admin/startups" },
-      { icon: <BuildingOffice2Icon />, name: "Empresas", path: "/admin/companies" },
+      { icon: <Grid2x2Icon />, name: "Dashboard", path: "/admin/dashboard" },
+      { icon: <ClipboardListIcon />, name: "Desafios", path: "/admin/challenges" },
+      { icon: <RocketIcon />, name: "Startups", path: "/admin/startups" },
+      { icon: <Building2Icon />, name: "Empresas", path: "/admin/companies" },
       { icon: <HistoryIcon />, name: "Histórico", path: "/admin/history" },
     ];
   }
@@ -119,8 +111,8 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
   // STARTUP sem contexto de empresa
   if (!companyId && role === "startup") {
     return [
-      { icon: <GridIcon />, name: "Desafios Públicos", path: "/startup/desafios" },
-      { icon: <RocketLaunchIcon />, name: "Startup", path: "/startup/my-startup" },
+      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/startup/desafios" },
+      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
       { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
   }
@@ -129,19 +121,19 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
   if (!companyId) {
     if (role === "gestor") {
       return [
-        { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/company" },
-        { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: "/company/desafios" },
+        { icon: <Building2Icon />, name: "Minha Empresa", path: "/company" },
+        { icon: <ClipboardListIcon />, name: "Desafios", path: "/company/desafios" },
         { icon: <HistoryIcon />, name: "Histórico", path: "/company/history" },
       ];
     }
     if (role === "usuario") {
       return [
-        { icon: <GridIcon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-        { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+        { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
+        { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
         { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
       ];
     }
-    return [{ icon: <BuildingOffice2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
+    return [{ icon: <Building2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
   // Com companyId
@@ -149,29 +141,29 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
 
   if (role === "gestor") {
     return [
-      { icon: <GridIcon />, name: "Dashboard", path: `${base}/dashboard` },
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
+      { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
       { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
-      { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
-      { icon: <RocketLaunchIcon />, name: "Startups", path: `${base}/startups` },
+      { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
       { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
-      { icon: <BuildingOffice2Icon />, name: "Usuários", path: `${base}/usuarios` },
+      { icon: <Building2Icon />, name: "Usuários", path: `${base}/usuarios` },
     ];
   }
 
   if (role === "avaliador") {
     return [
-      { icon: <ClipboardDocumentListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
       { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
-      { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
       { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
     ];
   }
 
   // Usuário comum (ou fallback com companyId)
   return [
-    { icon: <GridIcon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-    { icon: <BuildingOffice2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+    { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
+    { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
     { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
   ];
 }
@@ -305,7 +297,7 @@ const AppSidebar: React.FC = () => {
             <div className="flex flex-col gap-4">
               <div>
                 <h2 className={`mb-4 text-xs uppercase flex leading-[20px] text-white ${isCompact ? "justify-center" : "justify-start"}`}>
-                  {isExpanded || isHovered || isMobileOpen ? "" : <HorizontaLDots />}
+                  {isExpanded || isHovered || isMobileOpen ? "" : <GripHorizontalIcon />}
                 </h2>
                 {renderMenuItems(navItems)}
               </div>

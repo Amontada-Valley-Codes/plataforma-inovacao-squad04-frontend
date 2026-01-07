@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BoxIconLine, GroupIcon } from "@/icons";
+import { BoxesIcon, Group } from "lucide-react";
 
 type Metric = {
   title: string;
@@ -29,10 +29,10 @@ const MetricItem = ({ title, value, icon }: Metric) => (
 export const MetricsCards = ({ empresasAtivas, totalDesafios, totalEmpresas, totalIdeias }: MetricsCardsProps) => {
 
   const metrics: Metric[] = [
-  { title: "Empresas cadastradas", value: totalEmpresas, icon: <GroupIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Desafios", value: totalDesafios, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Ideias submetidas", value: totalIdeias, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Empresas Ativas", value: empresasAtivas, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Empresas cadastradas", value: totalEmpresas, icon: <Group className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Desafios", value: totalDesafios, icon: <BoxesIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Ideias submetidas", value: totalIdeias, icon: <BoxesIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Empresas Ativas", value: empresasAtivas, icon: <BoxesIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
 ];
 
   return (
