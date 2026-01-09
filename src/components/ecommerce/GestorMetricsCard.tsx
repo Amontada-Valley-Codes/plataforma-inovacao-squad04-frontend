@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { BoxIconLine, GroupIcon } from "@/icons";
 import { gestorDasboardResponse } from "@/api/payloads/dashboard.payload";
 import { dashboardService } from "@/api/services/dashboard.service";
+import { Box, LayoutDashboard } from "lucide-react";
 
 type Metric = {
   title: string;
@@ -50,10 +50,10 @@ export const GestorMetricsCards = () => {
   }
 
   const metrics: Metric[] = [
-  { title: "Desafios cadastrados", value: dashboardData?.totalDesafios || 0, icon: <GroupIcon className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Total de Pocs", value: dashboardData?.totalPocs || 0, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Total de Ideias submetidas", value: dashboardData?.totalIdeas || 0, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Usuários Ativos", value: dashboardData?.totalUsers || 0, icon: <BoxIconLine className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Desafios cadastrados", value: dashboardData?.totalDesafios || 0, icon: <LayoutDashboard className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Total de Pocs", value: dashboardData?.totalPocs || 0, icon: <Box className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Total de Ideias submetidas", value: dashboardData?.totalIdeas || 0, icon: <Box className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Usuários Ativos", value: dashboardData?.totalUsers || 0, icon: <Box className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
 ];
 
   return (
