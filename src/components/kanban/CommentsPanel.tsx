@@ -6,9 +6,10 @@ import { SlidersHorizontal } from 'lucide-react';
 type CommentsPanelProps = {
   sections: SectionType[];
   challengeId: string;
+  onChangeView: (view: "historico") => void;
 };
 
-export const CommentsPanel = ({ sections, challengeId }: CommentsPanelProps) => {
+export const CommentsPanel = ({ sections, challengeId, onChangeView }: CommentsPanelProps) => {
 
   if (!sections || sections.length === 0) {
     return (
@@ -25,6 +26,12 @@ export const CommentsPanel = ({ sections, challengeId }: CommentsPanelProps) => 
           <SlidersHorizontal/>
           Comentários
         </h2>
+        <button 
+          className="text-sm w-fit self-end text-white font-semibold px-2 py-1 rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors"
+          onClick={() => onChangeView("historico")}
+        >
+          Ver histórico de atividade
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-hidden px-4 py-2 min-h-0">
