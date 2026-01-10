@@ -19,8 +19,9 @@ const columns = [
   { id: 'GENERATION', name: 'Desafios' },
   { id: 'PRE_SCREENING', name: 'Pré-Triagem' },
   { id: 'DETAILED_SCREENING', name: 'Triagem Detalhada' },
-  { id: 'IDEATION', name: 'Ideação' },
+  { id: 'MATERIALIZATION', name: 'Materialização' },
   { id: 'EXPERIMENTATION', name: 'Experimentação' },
+  { id: 'SCALE', name: 'Escala' }
 ];
 
 export const dateFormatter = new Intl.DateTimeFormat('pt-BR', {

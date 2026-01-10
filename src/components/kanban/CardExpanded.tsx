@@ -25,7 +25,7 @@ import Image from "next/image"
 import { ChallengeSection } from "./ChallengeSection"
 import { PreScreening } from "./PreScreening"
 import { DetailedScreening } from "./DetailedScreening"
-import { Ideation } from "./Ideation"
+import Materialization from "./Materialization"
 import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
@@ -354,7 +354,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
         if (challengeId) {
           await ChallengeService.changeVisibility(challengeId, { visibility: visibilityToSet })
-          console.log("✅ Visibilidade alterada com sucesso");
+          console.log("Visibilidade alterada com sucesso");
         }
       }
 
@@ -366,7 +366,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
         if (challengeId) {
           await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
-          console.log("✅ Status atualizado com sucesso");
+          console.log("Status atualizado com sucesso");
         }
 
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
@@ -377,7 +377,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
       }
 
     } catch (error) {
-      console.error("❌ Erro ao atualizar desafio:", error);
+      console.error("Erro ao atualizar desafio:", error);
     } finally {
       setIsCardOpen(false);
     }
@@ -534,17 +534,16 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleApproveAndMove={handleApproveAndMove}
               />
             )}
-            {cardData.status === "IDEATION" && (
+            {cardData.status === "MATERIALIZATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <Ideation
-                    challengeTitle={cardData.name}
+                  <Materialization
                     challengeId={cardData.id}
-                    category={cardData.area}
+                    challengeTitle={cardData.name}
                     creator={cardData.Users.name}
-                    visibility={cardData.visibility}
                     endDate={cardData.endDate}
                     startDate={cardData.startDate}
+                    visibility={cardData.visibility}
                   />
                 }
                 commentsContent={(onChangeView) => (
@@ -562,10 +561,10 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   />
                 )}
                 challengeId={cardData.id}
+                handleApproveAndMove={handleApproveAndMove}
+                handleMoveBack={handleMoveBack}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
-                handleMoveBack={handleMoveBack}
-                handleApproveAndMove={handleApproveAndMove}
               />
             )}
             {cardData.status === "EXPERIMENTATION" && (
