@@ -29,11 +29,13 @@ import Materialization from "./Materialization"
 import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
+import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
 
 type CardExpandedLayoutProps = {
   className?: string;
   mainContent: React.ReactNode;
-  commentsContent: React.ReactNode;
+  commentsContent: (onChangeView: (view: View) => void) => React.ReactNode;
+  activyHistory: (onChangeView: (view: View) => void) => React.ReactNode;
   challengeId: string | undefined;
   challengeStatus?: string;
   isFirstColumn: boolean;
@@ -42,8 +44,12 @@ type CardExpandedLayoutProps = {
   handleApproveAndMove: (challengeId: string | undefined) => void;
 }
 
-const CardExpandedLayout = ({ className, mainContent, commentsContent, challengeId, challengeStatus, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack }: CardExpandedLayoutProps) => {
+type View = "historico" | "comentarios"
+
+const CardExpandedLayout = ({ className, mainContent, commentsContent, challengeId, challengeStatus, isLastColumn, isFirstColumn, handleApproveAndMove, handleMoveBack, activyHistory }: CardExpandedLayoutProps) => {
   const { isDesktop } = useBreakpoints()
+
+  const [view, setView] = useState<View>("comentarios");
 
   return (
     <div className={cn("flex flex-col lg:flex-row flex-1 min-h-0 bg-white w-full rounded-b-2xl overflow-y-auto", className)}>
@@ -81,7 +87,8 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
       </div>
 
       <div className="flex w-full lg:w-[45%] h-full bg-[#D9D9D9] dark:bg-gray-900">
-        {commentsContent}
+        {view === "comentarios" && commentsContent(setView)}
+        {view === "historico" && activyHistory(setView)}
       </div>
 
       {!isDesktop && (
@@ -437,7 +444,20 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                   />
                 }
-                commentsContent={<CommentsPanel challengeId={cardData.id} sections={challangeCommentSections}/>}
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -459,7 +479,20 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                   />
                 }
-                commentsContent={<CommentsPanel challengeId={cardData.id} sections={preScreeningCommentSections}/>}
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -480,9 +513,20 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     visibility={cardData.visibility}
                   />
                 }
-                commentsContent={
-                  <CommentsPanel challengeId={cardData.id} sections={detailedScreeningCommentSections}/>
-                }
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
                 challengeId={cardData.id}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
@@ -502,8 +546,21 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     visibility={cardData.visibility}
                   />
                 }
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
                 challengeId={cardData.id}
-                commentsContent={<></>}
                 handleApproveAndMove={handleApproveAndMove}
                 handleMoveBack={handleMoveBack}
                 isFirstColumn={isFirstColumn}
@@ -524,7 +581,20 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     visibility={cardData.visibility}
                   />
                 }
-                commentsContent={<CommentsPanel challengeId={cardData.id} sections={experimentationCommentSections}/>}
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    sections={challangeCommentSections}
+                    onChangeView={onChangeView}
+                  />
+                )}
                 challengeId={cardData.id}
                 challengeStatus={cardData.status}
                 isFirstColumn={isFirstColumn}
