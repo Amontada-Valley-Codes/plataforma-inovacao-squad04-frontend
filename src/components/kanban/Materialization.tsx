@@ -1,8 +1,6 @@
 'use client'
 
-import { Check, PenSquare, Plus, Trash2 } from "lucide-react";
 import { CardContentsHeader } from "./CardsContents";
-import { useState } from "react";
 import CanvasMVP from "./CanvasMVP";
 
 type CardMaterializationContentProps = {
