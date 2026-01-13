@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useRouter } from "next/navigation";
 import { authService } from "@/api/services/auth.service";
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { ShowLoggedUserResponse } from "@/api/payloads/user.payload";
 import { userService } from "@/api/services/user.service";
 
@@ -63,7 +63,7 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <div className="flex items-center justify-center size-full rounded-full bg-gray-300">
+          <div className="flex items-center justify-center size-full rounded-full bg-blue-light-900 text-white text-2xl">
             {user?.name.toUpperCase().charAt(0)}
           </div>
         </span>
@@ -98,17 +98,34 @@ export default function UserDropdown() {
         onClose={closeDropdown}
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
-        <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.name}
-          </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {user?.email}
-          </span>
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-light-900 text-white text-2xl">
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
+
+          {/* Informações */}
+          <div className="leading-tight">
+            <span className="block font-medium text-gray-700 text-lg dark:text-gray-200">
+              {user?.name}
+            </span>
+            <span className="block text-theme-xs text-gray-500 dark:text-gray-400">
+              {user?.email}
+            </span>
+          </div>
         </div>
 
-        <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+        <ul className="flex flex-col gap-1 pt-4 pb-1 border-b border-gray-200 dark:border-gray-800">
         </ul>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+        >
+          <User className="w-5 h-5" />
+          Conta
+        </button>
+
         <button
           onClick={handleLogout}
           className="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"

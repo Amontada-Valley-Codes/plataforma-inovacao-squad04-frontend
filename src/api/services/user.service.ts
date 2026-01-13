@@ -9,7 +9,7 @@ export const userService = {
     },
 
     async showLoggedUser(): Promise<ShowLoggedUserResponse> {
-        const { data } = await api.get(ENDPOINTS.USER.SHOW_LOGGED);
+        const { data } = await api.get(ENDPOINTS.USER.PROFILE);
         return data;
     }
 };
