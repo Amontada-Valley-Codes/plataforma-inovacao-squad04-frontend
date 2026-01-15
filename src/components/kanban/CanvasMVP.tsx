@@ -1,7 +1,6 @@
 'use client'
 
 import { Check, PenSquare, Plus, Trash2 } from "lucide-react";
-import { CardContentsHeader } from "./CardsContents";
 import { useState } from "react";
 
 type TypeResource = "PEOPLE" | "TECH" | "FINANCIAL" | "INFRASTRUCTURE" | "PARTNERSHIPS" | undefined
@@ -43,9 +42,6 @@ export default function CanvasMVP() {
 
   return (
     <div>
-      <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold mb-4">
-        Canvas do MVP
-      </h1>
 
       <div className="flex flex-col mb-4">
         <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
@@ -250,7 +246,7 @@ export default function CanvasMVP() {
 
           <div className="mb-3">
             <h1>
-              Tecnologiass
+              Tecnologias
             </h1>
 
             <ul className="list-disc pl-4 space-y-2">
