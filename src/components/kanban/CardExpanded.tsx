@@ -408,7 +408,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
       if (challengeId) {
         await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
-        console.log("✅ Status atualizado com sucesso");
+        console.log("Status atualizado com sucesso");
       }
 
       const otherChallenges = challenges.filter(c => c.id !== challengeId);
