@@ -244,7 +244,9 @@ export default function CanvasMVP() {
             </ul>
           </div>
 
-          <div className="mb-3">
+          <hr className="border-gray-400"/>
+
+          <div className="my-3">
             <h1>
               Tecnologias
             </h1>
@@ -274,7 +276,9 @@ export default function CanvasMVP() {
             </ul>
           </div>
 
-          <div className="mb-3">
+          <hr className="border-gray-400"/>
+
+          <div className="my-3">
             <h1>
               Financeiros
             </h1>
@@ -304,7 +308,9 @@ export default function CanvasMVP() {
             </ul>
           </div>
 
-          <div className="mb-3">
+          <hr className="border-gray-400"/>
+
+          <div className="my-3">
             <h1>
               Infraestruturas
             </h1>
@@ -334,7 +340,9 @@ export default function CanvasMVP() {
             </ul>
           </div>
 
-          <div className="mb-3">
+          <hr className="border-gray-400"/>
+
+          <div className="my-3">
             <h1>
               Parcerias
             </h1>
@@ -364,6 +372,8 @@ export default function CanvasMVP() {
             </ul>
           </div>
         </div>
+
+        <hr className="border-gray-400"/>
 
       </div>
     </div>
