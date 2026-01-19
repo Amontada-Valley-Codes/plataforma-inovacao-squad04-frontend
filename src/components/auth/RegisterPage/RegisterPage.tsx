@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import AuthVisual from "../AuthVisual";
+import AuthVisual from "../../AuthVisual";
 import LoginForm from "./RegisterForm";
 
 export default function RegisterPage() {

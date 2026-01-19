@@ -18,3 +18,14 @@ export type RegisterResponse = {
   message: string
   userId: string
 }
+
+export type ResetPasswordPayload = {
+  email: string
+  phone: string
+  newPassword: string
+  token: string
+}
+
+export type ResetPasswordResponse = {
+ message: string
+}
