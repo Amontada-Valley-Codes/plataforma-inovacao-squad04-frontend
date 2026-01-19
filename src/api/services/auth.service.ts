@@ -1,7 +1,7 @@
 // src/api/services/auth.service.ts
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
-import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse } from "../payloads/auth.payload";
+import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse, ResetPasswordPayload, ResetPasswordResponse } from "../payloads/auth.payload";
 
 function clearFrontendCookie(name: string) {
   document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
@@ -22,4 +22,10 @@ export const authService = {
     localStorage.removeItem("access_token");
     clearFrontendCookie("access_token");
   },
+
+  async resetPassword(resetPasswordPayload: ResetPasswordPayload): Promise<ResetPasswordResponse> {
+    const response = await api.post(ENDPOINTS.AUTH.RESET_PASSWORD, resetPasswordPayload)
+    console.log(response.data)
+    return response.data
+  }
 };

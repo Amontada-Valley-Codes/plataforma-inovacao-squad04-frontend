@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
     REGISTER: "/auth/register",
+    RESET_PASSWORD: '/auth/reset'
   },
 
   USER: {
@@ -21,6 +22,7 @@ export const ENDPOINTS = {
 
   INVITE: {
     SEND: "/invite",
+    FORGOT_PASSWORD: "/invite/request"
   },
 
   STARTUP: {

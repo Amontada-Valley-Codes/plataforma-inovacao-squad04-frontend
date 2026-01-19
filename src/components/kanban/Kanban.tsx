@@ -65,7 +65,7 @@ export type Challenge = ShowAllChallengeResponse
 
 const KanbanPage = () => {
   const [challanges, setChallanges] = useState<Challenge[]>([]);
-  const [isKanban, setIsKanban] = useState(false)
+  const [isKanban, setIsKanban] = useState(true)
 
   useEffect(() => {
     async function fetchChallanges() {
@@ -186,9 +186,9 @@ const KanbanPage = () => {
                                 </p>
                               </div>
                               <p className="flex items-center gap-1 m-0 font-semibold text-[#666] dark:text-[#ced3db] text-[12px] mt-1">
-                                <CalendarClock size={14}/>
+                                {/* <CalendarClock size={14}/>
                                 {shortDateFormatter.format(new Date(challenge.startDate))} -{' '}
-                                {dateFormatter.format(new Date(challenge.endDate))}
+                                {dateFormatter.format(new Date(challenge.endDate))} */}
                               </p>
                             </div>
                           </div>

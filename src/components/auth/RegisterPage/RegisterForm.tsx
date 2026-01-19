@@ -5,9 +5,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle, Loader2, EyeClosedIcon } from "lucide-react";
 import Link from "next/link";
-import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -202,7 +201,7 @@ export default function RegisterForm() {
             {showPassword ? (
               <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
             ) : (
-              <EyeCloseIcon size={20} className="text-gray-500 dark:text-gray-400" />
+              <EyeClosedIcon size={20} className="text-gray-500 dark:text-gray-400" />
             )}
           </span>
         </div>
@@ -230,7 +229,7 @@ export default function RegisterForm() {
             {showRepeatPassword ? (
               <EyeIcon size={20} className="text-gray-500 dark:text-gray-400" />
             ) : (
-              <EyeCloseIcon size={20} className="text-gray-500 dark:text-gray-400" />
+              <EyeClosedIcon size={20} className="text-gray-500 dark:text-gray-400" />
             )}
           </span>
         </div>
