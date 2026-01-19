@@ -11,3 +11,16 @@ export type InviteRepose = {
   zap: string
   expiresAt: string
 }
+
+export type ForgotPasswordPayload = {
+  email: string
+  phone: string
+}
+
+export type ForgotPasswordResponse = {
+  message: string
+  passwordResetId: string
+  token: string
+  zap: string
+  expiresAt: string
+}

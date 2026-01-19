@@ -6,7 +6,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle, Loader2, EyeClosedIcon } from "lucide-react";
 import Link from "next/link";
-import { EyeCloseIcon } from "@/icons";
 import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -170,7 +169,7 @@ export default function LoginForm() {
         {error && <p className="text-red-400 text-sm text-center w-full">{error}</p>}
 
         <div className="text-center mt-1 space-y-1">
-          <Link href="#" className="relative text-white font-normal cursor-pointer
+          <Link href="/auth/forgot-password" className="relative text-white font-normal cursor-pointer
               after:content-[''] after:absolute after:left-0 after:-bottom-0.5
               after:h-[1.5px] after:w-full after:bg-white
               after:origin-center after:scale-x-0 after:transition-transform 

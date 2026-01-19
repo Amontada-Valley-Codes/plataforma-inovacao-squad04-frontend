@@ -1,9 +1,9 @@
-import LoginPage from "@/components/auth/LoginPage/LoginPage";
+import ForgotPage from "@/components/auth/ForgotPage/ForgotPage"
 
 export default function Login() {
   return (
     <div className="w-full h-full">
-      <LoginPage/>
+      <ForgotPage />
     </div>
   )
 }
