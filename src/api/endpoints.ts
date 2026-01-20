@@ -8,6 +8,7 @@ export const ENDPOINTS = {
   USER: {
     CREATE: "/user",
     SHOW_ALL: "/user",
+    UPDATE: "/user",
     SHOW_ONE: (id: string) => `/user/${id}`,
     DELETE: (id: string) => `/user/${id}`,
     PROFILE: "/user/profile/myProfile"

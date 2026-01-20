@@ -40,6 +40,9 @@ export default function UserDropdown() {
     authService.logout();
     router.push("/auth/login");
   }
+  function userPageInfo() {
+    router.push("/profile");
+  }
 
   function translateRole(role?: string): string {
     switch ((role ?? "").toUpperCase()) {
@@ -119,7 +122,7 @@ export default function UserDropdown() {
         </ul>
 
         <button
-          onClick={handleLogout}
+          onClick={userPageInfo}
           className="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <User className="w-5 h-5" />

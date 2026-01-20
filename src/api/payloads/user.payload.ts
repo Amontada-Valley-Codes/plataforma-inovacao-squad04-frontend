@@ -32,3 +32,18 @@ export type ShowLoggedUserResponse = {
   },
   Startup: null
 }
+
+export type UpdatesUserResponse = {
+  name: string
+  email: string
+  phone: string
+  image: {
+    url: string
+    public_id: string
+  }
+}
+export type UpdatesUserPayload = {
+  name?: string
+  phone?: string
+  image?: File
+}

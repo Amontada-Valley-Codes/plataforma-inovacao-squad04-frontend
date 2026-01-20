@@ -7,23 +7,57 @@ import Badge from "@/components/ui/badge/Badge";
 import { useEffect, useState } from "react";
 import { userService } from "@/api/services/user.service";
 import { ShowLoggedUserResponse } from "@/api/payloads/user.payload";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function UserProfilePage() {
 
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState<ShowLoggedUserResponse | null>(null)
+  const [profileData, setProfileData] = useState<ShowLoggedUserResponse | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [pageLoading, setPageLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const router = useRouter();
+
 
   const fetchUserProfile = async () => {
     try {
-      setLoading(true);
+      setPageLoading(true);
       const response = await userService.showLoggedUser();
-      setProfileData(response)
+      setProfileData(response);
+      setName(response.name);
+      setPhone(response.phone ?? "");
     } catch (error) {
-      console.log("Erro ao buscar dados do perfil:", error);
+      console.log(error);
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
-  }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      setSaveLoading(true);
+
+      await userService.updateUser({
+        name,
+        phone,
+      });
+
+      setProfileData((prev) =>
+        prev ? { ...prev, name, phone } : prev
+      );
+
+      setIsEditing(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     fetchUserProfile()
@@ -78,10 +112,31 @@ export default function UserProfilePage() {
     }
   }
 
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#15358D] border-t-transparent" />
+      </div>
+    );
+  }
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold text-[#15358D]">Configurações</h1>
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          onClick={() => router.back()}
+          className="text-[#15358D] hover:bg-[#15358D]/10"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+
+        <h1 className="text-2xl font-semibold text-[#15358D]">
+          Configurações
+        </h1>
+      </div>
+
 
       {/* Perfil do Usuário */}
       <Card className="rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
@@ -91,9 +146,20 @@ export default function UserProfilePage() {
 
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-[#15358D]/10 text-[#15358D] font-semibold">AD</AvatarFallback>
+              <AvatarImage
+                src={profileData?.image || ""}
+                alt={profileData?.name}
+              />
+              <AvatarFallback className="bg-[#15358D]/10 text-[#15358D] font-semibold">
+                {profileData?.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase() || "US"}
+              </AvatarFallback>
             </Avatar>
+
 
             <div>
               <p className="font-medium text-gray-900 dark:text-white">{profileData?.name}</p>
@@ -104,17 +170,71 @@ export default function UserProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm text-gray-500">Nome</label>
-              <p className="font-medium text-gray-900 dark:text-white">{profileData?.name}</p>
+              {isEditing ? (
+                <input
+                  disabled={saveLoading}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-md border px-3 py-2 text-sm"
+                />
+              ) : (
+                <p className="font-medium text-gray-900 dark:text-white">
+                  {profileData?.name}
+                </p>
+              )}
             </div>
             <div>
               <label className="text-sm text-gray-500">Telefone</label>
-              <p className="font-medium text-gray-400">{profileData?.phone ?? "Não informado"}</p>
+              {isEditing ? (
+                <input
+                  disabled={saveLoading}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-md border px-3 py-2 text-sm"
+                  placeholder="(99) 99999-9999"
+                />
+              ) : (
+                <p className="font-medium text-gray-400">
+                  {profileData?.phone ?? "Não informado"}
+                </p>
+              )}
             </div>
           </div>
 
-          <Button variant="outline" className="border-[#15358D] text-[#15358D] hover:bg-[#15358D]/10">
-            Editar perfil
-          </Button>
+          <div className="flex gap-2">
+            {isEditing ? (
+              <>
+                <Button
+                  onClick={handleSaveProfile}
+                  className="bg-[#15358D] text-white" 
+                >
+                  {saveLoading && (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  )}
+                  Salvar
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setName(profileData?.name ?? "");
+                    setPhone(profileData?.phone ?? "");
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                className="border-[#15358D] text-[#15358D] hover:bg-[#15358D]/10"
+                onClick={() => setIsEditing(true)}
+              >
+                Editar perfil
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -142,16 +262,6 @@ export default function UserProfilePage() {
               <p className="font-medium text-gray-400">{profileData?.lastAccessAt ? formatDate(profileData.lastAccessAt) : "Não informado"}</p>
             </div>
 
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="border-[#15358D] text-[#15358D] hover:bg-[#15358D]/10"
-            >
-              Alterar senha
-            </Button>
-            <Button>Desativar conta</Button>
           </div>
         </CardContent>
       </Card>
