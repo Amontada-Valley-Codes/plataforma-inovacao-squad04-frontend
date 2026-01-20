@@ -5,6 +5,15 @@ export const ENDPOINTS = {
     RESET_PASSWORD: '/auth/reset'
   },
 
+  USER: {
+    CREATE: "/user",
+    SHOW_ALL: "/user",
+    UPDATE: "/user",
+    SHOW_ONE: (id: string) => `/user/${id}`,
+    DELETE: (id: string) => `/user/${id}`,
+    PROFILE: "/user/profile/myProfile"
+  },
+
   ENTERPRISE: {
     CREATE: "/enterprise",
     SHOW_ALL: "/enterprise",
@@ -115,10 +124,4 @@ export const ENDPOINTS = {
     LIKED_COMMENT: (id: string) => `/comments-funnel/${id}/like`,
     FILTERED_COMMENT: (id: string, context: string) => `/comments-funnel/filter/context/${id}?context=${encodeURIComponent(context)}`
   },
-
-  USER: {
-    SHOW_ALL: "/user",
-    SHOW_LOGGED: "/user/profile/myProfile"
-  },
-
-} as const;
+} 
