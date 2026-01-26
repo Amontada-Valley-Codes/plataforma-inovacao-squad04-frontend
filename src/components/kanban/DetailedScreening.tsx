@@ -185,7 +185,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   }
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+    <div className="w-full flex flex-col overflow-y-auto">
       <Toaster position="top-right" reverseOrder={false}/>
       {/* header */}
       <div className="flex flex-col xl:flex-row xl:justify-between mb-6">

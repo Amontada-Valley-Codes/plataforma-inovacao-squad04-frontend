@@ -16,7 +16,7 @@ type CardChallangeContentProps = {
 export const ChallengeSection = ({ challangeTitle, category, description, strategicAlignment, innovativePotential, businessRelevance, startDate, endDate, creator }: CardChallangeContentProps) => {
   return (
     //conteudo do card de desafio
-    <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+    <div className="w-full flex flex-col overflow-y-auto">
       {/* header */}
       <CardContentsHeader
         challengeTitle={challangeTitle}

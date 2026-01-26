@@ -54,7 +54,7 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
   return (
     <div className={cn("flex flex-col lg:flex-row flex-1 min-h-0 bg-white w-full rounded-b-2xl overflow-y-auto", className)}>
       <div className="flex flex-col w-full lg:w-[55%] bg-white dark:bg-gray-900 rounded-b-2xl">
-        <div className="flex-1 lg:overflow-y-auto px-8 py-6 scrollbar-hidden w-full">
+        <div className="flex-1 lg:overflow-y-auto px-8 py-6 w-full">
           {mainContent}
         </div>
 
@@ -250,7 +250,7 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
               </div>
             </div>
             {visibility === "PRIVATE" && (
-              <div className="flex flex-col w-full gap-2 overflow-y-auto scrollbar-hidden max-h-[300px]">
+              <div className="flex flex-col w-full gap-2 overflow-y-auto max-h-[300px]">
                 <h1 className="text-base text-[#0B2B72] font-semibold mt-4">Startups</h1>
                 {startups.map((startup) => (
                   <div key={startup.id} className={`flex rounded-2xl w-full justify-between bg-gray-100 dark:bg-gray-700 flex-col`}>

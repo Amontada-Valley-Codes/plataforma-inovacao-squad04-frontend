@@ -337,7 +337,7 @@
         >
           <div
             className={cn(
-              'grid grid-flow-col auto-cols-[280px] items-start gap-4 overflow-x-auto scrollbar-hidden',
+              'grid grid-flow-col auto-cols-[280px] items-start gap-4 overflow-x-auto h-[calc(100vh-160px)]',
               className
             )}
           >
