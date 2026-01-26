@@ -49,9 +49,11 @@ export default function CanvasMVP() {
         </h1>
 
         <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-          <input  
-            type="text"
-            maxLength={300} 
+          <textarea 
+            required
+            rows={5}
+            maxLength={300}
+            placeholder="Defina o público-alvo" 
             className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
           />
         </div>
@@ -63,9 +65,11 @@ export default function CanvasMVP() {
         </h1>
 
         <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-          <input  
-            type="text"
-            maxLength={500} 
+          <textarea 
+            required
+            rows={5}
+            maxLength={500}
+            placeholder="Defina a proposta de valor" 
             className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
           />
         </div>

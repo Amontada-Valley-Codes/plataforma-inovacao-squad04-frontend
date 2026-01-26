@@ -221,7 +221,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   }
 
   return (
-    <div  className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+    <div  className="w-full flex flex-col overflow-y-auto">
       <Toaster position="top-right" reverseOrder={false} />
 
       <CardContentsHeader

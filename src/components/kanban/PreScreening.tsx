@@ -93,7 +93,7 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
   }
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+    <div className="w-full flex flex-col overflow-y-auto">
       <Toaster position="top-right" reverseOrder={false} />
 
       {/* header */}
