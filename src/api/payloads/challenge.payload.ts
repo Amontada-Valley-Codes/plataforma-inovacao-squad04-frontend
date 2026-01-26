@@ -32,25 +32,46 @@ export type CreateChallengeResponse = {
 export type ShowAllChallengeResponse = {
   id: string
   name: string
-  startDate: string
-  endDate: string
-  area: string
-  description: string
+  proponentName: string
+  proponentEmail: string
+  proponentArea: string
+  problemDescription: string
+  problemDuration: string
+  currentSolution: string
+  problemRelevance: string
+  currentIndicators: string
+  expectedImpacts: string
+  involvedAreas: string[]
+  initialConstraints: string
+  proponentParticipation: string
+  strategic_alignment: string | null
+  innovative_potential: string | null
+  business_relevance: string | null
   visibility: string
   status: string
   createdAt: string
-  strategic_alignment: string
-  innovative_potential: string
-  business_relevance: string
   updatedAt: string
   enterpriseId: string
   usersId: string
   Users: {
     name: string
-    image: null
+    image: string | null
   }
-  enterpriseName?: string
+  strategicObjective: {
+    id: string
+    challengeId: string
+    strategicObjectiveId: string
+    createdAt: string
+    strategicObjective: {
+      id: string
+      title: string
+      description: string
+      createdAt: string
+      updatedAt: string
+    }
+  }[]
 }
+
 
 export type ShowOneChallengeResponse = {
   id: string

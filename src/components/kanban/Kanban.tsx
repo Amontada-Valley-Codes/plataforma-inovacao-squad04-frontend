@@ -182,13 +182,12 @@ const KanbanPage = () => {
                               <div className='flex gap-1 mt-1'>
                                 <p className='flex items-center gap-1 m-0 font-semibold dark:text-[#ced3db] text-neutral-700 text-[12px]'>
                                   <Tag size={14} className='text-white dark:text-[#ced3db] fill-neutral-700'/>
-                                  {getCategoryLabel(challenge.area)}
+                                  {getCategoryLabel(challenge.involvedAreas[0])}
                                 </p>
                               </div>
                               <p className="flex items-center gap-1 m-0 font-semibold text-[#666] dark:text-[#ced3db] text-[12px] mt-1">
-                                {/* <CalendarClock size={14}/>
-                                {shortDateFormatter.format(new Date(challenge.startDate))} -{' '}
-                                {dateFormatter.format(new Date(challenge.endDate))} */}
+                                <CalendarClock size={14}/>
+                                {shortDateFormatter.format(new Date(challenge.createdAt))}
                               </p>
                             </div>
                           </div>

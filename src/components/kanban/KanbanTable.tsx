@@ -46,16 +46,16 @@ export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps
         valueB = b.id
         break
       case 'date':
-        valueA = new Date(a.startDate).getTime()
-        valueB = new Date(b.startDate).getTime()
+        valueA = new Date(a.createdAt).getTime()
+        valueB = new Date(b.createdAt).getTime()
         break
       case 'user':
         valueA = a.Users.name.toLowerCase()
         valueB = b.Users.name.toLowerCase()
         break
       case 'area':
-        valueA = getCategoryLabel(a.area)
-        valueB = getCategoryLabel(b.area)
+        valueA = getCategoryLabel(a.involvedAreas[0])
+        valueB = getCategoryLabel(b.involvedAreas[0])
         break
       case 'status':
         valueA = getStatusLabel(a.status)
@@ -172,10 +172,10 @@ export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps
               className="divide-x-2 divide-[#15358D] text-center cursor-pointer odd:bg-white dark:odd:bg-[#101828] dark:even:bg-[#151d2c] even:bg-blue-100"
             >
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.id}</td>
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{dateFormatter.format(new Date(challenge.startDate))}</td>
+              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{dateFormatter.format(new Date(challenge.createdAt))}</td>
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.name}</td>
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.Users.name}</td>
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{getCategoryLabel(challenge.area)}</td>
+              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{getCategoryLabel(challenge.involvedAreas[0])}</td>
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{getStatusLabel(challenge.status)}</td>
             </tr>
           ))}
