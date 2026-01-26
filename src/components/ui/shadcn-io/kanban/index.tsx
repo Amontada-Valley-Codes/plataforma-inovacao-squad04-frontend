@@ -33,6 +33,7 @@
   import { Card } from '@/components/ui/card';
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
   import { cn } from '@/lib/utils';
+import { ChallengeService } from '@/api/services/challenge.service';
 
   const t = tunnel();
 
@@ -64,7 +65,6 @@
     activeCardId: null,
   });
 
-  // Componente da Coluna (Board)
   export type KanbanBoardProps = {
     id: string;
     children: ReactNode;
@@ -90,7 +90,6 @@
     );
   };
 
-  // Componente do Card
   export type KanbanCardProps<T extends KanbanItemProps = KanbanItemProps> = T & {
     children?: ReactNode;
     className?: string;
@@ -241,7 +240,7 @@
     const sensors = useSensors(
       useSensor(MouseSensor, {
         activationConstraint: {
-          distance: 100,
+          distance: 10,
           delay: 250,
         }
       }),
@@ -263,45 +262,43 @@
     };
 
     const handleDragOver = (event: DragOverEvent) => {
-      const { active, over } = event;
-      if (!over) return;
-
-      const activeItem = data.find((item) => item.id === active.id);
-      if (!activeItem) return;
-
-      const overId = over.id;
-      const overColumn = columns.find((col) => col.id === overId);
-
-
-      if (overColumn && activeItem.status !== overId) {
-        const activeIndex = data.findIndex((item) => item.id === active.id);
-        const newData = [...data];
-        newData[activeIndex] = { ...newData[activeIndex], status: overId as string };
-        onDataChange?.(arrayMove(newData, activeIndex, activeIndex));
-      }
-
       onDragOver?.(event);
     };
 
-    const handleDragEnd = (event: DragEndEvent) => {
+    const handleDragEnd = async (event: DragEndEvent) => {
       setActiveCardId(null);
       const { active, over } = event;
+      if (!over) return;
 
-      if (!over || active.id === over.id) {
-        onDragEnd?.(event);
-        return;
+      const activeItem = data.find(item => item.id === active.id);
+      if (!activeItem) return;
+
+      const overColumn = columns.find(col => col.id === over.id);
+      const overItem = data.find(item => item.id === over.id);
+
+      const targetStatus = overColumn?.id ?? overItem?.status;
+      console.log(targetStatus)
+      console.log(activeItem.status)
+      if (!targetStatus ||   activeItem.status === targetStatus) return;
+
+      const newData = data.map(item =>
+        item.id === active.id
+          ? { ...item, status: targetStatus }
+          : item
+      );
+      console.log(newData)
+
+      onDataChange?.(newData);
+
+      try {
+        await ChallengeService.changeStatus(active.id as string, {
+          status: targetStatus,
+        });
+      } catch (err) {
+        console.error(err);
       }
-
-      const oldIndex = data.findIndex((item) => item.id === active.id);
-      const newIndex = data.findIndex((item) => item.id === over.id);
-
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newData = arrayMove(data, oldIndex, newIndex);
-        onDataChange?.(newData);
-      }
-      
-      onDragEnd?.(event);
     };
+
 
     const announcements: Announcements = {
       onDragStart({ active }) {
@@ -337,7 +334,7 @@
         >
           <div
             className={cn(
-              'grid grid-flow-col auto-cols-[280px] items-start gap-4 overflow-x-auto h-[calc(100vh-160px)]',
+              'grid grid-flow-col auto-cols-[280px] items-start gap-4 overflow-x-auto scrollbar-hidden',
               className
             )}
           >
