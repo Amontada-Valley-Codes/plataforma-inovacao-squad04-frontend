@@ -56,7 +56,7 @@ export const ActivityHistoryPanel = ({ sections, challengeId, onChangeView }: Ac
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hidden px-4 py-2 min-h-0">
+      <div className="flex-1 overflow-y-auto px-4 py-2 min-h-0">
         {activityHistory.map((activity, index) => (
           <div
             key={index}

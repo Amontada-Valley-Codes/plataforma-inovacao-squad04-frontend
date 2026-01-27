@@ -70,7 +70,7 @@ export default function Materialization({ challengeTitle, visibility, creator, e
   }, [])
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto scrollbar-hidden">
+    <div className="w-full flex flex-col overflow-y-auto">
       <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
         <CardContentsHeader
           challengeTitle={challengeTitle}
@@ -121,7 +121,7 @@ export default function Materialization({ challengeTitle, visibility, creator, e
 
               <div 
                 className="flex items-center bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-                text-[14px] rounded-[8px] relative"
+                text-[14px] rounded-[8px] pr-4 relative"
               >
                 <select
                   value={sponsorId ?? ""}
