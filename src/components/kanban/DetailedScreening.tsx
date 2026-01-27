@@ -17,7 +17,6 @@ type CardDetailedScreeningContentProps = {
   challengeId: string;  
   category: string;
   startDate: string;
-  endDate: string;
   creator: string;
   visibility: string;
 }
@@ -45,7 +44,7 @@ const getDefaultForScreening = (cId: string): ShowDetailedScreeningResponse => (
   porcentagemMedia: '0%',
 });
 
-export const DetailedScreening = ({ challangeTitle, challengeId, category, startDate, endDate, creator, visibility }: CardDetailedScreeningContentProps) => {
+export const DetailedScreening = ({ challangeTitle, challengeId, category, startDate, creator, visibility }: CardDetailedScreeningContentProps) => {
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
   const [detailedScreening, setDetailedScreening] = useState<ShowDetailedScreeningResponse>()
@@ -193,7 +192,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
           challengeTitle={challangeTitle}
           category={category}
           startDate={startDate}
-          endDate={endDate}
           creator={creator}
           visibility={visibility}
         />

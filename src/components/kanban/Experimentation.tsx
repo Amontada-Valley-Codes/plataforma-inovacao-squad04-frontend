@@ -16,7 +16,6 @@ type CardExperimentationContentProps = {
   category: string;
   description: string;
   startDate: string;
-  endDate: string;
   creator: string;
   visibility: string;
 }
@@ -34,7 +33,7 @@ const getDefaultForExperimentation = (cId: string): ShowExperimentationResponse 
   Kpis: []
 });
 
-export const Experimentation = ({ challangeTitle, challengeId, category, startDate, endDate, creator, visibility }: CardExperimentationContentProps) => {
+export const Experimentation = ({ challangeTitle, challengeId, category, startDate, creator, visibility }: CardExperimentationContentProps) => {
   const [experimentation, setExperimentation] = useState<ShowExperimentationResponse>()
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -228,7 +227,6 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
         challengeTitle={challangeTitle}
         category={category}
         startDate={startDate}
-        endDate={endDate}
         creator={creator}
         visibility={visibility}
       />
