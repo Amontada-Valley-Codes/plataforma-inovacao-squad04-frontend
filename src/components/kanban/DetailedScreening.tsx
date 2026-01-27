@@ -4,10 +4,9 @@
 import { CardContentsHeader } from "./CardsContents"
 import { useEffect, useState, memo } from "react"
 import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react"
-import { ShowDetailedScreeningResponse, CreateDetailedScreeningPayload } from "@/api/payloads/detailedScreening.payload"
+import { ShowDetailedScreeningResponse } from "@/api/payloads/detailedScreening.payload"
 import { detailedScreeningService } from "@/api/services/detailedScreening.service"
 import { Toaster } from "react-hot-toast"
-import { kMaxLength } from "buffer"
 
 
 type CardDetailedScreeningContentProps = {
