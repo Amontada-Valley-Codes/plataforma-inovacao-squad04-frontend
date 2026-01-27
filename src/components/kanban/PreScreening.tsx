@@ -14,15 +14,14 @@ type CardPreScreeningContentProps = {
   challangeTitle: string;
   challengeId: string;
   category: string;
-  strategicAlignment: string;
-  innovativePotential: string;
-  businessRelevance: string;
+  strategicAlignment: string | null;
+  innovativePotential: string | null;
+  businessRelevance: string | null;
   startDate: string;
-  endDate: string;
   creator: string;
 }
 
-export const PreScreening = ({ challangeTitle, challengeId, category, startDate, endDate, creator, businessRelevance, innovativePotential, strategicAlignment }: CardPreScreeningContentProps) => {
+export const PreScreening = ({ challangeTitle, challengeId, category, startDate, creator, businessRelevance, innovativePotential, strategicAlignment }: CardPreScreeningContentProps) => {
   const [votes, setVotes] = useState<CreateVotePreScreeningPayload>({
     strategicAlignment: 0,
     innovativePotential: 0,
@@ -101,7 +100,6 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
         challengeTitle={challangeTitle}
         category={category}
         startDate={startDate}
-        endDate={endDate}
         creator={creator}
       />
 
