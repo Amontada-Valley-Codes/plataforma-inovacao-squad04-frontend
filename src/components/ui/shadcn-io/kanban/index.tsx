@@ -334,7 +334,7 @@ import { ChallengeService } from '@/api/services/challenge.service';
         >
           <div
             className={cn(
-              'grid grid-flow-col auto-cols-[280px] items-start gap-4 overflow-x-auto scrollbar-hidden',
+              'grid grid-flow-col auto-cols-[280px] items-start gap-4 overflow-x-auto',
               className
             )}
           >

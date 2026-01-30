@@ -57,6 +57,7 @@ export default function CanvasMVP() {
             className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
           />
         </div>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>
       </div>
 
       <div className="flex flex-col mb-4">
@@ -73,6 +74,7 @@ export default function CanvasMVP() {
             className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
           />
         </div>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>
       </div>
 
       <div className="flex flex-col mb-4">
