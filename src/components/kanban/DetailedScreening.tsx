@@ -4,20 +4,27 @@
 import { CardContentsHeader } from "./CardsContents"
 import { useEffect, useState, memo } from "react"
 import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react"
-import { ShowDetailedScreeningResponse } from "@/api/payloads/detailedScreening.payload"
+import { ShowDetailedScreeningByIdResponse, ShowDetailedScreeningResponse } from "@/api/payloads/detailedScreening.payload";
+import { ShowImmersionResponse } from "@/api/payloads/immersionDocument.payload";
+import { ShowConceptionById } from "@/api/payloads/conceptionDocument.payload";
 import { detailedScreeningService } from "@/api/services/detailedScreening.service"
 import { Toaster } from "react-hot-toast"
 
 
-type CardDetailedScreeningContentProps = {
-  challangeTitle: string;
-  challengeId: string;  
-  category: string;
-  startDate: string;
-  endDate: string;
-  creator: string;
-  visibility: string;
+type Props = {
+  challengeId: string
 }
+
+
+const getDefaultDetailedScreening = (
+  challengeId: string
+): ShowDetailedScreeningByIdResponse => ({
+  id: "",
+  challengeId,
+  enterpriseId: "",
+  immersionDocument: [],
+  conceptionDocument: [],
+});
 
 type TreeNode = {
   id: string;
@@ -77,36 +84,23 @@ const removeNode = (nodes: TreeNode[], id: string): TreeNode[] =>
 
 
 
-const getDefaultForScreening = (cId: string): ShowDetailedScreeningResponse => ({
-  id: '',
-  problema: '',
-  solucao: '',
-  beneficios: '',
-  api: '',
-  tipoApi: 'NENHUMA',
-  stackes: '',
-  numeroDeSprints: 0,
-  investimento: '',
-  custo: '',
-  beneficiosMensal: '',
-  pilarEstrategico: '',
-  principalRisco: '',
-  mitigacao: '',
-  responsavel: '',
-  prazo: '',
-  challengeId: cId,
-  userId: '',
-  TriagemVoto: [],
-  porcentagemMedia: '0%',
-});
 
-export const DetailedScreening = ({ challangeTitle, challengeId, category, startDate, endDate, creator, visibility }: CardDetailedScreeningContentProps) => {
+export function DetailedScreening({ challengeId }: Props) {
+  const [detailedScreening, setDetailedScreening] =
+    useState<ShowDetailedScreeningByIdResponse | null>(null);
+
   //hook para navegar nas duas paginas da triagem detalhada
   const [page, setPage] = useState('1')
-  const [detailedScreening, setDetailedScreening] = useState<ShowDetailedScreeningResponse>()
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [immersion, setImmersion] =
+    useState<ShowImmersionResponse | null>(null)
+
+  const [conception, setConception] =
+    useState<ShowConceptionById | null>(null)
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
 
   const [pov, setPov] = useState("");
   const [hmw, setHmw] = useState("");
@@ -137,6 +131,12 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     "Estratégia",
   ]
 
+    const [visaoProduto, setVisaoProduto] = useState({
+    descricao: "",
+    publicoAlvo: "",
+    propostaValor: "",
+  })
+
 
   const [mapasEmpatia, setMapasEmpatia] = useState([
     { pensa: "", sente: "", ve: "", fala: "", dores: "", ganhos: "" }
@@ -153,11 +153,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const MAKE_MAX = 1000;
   const CAPACIDADE_MAX = 100;
 
-  const [visaoProduto, setVisaoProduto] = useState({
-    propostaValor: "",
-    publicoAlvo: "",
-    descricao: "",
-  })
 
   const [alternativas, setAlternativas] = useState<string[]>([""])
   const [makeOrBuy, setMakeOrBuy] = useState<"MAKE" | "BUY" | "">("")
@@ -166,57 +161,77 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [capacidadeTecnica, setCapacidadeTecnica] = useState("")
   const [capacidadeFinanceira, setCapacidadeFinanceira] = useState("")
 
-  useEffect(() => {
-    async function fetchDetailedScreening() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await detailedScreeningService.showDetailedScreening(challengeId);
-        setDetailedScreening(response || getDefaultForScreening(challengeId));
-      } catch (err: any) {
-        console.error(err);
-        if (err?.response?.status === 404) {
-          setDetailedScreening(getDefaultForScreening(challengeId));
-        } else {
-          setError("Falha ao carregar os dados da triagem.");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchDetailedScreening();
-  }, [challengeId]);
 
-  const handleChange = (field: keyof ShowDetailedScreeningResponse, value: string) => {
-    if (field === 'numeroDeSprints') {
-      const numValue = parseInt(value, 10);
-      setDetailedScreening(prev => ({
-        ...(prev || getDefaultForScreening(challengeId)),
-        numeroDeSprints: isNaN(numValue) ? 0 : numValue
-      }));
-    } 
-    else if (field !== 'TriagemVoto' && field !== 'id' && field !== 'challengeId' && field !== 'userId') {
-      setDetailedScreening(prev => ({
-        ...(prev || getDefaultForScreening(challengeId)),
-        [field]: value
-      } as any));
+  useEffect(() => {
+  async function fetchDetailedScreening() {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const data =
+        await detailedScreeningService.showDetailedScreeningByChallenge(
+          challengeId
+        )
+
+      if (data) {
+        setDetailedScreening(data)
+      } else {
+        const created =
+          await detailedScreeningService.startDetailedScreening(challengeId)
+
+        setDetailedScreening(created)
+      }
+    } catch (err) {
+      console.error(err)
+      setError("Falha ao carregar os dados da triagem.")
+      setDetailedScreening(getDefaultDetailedScreening(challengeId))
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  fetchDetailedScreening()
+}, [challengeId])
+
+
+  const handleChange = <
+    K extends keyof ShowDetailedScreeningByIdResponse
+  >(
+    field: K,
+    value: ShowDetailedScreeningByIdResponse[K]
+  ) => {
+    setDetailedScreening((prev) =>
+      prev
+        ? {
+            ...prev,
+            [field]: value,
+          }
+        : prev
+    );
   };
 
-  if (error) {
-    return <div className="w-full flex items-center justify-center h-full">
-      {error}
-    </div>
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loader2 className="animate-spin" size={24} />
+      </div>
+    );
   }
 
-  if (isLoading) {
-    return <div className="justify-center items-center h-full">
-      <Loader2 size={24} className="animate-spin"/>
-    </div>
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        {error}
+      </div>
+    );
   }
-    
+
   if (!detailedScreening) {
-    return <div className="w-full flex items-center justify-center h-full">Dados não encontrados.</div>;
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        Dados não encontrados.
+      </div>
+    );
   }
 
 const TreeItem = memo(function TreeItem({
@@ -289,18 +304,21 @@ const TreeItem = memo(function TreeItem({
 });
 
 
+
+
   return (
     <div className="w-full flex flex-col overflow-y-auto">
       <Toaster position="top-right" reverseOrder={false}/>
       {/* header */}
       <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
-        <CardContentsHeader
-          challengeTitle={challangeTitle}
-          category={category}
-          startDate={startDate}
-          endDate={endDate}
-          creator={creator}
-          visibility={visibility}
+        <DetailedScreening
+          challengeId={challengeId}
+          challengeTitle=""
+          category=""
+          startDate=""
+          endDate=""
+          creator=""
+          visibility=""
         />
 
         <div className="relative flex items-center">

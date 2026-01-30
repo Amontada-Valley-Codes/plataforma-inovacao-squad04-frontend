@@ -1,37 +1,42 @@
-import api from "../axios";
-import { ENDPOINTS } from "../endpoints";
+import api from "../axios"
+import { ENDPOINTS } from "../endpoints"
 import {
-  CreateDetailedScreeningPayload,
-  CreateDetailedScreeningResponse,
+  ShowDetailedScreeningByIdResponse,
   ShowDetailedScreeningResponse,
-  UpdateDetailedScreeningPayload,
-  UpdateDetailedScreeningResponse,
-  VoteDetailedScreeningPayload,
-  VoteDetailedScreeningResponse
-} from "../payloads/detailedScreening.payload";
+} from "../payloads/detailedScreening.payload"
 
 export const detailedScreeningService = {
-  async createDetailedScreening(challengeId: string, payload: CreateDetailedScreeningPayload): Promise<CreateDetailedScreeningResponse> {
-    const response = await api.post(ENDPOINTS.DETAILED_SCREENING.CREATE_DETAILED_SCREENING(challengeId), payload);
-    console.log(response.data);
-    return response.data;
+  async startDetailedScreening(
+    challengeId: string
+  ): Promise<ShowDetailedScreeningByIdResponse> {
+    const { data } = await api.post(
+      ENDPOINTS.DETAILED_SCREENING.START_DETAILED_SCREENING(challengeId)
+    )
+    return data
+  },
+  async showDetailedScreeningByChallenge(
+  challengeId: string
+): Promise<ShowDetailedScreeningByIdResponse | null> {
+  const { data } = await api.get<ShowDetailedScreeningResponse>(
+    ENDPOINTS.DETAILED_SCREENING.SHOW_DETAILED_SCREENING
+  )
+
+  const screening = data.find(
+    (item) => item.challengeId === challengeId
+  )
+
+  return screening ?? null
+},
+  async showAll(): Promise<ShowDetailedScreeningResponse> {
+    const { data } = await api.get(
+      ENDPOINTS.DETAILED_SCREENING.SHOW_DETAILED_SCREENING
+    )
+    return data
   },
 
-  async showDetailedScreening(challengeId: string): Promise<ShowDetailedScreeningResponse> {
-    const response = await api.get(ENDPOINTS.DETAILED_SCREENING.SHOW_DETAILED_SCREENING(challengeId));
-    console.log(response.data);
-    return response.data;
+  async deleteDetailedScreening(id: string): Promise<void> {
+    await api.delete(
+      ENDPOINTS.DETAILED_SCREENING.DELETE_DETAILED_SCREENING(id)
+    )
   },
-
-  async updateDetailedScreening(triagemId: string, payload: UpdateDetailedScreeningPayload): Promise<UpdateDetailedScreeningResponse> {
-    const response = await api.put(ENDPOINTS.DETAILED_SCREENING.UPDATE_DETAILED_SCREENING(triagemId), payload);
-    console.log(response.data);
-    return response.data;
-  },
-
-  async voteDetailedScreening(triagemId: string, payload: VoteDetailedScreeningPayload): Promise<VoteDetailedScreeningResponse> {
-    const response = await api.post(ENDPOINTS.DETAILED_SCREENING.VOTE_DETAILED_SCREENING(triagemId), payload);
-    console.log(response.data);
-    return response.data;
-  }
-};
+}

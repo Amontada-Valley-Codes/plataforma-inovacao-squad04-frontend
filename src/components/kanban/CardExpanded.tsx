@@ -439,9 +439,6 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     startDate={cardData.startDate}
                     endDate={cardData.endDate}
                     creator={cardData.Users.name}
-                    businessRelevance={cardData.business_relevance}
-                    innovativePotential={cardData.innovative_potential}
-                    strategicAlignment={cardData.strategic_alignment}
                   />
                 }
                 commentsContent={(onChangeView) => (
@@ -503,15 +500,15 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "DETAILED_SCREENING" && (
               <CardExpandedLayout
                 mainContent={
-                  <DetailedScreening
-                    challangeTitle={cardData.name}
-                    challengeId={cardData.id}
-                    category={cardData.area}
-                    startDate={cardData.startDate}
-                    endDate={cardData.endDate}
-                    creator={cardData.Users.name}
-                    visibility={cardData.visibility}
-                  />
+                 <DetailedScreening
+                  challengeTitle={cardData.name}
+                  challengeId={cardData.id}
+                  category={cardData.area}
+                  startDate={cardData.startDate}
+                  endDate={cardData.endDate}
+                  creator={cardData.Users.name}
+                  visibility={cardData.visibility}
+                />
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
