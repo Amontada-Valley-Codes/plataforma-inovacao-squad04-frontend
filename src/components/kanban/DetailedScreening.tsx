@@ -12,7 +12,7 @@ import { Toaster } from "react-hot-toast"
 
 
 type Props = {
-  challengeTitle: string;
+  challangeTitle: string;
   challengeId: string;  
   category: string;
   startDate: string;
@@ -91,7 +91,7 @@ const removeNode = (nodes: TreeNode[], id: string): TreeNode[] =>
 
 
 
-export const DetailedScreening = ({ challengeTitle, challengeId, category, startDate, creator, visibility }: Props) => {
+export const DetailedScreening = ({ challangeTitle, challengeId, category, startDate, creator, visibility }: Props) => {
   const [detailedScreening, setDetailedScreening] =
     useState<ShowDetailedScreeningByIdResponse | null>(null);
 
@@ -318,7 +318,7 @@ const TreeItem = memo(function TreeItem({
       {/* header */}
       <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
         <CardContentsHeader
-          challengeTitle={challengeTitle}
+          challengeTitle={challangeTitle}
           category={category}
           startDate={startDate}
           creator={creator}
