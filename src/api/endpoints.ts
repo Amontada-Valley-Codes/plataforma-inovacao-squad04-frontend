@@ -74,11 +74,32 @@ export const ENDPOINTS = {
   },
 
   DETAILED_SCREENING: {
-    CREATE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
-    SHOW_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
-    UPDATE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
+    START_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
+    SHOW_DETAILED_SCREENING_BY_ID: (id: string) => `/detailed-screening/${id}`,
+    SHOW_DETAILED_SCREENING: `/detailed-screening`,
     DELETE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
-    VOTE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}/vote`
+  },
+
+    CONCEPTION_DOCUMENT: {
+    CREATE: (screeningId: string) => `/detailed-screening/conception-document/${screeningId}`,
+    DELETE: (id: string) => `/detailed-screening/conception-document/${id}`,
+    UPDATE: (id: string) => `/detailed-screening/conception-document/${id}`,
+    SHOW_ONE: (id: string) => `/detailed-screening/conception-document/findById/${id}`,
+  },
+
+  IMMERSION_DOCUMENT: {
+    CREATE: (screeningId: string) => `/detailed-screening/immersion-document/${screeningId}`,
+    UPDATE: (id: string) => `/detailed-screening/immersion-document/${id}`,
+    DELETE: (id: string) => `/detailed-screening/immersion-document/${id}`,
+    SHOW_ONE: (id: string) => `/detailed-screening/immersion-document/${id}`,
+    CREATE_PROBLEM_TREE: (immersionId: string) => `/detailed-screening/immersion-document/problemTreen/${immersionId}`,
+    SHOW_PROBLEM_TREE: (immersionId: string) => `/detailed-screening/immersion-document/problemTreen/${immersionId}`,
+    DELETE_PROBLEM_TREE_NODE: (id: string) => `/detailed-screening/immersion-document/problemTreen/${id}`,
+    UPDATE_PROBLEM_TREE_NODE: (id: string) => `/detailed-screening/immersion-document/problemTreen/${id}`,
+    CREATE_MAP_EMPATHY: (immersionId: string) => `/detailed-screening/immersion-document/mapEmpathy/${immersionId}`,
+    UPDATE_MAP_EMPATHY: (id: string) => `/detailed-screening/immersion-document/mapEmpathy/${id}`,
+    DELETE_MAP_EMPATHY: (id: string) => `/detailed-screening/immersion-document/mapEmpathy/${id}`,
+    SHOW_MAP_EMPATHY: (id: string) => `/detailed-screening/immersion-document/mapEmpathy/${id}`,
   },
 
   EXPERIMENTATION: {
