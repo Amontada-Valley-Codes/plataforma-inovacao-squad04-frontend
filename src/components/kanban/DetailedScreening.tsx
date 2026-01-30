@@ -12,8 +12,14 @@ import { Toaster } from "react-hot-toast"
 
 
 type Props = {
-  challengeId: string
+  challengeTitle: string;
+  challengeId: string;  
+  category: string;
+  startDate: string;
+  creator: string;
+  visibility: string;
 }
+
 
 
 const getDefaultDetailedScreening = (
@@ -85,7 +91,7 @@ const removeNode = (nodes: TreeNode[], id: string): TreeNode[] =>
 
 
 
-export function DetailedScreening({ challengeId }: Props) {
+export const DetailedScreening = ({ challengeTitle, challengeId, category, startDate, creator, visibility }: Props) => {
   const [detailedScreening, setDetailedScreening] =
     useState<ShowDetailedScreeningByIdResponse | null>(null);
 
@@ -307,18 +313,16 @@ const TreeItem = memo(function TreeItem({
 
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto">
+    <div className="w-full flex flex-col">
       <Toaster position="top-right" reverseOrder={false}/>
       {/* header */}
       <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
-        <DetailedScreening
-          challengeId={challengeId}
-          challengeTitle=""
-          category=""
-          startDate=""
-          endDate=""
-          creator=""
-          visibility=""
+        <CardContentsHeader
+          challengeTitle={challengeTitle}
+          category={category}
+          startDate={startDate}
+          creator={creator}
+          visibility={visibility}
         />
 
         <div className="relative flex items-center">
@@ -384,7 +388,7 @@ const TreeItem = memo(function TreeItem({
               <input
                 value={rootProblem}
                 onChange={(e) => setRootProblem(e.target.value)}
-                className="w-full bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/60 mb-4 placeholder:text-[#98A2B3]"
+                className="w-full bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/60 dark:text-white mb-4 placeholder:text-[#98A2B3]"
                 placeholder="Problema raiz"
               />
 
@@ -459,7 +463,7 @@ const TreeItem = memo(function TreeItem({
                   value={pov}
                   onChange={(e) => setPov(e.target.value)}
                   maxLength={POV_MAX}
-                  className="w-full h-32 bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/60 placeholder:text-[#98A2B3] resize-none"
+                  className="w-full h-32 bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/60 dark:text-white placeholder:text-[#98A2B3] resize-none"
                   placeholder="Usuário X precisa de Y porque Z..."
                 />
 
@@ -484,7 +488,7 @@ const TreeItem = memo(function TreeItem({
                   disabled={pov.trim().length === 0}
                   rows={3}
                   className={`w-full bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2
-                    text-black/60 placeholder:text-[#98A2B3] resize-none break-words
+                    text-black/60 dark:text-white placeholder:text-[#98A2B3] resize-none break-words
                     ${pov.trim().length === 0 ? "opacity-60 cursor-not-allowed" : ""}`}
                   placeholder="Como podemos..."
                 />
