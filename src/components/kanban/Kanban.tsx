@@ -153,6 +153,7 @@ const KanbanPage = () => {
             columns={columns}
             data={challanges}
             onDataChange={setChallanges}
+            className='h-[calc(100vh-159px)]'
           >
             {(column) => {
               const isLastColumn = columns.findIndex(c => c.id === column.id) === columns.length - 1;

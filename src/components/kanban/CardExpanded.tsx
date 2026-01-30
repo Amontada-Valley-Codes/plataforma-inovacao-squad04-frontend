@@ -434,10 +434,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 mainContent={
                   <ChallengeSection 
                     challangeTitle={cardData.name} 
-                    category={cardData.area}
-                    description={cardData.description}
-                    startDate={cardData.startDate}
-                    endDate={cardData.endDate}
+                    category={cardData.involvedAreas[0]}
+                    description={cardData.problemDescription}
+                    startDate={cardData.createdAt}
                     creator={cardData.Users.name}
                   />
                 }
@@ -467,9 +466,8 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   <PreScreening
                     challangeTitle={cardData.name} 
                     challengeId={cardData.id}
-                    category={cardData.area}
-                    startDate={cardData.startDate}
-                    endDate={cardData.endDate}
+                    category={cardData.involvedAreas[0]}
+                    startDate={cardData.createdAt}
                     creator={cardData.Users.name}
                     businessRelevance={cardData.business_relevance}
                     innovativePotential={cardData.innovative_potential}
@@ -500,15 +498,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "DETAILED_SCREENING" && (
               <CardExpandedLayout
                 mainContent={
-                 <DetailedScreening
-                  challengeTitle={cardData.name}
-                  challengeId={cardData.id}
-                  category={cardData.area}
-                  startDate={cardData.startDate}
-                  endDate={cardData.endDate}
-                  creator={cardData.Users.name}
-                  visibility={cardData.visibility}
-                />
+                  <DetailedScreening
+                    challangeTitle={cardData.name}
+                    challengeId={cardData.id}
+                    category={cardData.involvedAreas[0]}
+                    startDate={cardData.createdAt}
+                    creator={cardData.Users.name}
+                    visibility={cardData.visibility}
+                  />
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
@@ -538,8 +535,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     challengeId={cardData.id}
                     challengeTitle={cardData.name}
                     creator={cardData.Users.name}
-                    endDate={cardData.endDate}
-                    startDate={cardData.startDate}
+                    startDate={cardData.createdAt}
                     visibility={cardData.visibility}
                   />
                 }
@@ -570,10 +566,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   <Experimentation
                     challangeTitle={cardData.name}
                     challengeId={cardData.id}
-                    category={cardData.area}
-                    description={cardData.description}
-                    startDate={cardData.startDate}
-                    endDate={cardData.endDate}
+                    category={cardData.involvedAreas[0]}
+                    description={cardData.problemDescription}
+                    startDate={cardData.createdAt}
                     creator={cardData.Users.name}
                     visibility={cardData.visibility}
                   />

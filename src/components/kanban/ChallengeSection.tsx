@@ -5,15 +5,14 @@ type CardChallangeContentProps = {
   challangeTitle: string;
   category: string;
   description: string;
-  strategicAlignment: string;
-  innovativePotential: string;
-  businessRelevance: string;
+  strategicAlignment: string | null;
+  innovativePotential: string | null;
+  businessRelevance: string | null;
   startDate: string;
-  endDate: string;
   creator: string;
 }
 
-export const ChallengeSection = ({ challangeTitle, category, description, strategicAlignment, innovativePotential, businessRelevance, startDate, endDate, creator }: CardChallangeContentProps) => {
+export const ChallengeSection = ({ challangeTitle, category, description, strategicAlignment, innovativePotential, businessRelevance, startDate, creator }: CardChallangeContentProps) => {
   return (
     //conteudo do card de desafio
     <div className="w-full flex flex-col overflow-y-auto">
@@ -22,7 +21,6 @@ export const ChallengeSection = ({ challangeTitle, category, description, strate
         challengeTitle={challangeTitle}
         category={category}
         startDate={startDate}
-        endDate={endDate}
         creator={creator}
       />
 

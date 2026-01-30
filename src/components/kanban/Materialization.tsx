@@ -13,9 +13,7 @@ type CardMaterializationContentProps = {
   challengeId: string;
   visibility: string;
   creator: string;
-  endDate: string;
   startDate: string;
-
 }
 
 export function translateUserType(type: string): string {
@@ -50,7 +48,7 @@ export function translateUserType(type: string): string {
 }
 
 
-export default function Materialization({ challengeTitle, visibility, creator, endDate, startDate, challengeId}: CardMaterializationContentProps) {
+export default function Materialization({ challengeTitle, visibility, creator, startDate, challengeId}: CardMaterializationContentProps) {
   const [users, setUsers] = useState<ShowAllUsersResponse>([])
   const [sponsorId, setSponsorId] = useState<string | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -76,7 +74,6 @@ export default function Materialization({ challengeTitle, visibility, creator, e
           challengeTitle={challengeTitle}
           visibility={visibility} 
           creator={creator}
-          endDate={endDate}
           startDate={startDate}
         />
         <div className="relative flex items-center">
@@ -121,7 +118,7 @@ export default function Materialization({ challengeTitle, visibility, creator, e
 
               <div 
                 className="flex items-center bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-                text-[14px] rounded-[8px] pr-4 relative"
+                text-[14px] rounded-[8px] pr-10 relative"
               >
                 <select
                   value={sponsorId ?? ""}
