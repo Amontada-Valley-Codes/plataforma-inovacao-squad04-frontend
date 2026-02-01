@@ -438,6 +438,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     description={cardData.problemDescription}
                     startDate={cardData.createdAt}
                     creator={cardData.Users.name}
+                    businessRelevance={cardData.business_relevance}
+                    innovativePotential={cardData.innovative_potential}
+                    strategicAlignment={cardData.strategic_alignment}
                   />
                 }
                 commentsContent={(onChangeView) => (
