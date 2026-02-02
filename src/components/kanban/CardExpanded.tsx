@@ -30,6 +30,7 @@ import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
 import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
+import RolloutPlan from "./rolloutPlan"
 
 type CardExpandedLayoutProps = {
   className?: string;
