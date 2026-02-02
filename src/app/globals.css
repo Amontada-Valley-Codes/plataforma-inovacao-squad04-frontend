@@ -879,3 +879,47 @@ span.flatpickr-weekday,
     @apply bg-background text-foreground;
   }
 }
+
+/* Botões do calendário */
+.fc .fc-button {
+  background-color: #0B2B70;
+  border-color: #0B2B70;
+  color: #fff;
+  font-weight: 500;
+}
+
+.fc .fc-button:hover {
+  background-color: #0a245e;
+  border-color: #0a245e;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #081f52;
+  border-color: #081f52;
+}
+
+/* Header */
+.fc .fc-toolbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0B2B70;
+}
+
+/* Eventos (barras do Gantt) */
+.fc-timeline-event {
+  background-color: #0B2B70;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+/* Dark mode */
+.dark .fc .fc-toolbar-title {
+  color: #fff;
+}
+
+.dark .fc .fc-button {
+  background-color: #1f3a8a;
+  border-color: #1f3a8a;
+}

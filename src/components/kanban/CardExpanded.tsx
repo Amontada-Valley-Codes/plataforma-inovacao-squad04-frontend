@@ -9,11 +9,7 @@ import { cn } from "@/lib/utils"
 import { Loader2, MoreVertical, X } from "lucide-react"
 import { CommentsPanel } from "./CommentsPanel"
 import {
-  challangeCommentSections,
-  preScreeningCommentSections,
-  detailedScreeningCommentSections,
-  ideationCommentSections,
-  experimentationCommentSections,
+  challangeCommentSections
 } from "./commentsData"
 import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
