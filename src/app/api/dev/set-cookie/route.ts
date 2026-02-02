@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const { access_token } = await req.json().catch(() => ({}));
     const res = NextResponse.json({ ok: true });
 
-    // Limpa cookie se token vazio
+    
     if (!access_token) {
         res.cookies.set({
             name: "access_token",
