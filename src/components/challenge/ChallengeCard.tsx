@@ -16,24 +16,26 @@ type Status = "Completed" | "In Progress" | "Pending" | string;
 type Challenge = {
   id: string;
   name: string;
-  startDate: string;
-  endDate: string;
-  area: string;
-  description: string;
+
+  startDate?: string;
+  endDate?: string;
+  area?: string;
+  description?: string;
+
   visibility: string;
   status: string;
-  strategic_alignment: string;
-  innovative_potential: string;
-  business_relevance: string;
-  updatedAt: string;
-  enterpriseId: string;
-  usersId: string;
-  Users: {
+  strategic_alignment?: string;
+  innovative_potential?: string;
+  business_relevance?: string;
+  updatedAt?: string;
+  enterpriseId?: string;
+  usersId?: string;
+  Users?: {
     name: string;
-    image: null;
   };
   enterpriseName?: string;
 };
+
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
@@ -208,6 +210,9 @@ export default function ChallengeCard({
 
         response = filtered.map((challenge) => ({
           ...challenge,
+          strategic_alignment: challenge.strategic_alignment ?? undefined,
+          innovative_potential: challenge.innovative_potential ?? undefined,
+          business_relevance: challenge.business_relevance ?? undefined,
           enterpriseName:
             enterpriseMap[challenge.enterpriseId] || "Empresa não informada",
         }));
@@ -388,16 +393,16 @@ export default function ChallengeCard({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                      <Tag size={15} /> {typeTranslations[challenge.area] || "Sem categoria"}
+                      <Tag size={15} /> {"Sem categoria"}
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
                       <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.status)}`} />
                       {stageTranslations[challenge.status] || challenge.status}
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                      <Calendar size={15} />{" "}
-                      {new Date(challenge.startDate).toLocaleDateString("pt-BR")} -{" "}
-                      {new Date(challenge.endDate).toLocaleDateString("pt-BR")}
+                      {/* <Calendar size={15} />{" "} */}
+                      {/* {new Date(challenge.startDate).toLocaleDateString("pt-BR")} -{" "}
+                      {new Date(challenge.endDate).toLocaleDateString("pt-BR")} */}
                     </div>
                   </div>
 
