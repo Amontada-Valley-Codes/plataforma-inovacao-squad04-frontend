@@ -434,6 +434,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
               <CardExpandedLayout
                 mainContent={
                   <ChallengeSection 
+                    businessRelevance={''}
+                    innovativePotential={''}
+                    strategicAlignment={''}
                     challangeTitle={cardData.name} 
                     category={cardData.involvedAreas[0]}
                     description={cardData.problemDescription}

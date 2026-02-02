@@ -32,28 +32,24 @@ export default function CompanyHistoryHistoric({
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const normalize = (c: Challenge): Challenge => ({
-    id: String(c.id),
-    name: c.name,
-    Users: { 
-      name: c.Users?.name ?? "Autor Desconhecido", 
-      image: c.Users?.image ?? null
-    },
-    area: c.area,
-    business_relevance: c.business_relevance,
-    createdAt: c.createdAt,
-    description: c.description,
-    endDate: c.endDate,
-    enterpriseId: c.enterpriseId,
-    innovative_potential: c.innovative_potential,
-    startDate: c.startDate,
-    status: c.status,
-    strategic_alignment: c.strategic_alignment,
-    updatedAt: c.updatedAt,
-    usersId: c.usersId,
-    visibility: c.visibility,
-    enterpriseName: c.enterpriseName
-  });
+  // const normalize = (c: Challenge): Challenge => ({
+  //   id: String(c.id),
+  //   name: c.name,
+  //   Users: { 
+  //     name: c.Users?.name ?? "Autor Desconhecido", 
+  //     image: c.Users?.image ?? null
+  //   },
+  //   business_relevance: c.business_relevance,
+  //   createdAt: c.createdAt,
+  //   enterpriseId: c.enterpriseId,
+  //   innovative_potential: c.innovative_potential,
+  //   createdAt: c.createdAt,
+  //   status: c.status,
+  //   strategic_alignment: c.strategic_alignment,
+  //   updatedAt: c.updatedAt,
+  //   usersId: c.usersId,
+  //   visibility: c.visibility,
+  // });
 
   React.useEffect(() => {
     (async () => {
@@ -104,7 +100,7 @@ export default function CompanyHistoryHistoric({
         }
         // Para "usuario" não há filtro extra: o endpoint já limita ao próprio usuário.
         console.log(data)
-        setItems(scoped.map(normalize));
+        // setItems(scoped.map(normalize));
       } catch (e: any) {
         console.error(error)
         setError(e?.message ?? "Erro ao carregar histórico.");
@@ -154,10 +150,9 @@ export default function CompanyHistoryHistoric({
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
       {items.map((challenge) => {
         const title = challenge.name
-        const category = challenge.area
         const status =challenge.status
         const isPublic = challenge.visibility === "PUBLIC";
-        const when = challenge.startDate ?? challenge.updatedAt ?? challenge.createdAt ?? "—";
+        const when = challenge.createdAt ?? challenge.updatedAt ?? challenge.createdAt ?? "—";
 
         return (
           <div
@@ -178,9 +173,6 @@ export default function CompanyHistoryHistoric({
 
             {/* Metas */}
             <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
-                <Tag size={16} /> {getCategoryLabel(category)}
-              </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-sm">
                 <span className={`w-3 h-3 rounded-full ${getStatusColor(status)}`} />
                 {getStatusLabel(status)}
