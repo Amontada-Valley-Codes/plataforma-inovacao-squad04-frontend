@@ -532,7 +532,13 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "MATERIALIZATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <RolloutPlan />
+                  <Materialization
+                    challengeId={cardData.id}
+                    challengeTitle={cardData.name}
+                    creator={cardData.Users.name}
+                    startDate={cardData.createdAt}
+                    visibility={cardData.visibility}
+                  />
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
