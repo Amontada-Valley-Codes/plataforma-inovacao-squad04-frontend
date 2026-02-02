@@ -9,11 +9,7 @@ import { cn } from "@/lib/utils"
 import { Loader2, MoreVertical, X } from "lucide-react"
 import { CommentsPanel } from "./CommentsPanel"
 import {
-  challangeCommentSections,
-  preScreeningCommentSections,
-  detailedScreeningCommentSections,
-  ideationCommentSections,
-  experimentationCommentSections,
+  challangeCommentSections
 } from "./commentsData"
 import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
@@ -30,7 +26,6 @@ import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
 import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
-import RolloutPlan from "./rolloutPlan"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -434,9 +429,6 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
               <CardExpandedLayout
                 mainContent={
                   <ChallengeSection 
-                    businessRelevance={''}
-                    innovativePotential={''}
-                    strategicAlignment={''}
                     challangeTitle={cardData.name} 
                     category={cardData.involvedAreas[0]}
                     description={cardData.problemDescription}
