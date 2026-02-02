@@ -1,15 +1,19 @@
 "use client";
 import { PlusCircle } from "lucide-react";
-import RegisterChallengeForm from "../challenge/RegisterChallengeForm";
-import { useModal } from "@/hooks/useModal";
+import { useRouter } from "next/navigation";
+import { Router } from "next/router";
+// import RegisterChallengeForm from "../challenge/RegisterChallengeForm";
+// import { useModal } from "@/hooks/useModal";
 
 export default function CreateChallengeButton() {
-  const { isOpen, openModal, closeModal } = useModal();
+  const router = useRouter();
+  // const { isOpen, openModal, closeModal } = useModal();
 
   return (
     <div>
       <button
-        onClick={openModal}
+        onClick={()=> router.push("/admin/pageDesafios")}
+        // onClick={openModal}
         aria-label="Adicionar desafio"
         className={[
           "inline-flex items-center rounded-[12px] font-medium transition-colors duration-200",
@@ -36,7 +40,7 @@ export default function CreateChallengeButton() {
         <span className="hidden min-[1128px]:inline">Adicionar Desafio</span>
       </button>
 
-      <RegisterChallengeForm isOpen={isOpen} onClose={closeModal} />
+      {/* <RegisterChallengeForm isOpen={isOpen} onClose={closeModal} /> */}
     </div>
   );
 }
