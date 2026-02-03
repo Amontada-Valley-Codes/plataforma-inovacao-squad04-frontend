@@ -4,10 +4,8 @@ import React, { useRef, useEffect } from "react";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  className?: string;
   children: React.ReactNode;
-  showCloseButton?: boolean; // New prop to control close button visibility
-  isFullscreen?: boolean; // Default to false for backwards compatibility
+  isFullscreen?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -20,27 +18,15 @@ export const Modal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
 
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
+    if (isOpen) document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
+    document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -49,19 +35,25 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      
+      {/* BACKDROP */}
       {!isFullscreen && (
         <div
-          className="fixed inset-0 h-full w-full bg-zinc-600/20"
+          className="absolute inset-0 bg-black/50 z-40"
           onClick={onClose}
-        ></div>
+        />
       )}
+
+      {/* CONTEÚDO */}
       <div
         ref={modalRef}
+        className="relative z-50"
         onClick={(e) => e.stopPropagation()}
       >
-        <div>{children}</div>
+        {children}
       </div>
+
     </div>
   );
 };
