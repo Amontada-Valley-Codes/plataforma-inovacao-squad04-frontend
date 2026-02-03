@@ -6,6 +6,7 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   isFullscreen?: boolean;
+  className?:string
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -13,6 +14,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   isFullscreen = false,
+  className
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +50,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* CONTEÚDO */}
       <div
         ref={modalRef}
-        className="relative z-50"
+        className={`relative z-50 ${className}`} 
         onClick={(e) => e.stopPropagation()}
       >
         {children}

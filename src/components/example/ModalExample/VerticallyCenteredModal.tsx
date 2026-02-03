@@ -20,8 +20,7 @@ export default function VerticallyCenteredModal() {
       <Modal
         isOpen={isOpen}
         onClose={closeModal}
-        
-      
+        className="max-w-[507px] p-6 lg:p-10"
       >
         <div className="text-center">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 sm:text-title-sm">
