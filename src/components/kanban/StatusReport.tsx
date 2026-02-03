@@ -56,15 +56,17 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
         value,
         onChange,
         metaInfo,
+        placeholder,
     }: {
         title: string;
         value: string;
         onChange: (v: string) => void;
         metaInfo: { createdAtLabel: string; responsibleLabel: string };
+        placeholder?: string;
     }) => (
         <div className="flex flex-col mb-6">
         <div className="flex items-center justify-between mb-2">
-            <h2 className="text-black dark:text-white text-lg font-semibold">{title}</h2>
+            <h2 className="text-black dark:text-white text-lg">{title}</h2>
             <span className="text-xs text-[#98A2B3] dark:text-white/50">
             {value.length}/{MAX_CHARS}
             </span>
@@ -76,7 +78,7 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
             maxLength={MAX_CHARS}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="Escreva aqui…"
+            placeholder={placeholder}
             className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
             />
         </div>
@@ -115,6 +117,7 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
             value={avancosSemana.text}
             onChange={(v) => updateRegister(setAvancosSemana, v)}
             metaInfo={meta.weekly}
+            placeholder="Descreva os avanços realizados na semana."
         />
 
         <Section
@@ -122,6 +125,7 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
             value={problemasEncontrados.text}
             onChange={(v) => updateRegister(setProblemasEncontrados, v)}
             metaInfo={meta.problems}
+            placeholder="Descreva os problemas encontrados durante a semana."
         />
 
         <Section
@@ -129,6 +133,7 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
             value={proximosPassos.text}
             onChange={(v) => updateRegister(setProximosPassos, v)}
             metaInfo={meta.next}
+            placeholder="Descreva os próximos passos planejados."
         />
         </div>
     );
