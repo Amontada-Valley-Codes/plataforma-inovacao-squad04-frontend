@@ -1,3 +1,5 @@
+import { GET } from "@/app/(company)/company/[companyId]/api/route";
+
 export const ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
@@ -145,4 +147,12 @@ export const ENDPOINTS = {
     LIKED_COMMENT: (id: string) => `/comments-funnel/${id}/like`,
     FILTERED_COMMENT: (id: string, context: string) => `/comments-funnel/filter/context/${id}?context=${encodeURIComponent(context)}`
   },
+
+  STRATEGIC_OBJECTIVES: {
+    CREATE_OBJECTIVE: "/strategic-objectives",
+    SHOW_ALL_OBJECTIVES: "/strategic-objectives",
+    SHOW_ONE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
+    UPDATE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
+    DELETE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`
+  }
 } 
