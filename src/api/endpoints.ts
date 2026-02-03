@@ -1,4 +1,3 @@
-import { GET } from "@/app/(company)/company/[companyId]/api/route";
 
 export const ENDPOINTS = {
   AUTH: {

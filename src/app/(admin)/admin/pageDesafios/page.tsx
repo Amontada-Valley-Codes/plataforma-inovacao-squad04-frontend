@@ -14,10 +14,11 @@ export default function DesafiosPage(){
                     <p className="">Crie seu formulário</p>
                 </div>
                     
-                <div>
+                <div className="flex">
                     <Button className="w-40 rounded h-10" variant="primary">
                         Criar Formulário
                     </Button>
+                    
                 </div>
 
             </div>

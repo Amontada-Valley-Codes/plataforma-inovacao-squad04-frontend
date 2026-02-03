@@ -1,365 +1,339 @@
 "use client";
-import React, { useState } from "react";
-import {
-  X,
-  Building2,
-  SlidersHorizontal,
-  Menu,
-  CalendarDays,
-  ChevronDown,
-  Loader2,
-  CheckCircle2
-} from "lucide-react";
 import { Modal } from "../ui/modal";
 import { ChallengeService } from "@/api/services/challenge.service";
-import { useStore } from "../../../store";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Input from "../form/input/InputField";
+import Label from "../form/Label";
+import Button from "../ui/button/Button";
+import { useEffect, useState } from "react";
+import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
 };
 
+type StrategicObjective = {
+  id: string;
+  title: string;
+};
+
+const INVOLVED_AREAS_OPTIONS = [
+  { label: "Administrativo", value: "ADMINISTRATIVE" },
+  { label: "Financeiro", value: "FINANCIAL" },
+  { label: "Contábil", value: "ACCOUNTING" },
+  { label: "Jurídico", value: "LEGAL" },
+  { label: "Recursos Humanos", value: "HUMAN_RESOURCES" },
+  { label: "Marketing", value: "MARKETING" },
+  { label: "Vendas", value: "SALES" },
+  { label: "Comercial", value: "COMMERCIAL" },
+  { label: "Suprimentos", value: "SUPPLY" },
+  { label: "Logística", value: "LOGISTICS" },
+  { label: "Produção", value: "PRODUCTION" },
+  { label: "Tecnologia", value: "TECHNOLOGY" },
+  { label: "Engenharia", value: "ENGINEERING" },
+  { label: "Atendimento ao Cliente", value: "CUSTOMER_SERVICE" },
+  { label: "Qualidade", value: "QUALITY" },
+  { label: "Pesquisa e Desenvolvimento", value: "RESEARCH_DEVELOPMENT" },
+  { label: "Saúde e Segurança", value: "HEALTH_SAFETY" },
+  { label: "Outro", value: "OTHER" },
+] as const;
+
+const PROPONENT_PARTICIPATION_OPTIONS = [
+  { label: "Idealizador da ideia", value: "IDEATOR" },
+  { label: "Colaborador", value: "COLLABORATOR" },
+  { label: "Líder do projeto", value: "PROJECT_LEAD" },
+  { label: "Observador", value: "OBSERVER" },
+  { label: "Não participará", value: "NO_PARTICIPATION" },
+] as const;
+
+
+const CreateChallengeSchema = z.object({
+  name: z.string().min(3, "O nome do desafio deve ter no mínimo 3 caracteres"),
+  problemDescription: z.string().min(10, "A descrição do problema é obrigatória"),
+  problemDuration: z.string().min(3, "Informe há quanto tempo o problema existe"),
+  currentSolution: z.string().min(3, "Informe a solução atual do problema"),
+  problemRelevance: z.string().min(3, "Informe a relevância do problema"),
+  strategicObjectiveIds: z.array(z.string().uuid("ID de objetivo estratégico inválido")).min(1, "Selecione pelo menos um objetivo estratégico"),
+  currentIndicators: z.string().min(3, "Informe os indicadores ou metas atuais"),
+  expectedImpacts: z.string().min(3, "Informe os impactos esperados"),
+  involvedAreas: z.array(z.enum(["ADMINISTRATIVE","FINANCIAL","ACCOUNTING","LEGAL","HUMAN_RESOURCES",
+  "MARKETING","SALES","COMMERCIAL","SUPPLY","LOGISTICS","PRODUCTION","TECHNOLOGY","ENGINEERING",
+  "CUSTOMER_SERVICE","QUALITY","RESEARCH_DEVELOPMENT","HEALTH_SAFETY","OTHER",])).min(1, "Selecione pelo menos uma área envolvida"),
+  initialConstraints: z.string().min(3, "Informe as restrições iniciais"),
+  proponentParticipation: z.enum(["IDEATOR","COLLABORATOR","PROJECT_LEAD","OBSERVER","NO_PARTICIPATION",]),
+});
+
+type data = z.infer<typeof CreateChallengeSchema>
+
+
 export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
-  const [formData, setFormData] = useState({
-    titulo: "",
-    setor: "",
-    alinhamento: "",
-    potencial: "",
-    relevancia: "",
-    descricao: "",
-    dataInicio: "",
-    dataFim: "",
-  });
-  const [isFuncOpen, setIsFuncOpen] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { triggerReload } = useStore();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
+ const [strategicObjectives, setStrategicObjectives] = useState<StrategicObjective[]>([]);
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!formData.titulo.trim()) newErrors.titulo = "Informe o título do desafio";
-    if (!formData.setor.trim()) newErrors.setor = "Informe o setor";
-    if (!formData.alinhamento.trim())
-      newErrors.alinhamento = "Informe o alinhamento estratégico";
-    if (!formData.potencial.trim())
-      newErrors.potencial = "Informe o potencial inovador";
-    if (!formData.relevancia.trim())
-      newErrors.relevancia = "Informe a relevância";
-    if (!formData.descricao.trim())
-      newErrors.descricao = "Descreva o desafio";
-    if (!formData.dataInicio.trim())
-      newErrors.dataInicio = "Informe a data de início";
-    if (!formData.dataFim.trim()) newErrors.dataFim = "Informe a data final";
-    return newErrors;
-  };
 
-  const handleSave = async () => {
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+   const{
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: {errors},
+  } =  useForm<data>({
+      resolver: zodResolver(CreateChallengeSchema),
+      defaultValues: {
+      strategicObjectiveIds: [],
+      involvedAreas: [],
     }
+    });
 
+    
+     const onSubmit = async (data: data) => {
+       console.log("Dados validados:", data);
     try {
-      setLoading(true);
-
-      const dataInicioISO = new Date(formData.dataInicio).toISOString().split("T")[0];
-      const dataFimISO = new Date(formData.dataFim).toISOString().split("T")[0];
-
-      const payload = {
-        name: formData.titulo,
-        startDate: dataInicioISO,
-        endDate: dataFimISO,
-        area: formData.setor,
-        description: formData.descricao,
-        strategic_alignment: formData.alinhamento,
-        innovative_potential: formData.potencial,
-        business_relevance: formData.relevancia
-      }
-
-      const response = await ChallengeService.createChallenge(payload);
-      console.log("Desafio criado:", response);
-
-      setTimeout(() => {
-        setLoading(false);
-        setSuccess(true); 
-        setTimeout(() => {
-          setSuccess(false);
-          onClose();
-          triggerReload();
-        }, 2000);
-      }, 1500);
+      await ChallengeService.createChallenge(data);
+      onClose();
+      reset();
     } catch (error) {
-      setLoading(false);
-      console.error("Erro ao criar desafio:", error);
+      console.error("Erro ao salvar:", error);
     }
   };
 
-  const inputClass = (hasError: boolean) =>
-    `flex items-center rounded-lg border px-3 h-12 transition-colors ${
-      hasError
-        ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
-        : "bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900"
-    }`;
+  useEffect(() => {
+  async function loadStrategicObjectives() {
+    try {
+      const response = await StrategicObjectivesService.getAllObjectives();
+      setStrategicObjectives(response);
+    } catch (error) {
+      console.error("Erro ao buscar objetivos estratégicos", error);
+    }
+  }
 
-  const textareaClass = (hasError: boolean) =>
-    `flex items-start rounded-lg border px-3 py-2 h-20 transition-colors ${
-      hasError
-        ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
-        : "bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900"
-    }`;
+  loadStrategicObjectives();
+}, []);
+ 
 
-  const dateInputClass = (hasError: boolean) =>
-    `flex items-center rounded-lg border px-3 h-10 flex-1 transition-colors ${
-      hasError
-        ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
-        : "bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900"
-    }`;
+   const selectedAreas = watch("involvedAreas");
 
   return (
     <div>
-      <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-5 lg:p-10">
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="relative bg-white rounded-2xl shadow-lg w-full max-w-md p-6 dark:border-gray-800 dark:bg-gray-900">
+      <Modal isOpen={isOpen} onClose={onClose}  >
+        <div  className="lg:w-120 sm:w-50 md:w-100 p-6  bg-white z-50 shadow rounded-2xl max-h-[90vh] overflow-y-scroll ">
 
-            {loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-2xl z-50">
-                <Loader2 className="animate-spin text-blue-700 dark:text-blue-500" size={40} />
-                <p className="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Criando desafio...
-                </p>
-              </div>
-            )}
-
-            {success && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-900/95 rounded-2xl z-50 animate-fade-in">
-                <CheckCircle2 className="text-green-600 dark:text-green-400" size={48} />
-                <p className="mt-3 text-lg font-semibold text-green-700 dark:text-green-300">
-                  Desafio criado com sucesso!
-                </p>
-              </div>
-            )}
-            {/* Cabeçalho */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#15358D] dark:text-blue-800">
-                Cadastro Desafio
-              </h2>
-              <button onClick={onClose}>
-                <X
-                  className="text-gray-400 hover:text-gray-600 transition duration-400 hover:scale-[1.05] active:scale-[0.98]"
-                  size={20}
-                />
-              </button>
+          <form onSubmit={handleSubmit(onSubmit)}> 
+          <div className="space-y-3">
+            <div>
+              <Label>Título do desafio</Label>
+              <Input
+                placeholder="Digite o titulo desafio"
+                 {...register("name")} 
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+                )}
             </div>
 
-            {/* Inputs */}
-            <div className="space-y-3">
-              {/* Campo título */}
-              <div>
-                <div className={inputClass(!!errors.titulo)}>
-                  <Building2 className="text-[#98A2B3] mr-2" size={18} />
-                  <input
-                    type="text"
-                    name="titulo"
-                    placeholder="Título do Desafio"
-                    value={formData.titulo}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-                {errors.titulo && (
-                  <p className="text-red-500 text-xs mt-1">{errors.titulo}</p>
-                )}
-              </div>
-
-              {/* Setor */}
-              <div>
-                <div className={`relative ${inputClass(!!errors.setor)}`}>
-                  <SlidersHorizontal className="text-[#98A2B3] mr-2" size={18} />
-                  <select
-                    name="setor"
-                    onFocus={() => setIsFuncOpen(true)}
-                    onBlur={() => setIsFuncOpen(false)}
-                    value={formData.setor}
-                    onChange={(e) => {
-                      handleChange(e)
-                      setIsFuncOpen(false)
-                    }}
-                    className="w-full bg-transparent dark:text-[#ced3db] dark:bg-gray-900 text-sm outline-none text-[#344054] font-semibold appearance-none"
-                  >
-                    <option value="">Selecione o setor</option>
-                    <option value="TECHNOLOGY">Tecnologia</option>
-                    <option value="HEALTH">Saúde</option>
-                    <option value="EDUCATION">Educação</option>
-                    <option value="ENVIRONMENT">Ambiental</option>
-                    <option value="BUSINESS">Negócios</option>
-                    <option value="SOCIAL">Social</option>
-                    <option value="ENGINEERING">Engenharia</option>
-                    <option value="AGRICULTURE">Agricultura</option>
-                    <option value="DESIGN">Design</option>
-                    <option value="OTHER">Outro</option>
-                  </select>
-                  <ChevronDown
-                    size={20}
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-[#ced3db] transition-transform duration-300 ${
-                      isFuncOpen ? "rotate-180" : "rotate-0"
-                    }`}
-                  />
-                </div>
-                {errors.setor && (
-                  <p className="text-red-500 text-xs mt-1">{errors.setor}</p>
-                )}
-              </div>
-
-              {/* Alinhamento Estratégico */}
-              <div>
-                <div className={textareaClass(!!errors.alinhamento)}>
-                  <Building2 className="text-[#98A2B3] mr-2 mt-1" size={18} />
-                  <input
-                    name="alinhamento"
-                    type="text"
-                    placeholder="Alinhamento estratégico"
-                    value={formData.alinhamento}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-                {errors.alinhamento && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.alinhamento}
-                  </p>
-                )}
-              </div>
-
-              {/* Potencial inovador */}
-              <div>
-                <div className={textareaClass(!!errors.potencial)}>
-                  <SlidersHorizontal className="text-[#98A2B3] mr-2 mt-1" size={18} />
-                  <input
-                    name="potencial"
-                    type="text"
-                    placeholder="Potencial inovador"
-                    value={formData.potencial}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-                {errors.potencial && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.potencial}
-                  </p>
-                )}
-              </div>
-
-              {/* Relevância */}
-              <div>
-                <div className={textareaClass(!!errors.relevancia)}>
-                  <SlidersHorizontal className="text-[#98A2B3] mr-2 mt-1" size={18} />
-                  <input
-                    name="relevancia"
-                    type="text"
-                    placeholder="Relevância para o negócio"
-                    value={formData.relevancia}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-                {errors.relevancia && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.relevancia}
-                  </p>
-                )}
-              </div>
-
-              {/* Descrição */}
-              <div>
-                <div className={textareaClass(!!errors.descricao)}>
-                  <Menu className="text-[#98A2B3] mr-2 mt-1" size={18} />
-                  <textarea
-                    name="descricao"
-                    placeholder="Descrição"
-                    value={formData.descricao}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none resize-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-                {errors.descricao && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.descricao}
-                  </p>
-                )}
-              </div>
-
-              {/* Datas */}
-              <div className="flex space-x-2">
-                <div className={dateInputClass(!!errors.dataInicio)}>
-                  <CalendarDays className="text-[#98A2B3] mr-2" size={18} />
-                  <input
-                    name="dataInicio"
-                    type={formData.dataInicio ? "date" : "text"}
-                    placeholder="Data início"
-                    value={formData.dataInicio}
-                    onFocus={(e) => (e.target.type = "date")}
-                    onBlur={(e) => {
-                      if (!e.target.value) e.target.type = "text";
-                    }}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-
-                <div className={dateInputClass(!!errors.dataFim)}>
-                  <CalendarDays className="text-[#98A2B3] mr-2" size={18} />
-                  <input
-                    name="dataFim"
-                    type={formData.dataFim ? "date" : "text"}
-                    placeholder="Data final"
-                    value={formData.dataFim}
-                    onFocus={(e) => (e.target.type = "date")}
-                    onBlur={(e) => {
-                      if (!e.target.value) e.target.type = "text";
-                    }}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
-                  />
-                </div>
-              </div>
-
-              {(errors.dataInicio || errors.dataFim) && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.dataInicio || errors.dataFim}
-                </p>
+            <div>
+              <Label>Descrição do problema identificado</Label>
+              <Input
+              {...register("problemDescription")}
+                placeholder="Digite o problema identificado"
+              />
+              {errors.problemDescription && (
+                <p className="text-red-500 text-sm">{errors.problemDescription.message}</p>
               )}
             </div>
 
-            {/* Botões */}
-            <div className="flex justify-between mt-6">
-              <button
+             <div>
+              <Label>Há quanto tempo o problema existe</Label>
+              <Input
+              {...register("problemDuration")} 
+                placeholder="Digite Há quanto tempo o problema existe"
+              />
+              {errors.problemDuration && <p className="text-red-500 text-sm">{errors.problemDuration.message}</p>}
+            </div>
+
+             
+
+             <div>
+              <Label>Solução atual para o problema</Label>
+              <Input
+              {...register("currentSolution")}
+                placeholder="Digite quanto tempo o problema existe"
+              />
+              {errors.currentSolution && <p className="text-red-500 text-sm">{errors.currentSolution.message}</p>}
+            </div>
+
+            <div>
+              <Label>Relevância do problema para a organização</Label>
+              <Input
+                placeholder="Digite Relevância do problema para a organização"
+                 {...register("problemRelevance")} 
+              />
+              {errors.problemRelevance && <p className="text-red-500 text-sm">{errors.problemRelevance.message}</p>}
+            </div>
+
+            <div>
+              <Label>IDs dos objetivos estratégicos associados ao desafio</Label>
+              <select
+                  multiple
+                  className="w-full mt-2 border rounded-lg p-2 min-h-[120px]"
+                  value={watch("strategicObjectiveIds")}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions).map(
+                      (option) => option.value
+                    );
+
+                    setValue("strategicObjectiveIds", values, {
+                      shouldValidate: true,
+                    });
+                  }}
+                >
+                  {strategicObjectives.map((objective) => (
+                    <option key={objective.id} value={objective.id}>
+                      {objective.title}
+                    </option>
+                  ))}
+                </select>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  Segure <b>Ctrl</b> (ou <b>Cmd</b>) para selecionar mais de um
+                </p>
+
+                {errors.strategicObjectiveIds && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.strategicObjectiveIds.message}
+                  </p>
+                )}
+            </div>
+
+            <div>
+              <Label>Indicadores ou metas atuais da área</Label>
+              <Input  
+              placeholder="Digite os Indicadores ou metas atuais da área "
+              {...register("currentIndicators")}
+              />
+              {errors.currentIndicators && <p className="text-red-500 text-sm">{errors.currentIndicators.message}</p>}
+            </div>
+
+             <div>
+              <Label>Impactos esperados com a implementação da ideia</Label>
+              <Input  
+              {...register("expectedImpacts")}
+              placeholder="Digite os Impactos esperados com a implementação da ideia"
+              />
+              {errors.expectedImpacts && <p className="text-red-500 text-sm">{errors.expectedImpacts.message}</p>}
+            </div>
+
+            <div>
+              <Label>Áreas envolvidas ou impactadas</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                    {INVOLVED_AREAS_OPTIONS.map((area) => {
+                      const active = selectedAreas.includes(area.value);
+
+                    
+                      return (
+                        <button
+                          type="button"
+                          key={area.value}
+                          onClick={() => {
+                            setValue(
+                              "involvedAreas",
+                              active
+                                ? selectedAreas.filter((v) => v !== area.value)
+                                : [...selectedAreas, area.value],
+                              { shouldValidate: true }
+                            );
+                          }}
+                          className={`px-3 py-1 rounded-full border text-sm transition
+                            ${active ? "bg-blue-600 text-white" : "bg-gray-100"}
+                          `}
+                        >
+                          {area.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {errors.involvedAreas && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.involvedAreas.message}
+                    </p>
+                  )}
+             
+         
+              
+            </div>
+
+            <div>
+              <Label>Restrições ou dependências iniciais</Label>
+              <Input  
+              placeholder="Digite as Restrições ou dependências iniciais"
+              {...register("initialConstraints")}
+              />
+              {errors.initialConstraints && <p className="text-red-500 text-sm">{errors.initialConstraints.message}</p>}
+            </div>
+
+            <div>
+            <Label>Forma de participação do proponente se aprovado</Label>
+
+            <select
+              {...register("proponentParticipation")}
+              className="w-full mt-2 border rounded-lg p-2"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Selecione uma opção
+              </option>
+
+              {PROPONENT_PARTICIPATION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            {errors.proponentParticipation && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.proponentParticipation.message}
+              </p>
+            )}
+          </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-top mt-6">
+              <Button 
+                
                 onClick={onClose}
-                className="w-1/2 mr-2 bg-[#F2F4F7] text-[#344054] py-2 rounded-lg font-medium transition-colors ease-in-out border dark:border-gray-800 dark:bg-gray-900 dark:text-[#ced3db] hover:bg-[#E5E7EB]"
+                
               >
                 Cancelar
-              </button>
-              <button
-                onClick={handleSave}
-                className="w-1/2 ml-2 bg-[#15358D] dark:bg-blue-800 dark:hover:bg-blue-900 text-white py-2 rounded-lg font-medium transition-colors ease-in-out hover:bg-[#0f2a6d]"
+              </Button>
+              <Button 
+              
+              
+            
               >
-                Adicionar Desafio
-              </button>
+                Registrar Desafio
+              </Button>
             </div>
+
+            
+           
           </div>
+
+
+
+
+        </form>
+
+
+
         </div>
+
+        
+
       </Modal>
     </div>
   );
