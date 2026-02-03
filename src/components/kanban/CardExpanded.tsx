@@ -26,6 +26,7 @@ import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
 import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
+import OnePage from "./OnePage"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -530,13 +531,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "MATERIALIZATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <Materialization
-                    challengeId={cardData.id}
-                    challengeTitle={cardData.name}
-                    creator={cardData.Users.name}
-                    startDate={cardData.createdAt}
-                    visibility={cardData.visibility}
-                  />
+                  <OnePage />
+                  // <Materialization
+                  //   challengeId={cardData.id}
+                  //   challengeTitle={cardData.name}
+                  //   creator={cardData.Users.name}
+                  //   startDate={cardData.createdAt}
+                  //   visibility={cardData.visibility}
+                  // />
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
