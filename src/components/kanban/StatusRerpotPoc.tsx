@@ -66,7 +66,7 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
     }) => (
         <div className="flex flex-col mb-6">
         <div className="flex items-center justify-between mb-2">
-            <h2 className="text-black dark:text-white text-lg font-semibold">{title}</h2>
+            <h2 className="text-black dark:text-white text-lg">{title}</h2>
             <span className="text-xs text-[#98A2B3] dark:text-white/50">
             {value.length}/{MAX_CHARS}
             </span>
