@@ -108,8 +108,8 @@ export default function StatusReportPoC({ responsibleName }: StatusReportPoCProp
 
     return (
         <div className="flex flex-col">
-        <h1 className="text-[24px] text-[#0B2B70] dark:text-white mb-4">
-            Status Report da PoC
+        <h1 className="text-[24px] text-[#0B2B70] dark:text-white mb-4 font-semibold">
+            Relatório de Progresso
         </h1>
 
             <Section
