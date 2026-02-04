@@ -106,7 +106,16 @@ export const ENDPOINTS = {
   EXPERIMENTATION: {
     CREATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
     SHOW_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
-    UPDATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
+    CREATE_POC: (id: string) => `/experimentation/poc/${id}`,
+    SHOW_POC: (id: string) => `/experimentation/poc/${id}`,
+    UPDATE_POC: (id: string) => `/experimentation/poc/${id}`,
+    DELETE_POC: (id: string) => `/experimentation/poc/${id}`,
+    CREATE_HYPOTHESES: (id: string) => `experimentation/poc/${id}/hypotheses`,
+    UPDATE_HYPOTHESES: (id: string) => `experimentation/poc/${id}/hypotheses`,
+    DELETE_HYPOTHESES: (id: string) => `experimentation/poc/${id}/hypotheses`,
+    CREATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
+    UPDATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
+    DELETE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
   },
 
   KPIS: {
