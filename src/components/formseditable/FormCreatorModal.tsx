@@ -5,15 +5,34 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createFormTemplate, createFormTemplateVersion } from "@/lib/api/form-api"
-import { FormTemplate, FormTemplateVersion } from "@/lib/types/form-api"
+import { FormTemplateManagementService } from "@/api/services/formTemplateManagement.service"
+import { formTemplatePayload } from "@/api/payloads/formTemplate.payload"
+import { FormTemplateVersionPayload } from "@/api/payloads/formTemplateVersion.payload"
 import { toast } from "sonner"
+
+interface FormTemplate {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface FormTemplateVersion {
+  id: string
+  templateId: string
+  version: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
 
 interface FormCreatorModalProps {
   isOpen: boolean
   onClose: () => void
   onFormCreated: (template: FormTemplate, version: FormTemplateVersion) => void
 }
+
+const templateService = new FormTemplateManagementService()
 
 export function FormCreatorModal({ isOpen, onClose, onFormCreated }: FormCreatorModalProps) {
   const [formName, setFormName] = useState("")
@@ -25,8 +44,11 @@ export function FormCreatorModal({ isOpen, onClose, onFormCreated }: FormCreator
 
     setIsCreating(true)
     try {
-      const template = await createFormTemplate({ name: formName.trim() })
-      const version = await createFormTemplateVersion({ templateId: template.id })
+      const templatePayload: formTemplatePayload = { name: formName.trim() }
+      const template = await templateService.createFormTemplate(templatePayload)
+      
+      const versionPayload: FormTemplateVersionPayload = { templateId: template.id }
+      const version = await templateService.createFormTemplateVersion(versionPayload)
       
       toast.success("Formulário criado com sucesso!")
       onFormCreated(template, version)

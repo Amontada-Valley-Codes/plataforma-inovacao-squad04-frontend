@@ -5,7 +5,22 @@ import CardDesafio from "@/components/challenge/CardDesafios"
 import Button from "@/components/ui/button/Button"
 import { FormCreatorModal } from "@/components/formseditable/FormCreatorModal"
 import { FormBuilderContainer } from "@/components/formseditable/FormBuilderContainer"
-import { FormTemplate, FormTemplateVersion } from "@/lib/types/form-api"
+
+interface FormTemplate {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface FormTemplateVersion {
+  id: string
+  templateId: string
+  version: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
 
 export default function DesafiosPage(){
     const [isModalOpen, setIsModalOpen] = useState(false)

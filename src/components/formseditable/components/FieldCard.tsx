@@ -2,11 +2,24 @@
 
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import type { QuestionForm } from "@/lib/types/form-api"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { GripVertical, Pencil, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+interface QuestionForm {
+  id: string
+  title: string
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'OPTION' | 'CHECKBOX'
+  required: boolean
+  options?: {
+    options?: string[]
+    min?: number
+    max?: number
+  }
+  versionId: string
+  order: number
+}
 
 interface FieldCardProps {
   field: QuestionForm & { label?: string }
