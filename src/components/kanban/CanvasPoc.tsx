@@ -1,33 +1,64 @@
 'use client'
 
+import { experimentationService } from "@/api/services/experimentation.service";
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { useState } from "react"
 
-type Hypothesis = {
-  content: string;
-  status: string;
+type CanvasPoCProps = {
+  poc: {
+    id: string,
+    objective: string,
+    scope: string,
+    createdAt: string,
+    updatedAt: string,
+    experimentationId: string,
+    pocHypotheses: {
+      id: string,
+      description: string,
+      status: string,
+      pocId: string
+    }[],
+    poCIndicators: {
+      id: string,
+      name: string,
+      target: string,
+      pocId: string,
+      kpiId: null,
+      createdAt: string
+    }[]
+  };
+  updateObjective: (newObjective: string) => void;
+  updateScope: (newScope: string) => void;
 }
 
-export default function CanvasPoC() {
-  const [hypotheses, setHypotheses] = useState<Hypothesis[]>([])
+export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasPoCProps) {
+  const [objective, setObjective] = useState(poc.objective)
+  const [scope, setScope] = useState(poc.scope)
+  const [hypotheses, setHypotheses] = useState(poc.pocHypotheses)
   const [newHypothesis, setNewHypothesis] = useState('')
   const [isAddingHyp, setIsAddingHyp] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
-  const addHypothesis = () => {
+  const addHypothesis = async () => {
     if (!newHypothesis.trim()) return
 
-    setHypotheses(prev => [...prev, { content: newHypothesis, status: "PENDENTE"}])
+    const hypothesis = await experimentationService.createHypothesis(poc.id, {
+      description: newHypothesis,
+      status: "PENDING"
+    })
+
+    setHypotheses(prev => [...prev, hypothesis])
     setNewHypothesis('')
   }
 
-  const updateStatus = (index: number, newStatus: string) => {
+  const updateStatus = async (id: string, newStatus: string) => {
+    const updated = await experimentationService.updateHypothesis(id, {
+      description: hypotheses.find(h => h.id === id)!.description,
+      status: newStatus
+    })
+
     setHypotheses(prev => 
-      prev.map((hyp, i) => 
-        i === index 
-          ? { ...hyp, status: newStatus }
-          : hyp
-      )
+      prev.map(h => h.id === id ? updated : h)
     )
   }
 
@@ -45,11 +76,17 @@ export default function CanvasPoC() {
             required
             rows={5}
             maxLength={300}
+            value={objective}
+            onChange={(e) => {
+              const value = e.target.value
+              setObjective(value)
+              updateObjective(value)
+            }}
             placeholder="Defina o objetivo" 
             className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">{objective?.length}/300</span>
       </div>
 
       <div className="flex flex-col mb-4">
@@ -113,15 +150,15 @@ export default function CanvasPoC() {
                 text-[12px] rounded-[8px] pr-6 relative">
                   <select
                     value={hyp.status}
-                    onChange={(e) => updateStatus(i, e.target.value)}
+                    onChange={(e) => updateStatus(hyp.id, e.target.value)}
                     onFocus={() => setIsOpen(true)}
                     onBlur={() => setIsOpen(false)}
                     className="flex justify-center px-2 py-1 appearance-none
                     cursor-pointer rounded-[8px] outline-none"
                   >
-                    <option value="PENDENTE">PENDENTE</option>
-                    <option value="VALIDA">VÁLIDADA</option>
-                    <option value="INVALIDA">INVALIDADA</option>
+                    <option value="PENDING">PENDENTE</option>
+                    <option value="VALIDATED">VÁLIDADA</option>
+                    <option value="INVALIDATED">INVALIDADA</option>
                   </select>
 
                   <ChevronDown
@@ -131,7 +168,7 @@ export default function CanvasPoC() {
                               ${isOpen ? "rotate-180" : "rotate-0"}`}/>
                 </div>
               </div>
-              <p className="text-gray-600">{hyp.content}</p>
+              <p className="text-gray-600">{hyp.description}</p>
               <hr className="border-gray-400 mt-1"/>
             </div>
           ))}
@@ -147,11 +184,17 @@ export default function CanvasPoC() {
               required
               rows={5}
               maxLength={1500}
+              value={scope}
+              onChange={(e) => {
+                const value = e.target.value
+                setScope(value)
+                updateScope(value)
+              }}
               placeholder="Defina o escopo" 
               className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
             />
           </div>
-          <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/1500</span>
+          <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">{scope?.length}/1500</span>
         </div>
 
       </div>

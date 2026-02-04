@@ -1,15 +1,18 @@
 // src/api/payloads/challenge.payload.ts
 
 export type CreateChallengePayload = {
-  name: string
-  startDate: string
-  endDate: string
-  area: string
-  description: string
-  strategic_alignment: string
-  innovative_potential: string
-  business_relevance: string
-}
+  name: string;
+  problemDescription: string;
+  problemDuration: string;
+  currentSolution: string;
+  problemRelevance: string;
+  strategicObjectiveIds: string[];
+  currentIndicators: string;
+  expectedImpacts: string;
+  involvedAreas: string[];          
+  initialConstraints: string;
+  proponentParticipation: string;   
+};
 
 export type CreateChallengeResponse = {
   id: string

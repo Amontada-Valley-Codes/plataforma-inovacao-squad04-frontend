@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client"
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CardContentsHeader } from "./CardsContents"
 import { Toaster } from "react-hot-toast";
 import CanvasPoC from "./CanvasPoc";
 import ResultsReport from "./ResultsReport";
+import { CreateExperimentationResponse, ShowExperimentationResponse } from "@/api/payloads/experimentation.payload";
+import { experimentationService } from "@/api/services/experimentation.service";
+import StatusReportPoC from "./StatusRerpotPoc";
+
 
 type CardExperimentationContentProps = {
   challangeTitle: string;
@@ -17,8 +21,61 @@ type CardExperimentationContentProps = {
   visibility: string;
 }
 
+type ExperimentationState = (ShowExperimentationResponse | CreateExperimentationResponse) & { poc?: any }
+
 export const Experimentation = ({ challangeTitle, challengeId, category, startDate, creator, visibility }: CardExperimentationContentProps) => {
-  const [page, setPage] = useState('1')
+  const [experimentation, setExperimentation] = useState<ExperimentationState>()
+
+  const initExperimentation = useCallback(async () => {
+    try {
+      const res = await experimentationService.showExperimentation(challengeId)
+      setExperimentation(res)
+    } catch {
+      const newExp = await experimentationService.createExperimentation(challengeId)
+      setExperimentation(newExp)
+    }
+  }, [challengeId])
+
+  const updateObjective = async (newObjective: string) => {
+    if (!experimentation?.poc) return
+
+    const updatedPoc = await experimentationService.updatePoc(
+      experimentation.poc.id,
+      { objective: newObjective, scope: experimentation.poc.scope }
+    )
+
+    setExperimentation(prev => prev && { ...prev, poc: updatedPoc })
+  }
+
+  const updateScope = async (newScope: string) => {
+    if (!experimentation?.poc) return
+
+    const updatedPoc = await experimentationService.updatePoc(
+      experimentation.poc.id,
+      { objective: experimentation.poc.objective, scope: newScope }
+    )
+
+    setExperimentation(prev => prev && { ...prev, poc: updatedPoc })
+  }
+
+  useEffect(() => {
+    initExperimentation()
+  }, [initExperimentation ])
+
+  useEffect(() => {
+    if (!experimentation) return
+
+    if(!('poc' in experimentation) || !experimentation.poc) {
+      experimentationService.createPoc(experimentation.id, {
+        objective: "",
+        scope: ""
+      }).then(poc => {
+        setExperimentation(prev => prev && { ...prev, poc })
+      })
+    }
+  }, [experimentation])
+    
+  const [page, setPage] = useState<'1' | '2' | '3'>('1')
   return (
     <div  className="w-full flex flex-col overflow-y-auto">
       <Toaster position="top-right" reverseOrder={false} />
@@ -46,13 +103,31 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
             </div>
 
             <div className="flex flex-col items-center">
+          
+            <button 
+              className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${
+                page === '2'
+                  ? "bg-[#0B2B72] text-white"
+                  : "border-gray-400 border-2 text-gray-500"
+              }`}
+              onClick={() => setPage('2')}
+            >
+              2
+            </button>
+            <span className="text-sm mt-1 whitespace-nowrap">
+              Report da Poc
+            </span>
+          </div>
+
+
+            <div className="flex flex-col items-center">
               <button 
                 className={`w-8 h-8 rounded-full  font-semibold flex items-center justify-center ${
-                  page === '2' ? "bg-[#0B2B72] text-white" : "border-gray-400 dark:placeholder:text-white border-2 text-gray-500"
+                  page === '3' ? "bg-[#0B2B72] text-white" : "border-gray-400 dark:placeholder:text-white border-2 text-gray-500"
                 }`}
-                onClick={() => setPage('2')}
+                onClick={() => setPage('3')}
               >
-                2
+                3
               </button>
               <span className="text-sm mt-1 text-center flex flex-col leading-tight">
                 <span className="mt-0.5">Relatório</span>
@@ -63,11 +138,17 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       </div>
       
       <div>
-        {page === '1' ? (
-          <CanvasPoC/>
-        ) : (
-          <ResultsReport/>
-        )}
+        {page === '1' && experimentation &&
+          <CanvasPoC
+            poc={experimentation.poc}
+            updateObjective={updateObjective}
+            updateScope={updateScope}
+          />
+        }
+
+        {page === '2' && <StatusReportPoC />}
+
+        {page === '3' && <ResultsReport />}
       </div>
     </div>
   )
