@@ -14,6 +14,7 @@ export default function RolloutPlan() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [showGantt, setShowGantt] = useState(false);
 
+  const [executiveSummary, setExecutiveSummary] = useState("");
 
   const [cost, setCost] = useState<number | "">("");
   const [benefitValue, setBenefitValue] = useState<number | "">("");
@@ -101,6 +102,19 @@ return (
             2
           </button>
           <span className="text-xs mt-1 whitespace-nowrap">Page 2</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <button
+            className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${
+              page === '3'
+                ? "bg-[#0B2B72] text-white"
+                : "border-gray-400 border-2 text-gray-500"
+            }`}
+            onClick={() => setPage('3')}
+          >
+            3
+          </button>
+          <span className="text-xs mt-1 whitespace-nowrap">Page 3</span>
         </div>
       </div>
     </div>
@@ -208,33 +222,33 @@ return (
 
     {page === '2' && (
       <>
-        <div className="flex flex-col mb-4">
+        <div className="flex flex-col mb-6">
           <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
             Escopo Detalhado
           </h1>
 
-          <div className="flex-1 flex items-center rounded-lg border px-3 py-2 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+          <div className="flex rounded-lg border px-3 py-2 bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
             <textarea
               required
               rows={5}
               maxLength={2000}
               placeholder="Descreva o escopo detalhado"
-              className="w-full resize-none bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+              className="w-full resize-none bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
             />
           </div>
         </div>
 
-        <div className="flex flex-col mb-4">
+        <div className="flex flex-col mb-6">
           <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
             Definir Stakeholders e Responsáveis
           </h1>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold text-[14px] rounded-[8px] relative">
+          <div className="flex items-center gap-2 rounded-lg border px-3 py-2 bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+            <div className="relative flex-1">
               <select
                 value={selectedUserId}
                 onChange={(e) => setSelectedUserId(e.target.value)}
-                className="flex w-50 justify-center p-2 appearance-none cursor-pointer rounded-[8px] outline-none"
+                className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] dark:bg-black appearance-none cursor-pointer"
               >
                 <option value="">Selecionar stakeholders</option>
                 {users.map((user) => (
@@ -244,11 +258,7 @@ return (
                 ))}
               </select>
 
-              <ChevronDown
-                className={`text-[#0B2B70] absolute right-2 pointer-events-none transition-transform duration-200 ${
-                  isOpen ? "rotate-180" : "rotate-0"
-                }`}
-              />
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-[#0B2B70] pointer-events-none" />
             </div>
 
             <button
@@ -261,11 +271,12 @@ return (
             </button>
           </div>
 
+          {/* LISTA */}
           <div className="flex flex-wrap gap-2 mt-3">
             {stakeholders.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-2 bg-[#E7EEFF] text-[#0B2B70] px-3 py-1 rounded-full text-sm font-medium"
+                className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-[#E7EEFF] text-[#0B2B70]"
               >
                 {item.name}
                 <span className="text-xs opacity-70">({item.role})</span>
@@ -277,12 +288,16 @@ return (
                       prev.filter((s) => s.id !== item.id)
                     )
                   }
+                  className="hover:text-red-400 transition"
                 >
                   <Trash2 size={14} />
                 </button>
               </div>
             ))}
+          </div>
 
+          {/* GANTT */}
+          <div className="mt-4">
             <button
               type="button"
               onClick={() => setShowGantt(true)}
@@ -291,7 +306,7 @@ return (
               Ver cronograma (Gantt)
             </button>
           </div>
-
+        </div>
           {showGantt && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
               <div className="w-[90vw] max-w-6xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg flex flex-col">
@@ -323,9 +338,62 @@ return (
               </div>
             </div>
           )}
-        </div>
-      </>
+        </>
     )}
+
+    {page === "3" && (
+  <div className="grid grid-cols-1 gap-6">
+
+    {/* Resumo Executivo */}
+    <div className="rounded-xl border border-white/20 p-4 bg-black/30">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-white font-semibold">
+          Resumo Executivo Final
+        </h2>
+      </div>
+
+      <textarea
+        required
+        maxLength={1000}
+        value={executiveSummary}
+        onChange={(e) => setExecutiveSummary(e.target.value)}
+        placeholder="Descreva a decisão final, justificativa, aprendizados e próximos passos para a escala da solução."
+        className="
+          w-full
+          h-48
+          resize-none
+          rounded-lg
+          bg-black/40
+          border border-white/20
+          px-3 py-2
+          text-sm
+          text-white
+          outline-none
+          placeholder:text-white/40
+        "
+      />
+
+      <div className="text-right text-xs text-white/50 mt-1">
+        {executiveSummary.length}/1000
+      </div>
+    </div>
+
+    {/* Critérios para Avançar */}
+    <div className="rounded-xl border border-white/20 p-4 bg-black/30">
+      <h3 className="text-white font-semibold mb-3">
+        Critérios para avançar
+      </h3>
+
+      <ul className="space-y-2 text-sm text-white/80">
+        <li>• Aprovação do Comitê de Transformação</li>
+        <li>• Business case positivo (KPIs considerados)</li>
+        <li>• Viabilidade operacional</li>
+        <li>• Alinhamento com prioridades estratégicas do ciclo (PM)</li>
+      </ul>
+    </div>
   </div>
+)}
+  </div>
+
   )
 }
