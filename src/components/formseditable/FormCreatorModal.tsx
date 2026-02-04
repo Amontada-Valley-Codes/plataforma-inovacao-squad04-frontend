@@ -53,7 +53,6 @@ export function FormCreatorModal({ isOpen, onClose, onFormCreated }: FormCreator
       toast.success("Formulário criado com sucesso!")
       onFormCreated(template, version)
       setFormName("")
-      onClose()
     } catch (error) {
       console.error('Error creating form:', error)
       toast.error("Erro ao criar formulário")
@@ -64,26 +63,40 @@ export function FormCreatorModal({ isOpen, onClose, onFormCreated }: FormCreator
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Criar Novo Formulário</DialogTitle>
+      <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-theme-lg">
+        <DialogHeader className="pb-4 border-b border-gray-100 dark:border-gray-800">
+          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+            Criar Novo Formulário
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="formName">Nome do Formulário *</Label>
+        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+          <div className="space-y-3">
+            <Label htmlFor="formName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Nome do Formulário *
+            </Label>
             <Input
               id="formName"
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               placeholder="Ex: Formulário de Inscrição"
+              className="h-11 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-500 focus:border-brand-500 focus:ring-brand-500"
               required
             />
           </div>
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="px-6 py-2.5 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isCreating || !formName.trim()}>
+            <Button 
+              type="submit" 
+              disabled={isCreating || !formName.trim()}
+              className="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {isCreating ? "Criando..." : "Criar Formulário"}
             </Button>
           </div>

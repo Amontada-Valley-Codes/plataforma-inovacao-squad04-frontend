@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { FormBuilder } from "./form-builder"
-import { DynamicForm } from "./dynamic-form"
 import { FormTemplateManagementService } from "@/api/services/formTemplateManagement.service"
 import { FormFieldsService } from "@/api/services/formFields.service"
 import { FormQuestionPayload, UpdateQuestionPayload } from "@/api/payloads/questionForm.payload"
 import { ReorderQuestionsPayload } from "@/api/payloads/formTemplateVersion.payload"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Eye } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 
 interface FormTemplate {
@@ -52,8 +52,8 @@ const fieldsService = new FormFieldsService()
 
 export function FormBuilderContainer({ template, version, onBack }: FormBuilderContainerProps) {
   const [questions, setQuestions] = useState<QuestionForm[]>([])
-  const [isPreview, setIsPreview] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     loadQuestions()
@@ -157,52 +157,46 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
   }
 
   if (isLoading) {
-    return <div className="flex justify-center p-8">Carregando...</div>
-  }
-
-  if (isPreview) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => setIsPreview(false)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Editor
-          </Button>
-          <h2 className="text-2xl font-bold">{template.name} - Preview</h2>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando formulário...</p>
         </div>
-        <DynamicForm 
-          config={formConfig}
-          onSubmit={(data) => console.log('Form submitted:', data)}
-        />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="p-6">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <Button 
+            variant="outline" 
+            onClick={onBack}
+            className="gap-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            <ArrowLeft className="h-4 w-4" />
             Voltar
           </Button>
+
+          <FormBuilder
+            config={formConfig}
+            formTitle={template.name}
+            formDescription={""}
+            onAddField={handleAddField}
+            onUpdateField={handleUpdateField}
+            onRemoveField={handleRemoveField}
+            onReorderFields={handleReorderFields}
+            onSaveForm={() => {
+              toast.success("Formulário salvo com sucesso!")
+              console.log('Formulário salvo!')
+              // Redirect to challenges page after saving
+              router.push('/admin/challenges')
+            }}
+          />
         </div>
       </div>
-
-      <FormBuilder
-        config={formConfig}
-        formTitle={template.name}
-        formDescription={""}
-        onAddField={handleAddField}
-        onUpdateField={handleUpdateField}
-        onRemoveField={handleRemoveField}
-        onReorderFields={handleReorderFields}
-        onPreview={() => setIsPreview(true)}
-        onSaveForm={() => {
-          toast.success("Formulário salvo com sucesso!")
-          console.log('Formulário salvo!')
-        }}
-      />
     </div>
   )
 }
