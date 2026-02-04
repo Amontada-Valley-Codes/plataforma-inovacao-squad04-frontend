@@ -162,5 +162,33 @@ export const ENDPOINTS = {
     SHOW_ONE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
     UPDATE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
     DELETE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`
+  },
+
+  FORM_RESPONSES: {
+    SEND_RESPONSE: "/form-responses",
+    GET_RESPONSES: (challengeId: string) => `/form-responses/challenge-form/${challengeId}`
+  },
+
+  FORM_TEMPLATE: {
+    CREATE_TEMPLATE: '/form-templates',
+    GET_TEMPLATES: '/form-templates',
+    GET_TEMPLATE_BY_ID: (id: string) => `/form-templates/${id}`,
+    UPDATE_TEMPLATE: (id: string) => `/form-templates/${id}`,
+    DELETE_TEMPLATE: (id: string) => `/form-templates/${id}`
+  },
+
+  FORM_TEMPLATE_VERSIONS: {
+    CREATE_VERSION: (templateId: string) => `/form-template-versions/${templateId}`,
+    ACTIVATE_VERSION: (versionId: string) => `/form-template-versions/${versionId}/activate`,
+    DEACTIVATE_VERSION: (versionId: string) => `/form-template-versions/${versionId}/deactivate`,
+    DELETE_FORM_VERSION: (versionId: string) => `/form-template-versions/${versionId}`,
+  },
+
+  QUESTION_FORM: {
+    CREATE_QUESTION: (id: string) => `/question-forms/${id}`,
+    UPDATE_QUESTION: (id: string) => `/question-forms/${id}`,
+    DELETE_QUESTION: (id: string) => `/question-forms/${id}`,
+    GET_QUESTIONS_BY_VERSION: (versionId: string) => `/question-forms/version/${versionId}`,
+    REORDER_QUESTIONS: "/question-forms/questions/reorder"
   }
 } 
