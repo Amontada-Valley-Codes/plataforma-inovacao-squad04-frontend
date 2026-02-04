@@ -1,20 +1,21 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { QuestionForm } from "@/lib/types/form-api"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { FieldEditorForm } from "./components/FieldEditorForm"
 
-// Map API types to component types
-const mapApiTypeToComponentType = (apiType: string) => {
-  switch (apiType) {
-    case 'TEXT': return 'text'
-    case 'NUMBER': return 'number'
-    case 'SELECT': return 'select'
-    case 'OPTION': return 'multiselect'
-    case 'CHECKBOX': return 'multiselect'
-    default: return 'text'
+interface QuestionForm {
+  id: string
+  title: string
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'OPTION' | 'CHECKBOX'
+  required: boolean
+  options?: {
+    options?: string[]
+    min?: number
+    max?: number
   }
+  versionId: string
+  order: number
 }
 
 interface FieldEditorProps {

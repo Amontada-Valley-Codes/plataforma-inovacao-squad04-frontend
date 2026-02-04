@@ -3,17 +3,43 @@
 import { useState, useEffect } from "react"
 import { FormBuilder } from "./form-builder"
 import { DynamicForm } from "./dynamic-form"
-import { FormTemplate, FormTemplateVersion, QuestionForm } from "@/lib/types/form-api"
-import { 
-  createQuestionForm, 
-  getQuestionsByVersion, 
-  updateQuestionForm, 
-  deleteQuestionForm,
-  reorderQuestions 
-} from "@/lib/api/form-api"
+import { FormTemplateManagementService } from "@/api/services/formTemplateManagement.service"
+import { FormFieldsService } from "@/api/services/formFields.service"
+import { FormQuestionPayload, UpdateQuestionPayload } from "@/api/payloads/questionForm.payload"
+import { ReorderQuestionsPayload } from "@/api/payloads/formTemplateVersion.payload"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Eye } from "lucide-react"
 import { toast } from "sonner"
+
+interface FormTemplate {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface FormTemplateVersion {
+  id: string
+  templateId: string
+  version: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+interface QuestionForm {
+  id: string
+  title: string
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'OPTION' | 'CHECKBOX'
+  required: boolean
+  options?: {
+    options?: string[]
+    min?: number
+    max?: number
+  }
+  versionId: string
+  order: number
+}
 
 interface FormBuilderContainerProps {
   template: FormTemplate
@@ -21,30 +47,8 @@ interface FormBuilderContainerProps {
   onBack: () => void
 }
 
-// Map API types to component types
-const mapApiTypeToComponentType = (apiType: string) => {
-  switch (apiType) {
-    case 'TEXT': return 'text'
-    case 'NUMBER': return 'number'
-    case 'SELECT': return 'select'
-    case 'OPTION': return 'multiselect'
-    case 'CHECKBOX': return 'multiselect'
-    default: return 'text'
-  }
-}
-
-const mapComponentTypeToApiType = (componentType: string) => {
-  switch (componentType) {
-    case 'text': return 'TEXT'
-    case 'textarea': return 'TEXT'
-    case 'email': return 'TEXT'
-    case 'number': return 'NUMBER'
-    case 'select': return 'SELECT'
-    case 'multiselect': return 'OPTION'
-    case 'date': return 'TEXT'
-    default: return 'TEXT'
-  }
-}
+const templateService = new FormTemplateManagementService()
+const fieldsService = new FormFieldsService()
 
 export function FormBuilderContainer({ template, version, onBack }: FormBuilderContainerProps) {
   const [questions, setQuestions] = useState<QuestionForm[]>([])
@@ -57,7 +61,7 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
 
   const loadQuestions = async () => {
     try {
-      const data = await getQuestionsByVersion(version.id)
+      const data = await fieldsService.getQuestionsByVersion(version.id)
       setQuestions(data)
     } catch (error) {
       console.error('Error loading questions:', error)
@@ -68,7 +72,7 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
 
   const handleAddField = async (field: any) => {
     try {
-      const questionData: any = {
+      const questionPayload: FormQuestionPayload = {
         title: field.label,
         type: field.type as 'TEXT' | 'NUMBER' | 'SELECT' | 'OPTION' | 'CHECKBOX',
         required: field.required || false
@@ -76,11 +80,11 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
       
       // Add options only for types that need them
       if (field.options?.length > 0 && (field.type === 'SELECT' || field.type === 'OPTION' || field.type === 'CHECKBOX')) {
-        questionData.options = { options: field.options }
+        questionPayload.options = { options: field.options }
       }
 
-      console.log('Creating question with data:', questionData)
-      const newQuestion = await createQuestionForm({ ...questionData, versionId: version.id })
+      console.log('Creating question with data:', questionPayload)
+      const newQuestion = await fieldsService.createQuestionForm(version.id, questionPayload)
       setQuestions(prev => [...prev, newQuestion])
       toast.success("Campo adicionado com sucesso!")
     } catch (error) {
@@ -91,21 +95,16 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
 
   const handleUpdateField = async (id: string, updates: any) => {
     try {
-      // Update local state immediately for better UX
+      const updatePayload: UpdateQuestionPayload = {
+        title: updates.label,
+        required: updates.required,
+        options: updates.options?.length ? { options: updates.options } : undefined
+      }
+      await fieldsService.updateQuestionForm(id, updatePayload)
+      
+      // Update local state only after successful API call
       setQuestions(prev => prev.map(q => q.id === id ? { ...q, title: updates.label, required: updates.required, options: updates.options?.length ? { options: updates.options } : q.options } : q))
       toast.success("Campo atualizado com sucesso!")
-      
-      // Try to update backend, but don't fail if it doesn't work
-      try {
-        const updateData = {
-          title: updates.label,
-          required: updates.required,
-          options: updates.options?.length ? { options: updates.options } : undefined
-        }
-        await updateQuestionForm(id, updateData)
-      } catch (apiError) {
-        console.warn('Failed to sync update with backend:', apiError)
-      }
     } catch (error) {
       console.error('Error updating field:', error)
       toast.error("Erro ao atualizar campo")
@@ -114,7 +113,7 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
 
   const handleRemoveField = async (id: string) => {
     try {
-      await deleteQuestionForm(id)
+      await fieldsService.deleteQuestionForm(id)
       setQuestions(prev => prev.filter(q => q.id !== id))
       toast.success("Campo removido com sucesso!")
     } catch (error) {
@@ -125,23 +124,17 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
 
   const handleReorderFields = async (reorderedFields: any[]) => {
     try {
-      // Update local state immediately for better UX
+      const questionIds = reorderedFields.map(f => f.id)
+      const reorderPayload: ReorderQuestionsPayload = { versionId: version.id, questionIds }
+      await templateService.reorderQuestions(reorderPayload)
+      
+      // Update local state only after successful API call
       const updatedFields = reorderedFields.map((field, index) => ({
         ...field,
         order: index + 1
       }))
-      
       setQuestions(updatedFields)
-      
-      // Send reorder request to backend
-      try {
-        const questionIds = updatedFields.map(f => f.id)
-        await reorderQuestions({ versionId: version.id, questionIds })
-        toast.success("Campos reorganizados com sucesso!")
-      } catch (apiError) {
-        console.warn('Failed to sync order with backend:', apiError)
-        toast.success("Campos reorganizados localmente!")
-      }
+      toast.success("Campos reorganizados com sucesso!")
     } catch (error) {
       console.error('Error reordering fields:', error)
       toast.error("Erro ao reorganizar campos")

@@ -179,6 +179,7 @@ export const ENDPOINTS = {
 
   FORM_TEMPLATE_VERSIONS: {
     CREATE_VERSION: (templateId: string) => `/form-template-versions/${templateId}`,
+    GET_VERSIONS_BY_TEMPLATE: (templateId: string) => `/form-template-versions/template/${templateId}`,
     ACTIVATE_VERSION: (versionId: string) => `/form-template-versions/${versionId}/activate`,
     DEACTIVATE_VERSION: (versionId: string) => `/form-template-versions/${versionId}/deactivate`,
     DELETE_FORM_VERSION: (versionId: string) => `/form-template-versions/${versionId}`,
