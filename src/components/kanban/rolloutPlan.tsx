@@ -9,7 +9,6 @@ type Stakeholder = {
 };
 
 export default function RolloutPlan() {
-  const [isOpen, setIsOpen] = useState(false);
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [showGantt, setShowGantt] = useState(false);
@@ -87,7 +86,7 @@ return (
           >
             1
           </button>
-          <span className="text-xs mt-1 whitespace-nowrap">Page 1</span>
+          <span className="text-xs mt-1 whitespace-nowrap">Caso de Negocios</span>
         </div>
 
         <div className="flex flex-col items-center">
@@ -101,7 +100,7 @@ return (
           >
             2
           </button>
-          <span className="text-xs mt-1 whitespace-nowrap">Page 2</span>
+          <span className="text-xs mt-1 whitespace-nowrap">Plano de Rollout</span>
         </div>
         <div className="flex flex-col items-center">
           <button
@@ -114,7 +113,7 @@ return (
           >
             3
           </button>
-          <span className="text-xs mt-1 whitespace-nowrap">Page 3</span>
+          <span className="text-xs mt-1 whitespace-nowrap">Relatorio Final</span>
         </div>
       </div>
     </div>
@@ -122,7 +121,6 @@ return (
           {page === "1" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* Custo */}
           <div className="rounded-xl border border-white/20 p-4 bg-black/30">
             <div className="flex justify-between mb-3">
               <h2 className="text-white font-semibold">Custo Total</h2>
@@ -140,7 +138,6 @@ return (
             />
           </div>
 
-          {/* Benefícios */}
           <div className="rounded-xl border border-white/20 p-4 bg-black/30">
             <div className="flex justify-between mb-3">
               <h2 className="text-white font-semibold">Benefícios Esperados</h2>
@@ -271,7 +268,6 @@ return (
             </button>
           </div>
 
-          {/* LISTA */}
           <div className="flex flex-wrap gap-2 mt-3">
             {stakeholders.map((item) => (
               <div
@@ -296,7 +292,6 @@ return (
             ))}
           </div>
 
-          {/* GANTT */}
           <div className="mt-4">
             <button
               type="button"
@@ -344,7 +339,6 @@ return (
     {page === "3" && (
   <div className="grid grid-cols-1 gap-6">
 
-    {/* Resumo Executivo */}
     <div className="rounded-xl border border-white/20 p-4 bg-black/30">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-white font-semibold">
@@ -378,7 +372,6 @@ return (
       </div>
     </div>
 
-    {/* Critérios para Avançar */}
     <div className="rounded-xl border border-white/20 p-4 bg-black/30">
       <h3 className="text-white font-semibold mb-3">
         Critérios para avançar
@@ -386,7 +379,7 @@ return (
 
       <ul className="space-y-2 text-sm text-white/80">
         <li>• Aprovação do Comitê de Transformação</li>
-        <li>• Business case positivo (KPIs considerados)</li>
+        <li>• Caso de Negócios positivo (KPIs considerados)</li>
         <li>• Viabilidade operacional</li>
         <li>• Alinhamento com prioridades estratégicas do ciclo (PM)</li>
       </ul>
