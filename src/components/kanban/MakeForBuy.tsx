@@ -75,7 +75,7 @@ export default function MakeforBuy() {
             rows={5}
             maxLength={2000} 
             placeholder="Descreva o problema no formato HMW"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function MakeforBuy() {
             rows={5}
             maxLength={2000}
             placeholder="Quais são as regras de negócio?"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
       </div>

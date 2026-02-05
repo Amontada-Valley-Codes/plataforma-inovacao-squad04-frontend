@@ -54,7 +54,7 @@ export default function CanvasMVP() {
             rows={5}
             maxLength={300}
             placeholder="Defina o público-alvo" 
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
         <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>
@@ -71,7 +71,7 @@ export default function CanvasMVP() {
             rows={5}
             maxLength={500}
             placeholder="Defina a proposta de valor" 
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
         <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>

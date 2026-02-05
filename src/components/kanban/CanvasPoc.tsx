@@ -127,7 +127,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
               updateObjective(value)
             }}
             placeholder="Defina o objetivo" 
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
         <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">{objective?.length}/300</span>
@@ -378,7 +378,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
                 updateScope(value)
               }}
               placeholder="Defina o escopo" 
-              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
             />
           </div>
           <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">{scope?.length}/1500</span>
