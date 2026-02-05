@@ -173,7 +173,7 @@ export function FormBuilderContainer({ template, version, onBack }: FormBuilderC
         <div className="max-w-5xl mx-auto space-y-6">
           <Button 
             variant="outline" 
-            onClick={onBack}
+            onClick={() => router.push('/admin/challenges')}
             className="gap-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           >
             <ArrowLeft className="h-4 w-4" />

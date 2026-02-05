@@ -19,6 +19,12 @@ import {
   DeleteHypothesesResponse,
   DeleteIndicatorsResponse,
   DeletePocResponse,
+  CreateResultsReportPayload,
+  CreateResultsReportResponse,
+  DeleteResultsReportResponse,
+  ShowResultsReportResponse,
+  UpdateResultsReportPayload,
+  UpdateResultsReportResponse,
  } from "../payloads/experimentation.payload";
 
 export const experimentationService = {
@@ -88,8 +94,32 @@ export const experimentationService = {
     return response.data
   },
 
-  async deleteIndicators(indicatorId: string): Promise<DeleteHypothesesResponse> {
+  async deleteIndicators(indicatorId: string): Promise<DeleteIndicatorsResponse> {
     const response = await api.delete(ENDPOINTS.EXPERIMENTATION.DELETE_INDICATORS(indicatorId))
+    console.log(response.data)
+    return response.data
+  },
+
+  async createReport(pocId: string, payload: CreateResultsReportPayload): Promise<CreateResultsReportResponse> {
+    const response = await api.post(ENDPOINTS.EXPERIMENTATION.CREATE_REPORT(pocId), payload)
+    console.log(response.data)
+    return response.data
+  },
+
+  async showReport(pocId: string): Promise<ShowResultsReportResponse> {
+    const response = await api.get(ENDPOINTS.EXPERIMENTATION.SHOW_REPORT(pocId))
+    console.log(response.data)
+    return response.data
+  },
+
+  async updateReport(reportId: string, payload: UpdateResultsReportPayload): Promise<UpdateResultsReportResponse> {
+    const response = await api.patch(ENDPOINTS.EXPERIMENTATION.UPDATE_REPORT(reportId), payload)
+    console.log(response.data)
+    return response.data
+  },
+
+  async deleteReport(reportId: string): Promise<DeleteResultsReportResponse> {
+    const response = await api.delete(ENDPOINTS.EXPERIMENTATION.DELETE_REPORT(reportId))
     console.log(response.data)
     return response.data
   },
