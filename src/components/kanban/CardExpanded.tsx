@@ -23,6 +23,8 @@ import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
 import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
+import { Card } from "../ui/card"
+import RolloutPlan from "./rolloutPlan"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -584,6 +586,32 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleMoveBack={handleMoveBack}
                 handleApproveAndMove={handleApproveAndMove}
               />  
+            )}
+            {cardData.status === "SCALE" && (
+              <CardExpandedLayout
+                mainContent={
+                  <RolloutPlan />
+                }
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    context={cardData.status}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    context={cardData.status}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                challengeId={cardData.id}
+                isFirstColumn={isFirstColumn}
+                isLastColumn={isLastColumn}
+                handleMoveBack={handleMoveBack}
+                handleApproveAndMove={handleApproveAndMove}
+              />
             )}
           </div>
           <Modal
