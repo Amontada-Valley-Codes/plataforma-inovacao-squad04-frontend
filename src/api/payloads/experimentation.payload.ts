@@ -23,9 +23,25 @@ export type ShowExperimentationResponse = {
       id: string,
       name: string,
       target: string,
+      metric: string,
       pocId: string,
-      kpiId: null,
+      kpiId: string | null,
       createdAt: string
+    }[],
+    pocResultsReports: {
+      id: string,
+      executiveSummary: string,
+      learnings: string[],
+      recommendation: string,
+      recommendationTxt: string,
+      pocId: string,
+      kpis: {
+        kpiId: string,
+        value: number,
+        description: string
+      }[],
+      createdAt: string,
+      updatedAt: string
     }[]
   } | null
 }
@@ -67,8 +83,9 @@ export type ShowPocResponse = {
     id: string,
     name: string,
     target: string,
+    metric: string,
     pocId: string,
-    kpiId: null,
+    kpiId: string | null,
     createdAt: string
   }[]
 }
@@ -94,16 +111,18 @@ export type DeleteHypothesesResponse = CreateHypothesesResponse
 export type CreateIndicatorsPayload = {
   kpiId: string | null,
   name: string,
-  target: string
+  target: string,
+  metric: string
 }
 
 export type CreateIndicatorsResponse = {
   id: string,
   name: string,
   target: string,
+  metric: string,
   pocId: string,
   kpiId: string | null,
-  createAt: string
+  createdAt: string
 }
 
 export type UpdateIndicatorsPayload = CreateIndicatorsPayload
@@ -111,3 +130,39 @@ export type UpdateIndicatorsPayload = CreateIndicatorsPayload
 export type UpdateIndicatorsResponse = CreateIndicatorsResponse
 
 export type DeleteIndicatorsResponse = CreateIndicatorsResponse
+
+export type CreateResultsReportPayload = {
+  executiveSummary: string,
+  learnings: string[],
+  recommendation: string,
+  recommendationTxt: string,
+  kpis: {
+    kpiId: string,
+    value: number,
+    description: string
+  }[]
+}
+
+export type CreateResultsReportResponse = {
+  id: string,
+  executiveSummary: string,
+  learnings: string[],
+  recommendation: string,
+  recommendationTxt: string,
+  pocId: string,
+  kpis: {
+    kpiId: string,
+    value: number,
+    description: string
+  }[],
+  createdAt: string,
+  updatedAt: string
+}
+
+export type ShowResultsReportResponse = CreateResultsReportResponse
+
+export type UpdateResultsReportPayload = CreateResultsReportPayload
+
+export type UpdateResultsReportResponse = CreateResultsReportResponse
+
+export type DeleteResultsReportResponse = CreateResultsReportResponse
