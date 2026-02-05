@@ -124,7 +124,7 @@ return (
           <div className="rounded-xl border p-4 ">
             <div className="flex justify-between mb-3">
               <h2 className="text-[#0B2B70] dark:text-white font-semibold">Custo Total</h2>
-              <DollarSign size={18} className="text-white/70" />
+              <DollarSign size={18} className="text-[#0B2B70] dark:text-white" />
             </div>
 
             <input
@@ -141,7 +141,7 @@ return (
           <div className="rounded-xl border p-4 ">
             <div className="flex justify-between mb-3">
               <h2 className="text-[#0B2B70] dark:text-white font-semibold">Benefícios Esperados</h2>
-              <TrendingUp size={18} className="text-white/70" />
+              <TrendingUp size={18} className="text-[#0B2B70] dark:text-white" />
             </div>
 
             <input
@@ -169,7 +169,7 @@ return (
           <div className="rounded-xl border p-4 md:col-span-2">
             <div className="flex justify-between mb-2">
               <h2 className="text-[#0B2B70] dark:text-white font-semibold">ROI Estimado</h2>
-              <TrendingUp size={18} className="text-white/70" />
+              <TrendingUp size={18} className="text-[#0B2B70] dark:text-white" />
             </div>
 
             <div className="text-xl font-semibold text-[#0B2B70] dark:text-white ">
@@ -185,7 +185,7 @@ return (
           <div className="rounded-xl border p-4 md:col-span-2">
             <div className="flex justify-between mb-3">
               <h2 className="text-[#0B2B70] dark:text-white font-semibold">Riscos e Mitigadores</h2>
-              <AlertTriangle size={18} className="text-white/70" />
+              <AlertTriangle size={18} className="text-[#0B2B70] dark:text-white" />
             </div>
 
             {risks.map((risk, index) => (
