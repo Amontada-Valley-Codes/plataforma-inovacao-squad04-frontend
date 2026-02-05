@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FormCreatorModal } from "@/components/formseditable/FormCreatorModal"
 import { FormBuilderContainer } from "@/components/formseditable/FormBuilderContainer"
+import { FormTemplateManagementService } from "@/api/services/formTemplateManagement.service"
 
 interface FormTemplate {
   id: string
@@ -20,14 +21,38 @@ interface FormTemplateVersion {
   updatedAt: string
 }
 
+const templateService = new FormTemplateManagementService()
+
 export default function FormBuilderPage() {
-  const [isModalOpen, setIsModalOpen] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentForm, setCurrentForm] = useState<{
     template: FormTemplate
     version: FormTemplateVersion
   } | null>(null)
+  const [templatesLoaded, setTemplatesLoaded] = useState(false)
+
+  useEffect(() => {
+   
+    templateService.getFormTemplates()
+      .then(async (templates: FormTemplate[]) => {
+        if (templates.length === 0) {
+        
+          setIsModalOpen(true)
+        } else {
+     
+          const template = templates[0] 
+          const version = await templateService.createFormTemplateVersion({ templateId: template.id })
+          setCurrentForm({ template, version })
+        }
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+      .finally(() => setTemplatesLoaded(true))
+  }, [])
 
   const handleFormCreated = (template: FormTemplate, version: FormTemplateVersion) => {
+ 
     setCurrentForm({ template, version })
     setIsModalOpen(false)
   }
@@ -35,6 +60,11 @@ export default function FormBuilderPage() {
   const handleBackToModal = () => {
     setCurrentForm(null)
     setIsModalOpen(true)
+  }
+
+  if (!templatesLoaded) {
+ 
+    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>
   }
 
   if (currentForm) {
@@ -49,20 +79,9 @@ export default function FormBuilderPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-6">
-      <div className="text-center space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Construtor de Formulários
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Crie formulários personalizados de forma rápida e intuitiva
-          </p>
-        </div>
-      </div>
-
       <FormCreatorModal 
         isOpen={isModalOpen}
-        onClose={() => window.history.back()}
+        onClose={() => setIsModalOpen(false)}
         onFormCreated={handleFormCreated}
       />
     </div>
