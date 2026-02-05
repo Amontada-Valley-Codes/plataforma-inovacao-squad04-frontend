@@ -37,27 +37,43 @@ export const shortDateFormatter = new Intl.DateTimeFormat('pt-BR', {
 
 export const getCategoryLabel = (category: string) => {
   switch (category) {
+    case 'ADMINISTRATIVE':
+      return 'Administrativo';
+    case 'FINANCIAL':
+      return 'Financeiro';
+    case 'ACCOUNTING':
+      return 'Contábil';
+    case 'LEGAL':
+      return 'Jurídico';
+    case 'HUMAN_RESOURCES':
+      return 'Recursos Humanos';
+    case 'MARKETING':
+      return 'Marketing';
+    case 'SALES':
+      return 'Vendas';
+    case 'COMMERCIAL':
+      return 'Comercial';
+    case 'SUPPLY':
+      return 'Suprimentos';
+    case 'LOGISTICS':
+      return 'Logística';
+    case 'PRODUCTION':
+      return 'Produção';
     case 'TECHNOLOGY':
-      return 'TECNOLOGIA';
-    case 'HEALTH':
-      return 'SAÚDE';
-    case 'EDUCATION':
-      return 'EDUCAÇÃO';
-    case 'ENVIRONMENT':
-      return 'MEIO AMBIENTE';
-    case 'BUSINESS':
-      return 'NEGÓCIOS';
-    case 'SOCIAL':
-      return 'SOCIAL';
+      return 'Tecnologia';
     case 'ENGINEERING':
-      return 'ENGENHARIA';
-    case 'AGRICULTURE':
-      return 'AGRICULTURA';
-    case 'DESIGN':
-      return 'DESIGN';
+      return 'Engenharia';
+    case 'CUSTOMER_SERVICE':
+      return 'Atendimento ao Cliente';
+    case 'QUALITY':
+      return 'Qualidade';
+    case 'RESEARCH_DEVELOPMENT':
+      return 'Pesquisa e Desenvolvimento';
+    case 'HEALTH_SAFETY':
+      return 'Saúde e Segurança';
     case 'OTHER':
     default:
-      return 'OUTRO';
+      return 'Outro';
   }
 };
 
