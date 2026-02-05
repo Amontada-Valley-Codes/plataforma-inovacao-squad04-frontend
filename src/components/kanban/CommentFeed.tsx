@@ -1,7 +1,7 @@
 'use client'; 
 
 import { useState, useEffect } from 'react';
-import { SectionType } from './commentsData';
+
 import { Comment } from './Comment';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { FilteredCommentReponse, CreateCommentPayload } from '@/api/payloads/commentsFunel.payload';
@@ -10,14 +10,12 @@ import { showCustomToast } from './KanbanToaster';
 import { Toaster } from 'react-hot-toast';
 
 
-type CollapsibleSectionProps = {
-  section: SectionType;
+type CommentFeedProps = {
+  context: "GENERATION" | "PRE_SCREENING" | "MATERIALIZATION" | "DETAILED_SCREENING" | "EXPERIMENTATION" | "SCALE" | string;
   challengeId: string;
-  defaultOpen?: boolean;
 };
 
-export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }: CollapsibleSectionProps) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
+export const CommentFeed = ({ context, challengeId }: CommentFeedProps) => {
   const [comments, setComments] = useState<FilteredCommentReponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,9 +23,9 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
 
   const fetchComments = async () => {
     setIsLoading(true)
-    setError(null)
+    setError(null)  
     try {
-      const response = await commentsService.filteredComment(challengeId, section.id)
+      const response = await commentsService.filteredComment(challengeId, context)
       setComments(response)
     } catch (err) {
       console.error('Erro ao buscar comentários:', err)
@@ -38,10 +36,8 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
   }
 
   useEffect(() => {
-    if (isOpen) {
-      fetchComments()
-    }
-  }, [isOpen, challengeId, section.id])
+    fetchComments()
+  }, [challengeId, context])
 
   const handleCreateComment = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +45,7 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
 
     const payload: CreateCommentPayload = {
       comment: newCommentText,
-      context: section.id,
+      context: context
     }
 
     try {
@@ -65,24 +61,6 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
   return (
     <div className="border-b border-gray-200 last:border-b-0">
       <Toaster position="top-right" reverseOrder={false} />
-
-      {/* header clicavel para abrir/fechar a seçao */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center gap-2 py-4 text-left transition-colors dark:hover:bg-gray-800 hover:bg-gray-50/50"
-      >
-        <ChevronDown
-          size={20}
-          className={`text-gray-600 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
-        />
-        <div>
-          <h3 className="font-semibold text-black dark:text-white text-base">{section.title}</h3>
-          <span className="text-sm text-gray-600 dark:text-white">Comentar</span>
-        </div>
-      </button>
-
-      {/* conteudo que aparece quando a seçao esta aberta */}
-      {isOpen && (
         <div className="pl-7 pb-4">
           {isLoading && (
             <div className="flex items-center justify-center py-4">
@@ -105,7 +83,7 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
 
           {!isLoading && !error && comments.length === 0 && (
             <p className="text-sm text-gray-500 dark:text-white italic py-2">
-              Nenhum comentário nesta seção ainda.
+              Nenhum comentário nesta etapa  ainda.
             </p>
           )}
 
@@ -127,7 +105,6 @@ export const CollapsibleSection = ({ section, challengeId, defaultOpen = false }
             </div>
           </form>
         </div>
-      )}
     </div>
   );
 };
