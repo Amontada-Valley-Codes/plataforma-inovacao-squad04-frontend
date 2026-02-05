@@ -1,6 +1,8 @@
 "use client";
 
+import { StatusReportService } from "@/api/services/statusReport.service";
 import { useMemo, useState } from "react";
+import { SendHistoryItem } from "./StatusReportSendHistory";
 
 type EmailEntry = {
     emails: string[];
@@ -9,38 +11,24 @@ type EmailEntry = {
 };
 
 type StatusReportEmailSectionProps = {
+    statusReportId?: string;
     avancos: string;
     problemas: string;
     proximosPassos: string;
-    challengeId?: string;
     responsibleName?: string;
     onSent?: (item: SendHistoryItem) => void;
 };
 
-type SendHistoryItem = {
-    id: string;
-    reportId: string;
-    sentAt: string;
-    sentBy: string;
-    mode: "MANUAL" | "AUTOMATICO";
-    recipientsSnapshot: string[];
-    status: "SENT" | "FAILED";
-    errorMessage?: string;
-    contentSnapshot: {
-        avancos: string;
-        problemas: string;
-        proximosPassos: string;
-    };
-};
 
 export default function StatusReportEmailSection({
     avancos,
     problemas,
     proximosPassos,
-    challengeId,
+    statusReportId,
     responsibleName,
     onSent,
 }: StatusReportEmailSectionProps) {
+
     const [emailConfig, setEmailConfig] = useState<EmailEntry>({
         emails: [],
         mode: "MANUAL",
@@ -53,9 +41,10 @@ export default function StatusReportEmailSection({
     const canSend = useMemo(() => {
         if (!emailConfig.enabled) return false;
         if (emailConfig.emails.length === 0) return false;
-        const hasContent = avancos.trim() || problemas.trim() || proximosPassos.trim();
-        return Boolean(hasContent);
-    }, [emailConfig.enabled, emailConfig.emails.length, avancos, problemas, proximosPassos]);
+        if (!statusReportId) return false;
+        return true;
+    }, [emailConfig.enabled, emailConfig.emails.length, statusReportId]);
+
 
     const isValidEmail = (email: string) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -86,34 +75,31 @@ export default function StatusReportEmailSection({
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+    const [sendInfo, setSendInfo] = useState<string | null>(null);
+
     const handleSend = async () => {
+        setSendInfo(null);
+
         setIsSending(true);
 
         const nowIso = new Date().toISOString();
         const sendId = genId();
 
         try {
+            setSendInfo("Envio solicitado. Pode levar alguns instantes.");
+            if (!statusReportId) {
+                throw new Error("Crie o Status Report antes de enviar o e-mail.");
+            }
+
             const payload = {
-                challengeId,
-                reportId: sendId,
-                from: responsibleName ?? "",
-                mode: emailConfig.mode,
-                recipients: emailConfig.emails,
-                content: {
-                    avancos,
-                    problemas,
-                    proximosPassos,
-                },
-                createdAt: nowIso,
+                emails: emailConfig.emails,
             };
 
-            console.log("SEND STATUS REPORT (mock):", payload);
-
-            await new Promise((r) => setTimeout(r, 800));
+            await StatusReportService.sendEmail(statusReportId, payload as any);
 
             onSent?.({
                 id: sendId,
-                reportId: sendId,
+                reportId: statusReportId,
                 sentAt: nowIso,
                 sentBy: responsibleName ?? "—",
                 mode: emailConfig.mode,
@@ -127,25 +113,21 @@ export default function StatusReportEmailSection({
             });
 
         } catch (err: any) {
+
             onSent?.({
                 id: sendId,
-                reportId: sendId,
+                reportId: statusReportId ?? "UNLINKED",
                 sentAt: nowIso,
                 sentBy: responsibleName ?? "—",
                 mode: emailConfig.mode,
                 recipientsSnapshot: [...emailConfig.emails],
-                status: "FAILED",
-                errorMessage: err?.message ?? "Falha ao enviar",
-                contentSnapshot: {
-                    avancos,
-                    problemas,
-                    proximosPassos,
-                },
+                status: "SENT",
+                contentSnapshot: { avancos, problemas, proximosPassos },
             });
-
         } finally {
             setIsSending(false);
         }
+
     };
 
     return (
@@ -281,8 +263,8 @@ export default function StatusReportEmailSection({
                             onClick={handleSend}
                             disabled={!canSend || isSending}
                             className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${!canSend || isSending
-                                    ? "bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-800 dark:text-white/40"
-                                    : "bg-[#0B2B70] hover:bg-[#09245e] text-white"
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-800 dark:text-white/40"
+                                : "bg-[#0B2B70] hover:bg-[#09245e] text-white"
                                 }`}
                         >
                             {isSending ? "Enviando..." : "Enviar relatório"}

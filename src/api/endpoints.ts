@@ -81,7 +81,7 @@ export const ENDPOINTS = {
     DELETE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
   },
 
-    CONCEPTION_DOCUMENT: {
+  CONCEPTION_DOCUMENT: {
     CREATE: (screeningId: string) => `/detailed-screening/conception-document/${screeningId}`,
     DELETE: (id: string) => `/detailed-screening/conception-document/${id}`,
     UPDATE: (id: string) => `/detailed-screening/conception-document/${id}`,
@@ -203,5 +203,12 @@ export const ENDPOINTS = {
     DELETE_QUESTION: (id: string) => `/question-forms/${id}`,
     GET_QUESTIONS_BY_VERSION: (versionId: string) => `/question-forms/version/${versionId}`,
     REORDER_QUESTIONS: "/question-forms/questions/reorder"
+  },
+
+  STATUS_REPORT: {
+    CREATE: (challengeId: string) => `/status-report/${challengeId}`,
+    GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
+    SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
   }
+
 } 
