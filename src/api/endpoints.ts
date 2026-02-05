@@ -103,6 +103,14 @@ export const ENDPOINTS = {
     SHOW_MAP_EMPATHY: (id: string) => `/detailed-screening/immersion-document/mapEmpathy/${id}`,
   },
 
+  MATERIALIZATION: {
+    CREATE_MVP: (id: string) => `/mvp-canvas/${id}`,
+    SHOW_ALL_MVP: `/mvp-canvas`,
+    SHOW_MVP_BY_ID: (id: string) => `,mvp-canvas/${id}`,
+    UPDATE_MVP: (id: string) => `,mvp-canvas/${id}`,
+    DELETE_MVP: (id: string) => `,mvp-canvas/${id}`,
+  },
+
   EXPERIMENTATION: {
     CREATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
     SHOW_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
@@ -116,6 +124,10 @@ export const ENDPOINTS = {
     CREATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
     UPDATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
     DELETE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
+    CREATE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    SHOW_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    UPDATE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    DELETE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
   },
 
   KPIS: {
@@ -162,6 +174,35 @@ export const ENDPOINTS = {
     SHOW_ONE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
     UPDATE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
     DELETE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`
+  },
+
+  FORM_RESPONSES: {
+    SEND_RESPONSE: "/form-responses",
+    GET_RESPONSES: (challengeId: string) => `/form-responses/challenge-form/${challengeId}`
+  },
+
+  FORM_TEMPLATE: {
+    CREATE_TEMPLATE: '/form-templates',
+    GET_TEMPLATES: '/form-templates',
+    GET_TEMPLATE_BY_ID: (id: string) => `/form-templates/${id}`,
+    UPDATE_TEMPLATE: (id: string) => `/form-templates/${id}`,
+    DELETE_TEMPLATE: (id: string) => `/form-templates/${id}`
+  },
+
+  FORM_TEMPLATE_VERSIONS: {
+    CREATE_VERSION: (templateId: string) => `/form-template-versions/${templateId}`,
+    GET_VERSIONS_BY_TEMPLATE: (templateId: string) => `/form-template-versions/template/${templateId}`,
+    ACTIVATE_VERSION: (versionId: string) => `/form-template-versions/${versionId}/activate`,
+    DEACTIVATE_VERSION: (versionId: string) => `/form-template-versions/${versionId}/deactivate`,
+    DELETE_FORM_VERSION: (versionId: string) => `/form-template-versions/${versionId}`,
+  },
+
+  QUESTION_FORM: {
+    CREATE_QUESTION: (id: string) => `/question-forms/${id}`,
+    UPDATE_QUESTION: (id: string) => `/question-forms/${id}`,
+    DELETE_QUESTION: (id: string) => `/question-forms/${id}`,
+    GET_QUESTIONS_BY_VERSION: (versionId: string) => `/question-forms/version/${versionId}`,
+    REORDER_QUESTIONS: "/question-forms/questions/reorder"
   },
 
   STATUS_REPORT: {

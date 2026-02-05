@@ -39,4 +39,18 @@ export const detailedScreeningService = {
       ENDPOINTS.DETAILED_SCREENING.DELETE_DETAILED_SCREENING(id)
     )
   },
+  async getOrCreateDetailedScreening(
+  challengeId: string
+): Promise<ShowDetailedScreeningByIdResponse> {
+  const existing =
+    await detailedScreeningService.showDetailedScreeningByChallenge(challengeId)
+
+  if (existing) {
+    return existing
+  }
+
+  return detailedScreeningService.startDetailedScreening(challengeId)
 }
+
+}
+

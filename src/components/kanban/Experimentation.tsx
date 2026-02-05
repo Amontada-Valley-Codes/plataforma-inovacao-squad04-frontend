@@ -63,18 +63,17 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   }, [initExperimentation])
 
   useEffect(() => {
-    if (!experimentation) return
+    if (!experimentation?.id) return
+    if (experimentation.poc) return
 
-    if (!('poc' in experimentation) || !experimentation.poc) {
-      experimentationService.createPoc(experimentation.id, {
-        objective: "",
-        scope: ""
-      }).then(poc => {
-        setExperimentation(prev => prev && { ...prev, poc })
-      })
-    }
-  }, [experimentation])
-
+    experimentationService.createPoc(experimentation.id, {
+      objective: "Definir objetivo da PoC",
+      scope: "Definir escopo da PoC"
+    }).then(poc => {
+      setExperimentation(prev => prev && { ...prev, poc })
+    })
+  }, [experimentation?.id, experimentation?.poc])
+    
   const [page, setPage] = useState<'1' | '2' | '3'>('1')
   return (
     <div className="w-full flex flex-col overflow-y-auto">
@@ -135,7 +134,7 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       </div>
 
       <div>
-        {page === '1' && experimentation &&
+        {page === '1' && experimentation?.poc &&
           <CanvasPoC
             poc={experimentation.poc}
             updateObjective={updateObjective}
@@ -150,7 +149,11 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
           />
         )}
 
-        {page === '3' && <ResultsReport />}
+        {page === '3' && experimentation?.poc &&
+          <ResultsReport 
+            pocId={experimentation.poc.id}
+          />
+        }
       </div>
     </div>
   )

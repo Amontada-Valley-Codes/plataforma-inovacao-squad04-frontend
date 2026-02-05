@@ -2,7 +2,7 @@
 
 "use client"
 import { CardContentsHeader } from "./CardsContents"
-import { useEffect, useState, memo } from "react"
+import { useEffect, useState, memo, useRef } from "react"
 import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react"
 import { ShowDetailedScreeningByIdResponse, ShowDetailedScreeningResponse } from "@/api/payloads/detailedScreening.payload";
 import { ShowImmersionResponse } from "@/api/payloads/immersionDocument.payload";
@@ -62,7 +62,6 @@ const addChildNode = (
 ): TreeNode[] =>
   nodes.map(node => {
     if (node.id === id) {
-      // BLOQUEIA se já tiver subnível
       if (level >= 1) return node;
 
       return {
@@ -151,8 +150,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [evidencias, setEvidencias] = useState<File[]>([])
 
 
-
-
   const POV_MAX = 2000;
   const HMW_MAX = 1500;
   const SOLUTION_MAX = 2000;
@@ -168,36 +165,35 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [capacidadeFinanceira, setCapacidadeFinanceira] = useState("")
 
 
-  useEffect(() => {
-  async function fetchDetailedScreening() {
+const isFetchingRef = useRef(false)
+
+useEffect(() => {
+  if (!challengeId) return
+  if (isFetchingRef.current) return
+
+  isFetchingRef.current = true
+  setIsLoading(true)
+  setError(null)
+
+  const fetchDetailedScreening = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
-
       const data =
-        await detailedScreeningService.showDetailedScreeningByChallenge(
-          challengeId
-        )
+        await detailedScreeningService.getOrCreateDetailedScreening(challengeId)
 
-      if (data) {
-        setDetailedScreening(data)
-      } else {
-        const created =
-          await detailedScreeningService.startDetailedScreening(challengeId)
-
-        setDetailedScreening(created)
-      }
-    } catch (err) {
-      console.error(err)
+      setDetailedScreening(data)
+    } catch (error) {
+      console.error(error)
       setError("Falha ao carregar os dados da triagem.")
-      setDetailedScreening(getDefaultDetailedScreening(challengeId))
     } finally {
       setIsLoading(false)
+      isFetchingRef.current = false
     }
   }
 
   fetchDetailedScreening()
 }, [challengeId])
+
+
 
 
   const handleChange = <
@@ -324,6 +320,7 @@ const TreeItem = memo(function TreeItem({
           creator={creator}
           visibility={visibility}
         />
+        
 
         <div className="relative flex items-center">
           <div className="flex gap-4 items-center xl:justify-center w-full max-w-md">

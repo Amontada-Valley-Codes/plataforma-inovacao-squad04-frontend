@@ -1,10 +1,9 @@
 'use client';
 
-import { SectionType } from './commentsData';
 import { SlidersHorizontal,  UserCircle2 } from 'lucide-react';
 
 type ActivityHistoryPanelProps = {
-  sections: SectionType[];
+  context: string;
   challengeId: string;
   onChangeView:(view: "comentarios") => void;
 };
@@ -16,7 +15,7 @@ type ActivityHistory = {
   reason: string;
 }
 
-export const ActivityHistoryPanel = ({ sections, challengeId, onChangeView }: ActivityHistoryPanelProps) => {
+export const ActivityHistoryPanel = ({ challengeId, onChangeView }: ActivityHistoryPanelProps) => {
 
   const activityHistory: ActivityHistory[] = [
     {
@@ -32,14 +31,6 @@ export const ActivityHistoryPanel = ({ sections, challengeId, onChangeView }: Ac
       reason: 'Desafio aprovado para próxima fase',
     },
   ];
-
-  if (!sections || sections.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-full p-4 text-center text-gray-500 dark:text-white bg-gray-100 dark:bg-gray-900">
-        Nenhuma seção de comentários foi definida para esta fase do processo.
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-full w-full flex-col bg-[#d9d9d9] dark:bg-gray-900">
