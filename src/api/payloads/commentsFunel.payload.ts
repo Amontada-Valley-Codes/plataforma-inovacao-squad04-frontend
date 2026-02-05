@@ -1,6 +1,6 @@
 export type CreateCommentPayload = {
   comment: string
-  context: string
+  context: "GENERATION" | "PRE_SCREENING" | "MATERIALIZATION" | "DETAILED_SCREENING" | "EXPERIMENTATION" | "SCALE" | string  
 }
 
 export type CreateCommentResponse = {

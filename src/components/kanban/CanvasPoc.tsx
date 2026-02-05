@@ -176,7 +176,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
           </div>
         )}
 
-        {hypotheses.length > 0 ? (
+        {hypotheses && hypotheses.length > 0 ? (
           <div className="mb-4">
             {hypotheses.map((hyp, i) => (
               <div key={hyp.id} className="mb-2 flex flex-col">

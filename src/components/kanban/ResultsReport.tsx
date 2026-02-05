@@ -21,23 +21,17 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
 
   const totalChars = learnings.reduce((acc, item) => acc + item.length, 0)
 
+  const loadReport = async () => {
+    const res = await experimentationService.showReport(pocId)
+    setReport(res)
+    setExecutiveSummary(res.executiveSummary)
+    setLearnings(res.learnings)
+    setRecommendationTxt(res.recommendationTxt)
+    setFinalDecision(res.recommendation as any)
+  }
+
   useEffect(() => {
-    const loadReport = async () => {
-      try {
-        const res = await experimentationService.showReport(pocId)
-
-        setReport(res)
-        setExecutiveSummary(res.executiveSummary)
-        setLearnings(res.learnings)
-        setRecommendationTxt(res.recommendationTxt)
-        setFinalDecision(res.recommendation as any)
-      } catch {
-
-      }
-    }
-
     loadReport()
-    console.log(report)
   }, [pocId])
 
   const saveReport = async () => {
@@ -56,6 +50,8 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
       const created = await experimentationService.createReport(pocId, payload)
       setReport(created)
     }
+
+    await loadReport()
   }
 
 
