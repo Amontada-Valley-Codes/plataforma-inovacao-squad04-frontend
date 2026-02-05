@@ -148,7 +148,11 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
         {page === '2' && <StatusReportPoC />}
 
-        {page === '3' && <ResultsReport />}
+        {page === '3' && experimentation?.poc &&
+          <ResultsReport 
+            pocId={experimentation.poc.id}
+          />
+        }
       </div>
     </div>
   )
