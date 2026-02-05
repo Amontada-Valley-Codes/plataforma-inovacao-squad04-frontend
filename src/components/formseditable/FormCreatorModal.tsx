@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,29 +37,50 @@ const templateService = new FormTemplateManagementService()
 export function FormCreatorModal({ isOpen, onClose, onFormCreated }: FormCreatorModalProps) {
   const [formName, setFormName] = useState("")
   const [isCreating, setIsCreating] = useState(false)
+  const [existingTemplates, setExistingTemplates] = useState<FormTemplate[]>([])
+
+  useEffect(() => {
+  if (isOpen) {
+    templateService.getFormTemplates() 
+      .then((templates: FormTemplate[]) => setExistingTemplates(templates))
+      .catch((error) => console.error(error))
+  }
+}, [isOpen])
+  
+
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formName.trim()) return
+  e.preventDefault()
+  const trimmedName = formName.trim()
+  if (!trimmedName) return
 
-    setIsCreating(true)
-    try {
-      const templatePayload: formTemplatePayload = { name: formName.trim() }
-      const template = await templateService.createFormTemplate(templatePayload)
-      
-      const versionPayload: FormTemplateVersionPayload = { templateId: template.id }
-      const version = await templateService.createFormTemplateVersion(versionPayload)
-      
-      toast.success("Formulário criado com sucesso!")
-      onFormCreated(template, version)
-      setFormName("")
-    } catch (error) {
-      console.error('Error creating form:', error)
-      toast.error("Erro ao criar formulário")
-    } finally {
-      setIsCreating(false)
-    }
+  
+  const alreadyExists = existingTemplates.some(t => t.name.toLowerCase() === trimmedName.toLowerCase())
+  if (alreadyExists) {
+    toast.error("Já existe um formulário com esse nome!")
+    return
   }
+
+  setIsCreating(true)
+  try {
+    const templatePayload: formTemplatePayload = { name: trimmedName }
+    const template = await templateService.createFormTemplate(templatePayload)
+    
+    const versionPayload: FormTemplateVersionPayload = { templateId: template.id }
+    const version = await templateService.createFormTemplateVersion(versionPayload)
+    
+    toast.success("Formulário criado com sucesso!")
+    onFormCreated(template, version)
+    setFormName("")
+   
+    setExistingTemplates(prev => [...prev, template])
+  } catch (error) {
+    console.error('Error creating form:', error)
+    toast.error("Erro ao criar formulário")
+  } finally {
+    setIsCreating(false)
+  }
+}
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
