@@ -74,7 +74,7 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
       <h1 className="text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">Relatório de Resultados</h1>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Resumo Executivo
         </h1>
 
@@ -86,14 +86,17 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
             rows={5}
             maxLength={1000}
             placeholder="Descreva de forma objetiva o que foi testado na PoC"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/1000</span>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+          {executiveSummary.length}/1000
+        </span>
+
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex justify-between items-center text-lg mb-1">
+        <h1 className="flex justify-between items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Aprendizados
           <div className="flex gap-2">
             <button 
@@ -148,7 +151,7 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
                 maxLength={1000}
                 value={newLearning}
                 onChange={(e) => setNewLearning(e.target.value)}
-                className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] "
               />
             </div>
 
@@ -172,7 +175,7 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Recomendações (Parecer)
         </h1>
 
@@ -184,10 +187,13 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
             onChange={(e) => setRecommendationTxt(e.target.value)}
             maxLength={1000}
             placeholder=" Descreva a recomendação final com base nos resultados da PoC"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3]  resize-none"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/1000</span>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+          {recommendationTxt.length}/1000
+        </span>
+
       </div>
 
       <div className="flex gap-4">
