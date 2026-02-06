@@ -16,6 +16,8 @@ export default function CanvasMVP() {
   const [type, setType] = useState<TypeResource>()
   const [isAddingResource, setIsAddingResource] = useState(false)
   const [isEditingResource, setIsEditingResource] = useState(false)
+  const [publicoAlvo, setPublicoAlvo] = useState("");
+  const [propostaValor, setPropostaValor] = useState("");
 
   const addItem = () => {
     if (!newItem.trim()) return
@@ -44,7 +46,7 @@ export default function CanvasMVP() {
     <div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Público-Alvo
         </h1>
 
@@ -53,15 +55,19 @@ export default function CanvasMVP() {
             required
             rows={5}
             maxLength={300}
+            value={publicoAlvo}
+            onChange={(e) => setPublicoAlvo(e.target.value)}
             placeholder="Defina o público-alvo" 
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>
+       <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+          {publicoAlvo.length}/300
+       </span>
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Proposta de Valor
         </h1>
 
@@ -69,16 +75,20 @@ export default function CanvasMVP() {
           <textarea 
             required
             rows={5}
-            maxLength={500}
+            maxLength={300}
+            value={propostaValor}
+            onChange={(e) => setPropostaValor(e.target.value)}
             placeholder="Defina a proposta de valor" 
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/300</span>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+          {propostaValor.length}/300
+       </span>
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 justify-between items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 justify-between items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Funcionalidades
           <div className="flex gap-2">
             <button
@@ -156,7 +166,7 @@ export default function CanvasMVP() {
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 justify-between items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 justify-between items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Recursos Necessários
           <div className="flex gap-2">
             <button
@@ -187,7 +197,7 @@ export default function CanvasMVP() {
                 maxLength={300}
                 value={content}
                 onChange={(e) => setContent(e.target.value)} 
-                className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] "
               />
             </div>
 
@@ -211,7 +221,7 @@ export default function CanvasMVP() {
                 setIsAddingResource(false)
               }}
               className="flex w-10 justify-center items-center p-1
-              rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
+              rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-black/80 dark:text-white font-semibold
               text-[14px] cursor-pointer"
             >
               <Check size={14}/>
@@ -220,7 +230,7 @@ export default function CanvasMVP() {
         )}
 
         <div>
-          <div className="mb-3">
+          <div className="mb-3 text-[#0B2B70] dark:text-white font-semibold">
             <h1>
               Pessoas
             </h1>
@@ -252,7 +262,7 @@ export default function CanvasMVP() {
 
           <hr className="border-gray-400"/>
 
-          <div className="my-3">
+          <div className="my-3 text-[#0B2B70] dark:text-white font-semibold">
             <h1>
               Tecnologias
             </h1>
@@ -284,7 +294,7 @@ export default function CanvasMVP() {
 
           <hr className="border-gray-400"/>
 
-          <div className="my-3">
+          <div className="my-3 text-[#0B2B70] dark:text-white font-semibold">
             <h1>
               Financeiros
             </h1>
@@ -316,7 +326,7 @@ export default function CanvasMVP() {
 
           <hr className="border-gray-400"/>
 
-          <div className="my-3">
+          <div className="my-3 text-[#0B2B70] dark:text-white font-semibold">
             <h1>
               Infraestruturas
             </h1>
@@ -348,7 +358,7 @@ export default function CanvasMVP() {
 
           <hr className="border-gray-400"/>
 
-          <div className="my-3">
+          <div className="my-3 text-[#0B2B70] dark:text-white font-semibold">
             <h1>
               Parcerias
             </h1>
