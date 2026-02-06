@@ -20,10 +20,27 @@ export default function RolloutPlan() {
   const [benefitDescription, setBenefitDescription] = useState("");
   const [risks, setRisks] = useState<string[]>([""]);
 
-  const roi = useMemo(() => {
-    if (cost === "" || cost === 0 || benefitValue === "") return null;
-    return ((benefitValue - cost) / cost).toFixed(2);
-  }, [cost, benefitValue]);
+ const roi = useMemo<number | null>(() => {
+  if (cost === "" || cost === 0 || benefitValue === "") return null;
+  return (benefitValue - cost) / cost;
+}, [cost, benefitValue]);
+
+
+  const roiExplanation = useMemo(() => {
+  if (roi === null) return "Informe custos e benefícios para calcular o ROI.";
+
+  if (roi > 0.5)
+    return "O retorno é significativamente superior ao custo, indicando forte viabilidade financeira.";
+
+  if (roi > 0)
+    return "O retorno supera os custos, porém com margem moderada.";
+
+  if (roi === 0)
+    return "O retorno é equivalente ao custo, não gerando ganho financeiro.";
+
+  return "Os custos superam os benefícios, indicando inviabilidade financeira no formato atual.";
+}, [roi]);
+
 
   function updateRisk(index: number, value: string) {
     setRisks((prev) => prev.map((r, i) => (i === index ? value : r)));
@@ -134,7 +151,7 @@ return (
               value={cost}
               onChange={(e) => setCost(Number(e.target.value))}
               placeholder="R$ 0,00"
-              className="w-full rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/60 dark:text-white  px-3 py-2 text-s outline-none"
+              className="w-full rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white  px-3 py-2 text-s outline-none"
             />
           </div>
 
@@ -150,7 +167,7 @@ return (
               value={benefitValue}
               onChange={(e) => setBenefitValue(Number(e.target.value))}
               placeholder="Valor financeiro"
-              className="w-full mb-2 rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/60 dark:text-white px-3 py-2 text-sm outline-none"
+              className="w-full mb-2 rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white px-3 py-2 text-sm outline-none"
             />
 
             <textarea
@@ -158,7 +175,7 @@ return (
               value={benefitDescription}
               onChange={(e) => setBenefitDescription(e.target.value)}
               placeholder="Descrição dos benefícios"
-              className="w-full h-24 resize-none rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/60 dark:text-white px-3 py-2 text-sm outline-none"
+              className="w-full h-24 resize-none rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white px-3 py-2 text-sm outline-none"
             />
 
             <div className="text-right text-xs text-white/50">
@@ -168,19 +185,31 @@ return (
 
           <div className="rounded-xl border p-4 md:col-span-2">
             <div className="flex justify-between mb-2">
-              <h2 className="text-[#0B2B70] dark:text-white font-semibold">ROI Estimado</h2>
+              <h2 className="text-[#0B2B70] dark:text-white font-semibold">
+                ROI Estimado
+              </h2>
               <TrendingUp size={18} className="text-[#0B2B70] dark:text-white" />
             </div>
 
-            <div className="text-xl font-semibold text-[#0B2B70] dark:text-white ">
-              {roi !== null ? `${roi} R$` : "0 R$"}
+            <div className="text-xl font-semibold text-[#0B2B70] dark:text-white">
+              {roi !== null ? `${(roi * 100).toFixed(2)}%` : "0%"}
             </div>
 
-
             <p className="text-xs text-[#98A2B3] mt-1">
-              (Benefícios – Custos) / Custos
+              Fórmula: (Benefícios − Custos) ÷ Custos
             </p>
+
+            {roi !== null && (
+              <p className="text-xs text-[#667085] mt-1">
+                Cálculo: ({benefitValue} − {cost}) ÷ {cost}
+              </p>
+            )}
+
+            <div className="mt-3 rounded-md bg-[#F9FAFB] dark:bg-gray-900 p-3 text-sm text-[#344054] dark:text-[#ced3db]">
+              {roiExplanation}
+            </div>
           </div>
+
 
           <div className="rounded-xl border p-4 md:col-span-2">
             <div className="flex justify-between mb-3">
@@ -196,7 +225,8 @@ return (
                   value={risk}
                   onChange={(e) => updateRisk(index, e.target.value)}
                   placeholder="Descreva o risco e mitigação"
-                  className="flex-1 h-24 resize-none rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/60 dark:text-white px-3 py-2 text-sm outline-none"
+                  className="flex-1 h-24 resize-none rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 
+                  text-black/80 dark:text-white px-3 py-2 text-sm outline-none"
                 />
 
                 {risks.length > 1 && (
@@ -220,7 +250,7 @@ return (
     {page === '2' && (
       <>
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+          <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
             Escopo Detalhado
           </h1>
 
@@ -230,13 +260,13 @@ return (
               rows={5}
               maxLength={2000}
               placeholder="Descreva o escopo detalhado"
-              className="w-full resize-none bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3]"
+              className="w-full resize-none bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3]"
             />
           </div>
         </div>
 
         <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+          <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
             Definir Stakeholders e Responsáveis
           </h1>
 
@@ -359,28 +389,15 @@ return (
           rounded-lg
           px-3 py-2
           text-sm 
-          bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/60 dark:text-white
+          bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white
           outline-none
           placeholder:text-[#98A2B3]
         "
       />
 
-      <div className="text-right text-xs text-white/50 mt-1">
+      <div className="text-right text-xs text-[#98A2B3] mt-1">
         {executiveSummary.length}/1000
       </div>
-    </div>
-
-    <div className="rounded-xl border p-4">
-      <h3 className="text-[#0B2B70] dark:text-white font-semibold mb-3">
-        Critérios para avançar
-      </h3>
-
-      <ul className="space-y-2 text-sm text-[#0B2B70] dark:text-white">
-        <li>• Aprovação do Comitê de Transformação</li>
-        <li>• Caso de Negócios positivo (KPIs considerados)</li>
-        <li>• Viabilidade operacional</li>
-        <li>• Alinhamento com prioridades estratégicas do ciclo (PM)</li>
-      </ul>
     </div>
   </div>
 )}
