@@ -111,7 +111,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
       <h1 className="text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">Canvas da PoC</h1>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
         Objetivo da Poc
         </h1>
 
@@ -127,14 +127,14 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
               updateObjective(value)
             }}
             placeholder="Defina o objetivo" 
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
         <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">{objective?.length}/300</span>
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center justify-between text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center justify-between text-[#0B2B70] dark:text-white font-semibold mb-1">
           Hipóteses
 
           <div className="flex gap-2">
@@ -158,7 +158,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
                 value={newHypothesis}
                 onChange={(e) => setNewHypothesis(e.target.value)}
                 placeholder="Adicione uma hipotese"
-                className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white"
               />
             </div>
 
@@ -228,7 +228,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
         )}
 
         <div className="flex flex-col mb-4">
-          <h1 className="flex gap-1 items-center justify-between text-black dark:text-white text-lg mb-1">
+          <h1 className="flex gap-1 items-center justify-between text-[#0B2B70] dark:text-white font-semibold mb-1">
             Indicadores
 
             <div className="flex gap-2">
@@ -252,7 +252,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
                   value={newIndicatorName}
                   onChange={(e) => setNewIndicatorName(e.target.value)}
                   placeholder="Nome"
-                  className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                  className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
                   value={newIndicatorTarget}
                   onChange={(e) => setNewIndicatorTarget(e.target.value)}
                   placeholder="Meta"
-                  className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                  className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white"
                 />
               </div>
 
@@ -274,7 +274,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
                   value={newIndicatorMetric}
                   onChange={(e) => setNewIndicatorMetric(e.target.value)}
                   placeholder="Métrica"
-                  className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                  className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white"
                 />
               </div>
 
@@ -362,7 +362,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
         </div>
 
         <div className="flex flex-col mb-4">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+          <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Escopo
           </h1>
 
@@ -378,7 +378,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
                 updateScope(value)
               }}
               placeholder="Defina o escopo" 
-              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+              className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
             />
           </div>
           <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">{scope?.length}/1500</span>
