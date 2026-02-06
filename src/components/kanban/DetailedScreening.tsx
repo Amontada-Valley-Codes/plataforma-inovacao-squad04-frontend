@@ -2,7 +2,7 @@
 
 "use client"
 import { CardContentsHeader } from "./CardsContents"
-import { useEffect, useState, memo, useRef } from "react"
+import { useEffect, useState, memo, useRef, useCallback  } from "react"
 import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react"
 import { ShowDetailedScreeningByIdResponse, ShowDetailedScreeningResponse } from "@/api/payloads/detailedScreening.payload";
 import { ShowImmersionResponse } from "@/api/payloads/immersionDocument.payload";
@@ -20,7 +20,75 @@ type Props = {
   visibility: string;
 }
 
+const TreeItem = memo(function TreeItem({
+  node,
+  level,
+  type,
+  onChange,
+  onAddChild,
+  onRemove
+}: {
+  node: TreeNode;
+  level: number;
+  type: "cause" | "effect";
+  onChange: (id: string, value: string) => void;
+  onAddChild: (id: string, level: number) => void;
+  onRemove: (id: string) => void;
+}) {
+  return (
+    <div
+      className={`
+        mt-2
+        ${level === 1 ? "ml-6" : "ml-2"}
+        border-l border-white/20 pl-3
+        max-w-full
+      `}
+    >
+      <div className="flex items-center gap-2">
+        <input
+          value={node.text}
+          onChange={(e) => onChange(node.id, e.target.value)}
+          placeholder={level === 0
+            ? type === "cause" ? "Descreva a causa..." : "Descreva o efeito..."
+            : type === "cause" ? "Descreva a subcausa..." : "Descreva o subefeito..."
+          }
+          className="flex-1 min-w-0  border bg-[#F9FAFB] border-[#E5E7EB]  dark:border-gray-900 dark:bg-gray-900 rounded-md px-3 py-1 dark:text-white text-sm placeholder:text-[#98A2B3]"
+        />
 
+        <button
+          type="button"
+          onClick={() => onRemove(node.id)}
+          className="text-[#98A2B3] hover:text-red-400"
+        >
+          <Trash size={14} />
+        </button>
+      </div>
+
+      {level === 0 && (
+        <button
+          type="button"
+          onClick={() => onAddChild(node.id, level)}
+          className="mt-1 text-xs text-[#98A2B3] dark:text-white/50"
+        >
+          + {type === "cause" ? "Subcausa" : "Subefeito"}
+        </button>
+      )}
+
+      {node.children.map(child => (
+        <TreeItem
+          key={child.id}
+          node={child}
+          level={level + 1}
+          type={type}
+          onChange={onChange}
+          onAddChild={onAddChild}
+          onRemove={onRemove}
+        />
+      ))}
+
+    </div>
+  );
+});
 
 const getDefaultDetailedScreening = (
   challengeId: string
@@ -48,44 +116,83 @@ const updateNodeText = (
   nodes: TreeNode[],
   id: string,
   value: string
-): TreeNode[] =>
-  nodes.map(node =>
-    node.id === id
-      ? { ...node, text: value }
-      : { ...node, children: updateNodeText(node.children, id, value) }
-  );
+): TreeNode[] => {
+  let changed = false;
+
+  const result = nodes.map(node => {
+    if (node.id === id) {
+      changed = true;
+      return { ...node, text: value };
+    }
+
+    const updatedChildren = updateNodeText(node.children, id, value);
+
+    if (updatedChildren !== node.children) {
+      changed = true;
+      return { ...node, children: updatedChildren };
+    }
+
+    return node; // 🔑 mantém referência
+  });
+
+  return changed ? result : nodes;
+};
 
 const addChildNode = (
   nodes: TreeNode[],
   id: string,
   level: number
-): TreeNode[] =>
-  nodes.map(node => {
-    if (node.id === id) {
-      if (level >= 1) return node;
+): TreeNode[] => {
+  let changed = false;
 
+  const result = nodes.map(node => {
+    if (node.id === id && level === 0) {
+      if (node.children.length > 0) return node;
+
+      changed = true;
       return {
         ...node,
-        children: node.children.length === 0
-          ? [createNode()]
-          : node.children
+        children: [createNode()]
       };
     }
 
-    return {
-      ...node,
-      children: addChildNode(node.children, id, level + 1)
-    };
+    const updatedChildren = addChildNode(node.children, id, level + 1);
+
+    if (updatedChildren !== node.children) {
+      changed = true;
+      return { ...node, children: updatedChildren };
+    }
+
+    return node;
   });
 
+  return changed ? result : nodes;
+};
 
-const removeNode = (nodes: TreeNode[], id: string): TreeNode[] =>
-  nodes
-    .filter(node => node.id !== id)
-    .map(node => ({
-      ...node,
-      children: removeNode(node.children, id)
-    }));
+
+
+const removeNode = (nodes: TreeNode[], id: string): TreeNode[] => {
+  let changed = false;
+
+  const result = nodes
+    .map(node => {
+      const updatedChildren = removeNode(node.children, id);
+
+      if (updatedChildren !== node.children) {
+        changed = true;
+        return { ...node, children: updatedChildren };
+      }
+
+      return node;
+    })
+    .filter(node => {
+      const keep = node.id !== id;
+      if (!keep) changed = true;
+      return keep;
+    });
+
+  return changed ? result : nodes;
+};
 
 
 
@@ -112,6 +219,27 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [rootProblem, setRootProblem] = useState("");
   const [causes, setCauses] = useState<TreeNode[]>([]);
   const [effects, setEffects] = useState<TreeNode[]>([]);
+
+  const handleCauseChange = useCallback(
+  (id: string, value: string) => {
+    setCauses(prev => updateNodeText(prev, id, value));
+  },
+  []
+);
+
+const handleCauseAdd = useCallback(
+  (id: string, level: number) => {
+    setCauses(prev => addChildNode(prev, id, level));
+  },
+  []
+);
+
+const handleCauseRemove = useCallback(
+  (id: string) => {
+    setCauses(prev => removeNode(prev, id));
+  },
+  []
+);
 
   const [stakeholders, setStakeholders] = useState<string[]>([])
   const areasEnvolvidas = [
@@ -235,77 +363,6 @@ useEffect(() => {
       </div>
     );
   }
-
-const TreeItem = memo(function TreeItem({
-  node,
-  level,
-  type,
-  onChange,
-  onAddChild,
-  onRemove
-}: {
-  node: TreeNode;
-  level: number;
-  type: "cause" | "effect";
-  onChange: (id: string, value: string) => void;
-  onAddChild: (id: string, level: number) => void;
-  onRemove: (id: string) => void;
-}) {
-  return (
-    <div
-      className={`
-        mt-2
-        ${level === 1 ? "ml-6" : "ml-2"}
-        border-l border-white/20 pl-3
-        max-w-full
-      `}
-    >
-      <div className="flex items-center gap-2">
-        <input
-          value={node.text}
-          onChange={(e) => onChange(node.id, e.target.value)}
-          placeholder={level === 0
-            ? type === "cause" ? "Descreva a causa..." : "Descreva o efeito..."
-            : type === "cause" ? "Descreva a subcausa..." : "Descreva o subefeito..."
-          }
-          className="flex-1 min-w-0  border bg-[#F9FAFB] border-[#E5E7EB]  dark:border-gray-900 dark:bg-gray-900 rounded-md px-3 py-1 text-white text-sm placeholder:text-[#98A2B3]"
-        />
-
-        <button
-          type="button"
-          onClick={() => onRemove(node.id)}
-          className="text-[#98A2B3] hover:text-red-400"
-        >
-          <Trash size={14} />
-        </button>
-      </div>
-
-      {level === 0 && (
-        <button
-          type="button"
-          onClick={() => onAddChild(node.id, level)}
-          className="mt-1 text-xs text-[#98A2B3] dark:text-white/50"
-        >
-          + {type === "cause" ? "Subcausa" : "Subefeito"}
-        </button>
-      )}
-
-      {node.children.map(child => (
-        <TreeItem
-          key={child.id}
-          node={child}
-          level={level + 1}
-          type={type}
-          onChange={onChange}
-          onAddChild={onAddChild}
-          onRemove={onRemove}
-        />
-      ))}
-    </div>
-  );
-});
-
-
 
 
   return (
