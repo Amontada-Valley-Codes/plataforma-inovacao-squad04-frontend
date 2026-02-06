@@ -20,10 +20,27 @@ export default function RolloutPlan() {
   const [benefitDescription, setBenefitDescription] = useState("");
   const [risks, setRisks] = useState<string[]>([""]);
 
-  const roi = useMemo(() => {
-    if (cost === "" || cost === 0 || benefitValue === "") return null;
-    return ((benefitValue - cost) / cost).toFixed(2);
-  }, [cost, benefitValue]);
+ const roi = useMemo<number | null>(() => {
+  if (cost === "" || cost === 0 || benefitValue === "") return null;
+  return (benefitValue - cost) / cost;
+}, [cost, benefitValue]);
+
+
+  const roiExplanation = useMemo(() => {
+  if (roi === null) return "Informe custos e benefícios para calcular o ROI.";
+
+  if (roi > 0.5)
+    return "O retorno é significativamente superior ao custo, indicando forte viabilidade financeira.";
+
+  if (roi > 0)
+    return "O retorno supera os custos, porém com margem moderada.";
+
+  if (roi === 0)
+    return "O retorno é equivalente ao custo, não gerando ganho financeiro.";
+
+  return "Os custos superam os benefícios, indicando inviabilidade financeira no formato atual.";
+}, [roi]);
+
 
   function updateRisk(index: number, value: string) {
     setRisks((prev) => prev.map((r, i) => (i === index ? value : r)));
@@ -168,19 +185,35 @@ return (
 
           <div className="rounded-xl border p-4 md:col-span-2">
             <div className="flex justify-between mb-2">
-              <h2 className="text-[#0B2B70] dark:text-white font-semibold">ROI Estimado</h2>
+              <h2 className="text-[#0B2B70] dark:text-white font-semibold">
+                ROI Estimado
+              </h2>
               <TrendingUp size={18} className="text-[#0B2B70] dark:text-white" />
             </div>
 
-            <div className="text-xl font-semibold text-[#0B2B70] dark:text-white ">
-              {roi !== null ? `${roi} R$` : "0 R$"}
+            {/* Valor do ROI */}
+            <div className="text-xl font-semibold text-[#0B2B70] dark:text-white">
+              {roi !== null ? `${(roi * 100).toFixed(2)}%` : "0%"}
             </div>
 
-
+            {/* Fórmula */}
             <p className="text-xs text-[#98A2B3] mt-1">
-              (Benefícios – Custos) / Custos
+              Fórmula: (Benefícios − Custos) ÷ Custos
             </p>
+
+            {/* Cálculo aplicado */}
+            {roi !== null && (
+              <p className="text-xs text-[#667085] mt-1">
+                Cálculo: ({benefitValue} − {cost}) ÷ {cost}
+              </p>
+            )}
+
+            {/* Justificativa */}
+            <div className="mt-3 rounded-md bg-[#F9FAFB] dark:bg-gray-800 p-3 text-sm text-[#344054] dark:text-[#ced3db]">
+              {roiExplanation}
+            </div>
           </div>
+
 
           <div className="rounded-xl border p-4 md:col-span-2">
             <div className="flex justify-between mb-3">
