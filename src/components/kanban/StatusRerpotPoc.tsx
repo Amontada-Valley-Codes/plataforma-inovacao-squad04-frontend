@@ -30,7 +30,7 @@ function Section({ title, value, onChange, metaInfo, placeholder }: SectionProps
     return (
         <div className="flex flex-col mb-6">
             <div className="flex items-center justify-between mb-2">
-                <h2 className="text-black dark:text-white text-lg">{title}</h2>
+                <h2 className="text-[#0B2B70] dark:text-white font-semibold">{title}</h2>
                 <span className="text-xs text-[#98A2B3] dark:text-white/50">
                     {value.length}/{MAX_CHARS}
                 </span>
@@ -43,7 +43,7 @@ function Section({ title, value, onChange, metaInfo, placeholder }: SectionProps
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder ?? "Escreva aqui..."}
-                    className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+                    className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none"
                 />
             </div>
 
