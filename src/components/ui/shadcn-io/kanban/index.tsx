@@ -80,7 +80,7 @@ import { ChallengeService } from '@/api/services/challenge.service';
         className={cn(
           'flex w-[280px] flex-shrink-0 flex-col rounded-[8px]',
           'bg-[#15358D] dark:bg-[#1a2844] text-xs shadow-sm border border-gray-200 dark:border-gray-800',
-          'transition-all',
+          'transition-all max-h-[74vh] overflow-hidden',
           isOver ? '' : '',
           className
         )}
@@ -164,29 +164,26 @@ import { ChallengeService } from '@/api/services/challenge.service';
     const items = filteredData.map((item) => item.id);
 
     return (
-      <div className="overflow-hidden">
-        <ScrollArea className="max-h-[74vh] overflow-y-auto scrollbar-hidden">
-          <SortableContext items={items}>
-            <div
-              className={cn(
-                `flex flex-grow flex-col gap-2 ${filteredData.length === 0 ? 'px-3 py-2' : 'p-2'}`,
-                className
-              )}
-              {...props}
-            >
-              {filteredData.length === 0 ? (
-                <div>
-                  <p className="text-white/40 font-semibold text-sm">
-                    Aguardando processo...
-                  </p>
-                </div>
-              ) : (
-                filteredData.map(children)
-              )}
-            </div>
-          </SortableContext>
-          <ScrollBar orientation="vertical" />
-        </ScrollArea>
+      <div className="flex flex-col overflow-y-auto scrollbar-hidden">
+        <SortableContext items={items}>
+          <div
+            className={cn(
+              `flex flex-grow flex-col gap-2 ${filteredData.length === 0 ? 'px-3 py-2' : 'p-2'}`,
+              className
+            )}
+            {...props}
+          >
+            {filteredData.length === 0 ? (
+              <div>
+                <p className="text-white/40 font-semibold text-sm">
+                  Aguardando processo...
+                </p>
+              </div>
+            ) : (
+              filteredData.map(children)
+            )}
+          </div>
+        </SortableContext>
       </div>
     );
   };

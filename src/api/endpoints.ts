@@ -83,7 +83,7 @@ export const ENDPOINTS = {
     DELETE_DETAILED_SCREENING: (id: string) => `/detailed-screening/${id}`,
   },
 
-    CONCEPTION_DOCUMENT: {
+  CONCEPTION_DOCUMENT: {
     CREATE: (screeningId: string) => `/detailed-screening/conception-document/${screeningId}`,
     DELETE: (id: string) => `/detailed-screening/conception-document/${id}`,
     UPDATE: (id: string) => `/detailed-screening/conception-document/${id}`,
@@ -105,6 +105,14 @@ export const ENDPOINTS = {
     SHOW_MAP_EMPATHY: (id: string) => `/detailed-screening/immersion-document/mapEmpathy/${id}`,
   },
 
+  MATERIALIZATION: {
+    CREATE_MVP: (id: string) => `/mvp-canvas/${id}`,
+    SHOW_ALL_MVP: `/mvp-canvas`,
+    SHOW_MVP_BY_ID: (id: string) => `,mvp-canvas/${id}`,
+    UPDATE_MVP: (id: string) => `,mvp-canvas/${id}`,
+    DELETE_MVP: (id: string) => `,mvp-canvas/${id}`,
+  },
+
   EXPERIMENTATION: {
     CREATE_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
     SHOW_EXPERIMENTATION: (id: string) => `/experimentation/${id}`,
@@ -118,6 +126,10 @@ export const ENDPOINTS = {
     CREATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
     UPDATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
     DELETE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
+    CREATE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    SHOW_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    UPDATE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    DELETE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
   },
 
   KPIS: {
@@ -193,5 +205,12 @@ export const ENDPOINTS = {
     DELETE_QUESTION: (id: string) => `/question-forms/${id}`,
     GET_QUESTIONS_BY_VERSION: (versionId: string) => `/question-forms/version/${versionId}`,
     REORDER_QUESTIONS: "/question-forms/questions/reorder"
+  },
+
+  STATUS_REPORT: {
+    CREATE: (challengeId: string) => `/status-report/${challengeId}`,
+    GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
+    SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
   }
+
 } 

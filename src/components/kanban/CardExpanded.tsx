@@ -8,9 +8,6 @@ import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
 import { Loader2, MoreVertical, X } from "lucide-react"
 import { CommentsPanel } from "./CommentsPanel"
-import {
-  challangeCommentSections
-} from "./commentsData"
 import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
 import { Challenge, getCategoryLabel } from "./Kanban"
@@ -26,6 +23,8 @@ import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
 import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
+import { Card } from "../ui/card"
+import RolloutPlan from "./rolloutPlan"
 
 type CardExpandedLayoutProps = {
   className?: string;
@@ -70,12 +69,6 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
               )}
               {!isLastColumn && handleApproveAndMove && (
                 <ForwardButton className="w-45" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
-              )}
-              {challengeStatus && challengeId &&(
-                <div className="flex gap-2 items-center justify-center">
-                  <DisapproveButton challengeId={challengeId}/>
-                  <ApproveButton challengeId={challengeId}/>
-                </div>
               )}
             </div>
           </div>
@@ -442,14 +435,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
                 activyHistory={(onChangeView) => (
                   <ActivityHistoryPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
@@ -476,14 +469,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
                 activyHistory={(onChangeView) => (
                   <ActivityHistoryPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
@@ -509,14 +502,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
                 activyHistory={(onChangeView) => (
                   <ActivityHistoryPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
@@ -541,14 +534,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
                 activyHistory={(onChangeView) => (
                   <ActivityHistoryPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
@@ -575,14 +568,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
                 activyHistory={(onChangeView) => (
                   <ActivityHistoryPanel
                     challengeId={cardData.id}
-                    sections={challangeCommentSections}
+                    context={cardData.status}
                     onChangeView={onChangeView}
                   />
                 )}
@@ -593,6 +586,32 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                 handleMoveBack={handleMoveBack}
                 handleApproveAndMove={handleApproveAndMove}
               />  
+            )}
+            {cardData.status === "SCALE" && (
+              <CardExpandedLayout
+                mainContent={
+                  <RolloutPlan />
+                }
+                commentsContent={(onChangeView) => (
+                  <CommentsPanel
+                    challengeId={cardData.id}
+                    context={cardData.status}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                activyHistory={(onChangeView) => (
+                  <ActivityHistoryPanel
+                    challengeId={cardData.id}
+                    context={cardData.status}
+                    onChangeView={onChangeView}
+                  />
+                )}
+                challengeId={cardData.id}
+                isFirstColumn={isFirstColumn}
+                isLastColumn={isLastColumn}
+                handleMoveBack={handleMoveBack}
+                handleApproveAndMove={handleApproveAndMove}
+              />
             )}
           </div>
           <Modal

@@ -1,16 +1,59 @@
 'use client'
 
+import { ShowResultsReportResponse } from "@/api/payloads/experimentation.payload"
+import { experimentationService } from "@/api/services/experimentation.service"
 import { Check, CircleX, PenSquare, Plus, Rocket, Trash2, Wrench } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-export default function ResultsReport() {
+type ResultsReportProps = {
+  pocId: string,
+} 
+
+export default function ResultsReport({ pocId }: ResultsReportProps) {
+  const [report, setReport] = useState<ShowResultsReportResponse | null>(null)
+  const [executiveSummary, setExecutiveSummary] = useState("")
   const [learnings, setLearnings] = useState<string[]>([])
+  const [recommendationTxt, setRecommendationTxt] = useState("")
   const [newLearning, setNewLearning] = useState('')
   const [isAddingLearning, setIsAddingLearning] = useState(false)
   const [isEditingLearning, setIsEditingLearning] = useState(false)
-  const [finalDecision, setFinalDecision] = useState<"ESCALAR" | "AJUSTAR" | "ENCERRAR">("ESCALAR")
+  const [finalDecision, setFinalDecision] = useState<"SCALE" | "ADJUST" | "CLOSE">("SCALE")
 
   const totalChars = learnings.reduce((acc, item) => acc + item.length, 0)
+
+  const loadReport = async () => {
+    const res = await experimentationService.showReport(pocId)
+    setReport(res)
+    setExecutiveSummary(res.executiveSummary)
+    setLearnings(res.learnings)
+    setRecommendationTxt(res.recommendationTxt)
+    setFinalDecision(res.recommendation as any)
+  }
+
+  useEffect(() => {
+    loadReport()
+  }, [pocId])
+
+  const saveReport = async () => {
+    const payload = {
+      executiveSummary,
+      learnings,
+      recommendation: finalDecision,
+      recommendationTxt,
+      kpis: []
+    }
+
+    if (report) {
+      const updated = await experimentationService.updateReport(report.id, payload)
+      setReport(updated)
+    } else {
+      const created = await experimentationService.createReport(pocId, payload)
+      setReport(created)
+    }
+
+    await loadReport()
+  }
+
 
   const addLearning = () => {
     if (!newLearning.trim()) return
@@ -31,24 +74,29 @@ export default function ResultsReport() {
       <h1 className="text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">Relatório de Resultados</h1>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Resumo Executivo
         </h1>
 
         <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
           <textarea 
             required
+            value={executiveSummary}
+            onChange={(e) => setExecutiveSummary(e.target.value)}
             rows={5}
             maxLength={1000}
             placeholder="Descreva de forma objetiva o que foi testado na PoC"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/1000</span>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+          {executiveSummary.length}/1000
+        </span>
+
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex justify-between items-center text-lg mb-1">
+        <h1 className="flex justify-between items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Aprendizados
           <div className="flex gap-2">
             <button 
@@ -103,7 +151,7 @@ export default function ResultsReport() {
                 maxLength={1000}
                 value={newLearning}
                 onChange={(e) => setNewLearning(e.target.value)}
-                className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+                className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] "
               />
             </div>
 
@@ -127,7 +175,7 @@ export default function ResultsReport() {
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Recomendações (Parecer)
         </h1>
 
@@ -135,61 +183,75 @@ export default function ResultsReport() {
           <textarea 
             required
             rows={5}
+            value={recommendationTxt}
+            onChange={(e) => setRecommendationTxt(e.target.value)}
             maxLength={1000}
             placeholder=" Descreva a recomendação final com base nos resultados da PoC"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3]  resize-none"
           />
         </div>
-        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">0/1000</span>
+        <span className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+          {recommendationTxt.length}/1000
+        </span>
+
       </div>
 
       <div className="flex gap-4">
         <button
-          onClick={() => setFinalDecision("ESCALAR")} 
+          onClick={() => setFinalDecision("SCALE")} 
           className={`flex-1 p-4 rounded-xl border-2 bg-[#F9FAFB] text-left
-          ${finalDecision === "ESCALAR" ? "border-[#0b2b70]" : "border-gray-400"}`}
+          ${finalDecision === "SCALE" ? "border-[#0b2b70]" : "border-gray-400"}`}
         >
           <h3 
             className={`font-semibold flex items-center gap-2 
-            ${finalDecision === "ESCALAR" ? "text-[#0b2b70]" : "text-gray-400"}`}
+            ${finalDecision === "SCALE" ? "text-[#0b2b70]" : "text-gray-400"}`}
           >
            <Rocket/> Escalar
           </h3>
-          <p className={`text-sm  mt-1 ${finalDecision === "ESCALAR" ? "text-[#0b2b70]" : "text-gray-400"}`}>
+          <p className={`text-sm  mt-1 ${finalDecision === "SCALE" ? "text-[#0b2b70]" : "text-gray-400"}`}>
             Levar a ideia para a próxima fase
           </p>
         </button>
 
         <button 
-          onClick={() => setFinalDecision("AJUSTAR")} 
+          onClick={() => setFinalDecision("ADJUST")} 
           className={`flex-1 p-4 rounded-xl border-2 bg-[#F9FAFB] text-left
-          ${finalDecision === "AJUSTAR" ? "border-[#0b2b70]" : "border-gray-400"}`}
+          ${finalDecision === "ADJUST" ? "border-[#0b2b70]" : "border-gray-400"}`}
         >
           <h3 
             className={`font-semibold flex items-center gap-2 
-            ${finalDecision === "AJUSTAR" ? "text-[#0b2b70]" : "text-gray-400"}`}
+            ${finalDecision === "ADJUST" ? "text-[#0b2b70]" : "text-gray-400"}`}
           >
            <Wrench/> Ajustar
           </h3>
-          <p className={`text-sm mt-1 ${finalDecision === "AJUSTAR" ? "text-[#0b2b70]" : "text-gray-400"}`}>
+          <p className={`text-sm mt-1 ${finalDecision === "ADJUST" ? "text-[#0b2b70]" : "text-gray-400"}`}>
             Refinar e testar novamente
           </p>
         </button>
 
         <button 
-          onClick={() => setFinalDecision("ENCERRAR")} 
+          onClick={() => setFinalDecision("CLOSE")} 
           className={`flex-1 p-4 rounded-xl border-2 bg-[#F9FAFB] text-left
-          ${finalDecision === "ENCERRAR" ? "border-[#0b2b70]" : "border-gray-400"}`}
+          ${finalDecision === "CLOSE" ? "border-[#0b2b70]" : "border-gray-400"}`}
         >
           <h3 
             className={`font-semibold flex items-center gap-2 
-            ${finalDecision === "ENCERRAR" ? "text-[#0b2b70]" : "text-gray-400"}`}
+            ${finalDecision === "CLOSE" ? "text-[#0b2b70]" : "text-gray-400"}`}
           >
            <CircleX/> Encerrar
           </h3>
-          <p className={`text-sm mt-1 ${finalDecision === "ENCERRAR" ? "text-[#0b2b70]" : "text-gray-400"}`}>
+          <p className={`text-sm mt-1 ${finalDecision === "CLOSE" ? "text-[#0b2b70]" : "text-gray-400"}`}>
             Levar a ideia para a próxima fase
           </p>
+        </button>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={saveReport}
+          className="mt-6 w-fit px-4 py-2 rounded-lg text-sm font-semibold bg-[#0B2B70] text-white"
+        >
+          Salvar Relatório
         </button>
       </div>
     </div>

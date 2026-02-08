@@ -65,7 +65,7 @@ export default function MakeforBuy() {
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Problema do Edital
         </h1>
 
@@ -75,13 +75,13 @@ export default function MakeforBuy() {
             rows={5}
             maxLength={2000} 
             placeholder="Descreva o problema no formato HMW"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Regras do Desafio
         </h1>
 
@@ -91,13 +91,13 @@ export default function MakeforBuy() {
             rows={5}
             maxLength={2000}
             placeholder="Quais são as regras de negócio?"
-            className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] placeholder:text-[#98A2B3] dark:placeholder:text-white"
+            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
         </div>
       </div>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-black dark:text-white text-lg mb-1">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
           Critérios de Seleção do desafio
         </h1>
 

@@ -29,10 +29,10 @@ export function getStatusLabel(status: string) {
   }
 }
 
-type SortKey = 'id' | 'date' | 'user' | 'area' | 'status'
+type SortKey = 'date' | 'user' | 'area' | 'status'
 
 export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps) {
-  const [sortKey, setSortKey] = useState<SortKey | null>(null)
+  const [sortKey, setSortKey] = useState<SortKey>("date")
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const sortedChallenges = [...challenges].sort((a, b) => {
     if (!sortKey) return 0
@@ -41,10 +41,6 @@ export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps
     let valueB: any
 
     switch (sortKey) {
-      case 'id':
-        valueA = a.id
-        valueB = b.id
-        break
       case 'date':
         valueA = new Date(a.createdAt).getTime()
         valueB = new Date(b.createdAt).getTime()
@@ -81,21 +77,6 @@ export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps
       <table className="table-auto min-w-[700px] w-full border-collapse border-2 border-[#15358D]">
         <thead className="bg-[#15358D]">
           <tr>
-            <th 
-              onClick={() => handleSort("id")}
-              className="px-3 py-2 text-sm font-semibold text-white"
-            >
-              <div className="flex items-center justify-center gap-2">
-                {sortKey === 'id' && (
-                  <ArrowUp 
-                    size={16}
-                    className={`transition-transform duration-300
-                      ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
-                  />
-                )} 
-                <span>ID</span> 
-              </div>
-            </th>
             <th 
               onClick={() => handleSort('date')}
               className="px-3 py-2 text-sm font-semibold text-white"
@@ -171,7 +152,6 @@ export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps
               onClick={() => onRowClick(challenge)}
               className="divide-x-2 divide-[#15358D] text-center cursor-pointer odd:bg-white dark:odd:bg-[#101828] dark:even:bg-[#151d2c] even:bg-blue-100"
             >
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.id}</td>
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{dateFormatter.format(new Date(challenge.createdAt))}</td>
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.name}</td>
               <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.Users.name}</td>

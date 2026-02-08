@@ -2,7 +2,7 @@
 
 "use client"
 import { CardContentsHeader } from "./CardsContents"
-import { useEffect, useState, memo } from "react"
+import { useEffect, useState, memo, useRef, useCallback  } from "react"
 import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react"
 import { ShowDetailedScreeningByIdResponse, ShowDetailedScreeningResponse } from "@/api/payloads/detailedScreening.payload";
 import { ShowImmersionResponse } from "@/api/payloads/immersionDocument.payload";
@@ -20,7 +20,75 @@ type Props = {
   visibility: string;
 }
 
+const TreeItem = memo(function TreeItem({
+  node,
+  level,
+  type,
+  onChange,
+  onAddChild,
+  onRemove
+}: {
+  node: TreeNode;
+  level: number;
+  type: "cause" | "effect";
+  onChange: (id: string, value: string) => void;
+  onAddChild: (id: string, level: number) => void;
+  onRemove: (id: string) => void;
+}) {
+  return (
+    <div
+      className={`
+        mt-2
+        ${level === 1 ? "ml-6" : "ml-2"}
+        border-l border-white/20 pl-3
+        max-w-full
+      `}
+    >
+      <div className="flex items-center gap-2">
+        <input
+          value={node.text}
+          onChange={(e) => onChange(node.id, e.target.value)}
+          placeholder={level === 0
+            ? type === "cause" ? "Descreva a causa..." : "Descreva o efeito..."
+            : type === "cause" ? "Descreva a subcausa..." : "Descreva o subefeito..."
+          }
+          className="flex-1 min-w-0  border bg-[#F9FAFB] border-[#E5E7EB]  dark:border-gray-900 dark:bg-gray-900 rounded-md px-3 py-1 text-black/80 dark:text-white text-sm placeholder:text-[#98A2B3]"
+        />
 
+        <button
+          type="button"
+          onClick={() => onRemove(node.id)}
+          className="text-[#98A2B3] hover:text-red-400"
+        >
+          <Trash size={14} />
+        </button>
+      </div>
+
+      {level === 0 && (
+        <button
+          type="button"
+          onClick={() => onAddChild(node.id, level)}
+          className="mt-1 text-xs text-[#98A2B3] dark:text-white/50"
+        >
+          + {type === "cause" ? "Subcausa" : "Subefeito"}
+        </button>
+      )}
+
+      {node.children.map(child => (
+        <TreeItem
+          key={child.id}
+          node={child}
+          level={level + 1}
+          type={type}
+          onChange={onChange}
+          onAddChild={onAddChild}
+          onRemove={onRemove}
+        />
+      ))}
+
+    </div>
+  );
+});
 
 const getDefaultDetailedScreening = (
   challengeId: string
@@ -48,45 +116,83 @@ const updateNodeText = (
   nodes: TreeNode[],
   id: string,
   value: string
-): TreeNode[] =>
-  nodes.map(node =>
-    node.id === id
-      ? { ...node, text: value }
-      : { ...node, children: updateNodeText(node.children, id, value) }
-  );
+): TreeNode[] => {
+  let changed = false;
+
+  const result = nodes.map(node => {
+    if (node.id === id) {
+      changed = true;
+      return { ...node, text: value };
+    }
+
+    const updatedChildren = updateNodeText(node.children, id, value);
+
+    if (updatedChildren !== node.children) {
+      changed = true;
+      return { ...node, children: updatedChildren };
+    }
+
+    return node; // 🔑 mantém referência
+  });
+
+  return changed ? result : nodes;
+};
 
 const addChildNode = (
   nodes: TreeNode[],
   id: string,
   level: number
-): TreeNode[] =>
-  nodes.map(node => {
-    if (node.id === id) {
-      // BLOQUEIA se já tiver subnível
-      if (level >= 1) return node;
+): TreeNode[] => {
+  let changed = false;
 
+  const result = nodes.map(node => {
+    if (node.id === id && level === 0) {
+      if (node.children.length > 0) return node;
+
+      changed = true;
       return {
         ...node,
-        children: node.children.length === 0
-          ? [createNode()]
-          : node.children
+        children: [createNode()]
       };
     }
 
-    return {
-      ...node,
-      children: addChildNode(node.children, id, level + 1)
-    };
+    const updatedChildren = addChildNode(node.children, id, level + 1);
+
+    if (updatedChildren !== node.children) {
+      changed = true;
+      return { ...node, children: updatedChildren };
+    }
+
+    return node;
   });
 
+  return changed ? result : nodes;
+};
 
-const removeNode = (nodes: TreeNode[], id: string): TreeNode[] =>
-  nodes
-    .filter(node => node.id !== id)
-    .map(node => ({
-      ...node,
-      children: removeNode(node.children, id)
-    }));
+
+
+const removeNode = (nodes: TreeNode[], id: string): TreeNode[] => {
+  let changed = false;
+
+  const result = nodes
+    .map(node => {
+      const updatedChildren = removeNode(node.children, id);
+
+      if (updatedChildren !== node.children) {
+        changed = true;
+        return { ...node, children: updatedChildren };
+      }
+
+      return node;
+    })
+    .filter(node => {
+      const keep = node.id !== id;
+      if (!keep) changed = true;
+      return keep;
+    });
+
+  return changed ? result : nodes;
+};
 
 
 
@@ -113,6 +219,27 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [rootProblem, setRootProblem] = useState("");
   const [causes, setCauses] = useState<TreeNode[]>([]);
   const [effects, setEffects] = useState<TreeNode[]>([]);
+
+  const handleCauseChange = useCallback(
+  (id: string, value: string) => {
+    setCauses(prev => updateNodeText(prev, id, value));
+  },
+  []
+);
+
+const handleCauseAdd = useCallback(
+  (id: string, level: number) => {
+    setCauses(prev => addChildNode(prev, id, level));
+  },
+  []
+);
+
+const handleCauseRemove = useCallback(
+  (id: string) => {
+    setCauses(prev => removeNode(prev, id));
+  },
+  []
+);
 
   const [stakeholders, setStakeholders] = useState<string[]>([])
   const areasEnvolvidas = [
@@ -151,8 +278,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [evidencias, setEvidencias] = useState<File[]>([])
 
 
-
-
   const POV_MAX = 2000;
   const HMW_MAX = 1500;
   const SOLUTION_MAX = 2000;
@@ -168,36 +293,35 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [capacidadeFinanceira, setCapacidadeFinanceira] = useState("")
 
 
-  useEffect(() => {
-  async function fetchDetailedScreening() {
+const isFetchingRef = useRef(false)
+
+useEffect(() => {
+  if (!challengeId) return
+  if (isFetchingRef.current) return
+
+  isFetchingRef.current = true
+  setIsLoading(true)
+  setError(null)
+
+  const fetchDetailedScreening = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
-
       const data =
-        await detailedScreeningService.showDetailedScreeningByChallenge(
-          challengeId
-        )
+        await detailedScreeningService.getOrCreateDetailedScreening(challengeId)
 
-      if (data) {
-        setDetailedScreening(data)
-      } else {
-        const created =
-          await detailedScreeningService.startDetailedScreening(challengeId)
-
-        setDetailedScreening(created)
-      }
-    } catch (err) {
-      console.error(err)
+      setDetailedScreening(data)
+    } catch (error) {
+      console.error(error)
       setError("Falha ao carregar os dados da triagem.")
-      setDetailedScreening(getDefaultDetailedScreening(challengeId))
     } finally {
       setIsLoading(false)
+      isFetchingRef.current = false
     }
   }
 
   fetchDetailedScreening()
 }, [challengeId])
+
+
 
 
   const handleChange = <
@@ -240,77 +364,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     );
   }
 
-const TreeItem = memo(function TreeItem({
-  node,
-  level,
-  type,
-  onChange,
-  onAddChild,
-  onRemove
-}: {
-  node: TreeNode;
-  level: number;
-  type: "cause" | "effect";
-  onChange: (id: string, value: string) => void;
-  onAddChild: (id: string, level: number) => void;
-  onRemove: (id: string) => void;
-}) {
-  return (
-    <div
-      className={`
-        mt-2
-        ${level === 1 ? "ml-6" : "ml-2"}
-        border-l border-white/20 pl-3
-        max-w-full
-      `}
-    >
-      <div className="flex items-center gap-2">
-        <input
-          value={node.text}
-          onChange={(e) => onChange(node.id, e.target.value)}
-          placeholder={level === 0
-            ? type === "cause" ? "Descreva a causa..." : "Descreva o efeito..."
-            : type === "cause" ? "Descreva a subcausa..." : "Descreva o subefeito..."
-          }
-          className="flex-1 min-w-0  border bg-[#F9FAFB] border-[#E5E7EB]  dark:border-gray-900 dark:bg-gray-900 rounded-md px-3 py-1 text-white text-sm placeholder:text-[#98A2B3]"
-        />
-
-        <button
-          type="button"
-          onClick={() => onRemove(node.id)}
-          className="text-[#98A2B3] hover:text-red-400"
-        >
-          <Trash size={14} />
-        </button>
-      </div>
-
-      {level === 0 && (
-        <button
-          type="button"
-          onClick={() => onAddChild(node.id, level)}
-          className="mt-1 text-xs text-[#98A2B3] dark:text-white/50"
-        >
-          + {type === "cause" ? "Subcausa" : "Subefeito"}
-        </button>
-      )}
-
-      {node.children.map(child => (
-        <TreeItem
-          key={child.id}
-          node={child}
-          level={level + 1}
-          type={type}
-          onChange={onChange}
-          onAddChild={onAddChild}
-          onRemove={onRemove}
-        />
-      ))}
-    </div>
-  );
-});
-
-
-
 
   return (
     <div className="w-full flex flex-col">
@@ -324,6 +377,7 @@ const TreeItem = memo(function TreeItem({
           creator={creator}
           visibility={visibility}
         />
+        
 
         <div className="relative flex items-center">
           <div className="flex gap-4 items-center xl:justify-center w-full max-w-md">
@@ -388,7 +442,7 @@ const TreeItem = memo(function TreeItem({
               <input
                 value={rootProblem}
                 onChange={(e) => setRootProblem(e.target.value)}
-                className="w-full bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/60 dark:text-white mb-4 placeholder:text-[#98A2B3]"
+                className="w-full bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/80 dark:text-white mb-4 placeholder:text-[#98A2B3]"
                 placeholder="Problema raiz"
               />
 
@@ -463,7 +517,7 @@ const TreeItem = memo(function TreeItem({
                   value={pov}
                   onChange={(e) => setPov(e.target.value)}
                   maxLength={POV_MAX}
-                  className="w-full h-32 bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/60 dark:text-white placeholder:text-[#98A2B3] resize-none"
+                  className="w-full h-32 bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2 text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none"
                   placeholder="Usuário X precisa de Y porque Z..."
                 />
 
@@ -488,7 +542,7 @@ const TreeItem = memo(function TreeItem({
                   disabled={pov.trim().length === 0}
                   rows={3}
                   className={`w-full bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 rounded-md px-3 py-2
-                    text-black/60 dark:text-white placeholder:text-[#98A2B3] resize-none break-words
+                    text-black/80 dark:text-white placeholder:text-[#98A2B3] resize-none break-words
                     ${pov.trim().length === 0 ? "opacity-60 cursor-not-allowed" : ""}`}
                   placeholder="Como podemos..."
                 />
@@ -602,8 +656,8 @@ const TreeItem = memo(function TreeItem({
                           dark:bg-[#0B1220]
                           p-3
                           text-sm
-                          text-[#0B2B72]
-                          dark:text-white
+                        text-black/80 
+                        dark:text-white
                           resize-none
                           h-24
                           focus:border-[#4EA1FF]/50
@@ -718,7 +772,7 @@ const TreeItem = memo(function TreeItem({
               }
               placeholder="Proposta de valor"
               className="w-full mb-2 bg-[#F9FAFB] dark:bg-gray-900 border border-[#E5E7EB] dark:border-white/10 
-              rounded-md px-3 py-2"
+              rounded-md px-3 py-2 text-black/80 dark:text-white"
             />
 
             <input
@@ -728,7 +782,7 @@ const TreeItem = memo(function TreeItem({
               }
               placeholder="Público-alvo"
               className="w-full mb-2 bg-[#F9FAFB] border border-[#E5E7EB] dark:border-white/10 dark:bg-gray-900 
-              rounded-md px-3 py-2"
+              rounded-md px-3 py-2 text-black/80 dark:text-white"
             />
 
             <textarea
@@ -738,7 +792,7 @@ const TreeItem = memo(function TreeItem({
               }
               placeholder="Descrição da visão do produto"
               className="w-full bg-[#F9FAFB] border border-[#E5E7EB] dark:border-white/10 dark:bg-gray-900 
-              rounded-md px-3 py-2 h-28 resize-none"
+              rounded-md px-3 py-2 h-28 resize-none text-black/80 dark:text-white"
             />
           </div>
 
@@ -767,6 +821,8 @@ const TreeItem = memo(function TreeItem({
                         border border-[#E5E7EB]
                         dark:border-white/10
                         dark:bg-gray-900
+                        text-black/80 
+                      dark:text-white
                         rounded-md
                         px-3 py-2
                         resize-none
@@ -817,7 +873,7 @@ const TreeItem = memo(function TreeItem({
                   className={`px-4 py-1 rounded ${
                     makeOrBuy === op
                       ? "bg-[#0B2B72] text-white"
-                      : "border border-gray-400"
+                      : "border border-gray-400 text-[#0B2B70]"
                   }`}
                 >
                   {op}
@@ -837,6 +893,8 @@ const TreeItem = memo(function TreeItem({
                   border border-[#E5E7EB]
                   dark:border-white/10
                   dark:bg-gray-900
+                  text-black/80 
+                  dark:text-white
                   rounded-md
                   px-3 py-2
                   h-24
@@ -868,6 +926,8 @@ const TreeItem = memo(function TreeItem({
                 border border-[#E5E7EB]
                 dark:border-white/10
                 dark:bg-gray-900
+                text-black/80 
+                dark:text-white
                 rounded-md
                 px-3 py-2
                 h-24
@@ -881,71 +941,49 @@ const TreeItem = memo(function TreeItem({
           </div>
 
         {/* Capacidade */}
-        <div className="rounded-xl border border-[#E5E7EB] dark:border-[#737373] p-4">
-          <h2 className="text-[#0B2B70] dark:text-white font-semibold mb-4">
-            Registre a Capacidade Técnica e Financeira
-          </h2>
+          <div className="rounded-xl border border-[#E5E7EB] dark:border-[#737373] p-4">
+            <h2 className="text-[#0B2B70] dark:text-white font-semibold mb-4">
+              Registre a Capacidade Técnica e Financeira
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <input
-                value={capacidadeTecnica}
-                maxLength={CAPACIDADE_MAX}
-                onChange={(e) => setCapacidadeTecnica(e.target.value)}
-                placeholder="Capacidade Técnica"
-                className="
-                  w-full
-                  bg-[#F9FAFB]
-                  border border-[#E5E7EB]
-                  dark:border-white/10
-                  dark:bg-gray-900
-                  rounded-md
-                  px-3 py-2
-                "
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Capacidade Técnica */}
+              <div>
+                <textarea
+                  value={capacidadeTecnica}
+                  maxLength={CAPACIDADE_MAX}
+                  onChange={(e) => setCapacidadeTecnica(e.target.value)}
+                  placeholder="Capacidade Técnica"
+                  className="
+                    w-full bg-[#F9FAFB] border border-[#E5E7EB]dark:border-white/10 dark:bg-gray-900 
+                    rounded-md px-3 py-2 min-h-[150px] resize-none text-black/80 dark:text-white
+                  "
+                />
 
-              <p className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
-                {capacidadeTecnica.length}/{CAPACIDADE_MAX}
-              </p>
+                <p className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+                  {capacidadeTecnica.length}/{CAPACIDADE_MAX}
+                </p>
+              </div>
+
+              {/* Capacidade Financeira */}
+              <div>
+                <textarea
+                  value={capacidadeFinanceira}
+                  maxLength={CAPACIDADE_MAX}
+                  onChange={(e) => setCapacidadeFinanceira(e.target.value)}
+                  placeholder="Capacidade Financeira"
+                  className="
+                    w-full
+                    bg-[#F9FAFB] border border-[#E5E7EB] dark:border-white/10 dark:bg-gray-900 
+                    rounded-md px-3 py-2 min-h-[150px] resize-none text-black/80 dark:text-white
+                  "
+                />
+
+                <p className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
+                  {capacidadeFinanceira.length}/{CAPACIDADE_MAX}
+                </p>
+              </div>
             </div>
-
-            <div>
-              <input
-                value={capacidadeFinanceira}
-                maxLength={CAPACIDADE_MAX}
-                onChange={(e) => setCapacidadeFinanceira(e.target.value)}
-                placeholder="Capacidade Financeira"
-                className="
-                  w-full
-                  bg-[#F9FAFB]
-                  border border-[#E5E7EB]
-                  dark:border-white/10
-                  dark:bg-gray-900
-                  rounded-md
-                  px-3 py-2
-                "
-              />
-
-              <p className="text-xs text-[#98A2B3] dark:text-white/50 mt-1 text-right">
-                {capacidadeFinanceira.length}/{CAPACIDADE_MAX}
-              </p>
-            </div>
-          </div>
-        </div>
-
-          <div className="flex justify-end">
-            <button
-              disabled={
-                !visaoProduto.propostaValor ||
-                !visaoProduto.publicoAlvo ||
-                alternativas.length === 0 ||
-                !makeOrBuy ||
-                !justificativaMakeBuy
-              }
-              className="px-6 py-2 bg-[#0B2B72] text-white rounded-md disabled:opacity-50"
-            >
-              Finalizar
-            </button>
           </div>
         </div>
       )}

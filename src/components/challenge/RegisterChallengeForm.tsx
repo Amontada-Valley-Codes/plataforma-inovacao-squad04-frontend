@@ -13,6 +13,7 @@ import { StrategicObjectivesService } from "@/api/services/strategic-objectives.
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onSubmitSuccess: (createdChallengeId: string) => void; 
 };
 
 type StrategicObjective = {
@@ -69,7 +70,7 @@ const CreateChallengeSchema = z.object({
 type data = z.infer<typeof CreateChallengeSchema>
 
 
-export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
+export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess }: Props) {
 
  const [strategicObjectives, setStrategicObjectives] = useState<StrategicObjective[]>([]);
 
@@ -90,12 +91,15 @@ export default function RegisterChallengeForm({ onClose, isOpen }: Props) {
     });
 
     
-     const onSubmit = async (data: data) => {
-       console.log("Dados validados:", data);
+    const onSubmit = async (data: data) => {
     try {
-      await ChallengeService.createChallenge(data);
-      onClose();
+      const createdChallenge = await ChallengeService.createChallenge(data);
+
+      
+      onSubmitSuccess(createdChallenge.id);
+
       reset();
+      // onClose();
     } catch (error) {
       console.error("Erro ao salvar:", error);
     }
