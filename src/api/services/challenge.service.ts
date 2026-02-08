@@ -10,11 +10,14 @@ import {
   CreateChallengeResponse,
   CreateVotePreScreeningPayload,
   CreateVotePreScreeningResponse,
+  GanttChartResponse,
   ShowAllChallengeResponse,
   ShowAllPubliChallengeResponse,
   ShowOneChallengeResponse,
   ShowOnePublicChallengeResponse,
   ShowPercentageVoteResponse,
+  UpdateEndDatePayload,
+  UpdateEndDateResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -82,6 +85,16 @@ export const ChallengeService = {
 
   async ShowPercentage(challengeId: string): Promise<ShowPercentageVoteResponse> {
     const { data } = await api.get<ShowPercentageVoteResponse>(ENDPOINTS.CHALLENGE.SHOW_PRE_SCREENING_VOTES(challengeId))
+    return data
+  },
+
+  async updateEndDate(id: string, payload: UpdateEndDatePayload): Promise<UpdateEndDateResponse> {
+    const { data } = await api.patch<UpdateEndDateResponse>(ENDPOINTS.CHALLENGE.UPDATE_END_DATE(id), payload)
+    return data
+  },
+
+  async getGanttChart(): Promise<GanttChartResponse> {
+    const { data } = await api.get<GanttChartResponse>(ENDPOINTS.CHALLENGE.GANTT_CHART)
     return data
   }
 };
