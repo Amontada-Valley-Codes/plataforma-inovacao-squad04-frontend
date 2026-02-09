@@ -1,22 +1,39 @@
+import { BuyMaterializationService } from "@/api/services/buy-materialization.service";
 import { Check, ChevronDown, Plus, Trash2 } from "lucide-react";
 import React, { useState } from "react"
 
-export default function MakeforBuy() {
+type MakeForBuyProps = {
+  challengeId: string
+}
+
+type SelectionCriterion = {
+  criterio: string
+  peso: number
+}
+
+export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [criterion, setCriterion] = useState<string>('');
-  const [criteria, setCriteria] = useState<string[]>([]);
+  const [criteria, setCriteria] = useState<SelectionCriterion[]>([]);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [hmwProblem, setHmwProblem] = useState<string>('');
+  const [rules, setRules] = useState<string>('');
+  const [status, setStatus] = useState<string>('DRAFT')
 
   const addCriterion = () => {
     if (!criterion) return
-    if (criteria.includes(criterion)) return 
+    if (criteria.some(c => c.criterio === criterion)) return
 
-    setCriteria(prev => [...prev, criterion])
+    setCriteria(prev => [
+      ...prev,
+      { criterio: criterion, peso: 1 }
+    ])
+
     setCriterion('')
   }
 
   const removeCriterion = (value: string) => {
-    setCriteria(prev => prev.filter(item => item !== value))
+    setCriteria(prev => prev.filter(item => item.criterio !== value))
   }
 
   const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +52,21 @@ export default function MakeforBuy() {
   const label = hasFile ? pdfFile!.name : "Upload do Edital do desafio"
   const Icon = hasFile ? Check : Plus
 
+  async function handleSubmit() {
+
+    if (!pdfFile) return
+
+    const response = await BuyMaterializationService.createMaterialization(challengeId, {
+      hmwProblem,
+      selectionCriteria: criteria,
+      challengeRules: rules,
+      editalFileUrl: 'https://storage.meusistema.com/editais/edital.pdf',
+      status
+    })
+
+    console.log(response)
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -43,7 +75,6 @@ export default function MakeforBuy() {
         </h1>
 
       <div className="flex flex-col">
-        {/* BOTÃO DE UPLOAD */}
         <label
           className="flex items-center gap-2 px-3 py-2
           bg-[#0B2B70] text-white rounded-lg
@@ -73,7 +104,9 @@ export default function MakeforBuy() {
           <textarea  
             required
             rows={5}
-            maxLength={2000} 
+            maxLength={2000}
+            value={hmwProblem}
+            onChange={(e) => setHmwProblem(e.target.value)}
             placeholder="Descreva o problema no formato HMW"
             className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
@@ -90,6 +123,8 @@ export default function MakeforBuy() {
             required
             rows={5}
             maxLength={2000}
+            value={rules}
+            onChange={(e) => setRules(e.target.value)}
             placeholder="Quais são as regras de negócio?"
             className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
@@ -139,23 +174,33 @@ export default function MakeforBuy() {
             <Plus size={16} />
             Adicionar
           </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="flex items-center gap-1 px-3 py-2
+            bg-[#0B2B70] text-white rounded-lg"
+          >
+            <Plus size={16} />
+            Adicionar
+          </button>
         </div>
 
         <div className="flex flex-wrap gap-2 mt-3">
           {criteria.map((item) => (
             <div
-              key={item}
+              key={item.criterio}
               className="flex items-center gap-2
               bg-[#E7EEFF] text-[#0B2B70]
               px-3 py-1 rounded-full text-sm font-medium"
             >
-              {item.replaceAll("_", " ")}
+              {item.criterio.replaceAll("_", " ")}
 
               <button
                 type="button"
-                onClick={() => removeCriterion(item)}
+                onClick={() => removeCriterion(item.criterio)}
               >
-                <Trash2 className="hover:text-red-600 transition-colors" size={14} />
+                <Trash2 size={14} />
               </button>
             </div>
           ))}
