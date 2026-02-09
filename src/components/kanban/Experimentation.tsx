@@ -24,15 +24,28 @@ type CardExperimentationContentProps = {
 type ExperimentationState = (ShowExperimentationResponse | CreateExperimentationResponse) & { poc?: any }
 
 export const Experimentation = ({ challangeTitle, challengeId, category, startDate, creator, visibility }: CardExperimentationContentProps) => {
-  const [experimentation, setExperimentation] = useState<ExperimentationState>()
+  const [experimentation, setExperimentation] = useState<ExperimentationState | undefined>()
 
   const initExperimentation = useCallback(async () => {
     try {
       const res = await experimentationService.showExperimentation(challengeId)
-      setExperimentation(res)
-    } catch {
+
+      if (res.id) {
+        setExperimentation(res)
+        return
+      }
+
       const newExp = await experimentationService.createExperimentation(challengeId)
+
       setExperimentation(newExp)
+    } catch (err: any) {
+      if (err?.response?.status === 409) {
+        const res = await experimentationService.showExperimentation(challengeId)
+        setExperimentation(res)
+        return
+      }
+
+      console.error("Erro ao inicializar a experimentação:", err)
     }
   }, [challengeId])
 
@@ -59,6 +72,10 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   }
 
   useEffect(() => {
+    setExperimentation(undefined)
+  }, [challengeId])
+
+  useEffect(() => {
     initExperimentation()
   }, [initExperimentation])
 
@@ -71,6 +88,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
       scope: "Definir escopo da PoC"
     }).then(poc => {
       setExperimentation(prev => prev && { ...prev, poc })
+    }).catch(err => {
+      console.error("Erro ao criar PoC:", err)
     })
   }, [experimentation?.id, experimentation?.poc])
     

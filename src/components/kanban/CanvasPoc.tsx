@@ -2,7 +2,7 @@
 
 import { experimentationService } from "@/api/services/experimentation.service";
 import { Check, ChevronDown, MoreHorizontal, Plus, Trash2 } from "lucide-react";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type CanvasPoCProps = {
   poc: {
@@ -35,9 +35,9 @@ type CanvasPoCProps = {
 export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasPoCProps) {
   const [objective, setObjective] = useState(poc.objective)
   const [scope, setScope] = useState(poc.scope)
-  const [hypotheses, setHypotheses] = useState(poc.pocHypotheses)
+  const [hypotheses, setHypotheses] = useState(poc.pocHypotheses ?? [])
   const [newHypothesis, setNewHypothesis] = useState('')
-  const [indicators, setIndicators] = useState(poc.poCIndicators)
+  const [indicators, setIndicators] = useState(poc.poCIndicators ?? [])
   const [newIndicatorName, setNewIndicatorName] = useState("")
   const [newIndicatorMetric, setNewIndicatorMetric] = useState("")
   const [newIndicatorTarget, setNewIndicatorTarget] = useState("")
@@ -105,6 +105,13 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
       prev.filter(i => i.id !== indicatorId)
     )
   }
+
+  useEffect(() => {
+    setIndicators(poc.poCIndicators ?? [])
+    setHypotheses(poc.pocHypotheses ?? [])
+    setObjective(poc.objective)
+    setScope(poc.scope)
+  }, [poc.id])
 
   return (
     <div className="flex flex-col gap-1 mb-6">
