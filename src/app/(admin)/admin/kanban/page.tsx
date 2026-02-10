@@ -1,5 +1,7 @@
 import Kanban from "@/components/kanban/Kanban";
 
+export const dynamic = 'force-dynamic';
+
 export default function KanbanPage() {
   return (
     <div className="w-full overflow-hidden">
