@@ -61,6 +61,7 @@ export const ENDPOINTS = {
     UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visibility`,
     UPDATE_END_DATE: (id: string) => `/challenge/${id}/end-date`,
     GANTT_CHART: "/challenge/graph/gantt",
+    CHALLENGES_BY_STAGE: "/challenge/enterprise/enterpriseId/challenges-by-stage",
     VOTE_PRE_SCREENING: (id: string) => `/challenge/vote/${id}/pre-screening`,
     SHOW_PRE_SCREENING_VOTES: (id: string) => `/challenge/result/${id}/pre-screening`,
     HISTORICAL: {
