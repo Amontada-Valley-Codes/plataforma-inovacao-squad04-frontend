@@ -15,6 +15,28 @@ export type ShowAllUsersResponse = {
     },
   }[]
 
+export type ShowPaginetedUsersResponse = {
+  data: {
+    id: string,
+    name: string,
+    email: string,
+    phone: string,
+    googleId: null,
+    lastAccessAt: null,
+    type_user: string,
+    createdAt: string,
+    enterpriseId: string,
+    image: null,
+    startupId: null,
+    Enterprise: {
+      name: string
+    },
+  }[],
+  total: number,
+  page: number,
+  lastPage: number
+}
+
 export type ShowLoggedUserResponse = {
   id: string,
   name: string,

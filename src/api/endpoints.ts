@@ -9,6 +9,7 @@ export const ENDPOINTS = {
   USER: {
     CREATE: "/user",
     SHOW_ALL: "/user",
+    SHOW_PAGINATED_USERS: (page: number, limit: number) => `/user/pagination?page=${page}&limit=${limit}`,
     UPDATE: "/user",
     SHOW_ONE: (id: string) => `/user/${id}`,
     DELETE: (id: string) => `/user/${id}`,
