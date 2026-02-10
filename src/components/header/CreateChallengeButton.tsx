@@ -36,7 +36,7 @@ export default function CreateChallengeButton() {
         }} 
       >
         <DiamondPlus />
-        Cadastrar Objectivo Estratégico
+        Gerenciar Objectivo Estratégico
       </Button>
 
       <Button 

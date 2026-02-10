@@ -1,142 +1,180 @@
 "use client";
 
-import { Modal } from "../ui/modal";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
+import { useEffect, useState } from "react";
 import Button from "../ui/button/Button";
+import { Pencil, Trash2, Plus, X } from "lucide-react";
 import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
+
+type StrategicObjective = {
+  id: string;
+  title: string;
+  description?: string;
+};
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-const CreateStrategicObjectiveSchema = z.object({
-  title: z.string().min(3, "O título do objectivo deve ter no mínimo 3 caracteres"),
-  description: z.string().min(10, "A descrição é obrigatória"),
-});
+export default function RegisterObjectiveForm({ isOpen, onClose }: Props) {
+  const [objectives, setObjectives] = useState<StrategicObjective[]>([]);
+  const [loading, setLoading] = useState(false);
 
-type createStrategicObjectiveData = z.infer<typeof CreateStrategicObjectiveSchema>;
+  const [editing, setEditing] = useState<StrategicObjective | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-export default function RegisterStrategicObjectiveForm({ onClose, isOpen }: Props) {
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<createStrategicObjectiveData>({
-    resolver: zodResolver(CreateStrategicObjectiveSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-    },
-  });
-
-  const onSubmit = async (data: createStrategicObjectiveData) => {
-    try {
-      const response = await StrategicObjectivesService.createObjective(data);
-      console.log(response)
-      reset();
-    } catch (error) {
-      console.error("Erro ao salvar:", error);
-    }
+  const fetchObjectives = async () => {
+    setLoading(true);
+    const response = await StrategicObjectivesService.getAllObjectives();
+    setObjectives(response);
+    setLoading(false);
   };
 
+  useEffect(() => {
+    if (isOpen) fetchObjectives();
+  }, [isOpen]);
+
+  const resetForm = () => {
+    setEditing(null);
+    setTitle("");
+    setDescription("");
+  };
+
+  const handleSubmit = async () => {
+    if (!title.trim()) return;
+
+    if (editing) {
+      await StrategicObjectivesService.UpdateObjective(editing.id, {
+        title,
+        description,
+      });
+    } else {
+      await StrategicObjectivesService.createObjective({ title, description });
+    }
+    resetForm();
+    fetchObjectives();
+  };
+
+  const handleEdit = (objective: StrategicObjective) => {
+    setEditing(objective);
+    setTitle(objective.title);
+    setDescription(objective.description ?? "");
+  };
+
+  const handleDelete = async (id: string) => {
+    await StrategicObjectivesService.DeleteObjective(id);
+    fetchObjectives();
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <div
-          className="
-            lg:w-120 md:w-100 sm:w-50 w-full
-            p-6 z-50
-            bg-white dark:bg-gray-900
-            shadow-xl rounded-2xl
-            max-h-[90vh] overflow-y-auto
-          "
-        >
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-4">
-              <div className="flex flex-col gap-1">
-                <Label className="text-[#0B2B70] dark:text-white">
-                  Título do objetivo estratégico
-                </Label>
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+      <div className="w-full max-w-2xl p-6 space-y-6 bg-white dark:bg-gray-900 rounded-2xl shadow-xl">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-[#0B2B70] dark:text-white">
+            Objetivos Estratégicos
+          </h2>
 
-                <Input
-                  {...register("title")}
-                  placeholder="Digite o titulo Objetivo Estratégico"
-                  className="
-                    bg-[#F9FAFB] dark:bg-gray-800
-                    border border-[#E5E7EB] dark:border-gray-700
-                    text-black dark:text-white
-                    placeholder:text-[#98A2B3] dark:placeholder:text-gray-400
-                  "
-                />
-
-                {errors.title && (
-                  <p className="text-red-500 text-sm">
-                    {errors.title.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <Label className="text-[#0B2B70] dark:text-white">
-                  Descrição do problema identificado
-                </Label>
-
-                <Input
-                  {...register("description")}
-                  placeholder="Digite o problema identificado"
-                  className="
-                    bg-[#F9FAFB] dark:bg-gray-800
-                    border border-[#E5E7EB] dark:border-gray-700
-                    text-black dark:text-white
-                    placeholder:text-[#98A2B3] dark:placeholder:text-gray-400
-                  "
-                />
-
-                {errors.description && (
-                  <p className="text-red-500 text-sm">
-                    {errors.description.message}
-                  </p>
-                )}
-              </div>
-
-              <div
-                className="
-                  flex justify-end gap-3 pt-5 mt-6
-                  border-t border-gray-200 dark:border-gray-700
-                "
-              >
-                <Button
-                  onClick={onClose}
-                  className="
-                    bg-gray-100 text-gray-700
-                    hover:bg-gray-200
-                    dark:bg-gray-800 dark:text-gray-200
-                    dark:hover:bg-gray-700
-                  "
-                >
-                  Cancelar
-                </Button>
-
-                <Button
-                  className="
-                    bg-[#0B2B70] text-white
-                    hover:opacity-90
-                  "
-                >
-                  Registrar Objetivo Estratégico
-                </Button>
-              </div>
-            </div>
-          </form>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            <X />
+          </button>
         </div>
-      </Modal>
+
+        <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3 bg-gray-50 dark:bg-gray-800">
+          <h3 className="font-medium text-[#0B2B70] dark:text-white">
+            {editing ? "Editar Objetivo" : "Novo Objetivo"}
+          </h3>
+
+          <input 
+            className="w-full rounded-lg px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
+            placeholder="Título do objetivo"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          <textarea
+            className="w-full rounded-lg px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none resize-none"
+            placeholder="Descrição (opcional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
+          <div className="flex gap-2">
+            <Button
+              onClick={handleSubmit}
+              className="flex items-center gap-1 bg-[#0B2B70] text-white hover:opacity-90"
+            >
+              <Plus size={16} />
+              {editing ? "Salvar" : "Adicionar"}
+            </Button>
+
+            {editing && (
+              <Button
+                onClick={resetForm}
+                className="bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              >
+                Cancelar
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="border border-gray-200 dark:border-gray-700 rounded-xl max-h-64 overflow-y-auto">
+          {loading ? (
+            <p className="p-4 text-gray-600 dark:text-gray-300">
+              Carregando...
+            </p>
+          ) : objectives.length === 0 ? (
+            <p className="p-4 text-gray-600 dark:text-gray-300">
+              Nenhum objetivo cadastrado.
+            </p>
+          ) : (
+            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+              {objectives.map((objective) => (
+                <li
+                  key={objective.id}
+                  className="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-black dark:text-white">
+                      {objective.title}
+                    </p>
+
+                    {objective.description && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {objective.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleEdit(objective)}
+                      className=" bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    >
+                      <Pencil size={16} />
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleDelete(objective.id)}
+                      className="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
