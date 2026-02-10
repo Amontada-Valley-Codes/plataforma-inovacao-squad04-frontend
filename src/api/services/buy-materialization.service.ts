@@ -1,10 +1,10 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
-import { createBuyMaterializationPayload, showBuyMaterializationResponse } from "../payloads/buy-materialization.payload";
+import { CreateBuyMaterializationFormData, showBuyMaterializationResponse } from "../payloads/buy-materialization.payload";
 
 export const BuyMaterializationService = {
 
-  async createMaterialization(id: string, payload: createBuyMaterializationPayload) {
+  async createMaterialization(id: string, payload: CreateBuyMaterializationFormData) {
     const { data } = await api.post(ENDPOINTS.BUY_MATERIALIZATION.CREATE_MATERIALIZATION(id), payload);
     return data;
   },
