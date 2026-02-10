@@ -6,6 +6,7 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface Question {
   id: string;
@@ -106,65 +107,68 @@ export default function CustomForm({ challengeId, isOpen, onClose }: CustomFormP
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="lg:w-120 sm:w-full p-6 bg-white z-50 shadow rounded-2xl max-h-[90vh] overflow-y-auto">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Perguntas Complementares</h2>
-          <p className="text-sm text-gray-500">Preencha os detalhes finais do seu desafio.</p>
-        </div>
+      <div className="lg:w-250 sm:w-150 md:w-200 bg-white z-50 shadow rounded-2xl max-h-[90vh] flex flex-col overflow-hidden p-6">
+       
+        <form onSubmit={handleSubmit} className="space-y-3">
+  {questions.length > 0 ? (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {questions
+        .sort((a, b) => a.order - b.order)
+        .map((q) => (
+          <div key={q.id}>
+            <Label>
+              {q.title}
+            </Label>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {questions.length > 0 ? (
-            questions
-              .sort((a, b) => a.order - b.order)
-              .map((q) => (
-                <div key={q.id} className="flex flex-col gap-1">
-                  <Label>
-                    {q.title} {q.required && <span className="text-red-500">*</span>}
-                  </Label>
+            {q.type === "TEXT" && (
+              <Input
+                required={q.required}
+                value={answers[q.id] || ""}
+                onChange={(e) => handleChange(q.id, e.target.value)}
+                placeholder="Digite sua resposta"
+              />
+            )}
 
-                  {q.type === "TEXT" && (
-                    <Input
-                      required={q.required}
-                      value={answers[q.id] || ""}
-                      onChange={(e) => handleChange(q.id, e.target.value)}
-                      placeholder="Digite sua resposta"
-                    />
-                  )}
+            {q.type === "NUMBER" && (
+              <Input
+                type="number"
+                required={q.required}
+                value={answers[q.id] || ""}
+                onChange={(e) => handleChange(q.id, e.target.value)}
+                placeholder="0"
+              />
+            )}
 
-                  {q.type === "NUMBER" && (
-                    <Input
-                      type="number"
-                      required={q.required}
-                      value={answers[q.id] || ""}
-                      onChange={(e) => handleChange(q.id, e.target.value)}
-                      placeholder="0"
-                    />
-                  )}
+            {q.type === "SELECT" && Array.isArray(q.options) && (
+              <Select
+                value={answers[q.id] || ""}
+                onValueChange={(value) => handleChange(q.id, value)}
+              >
+                <SelectTrigger className="w-full border border-gray-300 rounded-lg px-3 py-5 bg-white">
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
 
-                  {q.type === "SELECT" && q.options && (
-                    <select
-                      required={q.required}
-                      value={answers[q.id] || ""}
-                      onChange={(e) => handleChange(q.id, e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
-                      <option value="">Selecione...</option>
-                      {q.options.map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-              ))
-          ) : (
-            <p className="text-center text-gray-500 py-4">
-              Não há perguntas adicionais para este desafio.
-            </p>
-          )}
+                <SelectContent>
+                  {q.options.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        ))}
+    </div>
+  ) : (
+    <p className="text-center text-gray-500 py-4">
+      Não há perguntas adicionais para este desafio.
+    </p>
+  )}
 
-          <div className="flex justify-end gap-3 pt-6 border-t mt-4">
+          <div className="flex justify-end gap-3 mt-3 ">
             <Button 
-         
+              
               onClick={onClose} 
              
               disabled={submitting}

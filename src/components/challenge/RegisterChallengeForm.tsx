@@ -10,6 +10,7 @@ import Button from "../ui/button/Button";
 import { useEffect, useState } from "react";
 import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Textarea } from "../ui/textarea";
 
 type Props = {
   isOpen: boolean;
@@ -145,14 +146,16 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
             </div>
 
             <div>
-              <Label>Descrição do problema identificado</Label>
+
+
+                <Label>Há quanto tempo o problema existe</Label>
               <Input
-              {...register("problemDescription")}
-                placeholder="Digite o problema identificado"
+              {...register("problemDuration")} 
+                placeholder="Digite Há quanto tempo o problema existe"
               />
-              {errors.problemDescription && (
-                <p className="text-red-500 text-sm">{errors.problemDescription.message}</p>
-              )}
+              {errors.problemDuration && <p className="text-red-500 text-sm">{errors.problemDuration.message}</p>}
+
+            
             </div>
 
 
@@ -162,17 +165,8 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 
               <div>
-              <Label>Há quanto tempo o problema existe</Label>
-              <Input
-              {...register("problemDuration")} 
-                placeholder="Digite Há quanto tempo o problema existe"
-              />
-              {errors.problemDuration && <p className="text-red-500 text-sm">{errors.problemDuration.message}</p>}
-            </div>
-
-             
-
-             <div>
+               
+            
               <Label>Solução atual para o problema</Label>
               <Input
               {...register("currentSolution")}
@@ -181,18 +175,31 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
               {errors.currentSolution && <p className="text-red-500 text-sm">{errors.currentSolution.message}</p>}
             </div>
 
+             
 
-            </div>
+             <div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-
-              <div>
-              <Label>Relevância do problema para a organização</Label>
+               <Label>Relevância do problema para a organização</Label>
               <Input
                 placeholder="Digite Relevância do problema para a organização"
                  {...register("problemRelevance")} 
               />
               {errors.problemRelevance && <p className="text-red-500 text-sm">{errors.problemRelevance.message}</p>}
+            </div>
+
+
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+
+            <div>
+                <Label>Impactos esperados com a implementação da ideia</Label>
+              <Input  
+              {...register("expectedImpacts")}
+              placeholder="Digite os Impactos esperados com a implementação da ideia"
+              />
+              {errors.expectedImpacts && <p className="text-red-500 text-sm">{errors.expectedImpacts.message}</p>}
+             
             </div>
 
              <div>
@@ -211,22 +218,45 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 
               <div>
-              <Label>Impactos esperados com a implementação da ideia</Label>
-              <Input  
-              {...register("expectedImpacts")}
-              placeholder="Digite os Impactos esperados com a implementação da ideia"
-              />
-              {errors.expectedImpacts && <p className="text-red-500 text-sm">{errors.expectedImpacts.message}</p>}
-            </div>
+                  <Label>Forma de participação do proponente se aprovado</Label>
 
-            <div>
+           <Select
+              value={watch("proponentParticipation")}
+              onValueChange={(value) =>
+                setValue("proponentParticipation", value as any, {
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger className="w-full mt-2 rounded-lg py-5">
+                <SelectValue  placeholder="Selecione uma opção" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {PROPONENT_PARTICIPATION_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {errors.proponentParticipation && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.proponentParticipation.message}
+              </p>
+            )}
+            
+              </div>
+
+              <div>
               <Label>Restrições ou dependências iniciais</Label>
               <Input  
               placeholder="Digite as Restrições ou dependências iniciais"
               {...register("initialConstraints")}
               />
               {errors.initialConstraints && <p className="text-red-500 text-sm">{errors.initialConstraints.message}</p>}
-            </div>
+              </div>
 
 
 
@@ -237,10 +267,10 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 
                <div>
-              <Label>IDs dos objetivos estratégicos associados ao desafio</Label>
+              <Label>Objetivos estratégicos associados ao desafio</Label>
               <select
                   multiple
-                  className="w-full mt-2 border rounded-lg p-2 min-h-[180px]"
+                  className="w-full  border rounded-lg p-2 min-h-[180px]"
                   value={watch("strategicObjectiveIds")}
                   onChange={(e) => {
                     const values = Array.from(e.target.selectedOptions).map(
@@ -269,10 +299,29 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
                   </p>
                 )}
             </div>
+                <div>
+                  <Label>Descrição do problema identificado</Label>
+                  <Textarea
+                  className="min-h-[180px] "
+                  {...register("problemDescription")}
+                    placeholder="Digite o problema identificado"
+                  />
+                  {errors.problemDescription && (
+                    <p className="text-red-500 text-sm">{errors.problemDescription.message}</p>
+                  )}
 
-           
+                </div>
 
              
+            
+
+             </div>
+          
+            <div>
+          
+          </div>
+
+          <div>
             <div>
               <Label>Áreas envolvidas ou impactadas</Label>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -312,38 +361,6 @@ export default function RegisterChallengeForm({ onClose, isOpen, onSubmitSuccess
          
               
             </div>
-
-             </div>
-          
-            <div>
-            <Label>Forma de participação do proponente se aprovado</Label>
-
-           <Select
-              value={watch("proponentParticipation")}
-              onValueChange={(value) =>
-                setValue("proponentParticipation", value as any, {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger className="w-full mt-2 rounded-lg py-5">
-                <SelectValue  placeholder="Selecione uma opção" />
-              </SelectTrigger>
-
-              <SelectContent>
-                {PROPONENT_PARTICIPATION_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {errors.proponentParticipation && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.proponentParticipation.message}
-              </p>
-            )}
           </div>
 
             <div className="flex justify-end gap-3 pt-4 border-top mt-6">
