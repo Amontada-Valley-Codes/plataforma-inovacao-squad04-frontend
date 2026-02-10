@@ -194,3 +194,35 @@ export type ShowPercentageVoteResponse = {
     image: null
   }[]
 }
+
+export type UpdateEndDatePayload = {
+  endDate: string
+}
+
+export type UpdateEndDateResponse = {
+  id: string
+  name: string
+  endDate: string
+  status: string
+  updatedAt: string
+}
+
+export type GanttChartItem = {
+  id: string
+  ideaIdentifier: string
+  name: string
+  problemDescription: string
+  status: string
+  startDate?: string
+  createdAt: string
+  endDate: string
+}
+
+export type GanttChartResponse = GanttChartItem[]
+
+export type ChallengesByStageItem = {
+  stage: string
+  total: number
+}
+
+export type ChallengesByStageResponse = ChallengesByStageItem[]

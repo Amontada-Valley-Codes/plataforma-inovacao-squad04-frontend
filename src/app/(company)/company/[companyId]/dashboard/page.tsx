@@ -4,6 +4,7 @@ import React from "react";
 import { getUserRole } from "@/lib/auth";
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 import { GestorMetricsCards } from "@/components/ecommerce/GestorMetricsCard";
+import GanttChart from "@/components/roadmap/GanttChart";
 
 type PageProps = { params: Promise<{ companyId: string }> };
 
@@ -40,6 +41,9 @@ export default async function CompanyDashboardPage({ params }: PageProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 gap-4 sm:gap-5 md:gap-6 p-3 sm:p-4 md:p-6 w-full max-w-screen-2xl mx-auto overflow-x-hidden">
       <div className="col-span-1 sm:col-span-2 xl:col-span-12">
         <GestorMetricsCards />
+      </div>
+      <div className="col-span-1 sm:col-span-2 xl:col-span-12">
+        <GanttChart />
       </div>
     </div>
   );
