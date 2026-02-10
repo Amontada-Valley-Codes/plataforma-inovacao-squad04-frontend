@@ -205,6 +205,12 @@ export const ENDPOINTS = {
     REORDER_QUESTIONS: "/question-forms/questions/reorder"
   },
 
+  BUY_MATERIALIZATION: {
+    CREATE_MATERIALIZATION: (challengeId: string) => `buy-materialization/${challengeId}`,
+    GET_MATERIALIZATION: '/buy-materialization',
+    GET_MATERIALIZATION_BY_ID: (id: string) => `buy-materialization/${id}`
+  },
+
   STATUS_REPORT: {
     CREATE: (challengeId: string) => `/status-report/${challengeId}`,
     GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
