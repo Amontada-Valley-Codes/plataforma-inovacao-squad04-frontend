@@ -155,7 +155,7 @@ export default function Materialization({ challengeTitle, visibility, creator, s
         {page === '1' ? (
           <CanvasMVP/>
         ) : (
-          <MakeforBuy/>
+          <MakeforBuy challengeId={challengeId} />
         )}
       </div>
     </div>

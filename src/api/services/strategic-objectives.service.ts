@@ -21,7 +21,7 @@ export const StrategicObjectivesService = {
     return response.data
   },
 
-  async UpdataObjective(id: string, updateObjectivePayload: UpdateObjectivePayload): Promise<UpdateObjectiveResponse>{
+  async UpdateObjective(id: string, updateObjectivePayload: UpdateObjectivePayload): Promise<UpdateObjectiveResponse>{
     const response = await api.put(ENDPOINTS.STRATEGIC_OBJECTIVES.UPDATE_OBJECTIVE(id), updateObjectivePayload)
     console.log(response.data)
     return response.data
