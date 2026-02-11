@@ -58,13 +58,13 @@ export const UpdateEndDateModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-2 border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-6 py-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h3 className="text-xl font-semibold text-gray-600 dark:text-white/90">
               Gerenciar Desafio
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Visualize ou atualize informações do desafio
             </p>
           </div>
@@ -76,8 +76,8 @@ export const UpdateEndDateModal = ({
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+        <div className="px-6 py-3 space-y-6">
+          <div className="bg-gradient-to-r from-blue-50/50 to-indigo-50/30 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
             <Label className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">
               Desafio Selecionado
             </Label>
@@ -91,10 +91,10 @@ export const UpdateEndDateModal = ({
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:bg-blue-500 transition-colors">
-                  <ExternalLink className="w-5 h-5 text-blue-600 dark:text-blue-400 group-hover:text-white" />
+                  <ExternalLink className="w-5 h-5 text-blue-600/80 dark:text-blue-400 group-hover:text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold text-gray-900 dark:text-white">Visualizar no Kanban</p>
+                  <p className="font-semibold text-gray-600 dark:text-white">Visualizar no Kanban</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Abrir visão detalhada do desafio</p>
                 </div>
               </div>
@@ -111,11 +111,11 @@ export const UpdateEndDateModal = ({
 
             <div className="p-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl">
               <div className="flex items-start gap-3 mb-4">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <CalendarIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <div className="p-2 bg-green-100/50 dark:bg-green-900/30 rounded-lg">
+                  <CalendarIcon className="w-5 h-5 text-green-600/80 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">Atualizar Data Final</p>
+                  <p className="font-semibold text-gray-600 dark:text-white">Atualizar Data Final</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Para obter um melhor alinhamento de métricas, atualize aqui a data de conclusão
                   </p>
