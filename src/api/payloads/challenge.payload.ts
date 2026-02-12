@@ -34,6 +34,7 @@ export type CreateChallengeResponse = {
 
 export type ShowAllChallengeResponse = {
   id: string
+  ideaIdentifier: string          
   name: string
   proponentName: string
   proponentEmail: string
@@ -50,9 +51,14 @@ export type ShowAllChallengeResponse = {
   strategic_alignment: string | null
   innovative_potential: string | null
   business_relevance: string | null
+  impactScore: number | null       
+  confidenceScore: number | null  
+  easeScore: number | null         
+  finalIceScore: number | null     
   visibility: string
   status: string
   createdAt: string
+  endDate: string                 
   updatedAt: string
   enterpriseId: string
   usersId: string
@@ -78,20 +84,38 @@ export type ShowAllChallengeResponse = {
 
 export type ShowOneChallengeResponse = {
   id: string
+  ideaIdentifier: string
   name: string
-  startDate: string
-  endDate: string
-  area: string
-  description: string
+  proponentName: string
+  proponentEmail: string
+  proponentArea: string
+  problemDescription: string
+  problemDuration: string
+  currentSolution: string
+  problemRelevance: string
+  currentIndicators: string
+  expectedImpacts: string
+  involvedAreas: string[]
+  initialConstraints: string
+  proponentParticipation: string
+  strategic_alignment: string | null
+  innovative_potential: string | null
+  business_relevance: string | null
+  impactScore: number | null
+  confidenceScore: number | null
+  easeScore: number | null
+  finalIceScore: number | null
   visibility: string
   status: string
-  strategic_alignment: string
-  innovative_potential: string
-  business_relevance: string
+  createdAt: string
+  endDate: string
   updatedAt: string
   enterpriseId: string
   usersId: string
-  enterpriseName?: string
+  Users: {
+    name: string
+    image?: string | null
+  }
 }
 
 export type ChangeStatusPayload = {

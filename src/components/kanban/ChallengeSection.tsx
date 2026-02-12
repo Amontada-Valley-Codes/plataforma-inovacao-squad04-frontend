@@ -1,32 +1,64 @@
 import { CardContentsHeader } from "./CardsContents"
-import { Menu, Building2, Lightbulb, BriefcaseBusiness } from "lucide-react"
+import { Menu,  Clock, Wrench, TrendingUp, Hash } from "lucide-react"
 
 type CardChallangeContentProps = {
   challangeTitle: string;
+  ideaIdentifier?: string;
   category: string;
   description: string;
   strategicAlignment: string | null;
   innovativePotential: string | null;
   businessRelevance: string | null;
+  problemDuration?: string;
+  currentSolution?: string;
+  problemRelevance?: string;
   startDate: string;
+  endDate?: string;
   creator: string;
+  visibility?: string;
 }
 
-export const ChallengeSection = ({ challangeTitle, category, description, strategicAlignment, innovativePotential, businessRelevance, startDate, creator }: CardChallangeContentProps) => {
+export const ChallengeSection = ({
+  challangeTitle,
+  ideaIdentifier,
+  category,
+  description,
+  strategicAlignment,
+  innovativePotential,
+  businessRelevance,
+  problemDuration,
+  currentSolution,
+  problemRelevance,
+  startDate,
+  endDate,
+  creator,
+  visibility,
+}: CardChallangeContentProps) => {
   return (
-    //conteudo do card de desafio
     <div className="w-full flex flex-col overflow-y-auto">
-      {/* header */}
+     
       <CardContentsHeader
         challengeTitle={challangeTitle}
         category={category}
         startDate={startDate}
+        endDate={endDate}
         creator={creator}
+        visibility={visibility}
       />
 
-      {/* conteudo */}
+   
+      {ideaIdentifier && (
+        <div className="flex items-center gap-2 mb-6">
+          <Hash size={14} className="text-gray-400"/>
+          <span className="text-xs text-gray-400 font-semibold tracking-widest">
+            {ideaIdentifier}
+          </span>
+        </div>
+      )}
+
+     
       <div>
-        {/* descrição */}
+        
         <div className="flex flex-col mb-6">
           <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
             <Menu size={16}/>
@@ -37,38 +69,47 @@ export const ChallengeSection = ({ challangeTitle, category, description, strate
           </p>
         </div>
 
-        {/* alinhamento estrategico */}
-        <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-            <Building2 size={16}/>
-            Alinhamento Estratégico
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-            {strategicAlignment}
-          </p>
-        </div>
+       
+        {problemDuration && (
+          <div className="flex flex-col mb-6">
+            <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
+              <Clock size={16}/>
+              Duração do Problema
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
+              {problemDuration}
+            </p>
+          </div>
+        )}
 
-        {/* potencial inovador */}
-        <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-            <Lightbulb size={16}/>
-            Potência Inovador
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-            {innovativePotential}
-          </p>
-        </div>
+        
+        {currentSolution && (
+          <div className="flex flex-col mb-6">
+            <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
+              <Wrench size={16}/>
+              Solução Atual
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
+              {currentSolution}
+            </p>
+          </div>
+        )}
 
-        {/* relevancia do negocio */}
-        <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-            <BriefcaseBusiness size={16}/>
-            Relevância para o negócio
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-            {businessRelevance}
-          </p>
-        </div>
+      
+        {problemRelevance && (
+          <div className="flex flex-col mb-6">
+            <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
+              <TrendingUp size={16}/>
+              Relevância do Problema
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
+              {problemRelevance}
+            </p>
+          </div>
+        )}
+
+        
+        
       </div>
     </div>
   )
