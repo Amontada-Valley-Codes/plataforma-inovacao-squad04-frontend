@@ -421,15 +421,21 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "GENERATION" && (
               <CardExpandedLayout
                 mainContent={
-                  <ChallengeSection 
-                    challangeTitle={cardData.name} 
+                  <ChallengeSection
+                    challangeTitle={cardData.name}
+                    ideaIdentifier={cardData.ideaIdentifier}   
                     category={cardData.involvedAreas[0]}
                     description={cardData.problemDescription}
                     startDate={cardData.createdAt}
+                    endDate={cardData.endDate}                 
+                    visibility={cardData.visibility}           
                     creator={cardData.Users.name}
                     businessRelevance={cardData.business_relevance}
                     innovativePotential={cardData.innovative_potential}
                     strategicAlignment={cardData.strategic_alignment}
+                    problemDuration={cardData.problemDuration} 
+                    currentSolution={cardData.currentSolution} 
+                    problemRelevance={cardData.problemRelevance} 
                   />
                 }
                 commentsContent={(onChangeView) => (
