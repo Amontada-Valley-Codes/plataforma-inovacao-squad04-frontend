@@ -110,9 +110,9 @@ export const ENDPOINTS = {
   MATERIALIZATION: {
     CREATE_MVP: (id: string) => `/mvp-canvas/${id}`,
     SHOW_ALL_MVP: `/mvp-canvas`,
-    SHOW_MVP_BY_ID: (id: string) => `,mvp-canvas/${id}`,
-    UPDATE_MVP: (id: string) => `,mvp-canvas/${id}`,
-    DELETE_MVP: (id: string) => `,mvp-canvas/${id}`,
+    SHOW_MVP_BY_ID: (id: string) => `mvp-canvas/${id}`,
+    UPDATE_MVP: (id: string) => `mvp-canvas/${id}`,
+    DELETE_MVP: (id: string) => `mvp-canvas/${id}`,
   },
 
   EXPERIMENTATION: {
