@@ -7,6 +7,7 @@ import { MetricsCards } from "@/components/ecommerce/MetricsCard";
 import ActiveCompaniesCard from "@/components/ecommerce/ActiveCompaniesCard";
 import { dashboardService } from "@/api/services/dashboard.service";
 import { adminDasboardResponse } from "@/api/payloads/dashboard.payload";
+import GanttChart from "@/components/roadmap/GanttChart";
 
 const DistributionBySector = dynamic(
   () => import("@/components/ecommerce/DistributionBySectorChart"),
@@ -87,6 +88,11 @@ export default function Ecommerce() {
         <ActiveCompaniesCard
           rankingEmpresas={dashboardData?.rankingEmpresas ?? []}
         />
+      </div>
+
+      {/* Gantt Chart */}
+      <div className="col-span-1 sm:col-span-2 xl:col-span-12">
+        <GanttChart />
       </div>
     </div>
   );

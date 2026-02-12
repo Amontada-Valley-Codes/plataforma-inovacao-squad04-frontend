@@ -15,6 +15,7 @@ import PreviousButton from './PreviousButton';
 import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
 import KanbanTable from './KanbanTable';
+import { useSearchParams } from 'next/navigation';
 
 const columns = [
   { id: 'GENERATION', name: 'Desafios' },
@@ -82,6 +83,8 @@ export type Challenge = ShowAllChallengeResponse
 const KanbanPage = () => {
   const [challanges, setChallanges] = useState<Challenge[]>([]);
   const [isKanban, setIsKanban] = useState(true)
+  const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     async function fetchChallanges() {
@@ -93,7 +96,16 @@ const KanbanPage = () => {
     fetchChallanges()
   }, [])  
 
-  const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
+  // REDIRECIONAMENTO PARA O KANBAN COM O CARD EXPANDIDO
+  useEffect(() => {
+    const challengeId = searchParams.get('challengeId');
+    if (challengeId && challanges.length > 0) {
+      const challenge = challanges.find(c => c.id === challengeId);
+      if (challenge) {
+        setExpandedCard(challenge);
+      }
+    }
+  }, [searchParams, challanges]);
 
   const handleApproveAndMove = async (challengeId: string | undefined) => {
     const challengeToMove = challanges?.find(c => c.id === challengeId);
