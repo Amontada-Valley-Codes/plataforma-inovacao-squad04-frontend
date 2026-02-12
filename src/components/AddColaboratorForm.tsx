@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { ChevronDown, Mail, Phone, User, X } from "lucide-react";
+import { Mail, Phone, User, X } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { inviteService } from "../api/services/invite.service";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 type Props = {
   isOpen: boolean;
@@ -96,28 +96,22 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
           </div>
 
           {/* FUNÇÃO */}
-          <div className="relative flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 h-12 dark:border-gray-800 dark:bg-gray-900">
+          <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 h-12 dark:border-gray-800 dark:bg-gray-900">
             <User className="text-[#98A2B3] mr-2" size={18} />
-            <select
-              onFocus={() => setIsFuncOpen(true)}
-              onBlur={() => setIsFuncOpen(false)}
-              className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] font-semibold appearance-none"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              <option value="" disabled>
-                Função
-              </option>
-              <option value="EVALUATOR">Avaliador</option>
-              <option value="COMMON">Usuário</option>
-            </select>
-
-            <ChevronDown
-              size={20}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-[#ced3db] transition-transform duration-300 ${
-                isFuncOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
+            
+            <Select value={role} onValueChange={(value) => setRole(value)}>
+              <SelectTrigger 
+                className="w-full bg-transparent text-sm text-[#344054] dark:text-[#ced3db] font-semibold border-none shadow-none p-0 h-auto focus:ring-0 focus-visible:ring-0 data-[placeholder]:text-[#98A2B3] data-[placeholder]:font-normal"
+                onFocus={() => setIsFuncOpen(true)}
+                onBlur={() => setIsFuncOpen(false)}
+              >
+                <SelectValue placeholder="Função" />
+              </SelectTrigger>
+              <SelectContent className="z-[100000]">
+                <SelectItem value="EVALUATOR">Avaliador</SelectItem>
+                <SelectItem value="COMMON">Usuário</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
