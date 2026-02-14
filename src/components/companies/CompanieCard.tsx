@@ -86,31 +86,9 @@ export default function CompanieCard({
       if (role === "admin") {
         list = await enterpriseService.showAllEnterprises();
       } else if (viewerCompanyId) {
+        // ✅ spread direto — sem recriar campos manualmente
         const one = await enterpriseService.showOneEnterprise(String(viewerCompanyId));
-        list = one
-          ? [{
-              id: one.id,
-              name: one.name,
-              cnpj: one.cnpj,
-              sector: one.sector,
-              description: one.description,
-              address: one.address,
-              email: one.email,
-              gestorEmail: one.gestorEmail,
-              coverImage: null,
-              profileImage: null,
-              status: one.status,
-              createdAt: one.createdAt,
-              updatedAt: one.updatedAt,
-              logo: one.logo,
-              cover: one.cover,
-              gallery: one.gallery,
-              instagram: one.instagram,
-              whatsapp: one.whatsapp,
-              linkedin: one.linkedin,
-              locationUrl: one.locationUrl,
-            }]
-          : [];
+        list = one ? [one] : [];
       } else {
         list = [];
       }
@@ -255,20 +233,32 @@ export default function CompanieCard({
       </div>
 
       <div style={{ height: containerHeight }} className="relative transition-[height] duration-300 ease-out">
+        {/* ── Lista ── */}
         <div
           ref={listRef}
           aria-hidden={viewMode !== "list"}
           className={`absolute inset-0 overflow-hidden will-change-transform transition duration-200 space-y-4 ${
-            viewMode === "list" ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-[0.98] pointer-events-none"
+            viewMode === "list"
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-[0.98] pointer-events-none"
           }`}
         >
           {filtered.map((c) => {
+            const logoSrc = c.profileImage?.url ?? c.logo ?? null;
+
             const row = (
               <div className="flex items-stretch gap-6 px-6 py-5 md:py-6">
                 <div className="flex w-full md:w-[32%] items-center gap-4">
                   <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                    {c.logo ? (
-                      <Image src={c.logo} alt={c.name ?? "Logo da empresa"} width={64} height={64} unoptimized className="object-contain" />
+                    {logoSrc ? (
+                      <Image
+                        src={logoSrc}
+                        alt={c.name ?? "Logo da empresa"}
+                        width={64}
+                        height={64}
+                        unoptimized
+                        className="object-contain"
+                      />
                     ) : (
                       <div className="w-16 h-16 grid place-items-center text-sm font-medium">
                         {c.name?.[0]?.toUpperCase() ?? "?"}
@@ -276,7 +266,9 @@ export default function CompanieCard({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">{c.name}</div>
+                    <div className="text-slate-900 dark:text-gray-100 font-semibold leading-tight truncate">
+                      {c.name}
+                    </div>
                     <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">{c.sector}</div>
                   </div>
                 </div>
@@ -328,29 +320,44 @@ export default function CompanieCard({
             );
 
             return (
-              <div key={`list-${c.id}`} className="group relative rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition">
+              <div
+                key={`list-${c.id}`}
+                className="group relative rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition"
+              >
                 {wrapIfNeeded(c, row)}
               </div>
             );
           })}
         </div>
 
+        {/* ── Grid ── */}
         <div
           ref={gridRef}
           aria-hidden={viewMode !== "grid"}
           className={`absolute inset-0 overflow-auto will-change-transform transition duration-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1 ${
-            viewMode === "grid" ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-[0.98] pointer-events-none"
+            viewMode === "grid"
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-[0.98] pointer-events-none"
           }`}
         >
           {filtered.map((c) => {
+            const logoSrc = c.profileImage?.url ?? c.logo ?? null;
+
             const card = (
               <article className="group relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-900 shadow-sm transition border-[#E5E7EB] dark:border-gray-800 hover:border-[#15358D]/40 hover:ring-1 hover:ring-[#15358D]/20 hover:scale-[1.01]">
                 <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
                 <div className="p-6">
                   <div className="flex items-center gap-3">
                     <div className="size-12 rounded-xl bg-slate-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden ring-1 ring-[#15358D]/20 ring-offset-2 ring-offset-white dark:ring-offset-gray-900">
-                      {c.logo ? (
-                        <Image src={c.logo} alt={c.name ?? "Logo da empresa"} width={48} height={48} unoptimized className="object-contain" />
+                      {logoSrc ? (
+                        <Image
+                          src={logoSrc}
+                          alt={c.name ?? "Logo da empresa"}
+                          width={48}
+                          height={48}
+                          unoptimized
+                          className="object-contain"
+                        />
                       ) : (
                         <div className="size-12 grid place-items-center text-sm font-semibold text-slate-700">
                           {c.name?.[0]?.toUpperCase() ?? "?"}
@@ -358,7 +365,9 @@ export default function CompanieCard({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">{c.name}</h3>
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">
+                        {c.name}
+                      </h3>
                       <div className="mt-1 text-[12px] text-[#15358D] truncate">{c.sector}</div>
                     </div>
                   </div>
@@ -382,7 +391,9 @@ export default function CompanieCard({
                     </li>
                   </ul>
 
-                  <p className="mt-3 text-sm text-slate-600 dark:text-gray-400 line-clamp-3">{c.description}</p>
+                  <p className="mt-3 text-sm text-slate-600 dark:text-gray-400 line-clamp-3">
+                    {c.description}
+                  </p>
                 </div>
               </article>
             );

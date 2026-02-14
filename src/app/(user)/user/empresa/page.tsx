@@ -76,5 +76,5 @@ export default function UserCompanyPage() {
     return <div className="w-full p-6 text-sm text-gray-500">Você ainda não possui empresa vinculada.</div>;
   }
 
-  return <CompaniesProfileInline data={company} editable={false} />;
+  return <CompaniesProfileInline  />;
 }

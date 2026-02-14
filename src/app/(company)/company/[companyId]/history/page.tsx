@@ -17,7 +17,7 @@ export default function CompanyHistoryPage({ params }: PageProps) {
   const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
   const [viewerCompanyId, setViewerCompanyId] = useState<string | undefined>();
   const [viewerUserId, setViewerUserId] = useState<string | undefined>();
-  const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [enterpriseName, setEnterpriseName] = useState<ShowOneEnterpriseResponse["name"]>()
 
   const fetchEnterprise = async () => {
@@ -42,12 +42,19 @@ export default function CompanyHistoryPage({ params }: PageProps) {
       setRole(r);
       setViewerCompanyId(c ? String(c) : undefined);
       setViewerUserId(u?.id ? String(u.id) : undefined);
-      setLoaded(true);
+      setLoading(false); // ✅ corrigido: false quando termina de carregar
     })();
   }, []);
 
-  if (!loaded) {
-    return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground dark:text-gray-400">Carregando</p>
+        </div>
+      </div>
+    );
   }
 
   return (
