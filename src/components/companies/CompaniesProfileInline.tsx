@@ -21,8 +21,6 @@ import { enterpriseService } from "@/api/services/enterprise.service";
 import { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import toast, { Toaster } from "react-hot-toast";
 
-
-
 interface EditableFields {
   sector: string;
   description: string;
@@ -32,7 +30,6 @@ interface EditableFields {
   numeroGestor: string;
 }
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
 
 function formatCnpj(raw: string) {
   return raw.replace(
@@ -43,7 +40,7 @@ function formatCnpj(raw: string) {
 
 const PRIMARY = "#15358c";
 
-// ─── sub-componentes ─────────────────────────────────────────────────────────
+
 
 function FieldRow({
   icon: Icon,

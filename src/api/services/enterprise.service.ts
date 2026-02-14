@@ -29,7 +29,7 @@ export const enterpriseService = {
     id: string,
     payload: Partial<{ sector: string; description: string; address: string; email: string }>
   ): Promise<ShowOneEnterpriseResponse> {
-    const { data } = await api.put(`/enterprise/${id}`, payload);
+    const { data } = await api.put(`/enterprise/`, payload);
     return data;
   },
 
