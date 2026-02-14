@@ -19,6 +19,8 @@ import {
   UpdateEndDatePayload,
   UpdateEndDateResponse,
   ChallengesByStageResponse,
+  PaginatedChallengesParams,
+  PaginatedChallengesResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -35,6 +37,11 @@ export const ChallengeService = {
 
   async showAllChallenges(): Promise<ShowAllChallengeResponse[]> {
     const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.SHOW_ENTERPRISE_CHALLENGE);
+    return data;
+  },
+
+  async paginatedChallenges(params: PaginatedChallengesParams): Promise<PaginatedChallengesResponse> {
+    const { data } = await api.get<PaginatedChallengesResponse>(ENDPOINTS.CHALLENGE.PAGINATED(params))
     return data;
   },
 

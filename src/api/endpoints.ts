@@ -68,6 +68,38 @@ export const ENDPOINTS = {
     HISTORICAL: {
       MY_HISTORY: "/challenge/historical/myhistory",
     },
+    PAGINATED: (params: {
+      page?: number
+      limit?: number
+      status?: string
+      sector?: string
+      search?: string
+      orderBy?: "createdAt" | "name" | "proponentName" | "proponentArea" | "status"
+      orderDirection?: "asc" | "desc"
+    }) => {
+      const {
+        page = 1,
+        limit = 10,
+        status,
+        sector,
+        search,
+        orderBy = "createdAt",
+        orderDirection = "desc",
+      } = params
+
+      const query = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        orderBy,
+        orderDirection,
+      })
+
+      if (status) query.append("status", status)
+      if (sector) query.append("sector", sector)
+      if (search) query.append("search", search)
+
+      return `/challenge/paginated?${query.toString()}`
+    },
   },
 
   CHECKLIST: {
