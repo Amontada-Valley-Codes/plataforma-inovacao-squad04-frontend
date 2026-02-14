@@ -66,13 +66,13 @@ export default function ChallengesByStageChart() {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[280px]">
-        <span className="text-muted-foreground dark:text-gray-400">Carregando...</span>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-[280px]">
+  //       <span className="text-muted-foreground dark:text-gray-400">Carregando...</span>
+  //     </div>
+  //   );
+  // }
 
   // Cria um mapa com os dados da API
   const dataMap = new Map(data.map(item => [item.stage, item.total]));

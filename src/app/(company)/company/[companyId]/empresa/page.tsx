@@ -74,20 +74,20 @@ export default function CompanyEmpresaPage() {
   }, [readyAuth, role, companyId, viewerCompanyId]);
 
   // loading
-  if (!readyAuth || (role !== "admin" && loadingEnterprise)) {
-    return (
-      <div className="w-full p-6 flex justify-center items-center">
-        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin" />
-      </div>
-    );
-  }
+  // if (!readyAuth || (role !== "admin" && loadingEnterprise)) {
+  //   return (
+  //     <div className="w-full p-6 flex justify-center items-center">
+  //       <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin" />
+  //     </div>
+  //   );
+  // }
 
   // não-admin com empresa encontrada => inline
   if (role !== "admin" && enterprise) {
     const editableInline = role === "gestor"; // só gestor edita
     return (
       <div className="w-full max-w-screen-xl mx-auto px-3 sm:px-4 md:px-6 py-4 overflow-x-hidden">
-        <CompaniesProfileInline data={enterprise} editable={editableInline} />
+        <CompaniesProfileInline  />
       </div>
     );
   }
