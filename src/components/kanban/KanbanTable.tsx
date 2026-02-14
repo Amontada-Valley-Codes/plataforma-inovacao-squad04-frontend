@@ -1,12 +1,15 @@
 'use client'
 
-import { ShowAllChallengeResponse } from "@/api/payloads/challenge.payload"
+import { PaginatedChallengesResponse, ShowAllChallengeResponse } from "@/api/payloads/challenge.payload"
 import { dateFormatter, getCategoryLabel } from "./Kanban"
-import { useState } from "react";
-import { ArrowUp, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowUp, Scaling, X } from "lucide-react";
+import { ChallengeService } from "@/api/services/challenge.service";
 
 type KanbanTableProps = {
-  challenges: ShowAllChallengeResponse[];
+  status: string | undefined;
+  sector: string | undefined;
+  search: string | undefined;
   onRowClick: (challenge: ShowAllChallengeResponse) => void;
 }
 
@@ -29,40 +32,35 @@ export function getStatusLabel(status: string) {
   }
 }
 
-type SortKey = 'date' | 'user' | 'area' | 'status'
+type SortKey = "createdAt" | "name" | "proponentName" | "proponentArea" | "status"
 
-export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps) {
-  const [sortKey, setSortKey] = useState<SortKey>("date")
+export default function KanbanTable({ onRowClick, search, sector, status }: KanbanTableProps) {
+  const [challenges, setChallenges] = useState<PaginatedChallengesResponse>()
+  const [page, setPage] = useState(1)
+  const [sortKey, setSortKey] = useState<SortKey>("createdAt")
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  const sortedChallenges = [...challenges].sort((a, b) => {
-    if (!sortKey) return 0
+  
+  async function fetchChallenges() {
+    const res = await ChallengeService.paginatedChallenges({
+      page,
+      limit: 15,
+      sector,
+      status,
+      search: search || undefined,
+      orderBy: sortKey,
+      orderDirection: sortDirection,
+    })
 
-    let valueA: any
-    let valueB: any
+    setChallenges(res)
+  }
 
-    switch (sortKey) {
-      case 'date':
-        valueA = new Date(a.createdAt).getTime()
-        valueB = new Date(b.createdAt).getTime()
-        break
-      case 'user':
-        valueA = a.Users.name.toLowerCase()
-        valueB = b.Users.name.toLowerCase()
-        break
-      case 'area':
-        valueA = getCategoryLabel(a.involvedAreas[0])
-        valueB = getCategoryLabel(b.involvedAreas[0])
-        break
-      case 'status':
-        valueA = getStatusLabel(a.status)
-        valueB = getStatusLabel(b.status)
-        break
-    }
+  useEffect(() => {
+    fetchChallenges()
+  }, [page, sortKey, sortDirection, search, sector, status])
 
-    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1
-    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1
-    return 0
-  })
+  useEffect(() => {
+    setPage(1)
+  }, [search, sector, status])
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -73,94 +71,170 @@ export default function KanbanTable({ challenges, onRowClick }: KanbanTableProps
     }
   }
   return (
-    <div className="overflow-x-auto sm:overflow-x-visible">
-      <table className="table-auto min-w-[700px] w-full border-collapse border-2 border-[#15358D]">
-        <thead className="bg-[#15358D]">
-          <tr>
-            <th 
-              onClick={() => handleSort('date')}
-              className="px-3 py-2 text-sm font-semibold text-white"
-            >
-              <div className="flex items-center justify-center gap-2">
-                {sortKey === 'date' && (
-                  <ArrowUp 
-                    size={16}
-                    className={`transition-transform duration-300
-                      ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
-                  />
-                )} 
-                <span>Data de Submissão</span>
-              </div>
-            </th>
-            <th 
-              className="px-3 py-2 text-sm font-semibold text-white"
-            >
-              Titulo da ideia
-            </th>
-            <th 
-              onClick={() => handleSort('user')}
-              className="px-3 py-2 text-sm font-semibold text-white"
-            >
-              <div className="flex items-center justify-center gap-2">
-                {sortKey === 'user' && (
-                  <ArrowUp 
-                    size={16}
-                    className={`transition-transform duration-300
-                      ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
-                  />
-                )} 
-                <span>Colaborador</span>
-              </div>
-            </th>
-            <th 
-              onClick={() => handleSort('area')}
-              className="px-3 py-2 text-sm font-semibold text-white"
-            >
-              <div className="flex items-center justify-center gap-2">
-                {sortKey === 'area' && (
-                  <ArrowUp 
-                    size={16}
-                    className={`transition-transform duration-300
-                      ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
-                  />
-                )} 
-                <span>Área</span>
-              </div>
-            </th>
-            <th 
-              onClick={() => handleSort('status')}
-              className="px-3 py-2 text-sm font-semibold text-white"
-            >
-              <div className="flex items-center justify-center gap-2">
-                {sortKey === 'status' && (
-                  <ArrowUp 
-                    size={16}
-                    className={`transition-transform duration-300
-                      ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
-                  />
-                )} 
-                <span>Status</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
-
-        <tbody className="divide-y-2 divide-[#15358D]">
-          {sortedChallenges.map((challenge) => (
-            <tr 
-              key={challenge.id} 
-              onClick={() => onRowClick(challenge)}
-              className="divide-x-2 divide-[#15358D] text-center cursor-pointer odd:bg-white dark:odd:bg-[#101828] dark:even:bg-[#151d2c] even:bg-blue-100"
-            >
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{dateFormatter.format(new Date(challenge.createdAt))}</td>
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.name}</td>
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{challenge.Users.name}</td>
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{getCategoryLabel(challenge.involvedAreas[0])}</td>
-              <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{getStatusLabel(challenge.status)}</td>
+    <div className="overflow-x-auto sm:overflow-x-visible relative h-[calc(100vh-175px)]">
+      <div className="rounded-[2px] overflow-hidden border-x-2 border-b-2 border-[#15358D]">
+        <table className="table-auto min-w-[700px] w-full border-separate border-spacing-0">
+          <thead className="bg-[#15358D]">
+            <tr>
+              <th 
+                onClick={() => handleSort('createdAt')}
+                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {sortKey === 'createdAt' && (
+                    <ArrowUp 
+                      size={16}
+                      className={`transition-transform duration-300
+                        ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
+                    />
+                  )} 
+                  <span>Data de Submissão</span>
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSort("name")}
+                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {sortKey === 'name' && (
+                    <ArrowUp 
+                      size={16}
+                      className={`transition-transform duration-300
+                        ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
+                    />
+                  )} 
+                  <span>Titulo da Ideia</span>
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSort('proponentName')}
+                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {sortKey === 'proponentName' && (
+                    <ArrowUp 
+                      size={16}
+                      className={`transition-transform duration-300
+                        ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
+                    />
+                  )} 
+                  <span>Colaborador</span>
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSort('proponentArea')}
+                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {sortKey === 'proponentArea' && (
+                    <ArrowUp 
+                      size={16}
+                      className={`transition-transform duration-300
+                        ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
+                    />
+                  )} 
+                  <span>Área</span>
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSort('status')}
+                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {sortKey === 'status' && (
+                    <ArrowUp 
+                      size={16}
+                      className={`transition-transform duration-300
+                        ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
+                    />
+                  )} 
+                  <span>Status</span>
+                </div>
+              </th>
+              <th
+                className="px-3 py-2 text-sm font-semibold text-white"
+              >
+                Ações
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody className="divide-y-2 divide-[#15358D]">
+            {challenges?.data.map((challenge, i) => {
+              const isLast = i === challenges.data.length - 1
+
+              return (
+                <tr 
+                  key={challenge.id}
+                  className="text-center odd:bg-white dark:odd:bg-[#101828]
+                  border-b-2 border-[#15358D] border-r-2"
+                >
+                  <td 
+                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
+                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                  >
+                    {dateFormatter.format(new Date(challenge.createdAt))}
+                  </td>
+                  <td 
+                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
+                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                  >
+                    {challenge.name}
+                  </td>
+                  <td 
+                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
+                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                  >
+                    {challenge.proponentName}
+                  </td>
+                  <td 
+                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
+                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                  >
+                    {getCategoryLabel(challenge.proponentArea)}
+                  </td>
+                  <td 
+                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
+                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                  >
+                    {getStatusLabel(challenge.status)}
+                  </td>
+                  <td 
+                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
+                  > 
+                    <div
+                      onClick={() => onRowClick(challenge)}
+                      className="flex cursor-pointer items-center justify-center"
+                      title="Clique para ver mais">
+                      <Scaling size={20}/>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {challenges && (
+        <div className="absolute bottom-0 left-0 w-full pt-4 flex justify-center gap-2 bg-white border-t-2 border-gray-600">
+          {Array.from({ length: challenges.meta.lastPage }, (_, index) => {
+            const pageNumber = index + 1
+            return (
+              <button
+                key={pageNumber}
+                onClick={() => setPage(pageNumber)}
+                className={`px-3 py-1 border rounded-[8px]
+                  ${page === pageNumber ? "bg-[#0b2b72] text-white" : "text-[#0b2b72]"}
+                `}
+              >
+                {pageNumber}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

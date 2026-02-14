@@ -34,7 +34,7 @@ export type CreateChallengeResponse = {
 
 export type ShowAllChallengeResponse = {
   id: string
-  ideaIdentifier: string          
+  ideaIdentifier: string
   name: string
   proponentName: string
   proponentEmail: string
@@ -51,15 +51,15 @@ export type ShowAllChallengeResponse = {
   strategic_alignment: string | null
   innovative_potential: string | null
   business_relevance: string | null
-  impactScore: number | null       
-  confidenceScore: number | null  
-  easeScore: number | null         
-  finalIceScore: number | null     
   visibility: string
   status: string
   createdAt: string
-  endDate: string                 
   updatedAt: string
+  endDate: string
+  impactScore: number | null
+  confidenceScore: number | null
+  easeScore: number | null
+  finalIceScore: number | null
   enterpriseId: string
   usersId: string
   Users: {
@@ -115,6 +115,27 @@ export type ShowOneChallengeResponse = {
   Users: {
     name: string
     image?: string | null
+  }
+}
+
+export type PaginatedChallengesParams = {
+  page?: number
+  limit?: number
+  status?: string
+  sector?: string
+  search?: string
+  orderBy?: "createdAt" | "name" | "proponentName" | "proponentArea" | "status"
+  orderDirection?: "asc" | "desc"
+}
+
+
+export type PaginatedChallengesResponse = {
+  data: ShowAllChallengeResponse[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    lastPage: number
   }
 }
 
