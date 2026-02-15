@@ -23,7 +23,6 @@ import { Experimentation } from "./Experimentation"
 import ApproveButton from "./ApproveButton"
 import DisapproveButton from "./Disapprove"
 import { ActivityHistoryPanel } from "./ActivityHistoryPanel"
-import { Card } from "../ui/card"
 import RolloutPlan from "./rolloutPlan"
 
 type CardExpandedLayoutProps = {

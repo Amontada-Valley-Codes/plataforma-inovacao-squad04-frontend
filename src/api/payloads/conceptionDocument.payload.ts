@@ -1,3 +1,5 @@
+type MakeOrBuyType = "MAKE" | "BUY" | null;
+
 export type CreateConceptionPayload = {
   ProductOverview: {
     summary: string;
@@ -6,7 +8,7 @@ export type CreateConceptionPayload = {
   };
   SolutionAlternatives: string;
   MakeorBuy: {
-    type: string;
+    type: MakeOrBuyType;
     justification: string;
   };
   InitialRisks: string;
