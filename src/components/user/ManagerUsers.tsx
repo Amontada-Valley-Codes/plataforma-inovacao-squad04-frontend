@@ -49,8 +49,15 @@ export default function UserManagement() {
     fetchUsers();
   }, [page]);
 
-  if (loading) {
-    return <div className="p-6 text-sm text-gray-500">Carregando usuários...</div>;
+if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground dark:text-gray-400">Carregando </p>
+        </div>
+      </div>
+    );
   }
 
   function translateUserRole(role: string) {

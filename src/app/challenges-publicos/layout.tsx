@@ -7,12 +7,9 @@ import Backdrop from "@/layout/Backdrop";
 import React, { useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { LayoutProps } from "../(admin)/layout";
 
-export default function ChallengesPublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ChallengesPublicLayout({ children, title }: LayoutProps) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   const [showModal, setShowModal] = useState(false);
 
@@ -59,7 +56,7 @@ export default function ChallengesPublicLayout({
         className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${mainContentMargin}`}
       >
         <div className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur">
-          <AppHeader />
+          <AppHeader title={title}/>
         </div>
 
         <main className="p-3 sm:p-4 md:p-6 mx-auto w-full max-w-screen-2xl overflow-x-hidden">

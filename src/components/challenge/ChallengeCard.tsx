@@ -338,29 +338,19 @@ export default function ChallengeCard({
   }, [data, isAdminView, onlyMine, authorId, authorName, role, myEnterpriseId, myUserId]);
 
   if (loading) {
-    return <div className="p-6 text-gray-500">Carregando desafios...</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground dark:text-gray-400">Carregando </p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
-      {errMsg && (
-        <div className="mx-2 mb-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-800 p-3 text-sm flex items-start gap-2">
-          <AlertTriangle size={16} className="mt-0.5 shrink-0" />
-          <div>
-            <strong>Não foi possível carregar os desafios.</strong>
-            <div className="opacity-80">{errMsg}</div>
-            <div className="opacity-80">
-              Verifique se <code>NEXT_PUBLIC_API_URL</code> termina com <code>/api</code>.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!filtered.length ? (
-        <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
-          Ainda não há desafios para exibir.
-        </div>
-      ) : (
+      
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
           {filtered.map((challenge) => {
             const isPublic = (challenge.visibility || "").toLowerCase() === "public";
@@ -434,7 +424,7 @@ export default function ChallengeCard({
             );
           })}
         </div>
-      )}
+    
     </>
   );
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type CreateEnterprisePayload = {
   name: string
@@ -24,7 +23,6 @@ export type CreateEnterpriseResponse = {
     createdAt: string
     updatedAt: string
   },
-  
   token: {
     message: string
     inviteId: string
@@ -34,50 +32,62 @@ export type CreateEnterpriseResponse = {
   }
 }
 
+
+export type CloudinaryImage = {
+  public_id: string
+  url: string
+}
+
 export type ShowAllEnterpriseResponse = {
   id: string
   name: string
   cnpj: string
+  companyCode: string
   sector: string
   description: string
   address: string
   email: string
   gestorEmail: string
-  coverImage: null
-  profileImage: null
+  numeroGestor: string
+  coverImage: CloudinaryImage | null
+  profileImage: CloudinaryImage | null
   status: string
   createdAt: string
   updatedAt: string
-  logo?: string;
-  cover?: string | null | undefined;
-  gallery?: string[] | undefined;
-  instagram?: string | null | undefined;
-  whatsapp?: string | null | undefined;
-  linkedin?: string | null | undefined;
-  locationUrl?: string | null | undefined
+  logo?: string
+  cover?: string | null
+  gallery?: string[]
+  instagram?: string | null
+  whatsapp?: string | null
+  linkedin?: string | null
+  locationUrl?: string | null
 }
 
 export type ShowOneEnterpriseResponse = {
   id: string
   name: string
   cnpj: string
+  companyCode: string
   sector: string
   description: string
   address: string
   email: string
   gestorEmail: string
+  numeroGestor: string
+  coverImage: CloudinaryImage | null
+  profileImage: CloudinaryImage | null
   status: string
   createdAt: string
   updatedAt: string
-  
-  User?: any[];            
-  _count?: { Users: number };
-  
-  logo?: string;
-  cover?: string | null | undefined;
-  gallery?: string[] | undefined;
-  instagram?: string | null | undefined;
-  whatsapp?: string | null | undefined;
-  linkedin?: string | null | undefined;
-  locationUrl?: string | null | undefined
+
+  User?: any[]
+  _count?: { Users: number }
+
+  logo?: string
+  cover?: string | null
+  gallery?: string[]
+  instagram?: string | null
+  whatsapp?: string | null
+  linkedin?: string | null
+  locationUrl?: string | null
 }

@@ -130,13 +130,13 @@ export default function CompanyHistoryHistoric({
     }
   }
 
-  if (loading) {
-    return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
-  }
+  // if (loading) {
+  //   return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
+  // }
 
-  if (error) {
-    return <div className="w-full p-6 text-sm text-red-600">{error}</div>;
-  }
+  // if (error) {
+  //   return <div className="w-full p-6 text-sm text-red-600">{error}</div>;
+  // }
 
   if (!items.length) {
     return (

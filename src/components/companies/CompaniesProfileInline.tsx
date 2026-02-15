@@ -1,494 +1,496 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import { FaRegImage, FaMapMarkedAlt } from "react-icons/fa";
-import type { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  FileText,
+  Hash,
+  Briefcase,
+  Pencil,
+  Camera,
+  Check,
+  X,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import { enterpriseService } from "@/api/services/enterprise.service";
+import { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
+import toast, { Toaster } from "react-hot-toast";
 
-type Props = {
-  data: ShowOneEnterpriseResponse | null; 
-  editable?: boolean;
-};
-type MediaTarget = "logo" | "cover" | null;
-
-/* ===== Helpers ===== */
-function getId(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
-  return e?.id ? String(e.id) : undefined;
-}
-function getCover(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
-  return e?.cover ?? undefined;
-}
-function getLogo(e: ShowOneEnterpriseResponse | null | undefined): string | undefined {
-  return e?.logo ?? undefined;
+interface EditableFields {
+  sector: string;
+  description: string;
+  address: string;
+  email: string;
+  gestorEmail: string;
+  numeroGestor: string;
 }
 
-export default function CompaniesProfileInline({ data, editable = false }: Props) {
-  const [company, setCompany] = useState<ShowOneEnterpriseResponse | null>(data);
-  const [editInfo, setEditInfo] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [editMedia, setEditMedia] = useState(false);
-  const [editSocial, setEditSocial] = useState(false);
-  const [editLocation, setEditLocation] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [mediaTarget, setMediaTarget] = useState<MediaTarget>(null);
-  const [busy, setBusy] = useState(false);
+
+function formatCnpj(raw: string) {
+  return raw.replace(
+    /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+    "$1.$2.$3/$4-$5"
+  );
+}
+
+const PRIMARY = "#15358c";
+
+
+
+function FieldRow({
+  icon: Icon,
+  label,
+  value,
+  editKey,
+  isEditing,
+  editedData,
+  onChange,
+  readOnly,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  editKey?: keyof EditableFields;
+  isEditing: boolean;
+  editedData: EditableFields;
+  onChange: (key: keyof EditableFields, val: string) => void;
+  readOnly?: boolean;
+}) {
+  return (
+    <div className="flex items-start space-x-3">
+      <div className="mt-1">
+        <Icon size={20} style={{ color: PRIMARY }} className="opacity-70" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm text-gray-500 mb-0.5">{label}</p>
+        {isEditing && editKey && !readOnly ? (
+          <input
+            type="text"
+            value={editedData[editKey]}
+            onChange={(e) => onChange(editKey, e.target.value)}
+            className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 text-gray-700 text-sm"
+            style={{ focusRingColor: PRIMARY } as React.CSSProperties}
+          />
+        ) : (
+          <p className="font-medium text-gray-800 text-sm">{value || "—"}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
+export default function CompanyProfile() {
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [enterprise, setEnterprise] =
+    useState<ShowOneEnterpriseResponse | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editedData, setEditedData] = useState<EditableFields>({
+    sector: "",
+    description: "",
+    address: "",
+    email: "",
+    gestorEmail: "",
+    numeroGestor: "",
+  });
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const fetchEnterprise = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await enterpriseService.getMyEnterprise();
+      if (!data) {
+        setError("Nenhuma empresa vinculada a este usuário.");
+        return;
+      }
+      setEnterprise(data);
+      setProfilePreview(data.profileImage?.url ?? data.logo ?? null);
+      setEditedData({
+        sector: data.sector ?? "",
+        description: data.description ?? "",
+        address: data.address ?? "",
+        email: data.email ?? "",
+        gestorEmail: data.gestorEmail ?? "",
+        numeroGestor: data.numeroGestor ?? "",
+      });
+    } catch {
+      setError("Erro ao carregar dados da empresa.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setCompany(data);
-    if (!editable) {
-      setEditInfo(false);
-      setEditMedia(false);
-      setEditSocial(false);
-      setEditLocation(false);
-    }
-  }, [data, editable]);
+    fetchEnterprise();
+  }, []);
 
-  const enterpriseId = useMemo(() => getId(company), [company]);
-  if (!company) return null;
+  const handleEdit = () => setIsEditing(true);
 
-  async function savePatchInfo(patch: {
-    sector?: string;
-    description?: string;
-    address?: string;
-    email?: string;
-  }) {
-    if (!editable) return alert("Sem permissão para editar.");
-    if (!enterpriseId) return alert("ID da empresa não encontrado.");
+  const handleCancel = () => {
+    if (!enterprise) return;
+    setEditedData({
+      sector: enterprise.sector ?? "",
+      description: enterprise.description ?? "",
+      address: enterprise.address ?? "",
+      email: enterprise.email ?? "",
+      gestorEmail: enterprise.gestorEmail ?? "",
+      numeroGestor: enterprise.numeroGestor ?? "",
+    });
+    setProfilePreview(enterprise.profileImage?.url ?? enterprise.logo ?? null);
+    setIsEditing(false);
+  };
 
-    setBusy(true);
+  const handleSave = async () => {
+    if (!enterprise) return;
+    setSaving(true);
     try {
-      const updated = await enterpriseService.updateEnterprise(enterpriseId, patch);
-      setCompany(updated); // backend retorna detalhe
-      alert("Informações atualizadas.");
+      const payload = {
+        sector: editedData.sector,
+        description: editedData.description,
+        address: editedData.address,
+        email: editedData.email,
+      };
+      const updated = await enterpriseService.updateEnterprise(
+        enterprise.id,
+        payload
+      );
+      setEnterprise({ ...updated, gestorEmail: editedData.gestorEmail, numeroGestor: editedData.numeroGestor });
+      setIsEditing(false);
+      toast.success("Dados salvos com sucesso!");
     } catch {
-      alert("Falha ao salvar as informações.");
+      toast.error("Erro ao salvar. Tente novamente.");
     } finally {
-      setBusy(false);
+      setSaving(false);
     }
+  };
+
+  const handleFieldChange = (key: keyof EditableFields, val: string) => {
+    setEditedData((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const handleProfileImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+  
+    const reader = new FileReader();
+    reader.onloadend = () => setProfilePreview(reader.result as string);
+    reader.readAsDataURL(file);
+
+    setUploadingProfile(true);
+    try {
+      await enterpriseService.updateProfileImage(file);
+      toast.success("Foto de perfil atualizada!");
+    } catch {
+      toast.error("Erro ao atualizar foto de perfil.");
+      setProfilePreview(enterprise?.profileImage?.url ?? enterprise?.logo ?? null);
+    } finally {
+      setUploadingProfile(false);
+    }
+  };
+
+ if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground dark:text-gray-400">Carregando </p>
+        </div>
+      </div>
+    );
   }
 
-  // Placeholder (preencha com dados reais quando houver endpoint)
-  const desafios: Array<{
-    ChallengeTitle: string;
-    Author: string;
-    Category: string;
-    Status: string;
-    Date?: string;
-    companyId?: string | number;
-  }> = [];
+  if (error || !enterprise) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <AlertCircle size={36} className="text-red-400" />
+        <p className="text-gray-600 text-sm">{error ?? "Empresa não encontrada."}</p>
+        <button
+          onClick={fetchEnterprise}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm"
+          style={{ background: PRIMARY }}
+        >
+          <RefreshCw size={15} /> Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
+  // ── render principal ──────────────────────────────────────────────────────────
   return (
-    <div className="flex items-center justify-center pt-2 lg:pt-4 pb-5 lg:pb-8">
-      <div className="w-[80vw] rounded-2xl shadow-md overflow-hidden bg-white dark:bg-gray-900">
-        {/* Header / Capa */}
-        <div className="relative group">
-          <div className="relative h-45 w-full bg-gray-200 dark:bg-gray-800">
-            {getCover(company) && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={getCover(company)!}
-                alt="capa"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )}
-{/*             {editable && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMediaTarget("cover");
-                  setEditMedia(true);
-                }}
-                className="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/35 transition"
-                title="Alterar capa"
+    <div className="max-w-4xl mx-auto p-6">
+      <Toaster position="top-right" />
+
+      {/* ── Header ── */}
+      <div
+        className="rounded-t-2xl p-8 relative overflow-hidden"
+        style={{
+          background: `linear-gradient(135deg, ${PRIMARY} 0%, ${PRIMARY}dd 100%)`,
+        }}
+      >
+        {/* Decoração de fundo */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white opacity-5" />
+          <div className="absolute -left-10 -bottom-10 w-60 h-60 rounded-full bg-white opacity-5" />
+        </div>
+
+        <div className="relative flex items-center justify-between flex-wrap gap-4">
+          {/* Logo / avatar */}
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-24 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center overflow-hidden">
+                {uploadingProfile ? (
+                  <Loader2
+                    size={32}
+                    className="animate-spin"
+                    style={{ color: PRIMARY }}
+                  />
+                ) : profilePreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profilePreview}
+                    alt="Logo da empresa"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Building2 size={48} style={{ color: PRIMARY }} />
+                )}
+              </div>
+
+              {/* Botão de trocar foto — disponível sempre que estiver em modo edição */}
+              {isEditing && (
+                <label
+                  className="absolute -bottom-2 -right-2 p-2 bg-white rounded-full shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                  style={{ color: PRIMARY }}
+                  title="Trocar foto de perfil"
+                >
+                  <Camera size={16} />
+                  <input
+                    ref={profileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfileImageChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                {enterprise.name}
+              </h1>
+              <p className="text-white opacity-80 mt-1">{enterprise.sector}</p>
+              <span
+                className={`mt-2 inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  enterprise.status === "APPROVED"
+                    ? "bg-green-400/20 text-green-200"
+                    : "bg-yellow-400/20 text-yellow-200"
+                }`}
               >
-                <span className="text-white text-4xl font-bold leading-none">+</span>
+                {enterprise.status === "APPROVED" ? "Aprovada" : enterprise.status}
+              </span>
+            </div>
+          </div>
+
+          {/* Ações */}
+          {!isEditing ? (
+            <button
+              onClick={handleEdit}
+              className="flex items-center space-x-2 px-4 py-2 bg-white rounded-lg hover:shadow-lg transition-all"
+              style={{ color: PRIMARY }}
+            >
+              <Pencil size={18} />
+              <span>Editar</span>
+            </button>
+          ) : (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all disabled:opacity-60"
+              >
+                {saving ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Check size={18} />
+                )}
+                <span>{saving ? "Salvando…" : "Salvar"}</span>
               </button>
-            )} */}
-          </div>
-
-          {/* Logo */}
-          <div className="absolute left-12 -bottom-24">
-            <div className="relative w-36 h-36 rounded-full bg-gray-100 dark:bg-gray-700 border-8 border-white dark:border-gray-900 shadow-md overflow-hidden group/logo">
-              {getLogo(company) ? (
-                <Image
-                  src={getLogo(company)!}
-                  alt="logo"
-                  width={144}
-                  height={144}
-                  unoptimized
-                  className="object-cover w-36 h-36"
-                />
-              ) : (
-                <div className="w-full h-full grid place-items-center">
-                  <FaRegImage className="text-gray-500 dark:text-[#ced3db] text-5xl" />
-                </div>
-              )}
-              {editable && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMediaTarget("logo");
-                    setEditMedia(true);
-                  }}
-                  className="absolute inset-0 hidden group-hover/logo:flex items-center justify-center bg-black/40 transition rounded-full"
-                  title="Alterar logo"
-                >
-                  <span className="text-white text-4xl font-bold leading-none">+</span>
-                </button>
-              )}
+              <button
+                onClick={handleCancel}
+                disabled={saving}
+                className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all disabled:opacity-60"
+              >
+                <X size={18} />
+                <span>Cancelar</span>
+              </button>
             </div>
-          </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Body ── */}
+      <div className="bg-white rounded-b-2xl shadow-xl p-8">
+        {/* Descrição */}
+        <div className="mb-8">
+          <h2
+            className="text-lg font-semibold mb-3"
+            style={{ color: PRIMARY }}
+          >
+            Sobre a empresa
+          </h2>
+          {isEditing ? (
+            <textarea
+              value={editedData.description}
+              onChange={(e) =>
+                handleFieldChange("description", e.target.value)
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 text-gray-700 text-sm"
+              rows={3}
+            />
+          ) : (
+            <p className="text-gray-600 leading-relaxed">
+              {enterprise.description || "Nenhuma descrição cadastrada."}
+            </p>
+          )}
         </div>
 
-        <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_24rem]">
-          <span className="hidden lg:block absolute top-6 bottom-6 right-[24rem] w-px bg-gray-200 dark:bg-gray-800" />
+        {/* Grid de campos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* somente leitura */}
+          <FieldRow
+            icon={Building2}
+            label="Nome"
+            value={enterprise.name}
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+            readOnly
+          />
+          <FieldRow
+            icon={Hash}
+            label="Código"
+            value={enterprise.companyCode ?? enterprise.id}
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+            readOnly
+          />
+          <FieldRow
+            icon={FileText}
+            label="CNPJ"
+            value={formatCnpj(enterprise.cnpj)}
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+            readOnly
+          />
 
-          {/* Esquerda: Info + Desafios */}
-          <div className="flex-1 px-12 mt-28 pb-8">
-            {/* Informações */}
-            <section id="info" className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-800">
-                  {company.name}
-                </h2>
-                {editable && (
-                  <button
-                    onClick={() => setEditInfo((v) => !v)}
-                    className="px-3 py-1.5 rounded-xl border text-sm disabled:opacity-50"
-                    disabled={busy}
-                  >
-                    {editInfo ? "Cancelar" : "Editar"}
-                  </button>
-                )}
-              </div>
+          {/* editáveis */}
+          <FieldRow
+            icon={Briefcase}
+            label="Setor"
+            value={enterprise.sector}
+            editKey="sector"
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+          />
+          <FieldRow
+            icon={MapPin}
+            label="Endereço"
+            value={enterprise.address}
+            editKey="address"
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+          />
+          <FieldRow
+            icon={Mail}
+            label="E-mail da empresa"
+            value={enterprise.email}
+            editKey="email"
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+          />
+          <FieldRow
+            icon={Mail}
+            label="E-mail do gestor"
+            value={enterprise.gestorEmail}
+            editKey="gestorEmail"
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+          />
+          <FieldRow
+            icon={Phone}
+            label="Telefone do gestor"
+            value={enterprise.numeroGestor ?? ""}
+            editKey="numeroGestor"
+            isEditing={isEditing}
+            editedData={editedData}
+            onChange={handleFieldChange}
+          />
+        </div>
 
-              {!editInfo ? (
-                <>
-                  <p className="text-gray-600 dark:text-[#ced3db] mt-1">
-                    {company.description}
-                  </p>
-                  <div className="flex flex-wrap gap-3 mt-4">
-                    <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      Área de Atuação: {company.sector ?? "—"}
-                    </span>
-                    <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      Endereço: {company.address ?? "—"}
-                    </span>
-                    <span className="bg-gray-100 dark:bg-gray-800 text-blue-900 dark:text-[#ced3db] px-4 py-1 rounded-md text-sm font-medium">
-                      E-mail: {company.email ?? "—"}
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <InfoForm
-                  company={company}
-                  onSave={async (form) => {
-                    await savePatchInfo(form);
-                    setEditInfo(false);
-                  }}
-                  onCancel={() => setEditInfo(false)}
-                  busy={busy}
-                />
-              )}
-            </section>
-
-            {/* Desafios (placeholder) */}
-            <h3 className="text-xl font-bold text-blue-900 dark:text-blue-800 mt-10">
-              Desafios
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6 mt-4">
-              {desafios.length === 0 ? (
-                <div className="border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 shadow-sm">
-                  <p className="text-gray-600 dark:text-[#ced3db] text-sm">
-                    Nenhum desafio encontrado para esta empresa.
-                  </p>
-                </div>
-              ) : (
-                desafios.map((d) => (
-                  <div
-                    key={`${d.companyId}-${d.ChallengeTitle}`}
-                    className="border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 relative shadow-sm hover:shadow-md transition"
-                  >
-                    <h4 className="font-semibold text-blue-900 dark:text-blue-800">
-                      {d.ChallengeTitle}
-                    </h4>
-                    <p className="text-gray-600 dark:text-[#ced3db] text-sm">{d.Author}</p>
-                    <ul className="mt-3 text-sm text-gray-700 dark:text-[#ced3db] space-y-1">
-                      <li>🏷 {d.Category}</li>
-                      <li>🟢 {d.Status}</li>
-                      {d.Date && <li>📅 {d.Date}</li>}
-                    </ul>
-                  </div>
-                ))
-              )}
+        {/* Card adicional */}
+        <div className="mt-8 p-6 rounded-xl border border-gray-100 bg-gray-50">
+          <h3
+            className="text-sm font-medium mb-4"
+            style={{ color: PRIMARY }}
+          >
+            Informações Adicionais
+          </h3>
+          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: PRIMARY }}
+              />
+              <span>
+                ID:{" "}
+                <strong className="font-mono text-xs">{enterprise.id}</strong>
+              </span>
             </div>
-          </div>
-
-          {/* Direita: Social + Location + Media */}
-          <div className="w-full lg:w-96 px-4 pt-3 pb-6 bg-white dark:bg-gray-900">
-            {/* Redes sociais */}
-            <section id="social" className="space-y-3 mt-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-900">
-                  Redes Sociais
-                </h3>
-                {editable && (
-                  <button
-                    onClick={() => setEditSocial((v) => !v)}
-                    className="px-3 py-1.5 rounded-xl border text-sm disabled:opacity-50"
-                    disabled={busy}
-                  >
-                    {editSocial ? "Cancelar" : "Editar"}
-                  </button>
-                )}
-              </div>
-
-              {!editSocial ? (
-                <div className="flex flex-col gap-2 mt-3">
-                  <a
-                    href={company.instagram ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] dark:bg-gray-800 text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
-                  >
-                    Instagram
-                  </a>
-                  <a
-                    href={company.whatsapp ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] dark:bg-gray-800 text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
-                  >
-                    WhatsApp
-                  </a>
-                  <a
-                    href={company.linkedin ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-center bg-[#F3F8FF] hover:bg-[#E6F0FF] dark:bg-gray-800 text-blue-900 dark:text-white py-2 rounded-md text-sm font-medium transition"
-                  >
-                    LinkedIn
-                  </a>
-                </div>
-              ) : (
-                <SocialForm
-                  company={company}
-                  onSave={async (form) => {
-                    setCompany((prev) => (prev ? { ...prev, ...form } : prev));
-                    setEditSocial(false);
-                  }}
-                  onCancel={() => setEditSocial(false)}
-                  busy={busy}
-                />
-              )}
-            </section>
-
-            {/* Localização */}
-            <section id="location" className="space-y-3 mt-10">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">
-                  Localização Maps
-                </h3>
-                {editable && (
-                  <button
-                    onClick={() => setEditLocation((v) => !v)}
-                    className="px-3 py-1.5 rounded-xl border text-sm disabled:opacity-50"
-                    disabled={busy}
-                  >
-                    {editLocation ? "Cancelar" : "Editar"}
-                  </button>
-                )}
-              </div>
-
-              {!editLocation ? (
-                <a
-                  href={company.locationUrl ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 w-full h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-sm hover:shadow-md transition"
-                  title={company.locationUrl ?? "—"}
-                >
-                  <FaMapMarkedAlt className="text-blue-700 dark:text-blue-800 text-4xl" />
-                </a>
-              ) : (
-                <LocationForm
-                  company={company}
-                  onSave={async (form) => {
-                    setCompany((prev) => (prev ? { ...prev, ...form } : prev));
-                    setEditLocation(false);
-                  }}
-                  onCancel={() => setEditLocation(false)}
-                  busy={busy}
-                />
-              )}
-            </section>
-
-            {/* Mídia: upload de arquivos */}
-            {/* {editMedia && (
-              <section id="media" className="space-y-3 mt-10">
-                <h3 className="text-lg font-bold text-blue-900 dark:text-blue-800">Mídia</h3>
-                <MediaForm
-                  initialTarget={mediaTarget}
-                  onSave={async ({ logoFile, coverFile }) => {
-                    if (coverFile) await saveCoverFile(coverFile);
-                    if (logoFile) await saveProfileFile(logoFile);
-                    setEditMedia(false);
-                    setMediaTarget(null);
-                  }}
-                  onCancel={() => {
-                    setEditMedia(false);
-                    setMediaTarget(null);
-                  }}
-                  busy={busy}
-                />
-              </section>
-            )} */}
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: PRIMARY }}
+              />
+              <span>
+                CNPJ: <strong>{formatCnpj(enterprise.cnpj)}</strong>
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: PRIMARY }}
+              />
+              <span>
+                Criado em:{" "}
+                <strong>
+                  {new Date(enterprise.createdAt).toLocaleDateString("pt-BR")}
+                </strong>
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-/* ===== Forms ===== */
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-sm font-medium">{label}</span>
-      {children}
-    </label>
-  );
-}
-function Actions({ onCancel, busy }: { onCancel: () => void; busy?: boolean }) {
-  return (
-    <div className="flex gap-2">
-      <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-[#15358D] text-white disabled:opacity-50">
-        Salvar
-      </button>
-      <button type="button" onClick={onCancel} disabled={busy} className="px-4 py-2 rounded-xl border disabled:opacity-50">
-        Cancelar
-      </button>
-    </div>
-  );
-}
-
-function InfoForm({
-  company,
-  onSave,
-  onCancel,
-  busy,
-}: {
-  company: ShowOneEnterpriseResponse;
-  onSave: (p: { sector?: string; description?: string; address?: string; email?: string }) => Promise<void>;
-  onCancel: () => void;
-  busy?: boolean;
-}) {
-  const [form, setForm] = useState({
-    sector: company.sector ?? "",
-    description: company.description ?? "",
-    address: company.address ?? "",
-    email: company.email ?? "",
-  });
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSave(form);
-      }}
-      className="grid md:grid-cols-2 gap-4 mt-3"
-    >
-      <Row label="Área de Atuação">
-        <input className="rounded-xl border px-3 py-[10px]" value={form.sector} onChange={(e) => setForm({ ...form, sector: e.target.value })} />
-      </Row>
-      <Row label="E-mail da Empresa">
-        <input className="rounded-xl border px-3 py-[10px]" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-      </Row>
-      <Row label="Endereço">
-        <input className="rounded-xl border px-3 py-[10px]" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-      </Row>
-      <div className="md:col-span-2">
-        <Row label="Descrição">
-          <textarea className="w-full rounded-xl border px-3 py-[10px] min-h-28" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-        </Row>
-      </div>
-      <div className="md:col-span-2">
-        <Actions onCancel={onCancel} busy={busy} />
-      </div>
-    </form>
-  );
-}
-
-function SocialForm({
-  company,
-  onSave,
-  onCancel,
-  busy,
-}: {
-  company: ShowOneEnterpriseResponse;
-  onSave: (p: Partial<ShowOneEnterpriseResponse>) => Promise<void>;
-  onCancel: () => void;
-  busy?: boolean;
-}) {
-  const [form, setForm] = useState({
-    instagram: company.instagram ?? "",
-    whatsapp: company.whatsapp ?? "",
-    linkedin: company.linkedin ?? "",
-  });
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSave(form);
-      }}
-      className="grid md:grid-cols-3 gap-4 mt-3"
-    >
-      <Row label="Instagram (URL)">
-        <input className="rounded-xl border px-3 py-[10px]" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="https://instagram.com/..." />
-      </Row>
-      <Row label="WhatsApp (URL ou número)">
-        <input className="rounded-xl border px-3 py-[10px]" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="https://wa.me/55..." />
-      </Row>
-      <Row label="LinkedIn (URL)">
-        <input className="rounded-xl border px-3 py-[10px]" value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} placeholder="https://linkedin.com/company/..." />
-      </Row>
-      <div className="md:col-span-3">
-        <Actions onCancel={onCancel} busy={busy} />
-      </div>
-    </form>
-  );
-}
-
-function LocationForm({
-  company,
-  onSave,
-  onCancel,
-  busy,
-}: {
-  company: ShowOneEnterpriseResponse;
-  onSave: (p: Partial<ShowOneEnterpriseResponse>) => Promise<void>;
-  onCancel: () => void;
-  busy?: boolean;
-}) {
-  const [locationUrl, setLocationUrl] = useState(company.locationUrl ?? "");
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSave({ locationUrl });
-      }}
-      className="grid md:grid-cols-2 gap-4 mt-3"
-    >
-      <Row label="URL do Google Maps">
-        <input className="rounded-xl border px-3 py-[10px]" value={locationUrl} onChange={(e) => setLocationUrl(e.target.value)} placeholder="https://maps.google.com/?q=..." />
-      </Row>
-      <div className="md:col-span-2">
-        <Actions onCancel={onCancel} busy={busy} />
-      </div>
-    </form>
   );
 }

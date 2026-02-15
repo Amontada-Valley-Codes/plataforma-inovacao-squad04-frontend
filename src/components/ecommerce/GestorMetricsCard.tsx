@@ -42,11 +42,7 @@ export const GestorMetricsCards = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="w-full p-6 flex justify-center items-center">
-        <div className="w-8 h-8 border-4 border-[#15358D]/30 border-t-[#15358D] rounded-full animate-spin"></div>
-      </div>
-    );
+    return 
   }
 
   const metrics: Metric[] = [

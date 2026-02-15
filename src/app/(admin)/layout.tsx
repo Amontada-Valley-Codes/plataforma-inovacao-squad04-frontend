@@ -5,14 +5,26 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import { usePathname } from "next/navigation";
 
-
-export default function AdminLayout({
-  children,
-}: {
+export type LayoutProps = {
   children: React.ReactNode;
-}) {
+  title?: string;
+}
+
+export default function AdminLayout({ children }: LayoutProps) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  const pathname = usePathname()
+  const titles: Record<string, string> = {
+    "/admin/challenges": "Desafios",
+    "/admin/dashboard": "Dashboard",
+    "/admin/companies": "Empresas",
+    "/admin/form-builder": "Formulário",
+    "/admin/history": "Histórico",
+    "/admin/kanban": "Funil",
+    "/admin/startups": "Startups",
+  }
+  const title = titles[pathname] ?? "Página"
 
   // Ajuste de margem principal para diferentes larguras de tela
   const mainContentMargin = isMobileOpen
@@ -33,7 +45,7 @@ export default function AdminLayout({
       >
         {/* Header fixo no topo em telas pequenas */}
         <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-          <AppHeader />
+          <AppHeader title={title}/>
         </div>
 
         {/* Conteúdo da Página */}
