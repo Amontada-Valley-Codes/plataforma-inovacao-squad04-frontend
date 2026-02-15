@@ -57,8 +57,8 @@ function buildNavItems(
 
     return [
       { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/challenges-publicos" },
-      { icon: <RocketIcon />, name: "Startup", path: `${startupBase}/my-startup` },
-      { icon: <HistoryIcon />, name: "Histórico", path: `${startupBase}/historico` },
+      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
   }
 
@@ -84,9 +84,9 @@ function buildNavItems(
   if (role === "startup") {
     const startupBase = effectiveStartupId ? `/startup/${effectiveStartupId}` : "/startup";
     return [
-      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: `${startupBase}/desafios` },
-      { icon: <RocketIcon />, name: "Startup", path: `${startupBase}/my-startup` },
-      { icon: <HistoryIcon />, name: "Histórico", path: `${startupBase}/historico` },
+      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/startup/desafios" },
+      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
   }
 

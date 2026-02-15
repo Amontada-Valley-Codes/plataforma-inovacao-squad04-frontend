@@ -147,7 +147,7 @@ export function redirectByRole(role?: Role, companyId?: string | number, startup
     case "avaliador":
       return companyId ? `/company/${companyId}/desafios` : "/desafios";
     case "startup": 
-      return startupId ? `/startup/${startupId}/desafios` : "/startup";
+        return "/startup/desafios";
     default:
       return "/user/meus-desafios";
   }

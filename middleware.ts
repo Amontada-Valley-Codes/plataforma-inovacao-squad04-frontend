@@ -40,12 +40,14 @@ function normalizeRole(raw?: unknown): RoleEn | undefined {
 
 const isPublic = (p: string) =>
   p === "/" ||
+  p === "/sem-permissao" ||
   p.startsWith("/auth/login") ||
   p.startsWith("/register") ||
   p.startsWith("/public") ||
   p.startsWith("/_next") ||
   p.startsWith("/favicon") ||
   p.startsWith("/api/dev/set-cookie");
+
 
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
@@ -69,6 +71,9 @@ export function middleware(req: NextRequest) {
   const prefix = ("/" + pathname.split("/").filter(Boolean)[0]) || "/";
   const allow = rules[prefix];
 
+  const isUuid = (s?: string) => !!s &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+
   if (allow && (!role || !allow.includes(role))) {
     return NextResponse.redirect(new URL("/sem-permissao", req.url));
   }
@@ -89,11 +94,12 @@ export function middleware(req: NextRequest) {
 
   // Escopo por startupId em /startup/:startupId/*
   if (prefix === "/startup") {
-    const parts = pathname.split("/").filter(Boolean); // ["startup", ":id", ...]
+    const parts = pathname.split("/").filter(Boolean);
     const routeStartupId = parts[1];
     const tokenStartupId = String(decoded.startupId ?? "");
 
-    if (routeStartupId && tokenStartupId) {
+    // Só valida se o segundo segmento for realmente um UUID
+    if (isUuid(routeStartupId) && tokenStartupId) {
       if (role !== "ADMINISTRATOR" && routeStartupId !== tokenStartupId) {
         return NextResponse.redirect(new URL("/sem-permissao", req.url));
       }
