@@ -8,7 +8,7 @@ import {
   KanbanProvider,
 } from '@/components/ui/shadcn-io/kanban';
 import { useEffect, useState } from 'react';
-import { CalendarClock, SquareKanban, TableOfContents, TableProperties, Tag } from 'lucide-react';
+import { CalendarClock, SquareKanban, TableProperties, Tag } from 'lucide-react';
 import CardExpanded from './CardExpanded';
 import ForwardButton from './ForwardButton';
 import PreviousButton from './PreviousButton';

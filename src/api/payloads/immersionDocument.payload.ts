@@ -9,6 +9,8 @@ export type CreateImmersionPayload = {
   }[];
 }
 
+export type CreateImmersionFormData = FormData;
+
 export type CreateImmersionResponse = {
   id: string;
   POV: string;
