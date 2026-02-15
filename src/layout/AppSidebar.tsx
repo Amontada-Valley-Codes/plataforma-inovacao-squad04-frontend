@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
@@ -6,8 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
+import {
+  Building2Icon,
+  ClipboardListIcon,
+  Grid2x2Icon,
+  GripHorizontalIcon,
+  HistoryIcon,
+  RocketIcon,
+  SquareKanban,
+} from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
+import { getCurrentUser } from "@/lib/auth";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
 
@@ -18,85 +26,50 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-function appendSearch(path: string, search: string) {
-  if (!search) return path;
-  const hasQuery = path.includes("?");
-  const sep = hasQuery ? "&" : "?";
-  return `${path}${sep}${search.replace(/^\?/, "")}`;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function selectSearchFor(path: string, _currentSearch: string, role: Role) {
-  if (path.startsWith("/admin")) return "?role=admin";
-  return "";
-}
-
-/** Lê a role a partir de ?role= (para testes), do JWT (access_token) ou do localStorage – apenas no client (useEffect). */
-function useCurrentRole(): Role {
+function useCurrentRole() {
   const [role, setRole] = useState<Role>("usuario");
+  const [companyIdFromToken, setCompanyIdFromToken] = useState<string | null>(null);
+  const [startupIdFromToken, setStartupIdFromToken] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    (async () => {
+      const u = await getCurrentUser();
+      if (!u) return;
 
-    const allowed: Role[] = ["admin", "gestor", "avaliador", "usuario", "startup"];
-
-    // 1) ?role= (útil para testes)
-    const params = new URLSearchParams(window.location.search);
-    const urlRole = params.get("role") as Role | null;
-    if (urlRole && allowed.includes(urlRole)) {
-      localStorage.setItem("role", urlRole);
-      setRole(urlRole);
-      return;
-    }
-
-    // 2) Tenta decodificar a role do JWT salvo no login
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      try {
-        const [, payload] = token.split(".");
-        if (payload) {
-          const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-          const decoded = JSON.parse(json) as { type_user?: string };
-          const type = String(decoded?.type_user || "").toUpperCase();
-          const map: Record<string, Role> = {
-            ADMINISTRATOR: "admin",
-            MANAGER: "gestor",
-            EVALUATOR: "avaliador",
-            COMMON: "usuario",
-            STARTUP: "startup",
-          };
-          const r = map[type] ?? "usuario";
-          localStorage.setItem("role", r);
-          setRole(r);
-          return;
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    // 3) Fallback no que já estiver salvo (ou "usuario")
-    const stored = localStorage.getItem("role") as Role | null;
-    setRole(stored && allowed.includes(stored) ? stored : "usuario");
+      setRole(u.role);
+      if (u.companyId) setCompanyIdFromToken(String(u.companyId));
+      if (u.startupId) setStartupIdFromToken(String(u.startupId));
+    })();
   }, []);
 
-  return role;
+  return { role, companyIdFromToken, startupIdFromToken };
 }
 
-function buildNavItems(role: Role, pathname: string, companyIdFromToken: string | null): NavItem[] {
-
+// Sidebar é somente UX. Segurança real = middleware + backend.
+function buildNavItems(
+  role: Role,
+  pathname: string,
+  companyIdFromToken: string | null,
+  startupIdFromToken: string | null
+): NavItem[] {
   if (pathname.startsWith("/challenges-publicos")) {
+    const startupBase = startupIdFromToken ? `/startup/${startupIdFromToken}` : "/startup";
+
     return [
       { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/challenges-publicos" },
-      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
-      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
+      { icon: <RocketIcon />, name: "Startup", path: `${startupBase}/my-startup` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${startupBase}/historico` },
     ];
   }
-  
-  let companyId = extractCompanyIdFromPath(pathname);
-  if (!companyId && companyIdFromToken) {
-    companyId = companyIdFromToken;
-  }
+
+
+  const routeCompanyId = extractCompanyIdFromPath(pathname);
+  const effectiveCompanyId = companyIdFromToken ?? routeCompanyId ?? null;
+
+  const routeStartupId = pathname.startsWith("/startup/")
+    ? pathname.split("/").filter(Boolean)[1] ?? null
+    : null;
+  const effectiveStartupId = startupIdFromToken ?? routeStartupId ?? null;
 
   if (role === "admin") {
     return [
@@ -108,36 +81,31 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
     ];
   }
 
-  // STARTUP sem contexto de empresa
-  if (!companyId && role === "startup") {
+  if (role === "startup") {
+    const startupBase = effectiveStartupId ? `/startup/${effectiveStartupId}` : "/startup";
     return [
-      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/startup/desafios" },
-      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
-      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
+      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: `${startupBase}/desafios` },
+      { icon: <RocketIcon />, name: "Startup", path: `${startupBase}/my-startup` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${startupBase}/historico` },
     ];
   }
 
-  // Sem companyId na rota nem no token
-  if (!companyId) {
-    if (role === "gestor") {
-      return [
-        { icon: <Building2Icon />, name: "Minha Empresa", path: "/company" },
-        { icon: <ClipboardListIcon />, name: "Desafios", path: "/company/desafios" },
-        { icon: <HistoryIcon />, name: "Histórico", path: "/company/history" },
-      ];
-    }
-    if (role === "usuario") {
-      return [
-        { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-        { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
-        { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
-      ];
-    }
-    return [{ icon: <Building2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
+  if (!effectiveCompanyId) {
+     if (role === "gestor" || role === "avaliador") {
+    return [{ icon: <Building2Icon />, name: "Minha Empresa", path: "/company" }];
   }
 
-  // Com companyId
-  const base = `/company/${companyId}`;
+  if (role === "usuario") {
+    return [
+      { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
+      { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
+    ];
+  }
+
+  return [{ icon: <Building2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
+}
+  const base = `/company/${effectiveCompanyId}`;
 
   if (role === "gestor") {
     return [
@@ -160,7 +128,6 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
     ];
   }
 
-  // Usuário comum (ou fallback com companyId)
   return [
     { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
     { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
@@ -175,33 +142,12 @@ function isBaseRoute(path: string) {
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
-  const role = useCurrentRole();
 
-  const [companyIdFromToken, setCompanyIdFromToken] = useState<string | null>(null);
-  useEffect(() => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) return;
-      const [, payload] = token.split(".");
-      if (!payload) return;
-      // base64url → base64
-      const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-      const decoded = JSON.parse(json) as { enterpriseId?: string | null };
-      if (decoded?.enterpriseId) setCompanyIdFromToken(String(decoded.enterpriseId));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-
-  const [searchSuffix, setSearchSuffix] = useState("");
-  useEffect(() => {
-    if (typeof window !== "undefined") setSearchSuffix(window.location.search || "");
-  }, [pathname]);
+  const { role, companyIdFromToken, startupIdFromToken } = useCurrentRole();
 
   const navItems = useMemo(
-    () => buildNavItems(role, pathname, companyIdFromToken),
-    [role, pathname, companyIdFromToken]
+    () => buildNavItems(role, pathname, companyIdFromToken, startupIdFromToken),
+    [role, pathname, companyIdFromToken, startupIdFromToken]
   );
 
   const isActive = useCallback(
@@ -244,7 +190,7 @@ const AppSidebar: React.FC = () => {
           <li key={`${nav.name}-${index}`} className={isCompact ? "" : "w-full"}>
             {nav.path && (
               <Link
-                href={appendSearch(nav.path, selectSearchFor(nav.path, searchSuffix, role))}
+                href={nav.path}
                 className={`${linkBase} ${active ? linkActive : linkInactive}`}
                 style={styleVar}
                 aria-current={active ? "page" : undefined}
@@ -270,8 +216,7 @@ const AppSidebar: React.FC = () => {
         onMouseEnter={() => !isExpanded && setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Logo */}
-        <div className={`py-8 flex justify-center`}>
+        <div className="py-8 flex justify-center">
           <Link href="/">
             {isExpanded || isHovered || isMobileOpen ? (
               <>
@@ -285,13 +230,12 @@ const AppSidebar: React.FC = () => {
                 width={32}
                 height={32}
                 priority
-                style={{ height: "auto" }} // evita warning de proporção
+                style={{ height: "auto" }}
               />
             )}
           </Link>
         </div>
 
-        {/* Navegação */}
         <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
           <nav className="mb-6">
             <div className="flex flex-col gap-4">
