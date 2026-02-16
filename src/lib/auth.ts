@@ -8,7 +8,7 @@ export type User = {
   email?: string;
   role: Role;
   companyId?: string | number;
-  startupId?: string | number; 
+  startupId?: string | number;
 };
 
 export function setFrontendCookie(
@@ -25,14 +25,14 @@ export function setFrontendCookie(
 }
 
 export function getAccessToken(): string | null {
-    if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return null;
 
-    // 2) fallback: cookie (como você está setando via JS, ele é legível)
-    const match = document.cookie.match(/(?:^|;\s*)access_token=([^;]+)/);
-    if (match) return decodeURIComponent(match[1]);
+  // 2) fallback: cookie (como você está setando via JS, ele é legível)
+  const match = document.cookie.match(/(?:^|;\s*)access_token=([^;]+)/);
+  if (match) return decodeURIComponent(match[1]);
 
-    // 2) fallback: localStorage
-    return localStorage.getItem("access_token");
+  // 2) fallback: localStorage
+  return localStorage.getItem("access_token");
 }
 
 type JwtPayload = {
@@ -77,15 +77,28 @@ function mapRoleFromToken(raw?: string): Role {
     case "ADMINISTRATOR":
     case "ADMIN":
       return "admin";
+
     case "MANAGER":
     case "GESTOR":
       return "gestor";
+
     case "EVALUATOR":
     case "AVALIADOR":
       return "avaliador";
-    case "STARTUP":                
+
+    case "STARTUP":
       return "startup";
+
+    case "STEERING_COMMITTEE":
+    case "OBSERVER":
+    case "INNOVATION_OFFICE":
+    case "ORGANIZER":
+      return "gestor";
+
+    case "COLLABORATOR":
     case "COMMON":
+      return "usuario";
+
     default:
       return "usuario";
   }
@@ -94,10 +107,10 @@ function mapRoleFromToken(raw?: string): Role {
 export async function getCurrentUser(): Promise<User | null> {
   const token = getAccessToken();
   if (!token) return null;
-  
+
   const payload = decodeJwtPayload<any>(token);
   if (!payload) return null;
-  
+
   return {
     id: payload.sub ? Number(payload.sub) : undefined,
     nome: payload.name ?? payload.nome ?? undefined,
@@ -138,17 +151,19 @@ export async function getUserId(): Promise<string | number | undefined> {
 }
 
 export function redirectByRole(role?: Role, companyId?: string | number, startupId?: string | number): string {
-  
+
   switch (role) {
     case "admin":
       return "/admin/dashboard";
     case "gestor":
       return companyId ? `/company/${companyId}/dashboard` : "/company";
     case "avaliador":
-      return companyId ? `/company/${companyId}/desafios` : "/desafios";
-    case "startup": 
-        return "/startup/desafios";
+      return companyId ? `/company/${companyId}/desafios` : "/company";
+    case "startup":
+      return "/startup/desafios";
+    case "usuario":
+      return "/user/meus-desafios"
     default:
-      return "/user/meus-desafios";
+      return "/company";
   }
 }

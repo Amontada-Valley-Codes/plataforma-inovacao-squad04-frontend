@@ -62,15 +62,13 @@ api.interceptors.response.use(
         }
       }
 
+
       if (status === 403) {
-        const path = window.location.pathname;
-        if (!path.startsWith("/sem-permissao")) {
-          window.location.href = "/sem-permissao";
-        }
+        //return Promise.reject(error);
       }
     }
 
-    return Promise.reject(error);
+   // return Promise.reject(error);
   }
 );
 

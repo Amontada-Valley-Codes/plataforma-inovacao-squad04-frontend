@@ -17,7 +17,17 @@ import {
 import { extractCompanyIdFromPath } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/auth";
 
-type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
+type Role =
+  | "admin"
+  | "gestor"
+  | "avaliador"
+  | "usuario"
+  | "startup"
+  | "steering_committee"
+  | "observer"
+  | "innovation_office"
+  | "organizer"
+  | "collaborator";
 
 type NavItem = {
   name: string;
@@ -36,9 +46,27 @@ function useCurrentRole() {
       const u = await getCurrentUser();
       if (!u) return;
 
-      setRole(u.role);
-      if (u.companyId) setCompanyIdFromToken(String(u.companyId));
-      if (u.startupId) setStartupIdFromToken(String(u.startupId));
+      const typeUser = String((u as any).type_user ?? (u as any).typeUser ?? (u as any).role ?? "").toUpperCase();
+
+      const mapped: Role =
+        typeUser === "ADMINISTRATOR" ? "admin" :
+          typeUser === "MANAGER" ? "gestor" :
+            typeUser === "EVALUATOR" ? "avaliador" :
+              typeUser === "STARTUP" ? "startup" :
+                typeUser === "STEERING_COMMITTEE" ? "steering_committee" :
+                  typeUser === "OBSERVER" ? "observer" :
+                    typeUser === "INNOVATION_OFFICE" ? "innovation_office" :
+                      typeUser === "ORGANIZER" ? "organizer" :
+                        typeUser === "COLLABORATOR" ? "collaborator" :
+                          "usuario";
+
+      setRole(mapped);
+
+      if (u.companyId || (u as any).enterpriseId) {
+        setCompanyIdFromToken(String(u.companyId ?? (u as any).enterpriseId));
+      }
+      const startupId = (u as any).startupId ?? (u as any).startup_id ?? null;
+      if (startupId) setStartupIdFromToken(String(startupId));
     })();
   }, []);
 
@@ -91,21 +119,55 @@ function buildNavItems(
   }
 
   if (!effectiveCompanyId) {
-     if (role === "gestor" || role === "avaliador") {
-    return [{ icon: <Building2Icon />, name: "Minha Empresa", path: "/company" }];
+    if (
+      role === "gestor" ||
+      role === "avaliador" ||
+      role === "steering_committee" ||
+      role === "observer" ||
+      role === "innovation_office" ||
+      role === "organizer"
+    ) {
+      return [{ icon: <Building2Icon />, name: "Minha Empresa", path: "/company" }];
+    }
+
+    if (role === "usuario" || role === "collaborator") {
+      return [
+        { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
+        { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
+        { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
+      ];
+    }
+
+    return [{ icon: <Building2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
   }
 
-  if (role === "usuario") {
+  const base = `/company/${effectiveCompanyId}`;
+
+  if (role === "steering_committee" || role === "observer") {
+
     return [
-      { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-      { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
-      { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
+      { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
+      { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
+      
+      // Steering pode precisar aprovar startups/empresas
+      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
+      { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
     ];
   }
 
-  return [{ icon: <Building2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
-}
-  const base = `/company/${effectiveCompanyId}`;
+  if (role === "innovation_office" || role === "organizer") {
+    return [
+      { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
+      { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
+      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
+      { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+      { icon: <Building2Icon />, name: "Usuários", path: `${base}/usuarios` },
+    ];
+  }
 
   if (role === "gestor") {
     return [
@@ -128,12 +190,12 @@ function buildNavItems(
     ];
   }
 
+
   return [
-    { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-    { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
-    { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
+    { icon: <Building2Icon />, name: "Minha Empresa", path: "/company" },
   ];
 }
+
 
 function isBaseRoute(path: string) {
   return path.split("/").filter(Boolean).length === 1;
