@@ -118,14 +118,14 @@ export default function Materialization({ challengeTitle, visibility, creator, s
 
               <div 
                 className="flex items-center bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-                text-[14px] rounded-[8px] pr-10 relative"
+                text-[14px] rounded-[8px] pr-10 relative w-40"
               >
                 <select
                   value={sponsorId ?? ""}
                   onFocus={() => setIsOpen(true)}
                   onBlur={() => setIsOpen(false)}
                   onChange={(e) => setSponsorId(e.target.value)}
-                  className="flex w-fit justify-center p-2 appearance-none
+                  className="flex w-full justify-center p-2 appearance-none
                   cursor-pointer rounded-[8px] outline-none"
                 >
                   <option 
