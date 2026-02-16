@@ -83,7 +83,7 @@ export type Challenge = ShowAllChallengeResponse
 
 const KanbanPage = () => {
   const [challanges, setChallanges] = useState<Challenge[]>([]);
-  const [isKanban, setIsKanban] = useState(false)
+  const [isKanban, setIsKanban] = useState(true)
   const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | undefined>()
