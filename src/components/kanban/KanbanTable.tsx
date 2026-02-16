@@ -3,7 +3,7 @@
 import { PaginatedChallengesResponse, ShowAllChallengeResponse } from "@/api/payloads/challenge.payload"
 import { dateFormatter, getCategoryLabel } from "./Kanban"
 import { useEffect, useState } from "react";
-import { ArrowUp, ChevronLeft, ChevronRight, Circle, Scaling, X } from "lucide-react";
+import { ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Circle, MoveVertical, Scaling, X } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
 
 type KanbanTableProps = {
@@ -89,13 +89,13 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
     }
   }
   return (  
-    <div className="overflow-x-auto sm:overflow-x-visible relative h-[calc(100vh-175px)]">
-      <div className="rounded-[12px] overflow-hidden border-x-2 border-b-2 border-[#15358D]">
-        <table className="table-auto min-w-[700px] w-full border-separate border-spacing-0">
+    <div className="relative h-[calc(100vh-175px)]">
+      <div className="rounded-[12px] overflow-x-auto w-full border-x-2 border-b-2 border-[#15358D]">
+        <table className="table-auto min-w-[1100px] w-full border-separate border-spacing-0">
           <thead className="bg-[#15358D]">
             <tr>
               <th 
-                className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   <span className="mr-4">Identificador</span>
@@ -105,15 +105,17 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('createdAt')}
-                className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
-                  {sortKey === 'createdAt' && (
+                  {sortKey === 'createdAt' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
                   <span className="mr-4">Data de Submissão</span>
 
@@ -122,15 +124,17 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort("name")}
-                className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
-                  {sortKey === 'name' && (
+                  {sortKey === 'name' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
                   <span className="mr-4">Titulo da Ideia</span>
 
@@ -139,15 +143,17 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('proponentName')}
-                className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
-                  {sortKey === 'proponentName' && (
+                  {sortKey === 'proponentName' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
                   <span className="mr-4">Colaborador</span>
 
@@ -156,15 +162,17 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('proponentArea')}
-                className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
-                  {sortKey === 'proponentArea' && (
+                  {sortKey === 'proponentArea' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
                   <span className="mr-4">Área</span>
 
@@ -173,15 +181,17 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('status')}
-                className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
-                  {sortKey === 'status' && (
+                  {sortKey === 'status' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
                   <span className="mr-4">Status</span>
 
@@ -189,7 +199,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                 </div>
               </th>
               <th
-                className="px-3 py-3 text-sm font-semibold text-white"
+                className="px-3 py-3 text-sm font-semibold bg-[#15358D] text-white"
               >
                 Ações
               </th>
@@ -231,37 +241,37 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                   border-b-2 border-[#15358D] border-r-2"
                 >
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-bl-[12px]" : ""}`}
                   >
                     {challenge.ideaIdentifier}
                   </td>
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {dateFormatter.format(new Date(challenge.createdAt))}
                   </td>
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {challenge.name}
                   </td>
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {challenge.proponentName}
                   </td>
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {getCategoryLabel(challenge.proponentArea)}
                   </td>
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     <span
@@ -273,7 +283,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                     </span>
                   </td>
                   <td 
-                    className={`px-10 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-br-[12px]" : ""}`}
                   > 
                     <div
@@ -291,7 +301,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
       </div>
 
       {challenges && (
-        <div className="absolute bottom-0 left-0 w-full pt-4 flex justify-center items-center gap-2 bg-white">
+        <div className="absolute bottom-0 left-0 w-full flex justify-center items-center gap-2 bg-white">
 
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
