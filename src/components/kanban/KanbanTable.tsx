@@ -301,7 +301,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
       </div>
 
       {challenges && (
-        <div className="absolute bottom-0 left-0 w-full flex justify-center items-center gap-2 bg-white">
+        <div className="absolute bottom-0 left-0 w-full flex justify-center items-center gap-2 bg-white dark:bg-[#101828]">
 
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
@@ -330,7 +330,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                   ${
                     page === pageNumber
                       ? "bg-[#0b2b72] text-white"
-                      : "text-[#0b2b72]"
+                      : "text-[#0b2b72] dark:text-white"
                   }
                 `}
               >

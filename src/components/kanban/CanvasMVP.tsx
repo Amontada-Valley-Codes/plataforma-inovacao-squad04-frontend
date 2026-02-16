@@ -121,6 +121,10 @@ export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
     setIsAddingKpi(false)
   }
 
+  const removeKpi = (index: number) => {
+    setKpis(prev => prev.filter((_, i) => i !== index))
+  }
+  
   const handleSave = async () => {
     try {
       const payload: CreateMvpPayload = {
@@ -355,46 +359,67 @@ export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
         )}
       
         {kpis.length > 0 ? (
-          <>
-            <table className="table-auto w-full border-collapse border-2 border-[#15358D]">
+          <div className="rounded-[12px] overflow-x-auto w-full border-x-2 border-b-2 border-[#15358D]">
+            <table className="table-auto w-full border-separate border-spacing-0">
               <thead className="bg-[#15358D]">
                 <tr>
-                  <th 
-                    className="px-2 py-1 text-sm font-semibold text-white"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <span>Indicator (KPI)</span> 
+                  <th className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D]">
+                    <div className="flex items-center justify-center gap-2 relative">
+                      <span className="mr-4">Indicator (KPI)</span>
+                      <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                     </div>
                   </th>
-                  <th 
-                    className="px-2 py-1 text-sm font-semibold text-white"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <span>Meta</span>
+
+                  <th className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D]">
+                    <div className="flex items-center justify-center gap-2 relative">
+                      <span className="mr-4">Meta</span>
+                      <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                     </div>
                   </th>
-                  <th 
-                    className="px-2 py-1 text-sm font-semibold text-white"
-                  >
-                    Métrica
+
+                  <th className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D]">
+                    <div className="flex items-center justify-center gap-2">
+                      Métrica
+                    </div>
                   </th>
                 </tr>
               </thead>
-      
+
               <tbody className="divide-y-2 divide-[#15358D]">
-                {kpis.map((ind) => (
-                  <tr 
-                    key={ind.id} 
-                    className="divide-x-2 divide-[#15358D] text-center cursor-pointer odd:bg-white dark:odd:bg-[#101828] dark:even:bg-[#151d2c] even:bg-blue-100"
-                  >
-                    <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{ind.name}</td>
-                    <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{ind.target}</td>
-                    <td className="px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold">{ind.metric}</td>
-                  </tr>
-                ))}
+                {kpis.map((ind, i) => {
+                  const isLast = i === kpis.length - 1
+
+                  return (
+                    <tr
+                      key={ind.id ?? i}
+                      className="odd:bg-white text-center dark:odd:bg-[#101828]"
+                    >
+                      <td
+                        className={`px-6 py-3 text-sm text-gray-600 dark:text-white font-medium
+                        border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-bl-[12px]" : ""}`}
+                      >
+                        {ind.name}
+                      </td>
+
+                      <td
+                        className={`px-6 py-3 text-sm text-gray-600 dark:text-white font-medium
+                        border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
+                      >
+                        {ind.target}
+                      </td>
+
+                      <td
+                        className={`px-6 py-3 text-sm text-gray-600 dark:text-white font-medium
+                        border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-br-[12px]" : ""}`}
+                      >
+                        {ind.metric}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
-          </>
+          </div>
         ) : (
           <div className="flex flex-col mb-4">
             <p className="text-sm text-[#98A2B3] dark:text-white/50 mt-1">Nenhum indicador definido</p>

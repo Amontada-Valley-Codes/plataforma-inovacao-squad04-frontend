@@ -8,15 +8,14 @@ import {
   KanbanProvider,
 } from '@/components/ui/shadcn-io/kanban';
 import { useEffect, useState } from 'react';
-import { CalendarClock, ChevronDown, Search, SquareKanban, TableOfContents, TableProperties, Tag } from 'lucide-react';
+import { CalendarClock, ChevronDown, Search, SquareKanban, TableProperties, Tag } from 'lucide-react';
 import CardExpanded from './CardExpanded';
 import ForwardButton from './ForwardButton';
 import PreviousButton from './PreviousButton';
 import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
-import KanbanTable, { getStatusLabel } from './KanbanTable';
+import KanbanTable from './KanbanTable';
 import { useSearchParams } from 'next/navigation';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 const columns = [
   { id: 'GENERATION', name: 'Desafios' },
@@ -250,7 +249,7 @@ const KanbanPage = () => {
             onClick={() => setIsKanban(!isKanban)}
             className="flex w-fit justify-center p-2 text-[#0B2B70] font-semibold
             rounded-[4px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors
-            text-[12px] cursor-pointer"
+            text-[12px] cursor-pointer dark:bg-[#15358d] dark:text-white"
           >
             {isKanban ? <TableProperties size={18}/> : <SquareKanban size={18}/>}
           </button>
