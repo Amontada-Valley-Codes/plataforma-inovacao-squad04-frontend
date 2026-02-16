@@ -98,7 +98,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                 className="pl-3 py-3 text-sm font-semibold text-white cursor-pointer"
               >
                 <div className="flex items-center justify-center gap-2 relative">
-                  <span>Identificador</span>
+                  <span className="mr-4">Identificador</span>
 
                   <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
@@ -115,9 +115,9 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
                   )} 
-                  <span>Data de Submissão</span>
+                  <span className="mr-4">Data de Submissão</span>
 
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[2px] rounded bg-gray-500"></span>
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th 
@@ -132,9 +132,9 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
                   )} 
-                  <span>Titulo da Ideia</span>
+                  <span className="mr-4">Titulo da Ideia</span>
 
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[2px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th 
@@ -149,7 +149,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
                   )} 
-                  <span>Colaborador</span>
+                  <span className="mr-4">Colaborador</span>
 
                   <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
@@ -166,7 +166,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
                   )} 
-                  <span>Área</span>
+                  <span className="mr-4">Área</span>
 
                   <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
@@ -183,7 +183,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
                   )} 
-                  <span>Status</span>
+                  <span className="mr-4">Status</span>
 
                   <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
