@@ -1,21 +1,46 @@
 import { BuyMaterializationService } from "@/api/services/buy-materialization.service";
-import { Check, Plus, Trash2 } from "lucide-react";
-import React, { useState } from "react"
+import { createBuyMaterializationPayload } from "@/api/payloads/buy-materialization.payload";
+import { Check, Plus, Trash2, Save } from "lucide-react";
+import React, { useState, useEffect } from "react"
 
 type MakeForBuyProps = {
   challengeId: string
 }
 
 export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
+  const [buyId, setBuyId] = useState<string>('');
   const [criterion, setCriterion] = useState<string>('');
   const [criteria, setCriteria] = useState<string[]>([]);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [existingFileUrl, setExistingFileUrl] = useState<string>('');
   const [hmwProblem, setHmwProblem] = useState<string>('');
   const [rules, setRules] = useState<string>('');
 
-  const addCriterion = () => {
-    if (!criterion) return
+  useEffect(() => {
+    async function fetchBuy() {
+      try {
+        const response = await BuyMaterializationService.ShowBuys();
+        const found = response.find(item => item.challengeId === challengeId);
 
+        if (found) {
+          setBuyId(found.id);
+          setHmwProblem(found.hmwProblem);
+          setRules(found.challengeRules);
+          setCriteria(found.selectionCriteria || []);
+          
+          if (found.editalFileUrl?.files?.[0]?.url) {
+            setExistingFileUrl(found.editalFileUrl.files[0].url);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchBuy();
+  }, [challengeId]);
+
+  const addCriterion = () => {
+    if (!criterion.trim()) return
     if (criteria.includes(criterion)) return
 
     setCriteria(prev => [...prev, criterion]);
@@ -29,65 +54,83 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
   const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setPdfFile(file);
   }
 
   const hasFile = Boolean(pdfFile);
-  const label = hasFile ? pdfFile!.name : "Upload do Edital do desafio"
-  const Icon = hasFile ? Check : Plus
+  const hasExisting = Boolean(existingFileUrl && !pdfFile);
+  
+  let label = "Upload do Edital do desafio";
+  if (hasFile) label = pdfFile!.name;
+  else if (hasExisting) label = "Edital já anexado (Clique para alterar)";
+  
+  const Icon = (hasFile || hasExisting) ? Check : Plus
 
   async function handleSubmit() {
+    // Se não tiver ID (Criação), o arquivo é obrigatório.
+    // Se tiver ID (Edição), o arquivo é opcional (mantém o antigo se pdfFile for null).
+    if ((!pdfFile && !buyId) || !hmwProblem || !rules) return;
 
-    if (!pdfFile) return;
+    try {
+      const payload = {
+        hmwProblem: hmwProblem,
+        challengeRules: rules,
+        selectionCriteria: criteria,
+        edital: pdfFile as File 
+      };
 
-    const formData = new FormData();
-
-    formData.append('hmwProblem', hmwProblem)
-    formData.append('challengeRules', rules)
-    formData.append('edital', pdfFile)
-
-    formData.append('selectionCriteria', JSON.stringify(criteria))
-
-    const response = await BuyMaterializationService.createMaterialization(challengeId, formData)
-
-    console.log(response)
+      if (buyId) {
+        await BuyMaterializationService.updateBuy(payload, buyId);
+      } else {
+        await BuyMaterializationService.createBuy(payload, challengeId);
+      }
+      
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold mb-4">
+    <div className="bg-white dark:bg-black p-4 rounded-lg">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold">
           Materialização para Buy
         </h1>
 
-      <div className="flex flex-col">
-        <label
-          className="flex items-center gap-2 px-3 py-2
-          bg-[#0B2B70] text-white rounded-lg
-          cursor-pointer hover:opacity-90"
-        >
-         <Icon/>
-         {label}
+        <div className="flex flex-col">
+          <label
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all
+              ${(hasFile || hasExisting) ? 'bg-green-600' : 'bg-[#0B2B70]'} 
+              text-white font-medium text-sm hover:opacity-90`}
+          >
+            <Icon size={18}/>
+            <span className="max-w-[200px] truncate">{label}</span>
 
-          <input
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={handlePdfUpload}
-            className="hidden"
-          />
-        </label>
-
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handlePdfUpload}
+              className="hidden"
+            />
+          </label>
+        </div>
       </div>
 
-      </div>
+      <div className="flex flex-col mb-6">
+        <h1 className="flex gap-1 items-center justify-between text-[#0B2B70] dark:text-white font-semibold mb-2">
+          <span>Problema do Edital</span>
 
-      <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
-          Problema do Edital
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="flex items-center gap-1 px-4 py-2 self-end
+            bg-[#0B2B70] text-white text-sm rounded-lg"
+          >
+            Salvar
+          </button>
         </h1>
 
-        <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex-1 flex rounded-lg border px-3 py-2 min-h-[120px] transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900 focus-within:border-[#0B2B70]">
           <textarea  
             required
             rows={5}
@@ -95,17 +138,17 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
             value={hmwProblem}
             onChange={(e) => setHmwProblem(e.target.value)}
             placeholder="Descreva o problema no formato HMW"
-            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full h-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-gray-500 resize-none"
           />
         </div>
       </div>
 
-      <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
+      <div className="flex flex-col mb-6">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-2">
           Regras do Desafio
         </h1>
 
-        <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex-1 flex rounded-lg border px-3 py-2 min-h-[120px] transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900 focus-within:border-[#0B2B70]">
           <textarea 
             required
             rows={5}
@@ -113,20 +156,20 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
             value={rules}
             onChange={(e) => setRules(e.target.value)}
             placeholder="Quais são as regras de negócio?"
-            className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
+            className="w-full h-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-gray-500 resize-none"
           />
         </div>
       </div>
 
-      <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
+      <div className="flex flex-col mb-8">
+        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-2">
           Critérios de Seleção do desafio
         </h1>
 
         <div className="flex items-center gap-2">
           <div 
             className="flex items-center bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors
-            text-[#0B2B70] font-semibold text-[14px] rounded-[8px] relative"
+            text-[#0B2B70] font-semibold text-[14px] rounded-[8px] flex-1 max-w-md border border-transparent focus-within:border-[#0B2B70]"
           >
             <input
               type="text"
@@ -139,36 +182,34 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
                 }
               }}
               placeholder="Digite um critério de seleção"
-              className="flex w-fit justify-center p-2
-              bg-transparent cursor-text rounded-[8px] outline-none"
+              className="w-full p-2 bg-transparent cursor-text rounded-[8px] outline-none placeholder:text-[#0B2B70]/50"
             />
           </div>
-
 
           <button
             type="button"
             onClick={addCriterion}
-            className="flex items-center gap-1 px-3 py-2
-            bg-[#0B2B70] text-white rounded-lg"
+            disabled={!criterion}
+            className="flex items-center gap-1 px-4 py-2
+            bg-[#0B2B70] text-white rounded-lg hover:opacity-90 disabled:opacity-50"
           >
             <Plus size={16} />
             Adicionar
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3 min-h-[40px]">
           {criteria.map((item) => (
             <div
               key={item}
-              className="flex items-center gap-2
-              bg-[#E7EEFF] text-[#0B2B70]
-              px-3 py-1 rounded-full text-sm font-medium"
+              className="flex items-center gap-2 bg-[#E7EEFF] text-[#0B2B70] border border-[#0B2B70]/10 px-3 py-1 rounded-full text-sm font-medium"
             >
               {item.replaceAll("_", " ")}
 
               <button
                 type="button"
                 onClick={() => removeCriterion(item)}
+                className="hover:text-red-500 transition-colors"
               >
                 <Trash2 size={14} />
               </button>
@@ -176,7 +217,6 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
           ))}
         </div>
       </div>
-
     </div>
   )
 }

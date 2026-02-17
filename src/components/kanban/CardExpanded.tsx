@@ -69,6 +69,12 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
               {!isLastColumn && handleApproveAndMove && (
                 <ForwardButton className="w-45" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
               )}
+              {challengeStatus && challengeId && isLastColumn && (
+                <div className="flex items-center gap-4 justify-center">
+                  <ApproveButton challengeId={challengeId}/>
+                  <DisapproveButton challengeId={challengeId}/>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -96,8 +102,8 @@ const CardExpandedLayout = ({ className, mainContent, commentsContent, challenge
             {!isLastColumn && handleApproveAndMove && (
               <ForwardButton className="w-45 py-3" challengeId={challengeId} handleApproveAndMove={handleApproveAndMove} />
             )}
-            {challengeStatus && challengeId &&(
-              <div className="flex items-center justify-center">
+            {challengeStatus && challengeId && isLastColumn && (
+              <div className="flex items-center gap-4 justify-center">
                 <ApproveButton challengeId={challengeId}/>
                 <DisapproveButton challengeId={challengeId}/>
               </div>
@@ -520,6 +526,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                   />
                 )}
                 challengeId={cardData.id}
+                challengeStatus={cardData.status}
                 isFirstColumn={isFirstColumn}
                 isLastColumn={isLastColumn}
                 handleMoveBack={handleMoveBack}
