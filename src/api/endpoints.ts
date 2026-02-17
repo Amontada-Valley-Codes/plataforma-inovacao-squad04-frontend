@@ -251,6 +251,14 @@ export const ENDPOINTS = {
     CREATE: (challengeId: string) => `/status-report/${challengeId}`,
     GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
     SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
+  },
+
+  STARTUP_MATCH: {
+    ACCEPT_INVITE: (id: string) => `/startupMatch/${id}`,
+    SEND_APPLICATION: (challengeId: string, enterpriseId: string) => `/startupMatch/${challengeId}/invite/${enterpriseId}`,
+    DENY: (id: string) => `/startupMatch/${id}/deny`,
+    GET_PENDING: "/startupMatch/pending",
+    GET_ACCEPTED: "/startupMatch/accept",
   }
 
 } 
