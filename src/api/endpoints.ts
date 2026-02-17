@@ -242,15 +242,24 @@ export const ENDPOINTS = {
   },
 
   BUY_MATERIALIZATION: {
-    CREATE_MATERIALIZATION: (challengeId: string) => `buy-materialization/${challengeId}`,
-    GET_MATERIALIZATION: '/buy-materialization',
-    GET_MATERIALIZATION_BY_ID: (id: string) => `buy-materialization/${id}`
+    CREATE_BUY: (challengeId: string) => `buy-materialization/${challengeId}`,
+    GET_BUY: '/buy-materialization',
+    GET_BUY_BY_ID: (id: string) => `buy-materialization/${id}`,
+    UPDATE_BUY: (id: string) => `buy-materialization/${id}`,
+    DELETE_BUY: (id: string) => `buy-materialization/${id}`,
   },
 
   STATUS_REPORT: {
     CREATE: (challengeId: string) => `/status-report/${challengeId}`,
     GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
     SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
-  }
+  },
 
+  SPONSOR: {
+    ADD: '/sponsors',
+    SHOW: '/sponsors',
+    UPDATE: (id: string) => `/sponsors/${id}`,
+    DELETE: (id: string) => `/sponsors/${id}`,
+    EVALUATE: '/sponsors/evaluate-experimentation',
+  }
 } 
