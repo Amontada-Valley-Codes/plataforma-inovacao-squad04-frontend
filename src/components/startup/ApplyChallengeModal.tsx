@@ -1,33 +1,40 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useState } from "react";
-import Button from "../ui/button/Button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 type Props = {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   challengeName: string;
   enterpriseName: string;
+  deadline?: string;
   onConfirm: () => Promise<void>;
 };
 
 export default function ApplyChallengeModal({
-  isOpen,
-  onClose,
+  open,
+  onOpenChange,
   challengeName,
   enterpriseName,
+  deadline,
   onConfirm,
 }: Props) {
   const [loading, setLoading] = useState(false);
-
-  if (!isOpen) return null;
 
   const handleConfirm = async () => {
     try {
       setLoading(true);
       await onConfirm();
-      onClose();
+      onOpenChange(false);
     } catch (error) {
       console.error("Erro ao enviar candidatura:", error);
     } finally {
@@ -36,42 +43,39 @@ export default function ApplyChallengeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            Confirmar Candidatura
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
-          >
-            <X size={20} className="text-gray-500" />
-          </button>
-        </div>
-
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
-          Você deseja se candidatar ao desafio <strong>{challengeName}</strong> da empresa{" "}
-          <strong>{enterpriseName}</strong>?
-        </p>
-
-        <div className="flex gap-3">
-          <Button
-            onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800"
-            disabled={loading}
-          >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-display">Confirmar Candidatura</DialogTitle>
+          <DialogDescription>
+            Você deseja se candidatar ao desafio{" "}
+            <strong className="text-foreground">{challengeName}</strong> da empresa{" "}
+            <strong className="text-foreground">{enterpriseName}</strong>?
+          </DialogDescription>
+        </DialogHeader>
+        {deadline && (
+          <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
+            <p>
+              Prazo:{" "}
+              <span className="font-medium text-foreground">
+                {new Date(deadline).toLocaleDateString("pt-BR")}
+              </span>
+            </p>
+          </div>
+        )}
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancelar
           </Button>
           <Button
             onClick={handleConfirm}
-            className="flex-1 bg-[#15358D] hover:bg-[#112c75] text-white"
+            className="bg-[#15358D] hover:bg-[#112c75] text-white"
             disabled={loading}
           >
-            {loading ? "Enviando..." : "Confirmar"}
+            {loading ? "Enviando..." : "Confirmar Candidatura"}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
