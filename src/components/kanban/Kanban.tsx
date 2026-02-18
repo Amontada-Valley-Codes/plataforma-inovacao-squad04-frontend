@@ -15,6 +15,7 @@ import PreviousButton from './PreviousButton';
 import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
 import KanbanTable from './KanbanTable';
+import { showCustomToast } from './KanbanToaster';
 import { useSearchParams } from 'next/navigation';
 
 const columns = [
@@ -120,18 +121,22 @@ const KanbanPage = () => {
     if (currentColumnIndex < columns.length - 1) {
       const nextColumn = columns[currentColumnIndex + 1];
 
-      if (challengeId) {
-        await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
-        console.log("Status atualizado com sucesso");
-      }
-      
-      if (nextColumn.id === "IDEATION") {
-        setExpandedCard(challengeToMove)
-      } else {
+      try {
+        if (challengeId) {
+          await ChallengeService.changeStatus(challengeId, { status: nextColumn.id });
+        }
+
         const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
         const otherChallenges = challanges?.filter(c => c.id !== challengeId);
-        const newChallenges = [updatedChallenge, ...otherChallenges];
-        setChallanges(newChallenges);
+        setChallanges([updatedChallenge, ...otherChallenges]);
+
+        showCustomToast("Desafio avançado com sucesso.", "success");
+
+      } catch (error: any) {
+        showCustomToast(
+          error?.response?.data?.message || "Não foi possível avançar o desafio.",
+          "error"
+        );
       }
     }
   };
@@ -144,16 +149,24 @@ const KanbanPage = () => {
 
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
-      const updatedChallenges = { ...cardToMove, status: prevColumn.id };
 
-      if (challengeId) {
-        await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
-        console.log("Status atualizado com sucesso");
+      try {
+        if (challengeId) {
+          await ChallengeService.changeStatus(challengeId, { status: prevColumn.id });
+        }
+
+        const updatedChallenge = { ...cardToMove, status: prevColumn.id };
+        const otherChallenges = challanges?.filter(c => c.id !== challengeId);
+        setChallanges([updatedChallenge, ...otherChallenges]);
+
+        showCustomToast("Desafio retornado com sucesso.", "success");
+
+      } catch (error: any) {
+        showCustomToast(
+          error?.response?.data?.message || "Não foi possível retornar o desafio.",
+          "error"
+        );
       }
-
-      const otherChallenges = challanges?.filter(c => c.id !== challengeId);
-      const newChallenges = [updatedChallenges, ...otherChallenges];
-      setChallanges(newChallenges);
     }
   };
 

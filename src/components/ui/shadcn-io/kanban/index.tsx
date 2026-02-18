@@ -110,6 +110,7 @@ import { ChallengeService } from '@/api/services/challenge.service';
       isDragging,
     } = useSortable({
       id,
+      disabled: true, // drag desativado
     });
     const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
 
@@ -123,8 +124,8 @@ import { ChallengeService } from '@/api/services/challenge.service';
         <div style={style} ref={setNodeRef} {...listeners} {...attributes}>
           <Card
             className={cn(
-              'cursor-grab gap-4 rounded-[8px] bg-[#fff] p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900',
-              isDragging && 'pointer-events-none cursor-grabbing opacity-30',
+              'gap-4 rounded-[8px] bg-[#fff] p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900', // cursor-grab
+              /* isDragging && 'pointer-events-none cursor-grabbing opacity-30', */ // drag removido
               className
             )}
           >
