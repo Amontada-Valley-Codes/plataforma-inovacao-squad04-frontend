@@ -9,6 +9,7 @@ import { detailedScreeningService } from "@/api/services/detailedScreening.servi
 import { Toaster } from "react-hot-toast";
 import { ConceptionDocumentsService } from "@/api/services/conception-documents.service";
 import { immersionDocumentService } from "@/api/services/immersion-document.service";
+import { CreateMapEmpathyPayload } from "@/api/payloads/immersionDocument.payload";
 
 type Props = {
   challangeTitle: string;
@@ -342,8 +343,38 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   };
 
   const handleCreateEmpathyMap = async () => {
-  
-  }
+    try {
+
+      if (!detailedScreening?.id) return;
+
+      const immersion = detailedScreening.immersionDocument?.[0];
+
+      if (!immersion) return;
+
+      if (mapasEmpatia.length === 0) return;
+
+      if (mapasEmpatia.length > 3) return
+
+      for (const mapa of mapasEmpatia) {
+        const payload: CreateMapEmpathyPayload = {
+          listen: mapa.pensa,
+          see: mapa.ve,
+          speakAndDo: mapa.fala,
+          pains: mapa.dores,
+          gains: mapa.ganhos
+        };
+
+        await immersionDocumentService.createEmpathyMap(
+          immersion.id,
+          payload
+        );
+      }
+
+      console.log("Mapas criados com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar mapas:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -672,7 +703,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
               + Adicionar mapa (máx. 3)
             </button>
           </div>
-
 
           {/* Upload de Evidências */}
           <div className="rounded-2xl border bg-[#F9FAFB] border-[#E5E7EB] dark:border-white/10 p-6 dark:bg-[#0B1220]">
