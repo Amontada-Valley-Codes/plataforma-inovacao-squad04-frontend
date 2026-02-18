@@ -5,15 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import {
-  Building2Icon,
-  ClipboardListIcon,
-  Grid2x2Icon,
-  GripHorizontalIcon,
-  HistoryIcon,
-  RocketIcon,
-  SquareKanban,
-} from "lucide-react";
+import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -85,6 +77,7 @@ function buildNavItems(
     const startupBase = effectiveStartupId ? `/startup/${effectiveStartupId}` : "/startup";
     return [
       { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/startup/desafios" },
+      { icon: <HandshakeIcon />, name: "Meus Matches", path: "/startup/meus-matches" },
       { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
       { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
@@ -168,7 +161,7 @@ const AppSidebar: React.FC = () => {
   const linkBase = [
     "group rounded-xl transition-all duration-200",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#15358d]",
-    isCompact ? "grid place-items-center w-12 h-12 mx-auto" : "flex items-center w-full gap-3 px-4 py-2",
+    isCompact ? "grid place-items-center w-12 h-12 mx-auto" : "flex items-center w-full gap-3 px-4 pt-2 pb-[12px]",
   ].join(" ");
 
   const linkActive = "bg-white text-[var(--azul)]";

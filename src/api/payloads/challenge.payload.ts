@@ -271,3 +271,36 @@ export type ChallengesByStageItem = {
 }
 
 export type ChallengesByStageResponse = ChallengesByStageItem[]
+
+export type ChallengeFullResponse = {
+  name: string;
+  problemDescription: string;
+  Users: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+  };
+  forms: {
+    id: string;
+    version: {
+      questions: {
+        id: string;
+        title: string;
+        type: string;
+        required: boolean;
+        order: number;
+        options: string[] | null;
+        versionId: string;
+      }[];
+    };
+    responses: {
+      id: string;
+      challengeFormId: string;
+      createdAt: string;
+      answers: {
+        value: string
+      }[]
+    }[];
+  }[];
+};
