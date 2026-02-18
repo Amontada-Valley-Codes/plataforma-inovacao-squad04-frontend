@@ -44,9 +44,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (typeof window !== "undefined") {
-      const status = error?.response?.status;
+    const status = error?.response?.status;
 
+    if (typeof window !== "undefined") {
       if (status === 401) {
         try {
           localStorage.removeItem("access_token");
@@ -61,17 +61,15 @@ api.interceptors.response.use(
           window.location.href = `/auth/login?next=${next}`;
         }
       }
-
+      
       if (status === 403) {
-        const path = window.location.pathname;
-        if (!path.startsWith("/sem-permissao")) {
-          window.location.href = "/sem-permissao";
-        }
+        // console.warn("Forbidden:", error?.response?.data);
       }
     }
 
     return Promise.reject(error);
   }
 );
+
 
 export default api;

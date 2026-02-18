@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decodeJwtEdge, type DecodedToken } from "./src/lib/jwt-edge";
 
-type RoleEn = "COMMON" | "ADMINISTRATOR" | "EVALUATOR" | "MANAGER" | "STARTUP";
+type RoleEn =
+  | "COMMON"
+  | "ADMINISTRATOR"
+  | "EVALUATOR"
+  | "MANAGER"
+  | "STARTUP"
+  | "ORGANIZER"
+  | "COLLABORATOR"
+  | "OBSERVER"
+  | "INNOVATION_TEAM"
+  | "STEERING_COMMITTEE";
 
 type TokenWithScope = DecodedToken & {
   companyId?: string | number;
@@ -11,9 +21,36 @@ type TokenWithScope = DecodedToken & {
 
 const rules: Record<string, RoleEn[]> = {
   "/admin": ["ADMINISTRATOR"],
-  "/company": ["ADMINISTRATOR", "MANAGER", "EVALUATOR"],
-  "/user": ["COMMON", "ADMINISTRATOR", "MANAGER", "EVALUATOR"],
-  "/startup": ["STARTUP"],
+
+  "/company": [
+    "ADMINISTRATOR",
+    "MANAGER",
+    "EVALUATOR",
+    "ORGANIZER",
+    "INNOVATION_TEAM",
+    "STEERING_COMMITTEE",
+    "OBSERVER",
+  ],
+
+  "/user": [
+    "COMMON",
+    "COLLABORATOR",
+    "ADMINISTRATOR",
+    "MANAGER",
+    "EVALUATOR",
+    "ORGANIZER",
+    "INNOVATION_TEAM",
+    "STEERING_COMMITTEE",
+    "OBSERVER",
+  ],
+
+  "/startup": [
+    "STARTUP",
+    "ADMINISTRATOR",
+    "INNOVATION_TEAM",
+    "STEERING_COMMITTEE",
+    "OBSERVER",
+  ],
 };
 
 function normalizeRole(raw?: unknown): RoleEn | undefined {
@@ -22,14 +59,29 @@ function normalizeRole(raw?: unknown): RoleEn | undefined {
     case "ADMIN":
     case "ADMINISTRATOR":
       return "ADMINISTRATOR";
+
     case "MANAGER":
     case "GESTOR":
       return "MANAGER";
+
     case "EVALUATOR":
     case "AVALIADOR":
       return "EVALUATOR";
+
     case "STARTUP":
       return "STARTUP";
+
+    case "ORGANIZER":
+      return "ORGANIZER";
+    case "COLLABORATOR":
+      return "COLLABORATOR";
+    case "OBSERVER":
+      return "OBSERVER";
+    case "INNOVATION_TEAM":
+      return "INNOVATION_TEAM";
+    case "STEERING_COMMITTEE":
+      return "STEERING_COMMITTEE";
+
     case "COMMON":
     case "USER":
     case "USUARIO":
@@ -54,39 +106,53 @@ export function middleware(req: NextRequest) {
   if (isPublic(pathname)) return NextResponse.next();
 
   const token = req.cookies.get("access_token")?.value;
+
   if (!token) {
     const login = new URL("/auth/login", req.url);
     login.searchParams.set("next", pathname + search);
     return NextResponse.redirect(login);
   }
 
-  const decoded = decodeJwtEdge<TokenWithScope>(token);
+  const tokenValue = decodeURIComponent(token);
+
+  const decoded = decodeJwtEdge<TokenWithScope>(tokenValue);
+
   if (!decoded) {
     const login = new URL("/auth/login", req.url);
     login.searchParams.set("next", pathname + search);
     return NextResponse.redirect(login);
   }
-  const role = normalizeRole(decoded.type_user ?? (decoded as any).role);
+
+  const rawRole =
+    (decoded as any).type_user ??
+    (decoded as any).typeUser ??
+    (decoded as any).role ??
+    (decoded as any).userType;
+
+  const role = normalizeRole(rawRole);
+
 
   const prefix = ("/" + pathname.split("/").filter(Boolean)[0]) || "/";
   const allow = rules[prefix];
 
   const isUuid = (s?: string) => !!s &&
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+
+  const isPrivileged = role === "ADMINISTRATOR" || role === "INNOVATION_TEAM" || role === "STEERING_COMMITTEE";
+
 
   if (allow && (!role || !allow.includes(role))) {
     return NextResponse.redirect(new URL("/sem-permissao", req.url));
   }
 
-  // Escopo por companyId em /company/:companyId/*
-   if (prefix === "/company") {
+  if (prefix === "/company") {
     const parts = pathname.split("/").filter(Boolean); // ["company", ":id", ...]
-    const routeCompanyId = parts[1]; // pode ser número ou UUID
+    const routeCompanyId = parts[1]; // pode ser UUID ou slug tipo "dashboard"
     const tokenCompanyId = String(decoded.companyId ?? decoded.enterpriseId ?? "");
 
-    // Se a rota tem :id e o token tem companyId, valida
-    if (routeCompanyId && tokenCompanyId) {
-      if (role !== "ADMINISTRATOR" && routeCompanyId !== tokenCompanyId) {
+    // Só valida escopo quando o 2º segmento for realmente um UUID
+    if (isUuid(routeCompanyId) && tokenCompanyId) {
+      if (!isPrivileged && routeCompanyId !== tokenCompanyId) {
         return NextResponse.redirect(new URL("/sem-permissao", req.url));
       }
     }
@@ -100,7 +166,7 @@ export function middleware(req: NextRequest) {
 
     // Só valida se o segundo segmento for realmente um UUID
     if (isUuid(routeStartupId) && tokenStartupId) {
-      if (role !== "ADMINISTRATOR" && routeStartupId !== tokenStartupId) {
+      if (!isPrivileged && routeStartupId !== tokenStartupId) {
         return NextResponse.redirect(new URL("/sem-permissao", req.url));
       }
     }

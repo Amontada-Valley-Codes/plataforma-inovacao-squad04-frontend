@@ -35,23 +35,42 @@ function getJwtMaxAge(jwt: string, fallbackSeconds = 60 * 60 * 8) {
 }
 
 function decideDestinyFromToken(jwt: string) {
-  const p = parseJwt<{ type_user?: string; enterpriseId?: string | null }>(jwt) || {};
+  const p =
+  parseJwt<{
+    type_user?: string;
+    enterpriseId?: string | null;
+    startupId?: string | null;
+  }>(jwt) || {};
+
   const type = (p.type_user ?? "").toUpperCase();
   const companyId = p.enterpriseId ? String(p.enterpriseId) : null;
+  const startupId = p.startupId ? String(p.startupId) : null;
+
 
   switch (type) {
+    
     case "ADMINISTRATOR":
       return "/admin/dashboard";
+    
     case "MANAGER":
+    case "STEERING_COMMITTEE":
+    case "INNOVATION_TEAM": 
+    case "ORGANIZER":
       return companyId ? `/company/${companyId}/dashboard` : "/company";
+
     case "EVALUATOR":
+    case "OBSERVER":
       return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
+
+    case "COLLABORATOR":
     case "COMMON":
       return "/user/meus-desafios";
+
     case "STARTUP":
-      return "/startup/desafios";
+      return startupId ? `/startup/${startupId}` : "/startup/desafios";
+
     default:
-      return "/user/meus-desafios";
+      return "/company";
   }
 }
 
@@ -110,7 +129,7 @@ export default function LoginForm() {
 
       setLoading(false);
       showCustomToast("Login realizado com sucesso!", "success");
-      setTimeout(() => router.push(destiny), 300);
+      setTimeout(() => router.replace(destiny), 300);
     } catch (err: any) {
       setLoading(false);
       const msg = err?.response?.data?.message || "Erro ao entrar.";

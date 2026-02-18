@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
+export type Role =
+  | "admin"
+  | "gestor"
+  | "avaliador"
+  | "usuario"
+  | "startup"
+  | "collaborator"
+  | "observer"
+  | "organizer"
+  | "innovation_team"
+  | "steering_committee";
 
 export type User = {
   id?: number;
@@ -8,7 +18,8 @@ export type User = {
   email?: string;
   role: Role;
   companyId?: string | number;
-  startupId?: string | number; 
+  startupId?: string | number;
+  type_user?: string;
 };
 
 export function setFrontendCookie(
@@ -25,14 +36,14 @@ export function setFrontendCookie(
 }
 
 export function getAccessToken(): string | null {
-    if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return null;
 
-    // 2) fallback: cookie (como você está setando via JS, ele é legível)
-    const match = document.cookie.match(/(?:^|;\s*)access_token=([^;]+)/);
-    if (match) return decodeURIComponent(match[1]);
+  // 2) fallback: cookie (como você está setando via JS, ele é legível)
+  const match = document.cookie.match(/(?:^|;\s*)access_token=([^;]+)/);
+  if (match) return decodeURIComponent(match[1]);
 
-    // 2) fallback: localStorage
-    return localStorage.getItem("access_token");
+  // 2) fallback: localStorage
+  return localStorage.getItem("access_token");
 }
 
 type JwtPayload = {
@@ -70,34 +81,54 @@ function decodeJwtPayload<T = any>(token: string): JwtPayload | null {
   }
 }
 
-
 function mapRoleFromToken(raw?: string): Role {
   const v = (raw ?? "").toString().trim().toUpperCase();
+
   switch (v) {
     case "ADMINISTRATOR":
     case "ADMIN":
       return "admin";
+
     case "MANAGER":
     case "GESTOR":
       return "gestor";
+
     case "EVALUATOR":
     case "AVALIADOR":
       return "avaliador";
-    case "STARTUP":                
+
+    case "STARTUP":
       return "startup";
+
+    case "ORGANIZER":
+      return "organizer";
+
+    case "INNOVATION_TEAM":
+      return "innovation_team";
+
+    case "STEERING_COMMITTEE":
+      return "steering_committee";
+
+    case "OBSERVER":
+      return "observer";
+
+    case "COLLABORATOR":
+      return "collaborator";
+
     case "COMMON":
     default:
       return "usuario";
   }
 }
 
+
 export async function getCurrentUser(): Promise<User | null> {
   const token = getAccessToken();
   if (!token) return null;
-  
+
   const payload = decodeJwtPayload<any>(token);
   if (!payload) return null;
-  
+
   return {
     id: payload.sub ? Number(payload.sub) : undefined,
     nome: payload.name ?? payload.nome ?? undefined,
@@ -136,18 +167,26 @@ export async function getUserId(): Promise<string | number | undefined> {
   const payload = decodeJwtPayload<any>(token);
   return payload?.sub ?? undefined;
 }
-
-export function redirectByRole(role?: Role, companyId?: string | number, startupId?: string | number): string {
-  
+export function redirectByRole(role?: Role, companyId?: string | number): string {
   switch (role) {
     case "admin":
       return "/admin/dashboard";
+
     case "gestor":
       return companyId ? `/company/${companyId}/dashboard` : "/company";
+
+    case "startup":
+      return "/startup/desafios";
+
     case "avaliador":
-      return companyId ? `/company/${companyId}/desafios` : "/desafios";
-    case "startup": 
-        return "/startup/desafios";
+    case "organizer":
+    case "innovation_team":
+    case "steering_committee":
+    case "observer":
+      return companyId ? `/company/${companyId}/desafios` : "/company";
+
+    case "collaborator":
+    case "usuario":
     default:
       return "/user/meus-desafios";
   }
