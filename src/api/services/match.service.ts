@@ -2,7 +2,6 @@ import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
 import type {
   StartupMatchResponse,
-  CreateApplicationPayload,
   MatchStatsResponse,
 } from "../payloads/match.payload";
 
@@ -12,9 +11,9 @@ export const matchService = {
     return data;
   },
 
-  async sendApplication(payload: CreateApplicationPayload): Promise<StartupMatchResponse> {
+  async sendApplication(challengeId: string, enterpriseId: string): Promise<StartupMatchResponse> {
     const { data } = await api.post(
-      ENDPOINTS.STARTUP_MATCH.SEND_APPLICATION(payload.challengeId, payload.enterpriseId)
+      ENDPOINTS.STARTUP_MATCH.SEND_APPLICATION(challengeId, enterpriseId)
     );
     return data;
   },
@@ -26,12 +25,45 @@ export const matchService = {
 
   async getPendingMatches(): Promise<StartupMatchResponse[]> {
     const { data } = await api.get(ENDPOINTS.STARTUP_MATCH.GET_PENDING);
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(data?.pendings) ? data.pendings : [];
+  },
+
+  async getReceivedInvites(): Promise<StartupMatchResponse[]> {
+    const { data } = await api.get(ENDPOINTS.STARTUP_MATCH.GET_INVITATIONS);
+    return Array.isArray(data?.pendings) ? data.pendings : [];
   },
 
   async getAcceptedMatches(): Promise<StartupMatchResponse[]> {
     const { data } = await api.get(ENDPOINTS.STARTUP_MATCH.GET_ACCEPTED);
-    return Array.isArray(data) ? data : [];
+    // Backend retorna array de empresas com challenges dentro
+    if (!Array.isArray(data)) return [];
+    
+    const matches: StartupMatchResponse[] = [];
+    data.forEach((enterprise: any) => {
+      enterprise.challenges?.forEach((challenge: any) => {
+        matches.push({
+          id: challenge.matchId,
+          statusMatch: "ACCEPTED",
+          acceptStartup: "ACCEPTED",
+          acceptEnterprise: "ACCEPTED",
+          challengeId: challenge.id,
+          enterpriseId: enterprise.enterprise.id,
+          startupId: "",
+          Challenge: {
+            id: challenge.id,
+            name: challenge.name,
+            status: "",
+          },
+          Enterprise: {
+            id: enterprise.enterprise.id,
+            name: enterprise.enterprise.name,
+            gestorEmail: enterprise.enterprise.gestorEmail,
+          },
+        });
+      });
+    });
+    
+    return matches;
   },
 
   async getMatchStats(): Promise<MatchStatsResponse> {
