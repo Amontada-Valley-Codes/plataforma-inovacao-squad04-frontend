@@ -3,13 +3,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Tag, Calendar, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { Tag, Eye, EyeOff } from "lucide-react";
 import { getUserRole } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
-import ApplyButton from "./ApplyButton";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import { useStore } from "../../../store";
+import ApplyChallengeModal from "../startup/ApplyChallengeModal";
+import { matchService } from "@/api/services/match.service";
+import { Button } from "../ui/button";
+import { showCustomToast } from "../kanban/KanbanToaster";
 
 type Status = "Completed" | "In Progress" | "Pending" | string;
 
@@ -126,6 +129,8 @@ export default function ChallengeCard({
 
   const [myUserId, setMyUserId] = useState<string | undefined>();
   const [myEnterpriseId, setMyEnterpriseId] = useState<string | undefined>();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalChallenge, setModalChallenge] = useState<Challenge | null>(null);
 
   const searchParams = useSearchParams();
   const roleQS = parseRoleFromQS(searchParams?.get("role") ?? null);
@@ -158,9 +163,9 @@ export default function ChallengeCard({
       let response: Challenge[] = [];
 
       if (role === "startup" || !role) {
-        // público
+        // público - agora com enterpriseId disponível
         const publicList = await ChallengeService.showAllPublicChallenges();
-        response = publicList.map((p) => ({
+        response = publicList.map((p: any) => ({
           id: p.id,
           name: p.name,
           startDate: p.endDate,
@@ -173,9 +178,9 @@ export default function ChallengeCard({
           innovative_potential: "",
           business_relevance: "",
           updatedAt: p.endDate,
-          enterpriseId: "",
+          enterpriseId: p.Enterprise?.id || "",
           usersId: "",
-          Users: { name: "", image: null },
+          Users: { name: "" },
           enterpriseName: p.Enterprise?.name ?? "Empresa não informada",
         }));
       } else {
@@ -235,8 +240,34 @@ export default function ChallengeCard({
     const { sub, enterpriseId } = getAuthFromLocalStorage();
     if (sub) setMyUserId(String(sub));
     if (enterpriseId) setMyEnterpriseId(String(enterpriseId));
-    fetchChallenges();
+    
+    if (role !== null) {
+      fetchChallenges();
+    }
   }, [reload, role, authorId]);
+
+  const handleApply = async (challenge: Challenge) => {
+    if (!challenge || !startupId) {
+      showCustomToast("Erro: Dados incompletos", "error");
+      return;
+    }
+
+    if (!challenge.enterpriseId) {
+      showCustomToast(
+        "Erro: Este desafio não possui empresa associada. Entre em contato com o suporte.",
+        "error"
+      );
+      return;
+    }
+
+    try {
+      await matchService.sendApplication(challenge.id, challenge.enterpriseId);
+      showCustomToast("Candidatura enviada com sucesso!", "success");
+      setModalOpen(false);
+    } catch (error: any) {
+      showCustomToast(error?.response?.data?.message || "Erro ao enviar candidatura", "error");
+    }
+  };
 
 
   const storageKey = React.useMemo(() => {
@@ -411,20 +442,32 @@ export default function ChallengeCard({
 
                 {Boolean(canApply && role === "startup" && isPublic) && (
                   <div className="border-top border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
-                    <ApplyButton
-                      applied={alreadyApplied}
-                      onApply={() => {}}
-                      labelApply="Candidatar-se"
-                      labelApplied="Solicitado"
-                      className="w-full"
-                    />
+                    <Button
+                      onClick={() => {
+                        setModalChallenge(challenge);
+                        setModalOpen(true);
+                      }}
+                      className="w-full bg-[#15358D] hover:bg-[#112c75] text-white"
+                    >
+                      Candidatar-se
+                    </Button>
                   </div>
                 )}
               </div>
             );
           })}
         </div>
-    
+
+      {modalChallenge && (
+        <ApplyChallengeModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          challengeName={modalChallenge.name}
+          enterpriseName={modalChallenge.enterpriseName || "Empresa"}
+          deadline={modalChallenge.endDate}
+          onConfirm={() => handleApply(modalChallenge)}
+        />
+      )}
     </>
   );
 }

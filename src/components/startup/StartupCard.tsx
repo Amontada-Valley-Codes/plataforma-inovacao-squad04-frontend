@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   LayoutGrid,
   List as ListIcon,
@@ -32,6 +33,7 @@ export default function StartupCard({
   title = "Startups",
   autoOpen = false,
 }: Props) {
+  const router = useRouter();
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedStartup, setSelectedStartup] = useState<ShowAllStartupsResponse | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
@@ -121,7 +123,22 @@ export default function StartupCard({
     startup: ShowAllStartupsResponse,
     children: React.ReactNode,
   ) => {
-    if (role === "admin" || role === "gestor") {
+    if (role === "gestor") {
+      const handlers = {
+        onClick: () => {
+          router.push(`/user/startups/${startup.id}`);
+        },
+        onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            router.push(`/user/startups/${startup.id}`);
+          }
+        },
+        role: "button" as const,
+        tabIndex: 0,
+      };
+      return <div {...handlers}>{children}</div>;
+    }
+    if (role === "admin") {
       const handlers = {
         onClick: () => {
           setSelectedStartup(startup);
