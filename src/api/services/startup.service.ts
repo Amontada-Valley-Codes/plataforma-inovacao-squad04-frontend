@@ -70,6 +70,11 @@ export const startupService = {
     }
   },
 
+  async showOneStartup(id: string): Promise<ShowAllStartupsResponse> {
+    const { data } = await api.get(ENDPOINTS.STARTUP.SHOW_ONE(id));
+    return data;
+  },
+
   async getMyStartup(): Promise<ShowAllStartupsResponse> {
     const url = withBust(ENDPOINTS.STARTUP.ME);
     const { data } = await api.get(url, {

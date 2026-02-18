@@ -255,6 +255,24 @@ export const ENDPOINTS = {
     SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
   },
 
+  STARTUP_MATCH: {
+    ACCEPT_INVITE: (id: string) => `/startupMatch/${id}`,
+    SEND_APPLICATION: (challengeId: string, enterpriseId: string) => `/startupMatch/${challengeId}/invite/${enterpriseId}`,
+    DENY: (id: string) => `/startupMatch/${id}/deny`,
+    GET_PENDING: "/startupMatch/pending",
+    GET_INVITATIONS: "/startupMatch/pending/invitation",
+    GET_ACCEPTED: "/startupMatch/accept",
+  },
+
+  ENTERPRISE_MATCH: {
+    SEND_INVITE: (startupId: string, challengeId: string) => `/match/${startupId}/challenge/${challengeId}`,
+    ACCEPT_APPLICATION: (id: string) => `/match/${id}/accept`,
+    DENY_MATCH: (id: string) => `/match/${id}/deny/invite`,
+    GET_ACCEPTED: "/match/accept",
+    GET_PENDING_APPLICATIONS: "/match/pending",
+    GET_PENDING_INVITES: "/match/pending/enterprise/invite",
+  },
+
   SPONSOR: {
     ADD: '/sponsors',
     SHOW: '/sponsors',

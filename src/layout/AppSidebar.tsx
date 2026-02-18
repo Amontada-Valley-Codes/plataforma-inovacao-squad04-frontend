@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
+import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HandshakeIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
 
 type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
@@ -112,6 +112,7 @@ function buildNavItems(role: Role, pathname: string, companyIdFromToken: string 
   if (!companyId && role === "startup") {
     return [
       { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/startup/desafios" },
+      { icon: <HandshakeIcon />, name: "Meus Matches", path: "/startup/meus-matches" },
       { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
       { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
     ];
