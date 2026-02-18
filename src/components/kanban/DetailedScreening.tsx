@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client"
-import { CardContentsHeader } from "./CardsContents"
-import { useEffect, useState, memo, useCallback } from "react"
-import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react"
+import { CardContentsHeader } from "./CardsContents";
+import { useEffect, useState, memo, useCallback } from "react";
+import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react";
 import { ShowDetailedScreeningByIdResponse } from "@/api/payloads/detailedScreening.payload";
-import { detailedScreeningService } from "@/api/services/detailedScreening.service"
-import { Toaster } from "react-hot-toast"
+import { detailedScreeningService } from "@/api/services/detailedScreening.service";
+import { Toaster } from "react-hot-toast";
 import { ConceptionDocumentsService } from "@/api/services/conception-documents.service";
 import { immersionDocumentService } from "@/api/services/immersion-document.service";
 
@@ -18,6 +18,8 @@ type Props = {
   creator: string;
   visibility: string;
 }
+
+type ProblemTreeType = "PROBLEM" | "CAUSE" | "EFFECT";
 
 const TreeItem = memo(function TreeItem({
   node,
@@ -225,6 +227,19 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const MAKE_MAX = 1000;
   const CAPACIDADE_MAX = 100;
 
+  const serializeTree = (
+    nodes: TreeNode[],
+    type: ProblemTreeType
+  ): any[] => {
+    return nodes
+      .filter(node => node.text.trim() !== "")
+      .map(node => ({
+        description: node.text,
+        type,
+        children: serializeTree(node.children, type)
+      }));
+  };
+
   const initDetailedScreening = useCallback(async () => {
     try {
       const newDetailedScreening = await detailedScreeningService.startDetailedScreening(challengeId)
@@ -286,12 +301,45 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       
       if (!detailedScreening?.id) return
 
-      await immersionDocumentService.createFormTemplateVersion(detailedScreening.id, formData)
+      await immersionDocumentService.createImmersionDocument(detailedScreening.id, formData)
     } catch (error) {
       console.error("Erro ao criar documento de imersão:", error)
     }
 
   }
+
+  const handleCreateProblemTree = async () => {
+    try {
+      if (!detailedScreening?.id) return;
+
+      const immersion = detailedScreening.immersionDocument?.[0];
+
+      if (!immersion) return; 
+
+      if (!rootProblem.trim()) {
+        console.warn("Problema raiz é obrigatório");
+        return;
+      }
+
+      const payload = {
+        description: rootProblem,
+        type: "PROBLEM" as const,
+        children: [
+          ...serializeTree(causes, "CAUSE"),
+          ...serializeTree(effects, "EFFECT")
+        ]
+      };
+
+      await immersionDocumentService.createProblemTree(
+        immersion.id,
+        payload
+      );
+
+      console.log("Árvore criada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar árvore:", error);
+    }
+  };
 
   const handleCreateEmpathyMap = async () => {
   
@@ -497,8 +545,6 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
                   : `${hmw.length}/${HMW_MAX}`}
               </p>
             </div>
-
-
           </div>
         </div>
       )}

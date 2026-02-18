@@ -47,7 +47,7 @@ export type ShowImmersionResponse = {
     speakAndDo: string;
     pains: string;
     gains: string;
-    immersionId: string;
+    immersionId: string; 
   }[];
 }
 
