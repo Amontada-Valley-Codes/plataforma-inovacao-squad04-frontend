@@ -8,15 +8,14 @@ import {
   KanbanProvider,
 } from '@/components/ui/shadcn-io/kanban';
 import { useEffect, useState } from 'react';
-import { CalendarClock, ChevronDown, Search, SquareKanban, TableOfContents, TableProperties, Tag } from 'lucide-react';
+import { CalendarClock, ChevronDown, Search, SquareKanban, TableProperties, Tag } from 'lucide-react';
 import CardExpanded from './CardExpanded';
 import ForwardButton from './ForwardButton';
 import PreviousButton from './PreviousButton';
 import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
-import KanbanTable, { getStatusLabel } from './KanbanTable';
+import KanbanTable from './KanbanTable';
 import { useSearchParams } from 'next/navigation';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 const columns = [
   { id: 'GENERATION', name: 'Desafios' },
@@ -83,13 +82,12 @@ export type Challenge = ShowAllChallengeResponse
 
 const KanbanPage = () => {
   const [challanges, setChallanges] = useState<Challenge[]>([]);
-  const [isKanban, setIsKanban] = useState(false)
+  const [isKanban, setIsKanban] = useState(true)
   const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | undefined>()
   const [areaFilter, setAreaFilter] = useState<string | undefined>()
   const searchParams = useSearchParams();
-  const { isDesktop } = useBreakpoints()
   const [isOpenStatus, setIsOpenStatus] = useState(false)
   const [isOpenArea, setIsOpenArea] = useState(false)
 
@@ -161,10 +159,10 @@ const KanbanPage = () => {
 
   return (
     <div className='w-full h-full'>
-      <div className={`flex items-center ${isKanban ? "justify-end" : "justify-between"} gap-2 mb-4`}>
-        {!isKanban && isDesktop && (
-          <div className='flex items-center gap-4'>
-            <div className="flex w-[360px] relative items-center rounded-lg border pl-12 pr-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
+      <div className={`flex flex-col md:flex-row md:items-center ${isKanban ? "justify-end" : "justify-between"} gap-2 mb-4`}>
+        {!isKanban && (
+          <div className='flex flex-col md:flex-row w-full md:w-auto gap-3 md:gap-4'>
+            <div className="flex w-full md:w-[300px] lg:w-[360px] relative items-center rounded-lg border pl-12 pr-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
               <Search className='absolute left-3 text-[#98A2B3]' size={20}/>
               <input
                 value={search}
@@ -174,91 +172,91 @@ const KanbanPage = () => {
               />
             </div>
             
-            <div 
-                className="transition-colors border text-[#98A2B3] bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900
-                text-[14px] rounded-[8px] relative"
-            >
-              <select
-                onFocus={() => setIsOpenStatus(true)}
-                onBlur={() => setIsOpenStatus(false)}
-                value={statusFilter || ""}
-                onChange={(e) => setStatusFilter(e.target.value || undefined)}
-                className="flex w-full justify-center p-2 appearance-none
-                cursor-pointer rounded-[8px] outline-none pr-10"
+            <div className='flex gap-3 w-full md:w-auto'>
+              <div 
+                  className="transition-colors border text-[#98A2B3] bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900
+                  text-[14px] rounded-[8px] relative w-1/2 md:w-auto"
               >
-                <option value="">Todos Status</option>
-                <option value="GENERATION">Desafios</option>
-                <option value="PRE_SCREENING">Pré-Triagem</option>
-                <option value="DETAILED_SCREENING">Triagem Detalhada</option>
-                <option value="MATERIALIZATION">Materialização</option>
-                <option value="EXPERIMENTATION">Experimentação</option>
-                <option value="SCALE">Escala</option>
-              </select>
-              <ChevronDown 
-                className={`text-[#98A2B3] absolute right-2 pointer-events-none
-                            transition-transform duration-200 top-2
-                            ${isOpenStatus ? "rotate-180" : "rotate-0"}`}
-              />
-            </div>
+                <select
+                  onFocus={() => setIsOpenStatus(true)}
+                  onBlur={() => setIsOpenStatus(false)}
+                  value={statusFilter || ""}
+                  onChange={(e) => setStatusFilter(e.target.value || undefined)}
+                  className="flex w-full justify-center p-2 appearance-none
+                  cursor-pointer rounded-[8px] outline-none pr-10"
+                >
+                  <option value="">Todos Status</option>
+                  <option value="GENERATION">Desafios</option>
+                  <option value="PRE_SCREENING">Pré-Triagem</option>
+                  <option value="DETAILED_SCREENING">Triagem Detalhada</option>
+                  <option value="MATERIALIZATION">Materialização</option>
+                  <option value="EXPERIMENTATION">Experimentação</option>
+                  <option value="SCALE">Escala</option>
+                </select>
+                <ChevronDown 
+                  className={`text-[#98A2B3] absolute right-2 pointer-events-none
+                              transition-transform duration-200 top-2
+                              ${isOpenStatus ? "rotate-180" : "rotate-0"}`}
+                />
+              </div>
 
-            <div 
-                className="transition-colors border text-[#98A2B3] bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900
-                text-[14px] rounded-[8px] relative"
-            >
-              <select
-                onFocus={() => setIsOpenArea(true)}
-                onBlur={() => setIsOpenArea(false)}
-                value={areaFilter || ""}
-                onChange={(e) => setAreaFilter(e.target.value || undefined)}
-                className="flex w-full justify-center p-2 appearance-none
-                cursor-pointer rounded-[8px] outline-none pr-10"
+              <div 
+                  className="transition-colors border text-[#98A2B3] bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900
+                  text-[14px] rounded-[8px] relative w-1/2 md:w-auto"
               >
-                <option value="">Todas áreas</option>
-                <option value="ADMINISTRATIVE">Administrativo</option>
-                <option value="FINANCIAL">Financeiro</option>
-                <option value="ACCOUNTING">Contábil</option>
-                <option value="LEGAL">Jurídico</option>
-                <option value="HUMAN_RESOURCES">Recursos Humanos</option>
-                <option value="MARKETING">Marketing</option>
-                <option value="SALES">Vendas</option>
-                <option value="COMMERCIAL">Comercial</option>
-                <option value="SUPPLY">Suprimentos</option>
-                <option value="LOGISTICS">Logística</option>
-                <option value="PRODUCTION">Produção</option>
-                <option value="TECHNOLOGY">Tecnologia</option>
-                <option value="ENGINEERING">Engenharia</option>
-                <option value="CUSTOMER_SERVICE">Atendimento ao Cliente</option>
-                <option value="QUALITY">Qualidade</option>
-                <option value="RESEARCH_DEVELOPMENT">Pesquisa e Desenvolvimento</option>
-                <option value="HEALTH_SAFETY">Saúde e Segurança</option>
-                <option value="OTHER">Outro</option>
-              </select>
-              <ChevronDown 
-                className={`text-[#98A2B3] absolute right-2 pointer-events-none
-                            transition-transform duration-200 top-2
-                            ${isOpenArea ? "rotate-180" : "rotate-0"}`}
-              />
+                <select
+                  onFocus={() => setIsOpenArea(true)}
+                  onBlur={() => setIsOpenArea(false)}
+                  value={areaFilter || ""}
+                  onChange={(e) => setAreaFilter(e.target.value || undefined)}
+                  className="flex w-full justify-center p-2 appearance-none
+                  cursor-pointer rounded-[8px] outline-none pr-10"
+                >
+                  <option value="">Todas áreas</option>
+                  <option value="ADMINISTRATIVE">Administrativo</option>
+                  <option value="FINANCIAL">Financeiro</option>
+                  <option value="ACCOUNTING">Contábil</option>
+                  <option value="LEGAL">Jurídico</option>
+                  <option value="HUMAN_RESOURCES">Recursos Humanos</option>
+                  <option value="MARKETING">Marketing</option>
+                  <option value="SALES">Vendas</option>
+                  <option value="COMMERCIAL">Comercial</option>
+                  <option value="SUPPLY">Suprimentos</option>
+                  <option value="LOGISTICS">Logística</option>
+                  <option value="PRODUCTION">Produção</option>
+                  <option value="TECHNOLOGY">Tecnologia</option>
+                  <option value="ENGINEERING">Engenharia</option>
+                  <option value="CUSTOMER_SERVICE">Atendimento ao Cliente</option>
+                  <option value="QUALITY">Qualidade</option>
+                  <option value="RESEARCH_DEVELOPMENT">Pesquisa e Desenvolvimento</option>
+                  <option value="HEALTH_SAFETY">Saúde e Segurança</option>
+                  <option value="OTHER">Outro</option>
+                </select>
+                <ChevronDown 
+                  className={`text-[#98A2B3] absolute right-2 pointer-events-none
+                              transition-transform duration-200 top-2
+                              ${isOpenArea ? "rotate-180" : "rotate-0"}`}
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {isDesktop && (
-          <div className='flex items-center gap-2'>
-            <p className='text-sm text-gray-600 dark:text-white font-medium text-justify'>Visualizar como:</p>
-            <button
-              title={isKanban ? "Tabela" : "Funil"}
-              onClick={() => setIsKanban(!isKanban)}
-              className="flex w-fit justify-center p-2 text-[#0B2B70] font-semibold
-              rounded-[4px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors
-              text-[12px] cursor-pointer"
-            >
-              {isKanban ? <TableProperties size={18}/> : <SquareKanban size={18}/>}
-            </button>
-          </div>
-        )}
+        <div className='flex items-center gap-2 self-end md:self-auto'>
+          <p className='text-sm text-gray-600 dark:text-white font-medium text-justify'>Visualizar como:</p>
+          <button
+            title={isKanban ? "Tabela" : "Funil"}
+            onClick={() => setIsKanban(!isKanban)}
+            className="flex w-fit justify-center p-2 text-[#0B2B70] font-semibold
+            rounded-[4px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors
+            text-[12px] cursor-pointer dark:bg-[#15358d] dark:text-white"
+          >
+            {isKanban ? <TableProperties size={18}/> : <SquareKanban size={18}/>}
+          </button>
+        </div>
       </div>
 
-      {!isKanban && isDesktop && (
+      {!isKanban && (
         <KanbanTable
           search={search}
           sector={areaFilter}

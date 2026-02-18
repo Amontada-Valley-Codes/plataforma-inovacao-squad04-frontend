@@ -3,7 +3,7 @@
 import { PaginatedChallengesResponse, ShowAllChallengeResponse } from "@/api/payloads/challenge.payload"
 import { dateFormatter, getCategoryLabel } from "./Kanban"
 import { useEffect, useState } from "react";
-import { ArrowUp, Scaling, X } from "lucide-react";
+import { ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Circle, MoveVertical, Scaling, X } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
 
 type KanbanTableProps = {
@@ -39,19 +39,37 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
   const [page, setPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>("createdAt")
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  
-  async function fetchChallenges() {
-    const res = await ChallengeService.paginatedChallenges({
-      page,
-      limit: 15,
-      sector,
-      status,
-      search: search || undefined,
-      orderBy: sortKey,
-      orderDirection: sortDirection,
-    })
+  const [loading, setLoading] = useState(false)
+  const colors: Record<string, string> = {
+    GENERATION: "bg-violet-500",          
+    PRE_SCREENING: "bg-amber-500",       
+    DETAILED_SCREENING: "bg-orange-500", 
+    MATERIALIZATION: "bg-blue-500",      
+    EXPERIMENTATION: "bg-teal-500",      
+    SCALE: "bg-green-500",               
+    DEFAULT: "bg-gray-500",              
+  }
 
-    setChallenges(res)
+  async function fetchChallenges() {
+    try {
+      setLoading(true)
+
+      const res = await ChallengeService.paginatedChallenges({
+        page,
+        limit: 10,
+        sector,
+        status,
+        search: search || undefined,
+        orderBy: sortKey,
+        orderDirection: sortDirection,
+      })
+
+      setChallenges(res)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -70,89 +88,118 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
       setSortDirection('asc')
     }
   }
-  return (
-    <div className="overflow-x-auto sm:overflow-x-visible relative h-[calc(100vh-175px)]">
-      <div className="rounded-[2px] overflow-hidden border-x-2 border-b-2 border-[#15358D]">
-        <table className="table-auto min-w-[700px] w-full border-separate border-spacing-0">
+  return (  
+    <div className="relative h-[calc(100vh-175px)]">
+      <div className="rounded-[12px] overflow-x-auto w-full border-x-2 border-b-2 border-[#15358D]">
+        <table className="table-auto min-w-[1100px] w-full border-separate border-spacing-0">
           <thead className="bg-[#15358D]">
             <tr>
               <th 
-                onClick={() => handleSort('createdAt')}
-                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer"
               >
-                <div className="flex items-center justify-center gap-2">
-                  {sortKey === 'createdAt' && (
+                <div className="flex items-center justify-center gap-2 relative">
+                  <span className="mr-4">Identificador</span>
+
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSort('createdAt')}
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
+              >
+                <div className="flex items-center justify-center gap-2 relative">
+                  {sortKey === 'createdAt' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
-                  <span>Data de Submissão</span>
+                  <span className="mr-4">Data de Submissão</span>
+
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th 
                 onClick={() => handleSort("name")}
-                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
-                <div className="flex items-center justify-center gap-2">
-                  {sortKey === 'name' && (
+                <div className="flex items-center justify-center gap-2 relative">
+                  {sortKey === 'name' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
-                  <span>Titulo da Ideia</span>
+                  <span className="mr-4">Titulo da Ideia</span>
+
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[2px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th 
                 onClick={() => handleSort('proponentName')}
-                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
-                <div className="flex items-center justify-center gap-2">
-                  {sortKey === 'proponentName' && (
+                <div className="flex items-center justify-center gap-2 relative">
+                  {sortKey === 'proponentName' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
-                  <span>Colaborador</span>
+                  <span className="mr-4">Colaborador</span>
+
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th 
                 onClick={() => handleSort('proponentArea')}
-                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
-                <div className="flex items-center justify-center gap-2">
-                  {sortKey === 'proponentArea' && (
+                <div className="flex items-center justify-center gap-2 relative">
+                  {sortKey === 'proponentArea' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
-                  <span>Área</span>
+                  <span className="mr-4">Área</span>
+
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th 
                 onClick={() => handleSort('status')}
-                className="px-3 py-2 text-sm font-semibold text-white cursor-pointer"
+                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
-                <div className="flex items-center justify-center gap-2">
-                  {sortKey === 'status' && (
+                <div className="flex items-center justify-center gap-2 relative">
+                  {sortKey === 'status' ? (
                     <ArrowUp 
                       size={16}
                       className={`transition-transform duration-300
                         ${sortDirection === 'desc' ? "rotate-180" : "rotate-0"}`}
                     />
+                  ) : (
+                    <MoveVertical size={16}/>
                   )} 
-                  <span>Status</span>
+                  <span className="mr-4">Status</span>
+
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-[1.5px] rounded bg-gray-500"></span>
                 </div>
               </th>
               <th
-                className="px-3 py-2 text-sm font-semibold text-white"
+                className="px-3 py-3 text-sm font-semibold bg-[#15358D] text-white"
               >
                 Ações
               </th>
@@ -160,54 +207,90 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
           </thead>
 
           <tbody className="divide-y-2 divide-[#15358D]">
-            {challenges?.data.map((challenge, i) => {
+            {loading && (
+              <tr>
+                <td colSpan={7} className="py-16">
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                      <p className="text-muted-foreground dark:text-gray-400">Carregando </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            )}
+
+            {challenges && challenges.data.length === 0 && (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="py-10 text-center text-gray-500 text-sm"
+                >
+                  Nenhum desafio encontrado.
+                </td>
+              </tr>
+            )}
+
+            {!loading && challenges?.data.map((challenge, i) => {
               const isLast = i === challenges.data.length - 1
 
               return (
                 <tr 
                   key={challenge.id}
-                  className="text-center odd:bg-white dark:odd:bg-[#101828]
+                  className="odd:bg-white dark:odd:bg-[#101828]
                   border-b-2 border-[#15358D] border-r-2"
                 >
                   <td 
-                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
-                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-bl-[12px]" : ""}`}
+                  >
+                    {challenge.ideaIdentifier}
+                  </td>
+                  <td 
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {dateFormatter.format(new Date(challenge.createdAt))}
                   </td>
                   <td 
-                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
-                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {challenge.name}
                   </td>
                   <td 
-                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
-                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {challenge.proponentName}
                   </td>
                   <td 
-                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
-                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {getCategoryLabel(challenge.proponentArea)}
                   </td>
                   <td 
-                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
-                    border-[#15358D] border-r-2 ${!isLast ? "border-b-2" : ""}`}
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
-                    {getStatusLabel(challenge.status)}
+                    <span
+                      className={`pl-6 px-3 py-1 rounded-full text-white text-sm font-semibold
+                      ${colors[challenge.status] ?? colors.DEFAULT} relative`}
+                    >
+                      <span className="absolute left-[10px] top-[10px]"><Circle fill="white" size={6}/></span>
+                      {getStatusLabel(challenge.status)}
+                    </span>
                   </td>
                   <td 
-                    className={`px-2 py-1 text-sm text-gray-600 dark:text-white font-semibold
-                    border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
+                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-br-[12px]" : ""}`}
                   > 
                     <div
                       onClick={() => onRowClick(challenge)}
                       className="flex cursor-pointer items-center justify-center"
                       title="Clique para ver mais">
-                      <Scaling size={20}/>
+                      <Scaling size={18}/>
                     </div>
                   </td>
                 </tr>
@@ -218,21 +301,54 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
       </div>
 
       {challenges && (
-        <div className="absolute bottom-0 left-0 w-full pt-4 flex justify-center gap-2 bg-white border-t-2 border-gray-600">
-          {Array.from({ length: challenges.meta.lastPage }, (_, index) => {
-            const pageNumber = index + 1
-            return (
+        <div className="absolute bottom-0 left-0 w-full flex justify-center items-center gap-2 bg-white dark:bg-[#101828]">
+
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="p-1 border rounded-[8px] disabled:opacity-50"
+          >
+            <ChevronLeft size={20}/>
+          </button>
+
+          {Array.from({ length: challenges.meta.lastPage }, (_, index) => index + 1)
+            .filter((pageNumber) => {
+              const lastPage = challenges.meta.lastPage
+
+              if (lastPage <= 3) return true
+
+              if (page === 1) return pageNumber <= 3
+              if (page === lastPage) return pageNumber >= lastPage - 2
+
+              return pageNumber >= page - 1 && pageNumber <= page + 1
+            })
+            .map((pageNumber) => (
               <button
                 key={pageNumber}
                 onClick={() => setPage(pageNumber)}
                 className={`px-3 py-1 border rounded-[8px]
-                  ${page === pageNumber ? "bg-[#0b2b72] text-white" : "text-[#0b2b72]"}
+                  ${
+                    page === pageNumber
+                      ? "bg-[#0b2b72] text-white"
+                      : "text-[#0b2b72] dark:text-white"
+                  }
                 `}
               >
                 {pageNumber}
               </button>
-            )
-          })}
+            ))}
+
+          <button
+            onClick={() =>
+              setPage((prev) =>
+                Math.min(prev + 1, challenges.meta.lastPage)
+              )
+            }
+            disabled={page === challenges.meta.lastPage}
+            className="p-1 border rounded-[8px] disabled:opacity-50"
+          >
+            <ChevronRight size={20}/>
+          </button>
         </div>
       )}
     </div>
