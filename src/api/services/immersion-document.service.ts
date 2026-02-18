@@ -1,6 +1,6 @@
 import api from "../axios";
 import { ENDPOINTS } from "../endpoints";
-import { CreateImmersionFormData, CreateImmersionResponse, CreateProblemTreePayload, CreateProblemTreeResponse } from "../payloads/immersionDocument.payload";
+import { CreateImmersionFormData, CreateImmersionResponse, CreateMapEmpathyPayload, CreateMapEmpathyResponse, CreateProblemTreePayload, CreateProblemTreeResponse } from "../payloads/immersionDocument.payload";
 
 export const immersionDocumentService = {
 
@@ -12,6 +12,12 @@ export const immersionDocumentService = {
 
   async createProblemTree(id: string, payload: CreateProblemTreePayload): Promise<CreateProblemTreeResponse> {
     const { data } = await api.post(ENDPOINTS.IMMERSION_DOCUMENT.CREATE_PROBLEM_TREE(id), payload);
+    console.log(data)
+    return data;
+  },
+
+  async createEmpathyMap(id: string, payload: CreateMapEmpathyPayload): Promise<CreateMapEmpathyResponse> {
+    const { data } = await api.post(ENDPOINTS.IMMERSION_DOCUMENT.CREATE_MAP_EMPATHY(id), payload);
     console.log(data)
     return data;
   }
