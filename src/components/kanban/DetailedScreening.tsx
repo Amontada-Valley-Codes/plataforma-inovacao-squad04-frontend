@@ -704,55 +704,103 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
             </button>
           </div>
 
-          {/* Upload de Evidências */}
+         {/* Upload de Evidências */}
           <div className="rounded-2xl border bg-[#F9FAFB] border-[#E5E7EB] dark:border-white/10 p-6 dark:bg-[#0B1220]">
-            <h2 className="text-[#0B2B72] dark:text-white text-lg mb-2">Evidências</h2>
-            <p className="text-sm text-gray-400 mb-4">
-              Upload obrigatório para avançar
-            </p>
 
-            <input
-              type="file"
-              multiple
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const files = e.currentTarget.files
-                if (!files) return
+            {/* Cabeçalho */}
+            <div className="mb-4">
+              <h2 className="text-[#0B2B72] dark:text-white text-lg font-semibold">
+                Evidências
+              </h2>
+              <p className="text-sm text-gray-400">
+                Upload obrigatório para avançar
+              </p>
+            </div>
 
-                const filesArray: File[] = Array.from(files)
+            <label className="
+              flex flex-col items-center justify-center
+              border-2 border-dashed
+              border-[#E5E7EB] dark:border-white/20
+              rounded-xl
+              h-36
+              cursor-pointer
+              transition
+              hover:border-[#0B2B72]
+              hover:bg-[#0B2B72]/5
+              dark:hover:bg-white/5
+            ">
+              <span className="text-sm text-gray-500 dark:text-gray-300">
+                Clique ou arraste arquivos aqui
+              </span>
+              <span className="text-xs text-gray-400 mt-1">
+                Múltiplos arquivos permitidos
+              </span>
 
-                setEvidencias(prev => [...prev, ...filesArray])
-              }}
-              className="text-sm text-gray-400"
-            />
+              <input
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const files = e.currentTarget.files
+                  if (!files) return
+
+                  const filesArray: File[] = Array.from(files)
+                  setEvidencias(prev => [...prev, ...filesArray])
+                }}
+              />
+            </label>
 
             {evidencias.length > 0 && (
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-5 space-y-2">
                 {evidencias.map((file, index) => (
                   <li
                     key={`${file.name}-${index}`}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg border border-white/10"
+                    className="
+                      flex items-center justify-between
+                      bg-white dark:bg-[#0F172A]
+                      px-4 py-3
+                      rounded-xl
+                      border border-[#E5E7EB] dark:border-white/10
+                      shadow-sm
+                    "
                   >
-                    <span className="text-sm text-[#0B2B72] dark:text-white truncate">
-                      {file.name}
-                    </span>
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <div className="
+                        h-8 w-8
+                        flex items-center justify-center
+                        rounded-lg
+                        bg-[#0B2B72]/10
+                        text-[#0B2B72]
+                        dark:bg-white/10
+                        dark:text-white
+                        text-xs font-semibold
+                      ">
+                        FILE
+                      </div>
 
+                      <span className="text-sm text-[#0B2B72] dark:text-white truncate">
+                        {file.name}
+                      </span>
+                    </div>
+
+                    {/* Botão remover */}
                     <button
                       type="button"
                       onClick={() =>
                         setEvidencias(prev => prev.filter((_, i) => i !== index))
                       }
                       className="
-                          h-6 w-6
-                          flex items-center justify-center
-                          rounded-full
-                          text-gray-400
-                          hover:text-red-400
-                          hover:bg-red-400/10
-                          transition
-                        "
+                        h-7 w-7
+                        flex items-center justify-center
+                        rounded-lg
+                        text-gray-400
+                        hover:text-red-400
+                        hover:bg-red-400/10
+                        transition
+                      "
                       title="Remover arquivo"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   </li>
                 ))}
