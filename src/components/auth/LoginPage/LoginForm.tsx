@@ -48,22 +48,21 @@ function decideDestinyFromToken(jwt: string) {
 
 
   switch (type) {
+    
     case "ADMINISTRATOR":
       return "/admin/dashboard";
+    
     case "MANAGER":
-      return companyId ? `/company/${companyId}/dashboard` : "/company";
-    case "EVALUATOR":
-      return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
-
     case "STEERING_COMMITTEE":
-    case "OBSERVER":
-    case "INNOVATION_OFFICE":
+    case "INNOVATION_TEAM": 
     case "ORGANIZER":
       return companyId ? `/company/${companyId}/dashboard` : "/company";
 
-    case "COLLABORATOR":
-      return "/user/meus-desafios";
+    case "EVALUATOR":
+    case "OBSERVER":
+      return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
 
+    case "COLLABORATOR":
     case "COMMON":
       return "/user/meus-desafios";
 

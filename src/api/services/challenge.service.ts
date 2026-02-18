@@ -1,5 +1,6 @@
 // src/api/services/challenge.service.ts
-import api from "../axios";
+
+import api from "@/api/axios";
 import { ENDPOINTS } from "../endpoints";
 import {
   ChangeStatusPayload,

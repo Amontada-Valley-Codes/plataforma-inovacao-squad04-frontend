@@ -10,7 +10,7 @@ type RoleEn =
   | "ORGANIZER"
   | "COLLABORATOR"
   | "OBSERVER"
-  | "INNOVATION_OFFICE"
+  | "INNOVATION_TEAM"
   | "STEERING_COMMITTEE";
 
 type TokenWithScope = DecodedToken & {
@@ -27,7 +27,7 @@ const rules: Record<string, RoleEn[]> = {
     "MANAGER",
     "EVALUATOR",
     "ORGANIZER",
-    "INNOVATION_OFFICE",
+    "INNOVATION_TEAM",
     "STEERING_COMMITTEE",
     "OBSERVER",
   ],
@@ -39,7 +39,7 @@ const rules: Record<string, RoleEn[]> = {
     "MANAGER",
     "EVALUATOR",
     "ORGANIZER",
-    "INNOVATION_OFFICE",
+    "INNOVATION_TEAM",
     "STEERING_COMMITTEE",
     "OBSERVER",
   ],
@@ -47,7 +47,7 @@ const rules: Record<string, RoleEn[]> = {
   "/startup": [
     "STARTUP",
     "ADMINISTRATOR",
-    "INNOVATION_OFFICE",
+    "INNOVATION_TEAM",
     "STEERING_COMMITTEE",
     "OBSERVER",
   ],
@@ -77,8 +77,8 @@ function normalizeRole(raw?: unknown): RoleEn | undefined {
       return "COLLABORATOR";
     case "OBSERVER":
       return "OBSERVER";
-    case "INNOVATION_OFFICE":
-      return "INNOVATION_OFFICE";
+    case "INNOVATION_TEAM":
+      return "INNOVATION_TEAM";
     case "STEERING_COMMITTEE":
       return "STEERING_COMMITTEE";
 
@@ -138,7 +138,7 @@ export function middleware(req: NextRequest) {
   const isUuid = (s?: string) => !!s &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
-  const isPrivileged = role === "ADMINISTRATOR" || role === "INNOVATION_OFFICE" || role === "STEERING_COMMITTEE";
+  const isPrivileged = role === "ADMINISTRATOR" || role === "INNOVATION_TEAM" || role === "STEERING_COMMITTEE";
 
 
   if (allow && (!role || !allow.includes(role))) {

@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
+export type Role =
+  | "admin"
+  | "gestor"
+  | "avaliador"
+  | "usuario"
+  | "startup"
+  | "collaborator"
+  | "observer"
+  | "organizer"
+  | "innovation_team"
+  | "steering_committee";
 
 export type User = {
   id?: number;
@@ -9,6 +19,7 @@ export type User = {
   role: Role;
   companyId?: string | number;
   startupId?: string | number;
+  type_user?: string;
 };
 
 export function setFrontendCookie(
@@ -70,9 +81,9 @@ function decodeJwtPayload<T = any>(token: string): JwtPayload | null {
   }
 }
 
-
 function mapRoleFromToken(raw?: string): Role {
   const v = (raw ?? "").toString().trim().toUpperCase();
+
   switch (v) {
     case "ADMINISTRATOR":
     case "ADMIN":
@@ -89,20 +100,27 @@ function mapRoleFromToken(raw?: string): Role {
     case "STARTUP":
       return "startup";
 
-    case "STEERING_COMMITTEE":
-    case "OBSERVER":
-    case "INNOVATION_OFFICE":
     case "ORGANIZER":
-      return "gestor";
+      return "organizer";
+
+    case "INNOVATION_TEAM":
+      return "innovation_team";
+
+    case "STEERING_COMMITTEE":
+      return "steering_committee";
+
+    case "OBSERVER":
+      return "observer";
 
     case "COLLABORATOR":
-    case "COMMON":
-      return "usuario";
+      return "collaborator";
 
+    case "COMMON":
     default:
       return "usuario";
   }
 }
+
 
 export async function getCurrentUser(): Promise<User | null> {
   const token = getAccessToken();
@@ -149,21 +167,27 @@ export async function getUserId(): Promise<string | number | undefined> {
   const payload = decodeJwtPayload<any>(token);
   return payload?.sub ?? undefined;
 }
-
-export function redirectByRole(role?: Role, companyId?: string | number, startupId?: string | number): string {
-
+export function redirectByRole(role?: Role, companyId?: string | number): string {
   switch (role) {
     case "admin":
       return "/admin/dashboard";
+
     case "gestor":
       return companyId ? `/company/${companyId}/dashboard` : "/company";
-    case "avaliador":
-      return companyId ? `/company/${companyId}/desafios` : "/company";
+
     case "startup":
       return "/startup/desafios";
+
+    case "avaliador":
+    case "organizer":
+    case "innovation_team":
+    case "steering_committee":
+    case "observer":
+      return companyId ? `/company/${companyId}/desafios` : "/company";
+
+    case "collaborator":
     case "usuario":
-      return "/user/meus-desafios"
     default:
-      return "/company";
+      return "/user/meus-desafios";
   }
 }

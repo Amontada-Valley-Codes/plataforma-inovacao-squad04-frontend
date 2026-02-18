@@ -17,7 +17,7 @@ import {
 import { extractCompanyIdFromPath } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/auth";
 
-type Role =
+type RoleEn =
   | "admin"
   | "gestor"
   | "avaliador"
@@ -25,7 +25,7 @@ type Role =
   | "startup"
   | "steering_committee"
   | "observer"
-  | "innovation_office"
+  | "innovation_team"
   | "organizer"
   | "collaborator";
 
@@ -37,68 +37,63 @@ type NavItem = {
 };
 
 function useCurrentRole() {
-  const [role, setRole] = useState<Role>("usuario");
+  const [role, setRole] = useState<RoleEn>("usuario");
   const [companyIdFromToken, setCompanyIdFromToken] = useState<string | null>(null);
   const [startupIdFromToken, setStartupIdFromToken] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    (async () => {
+  (async () => {
+    try {
       const u = await getCurrentUser();
+
+      console.log("USER RETORNADO:", u);
+
       if (!u) return;
 
-      const typeUser = String((u as any).type_user ?? (u as any).typeUser ?? (u as any).role ?? "").toUpperCase();
+      const backendRole = (u.role ?? u.type_user ?? "usuario").toUpperCase();
 
-      const mapped: Role =
-        typeUser === "ADMINISTRATOR" ? "admin" :
-          typeUser === "MANAGER" ? "gestor" :
-            typeUser === "EVALUATOR" ? "avaliador" :
-              typeUser === "STARTUP" ? "startup" :
-                typeUser === "STEERING_COMMITTEE" ? "steering_committee" :
-                  typeUser === "OBSERVER" ? "observer" :
-                    typeUser === "INNOVATION_OFFICE" ? "innovation_office" :
-                      typeUser === "ORGANIZER" ? "organizer" :
-                        typeUser === "COLLABORATOR" ? "collaborator" :
-                          "usuario";
+const roleMap: Record<string, RoleEn> = {
+  ADMIN: "admin",
+  GESTOR: "gestor",
+  AVALIADOR: "avaliador",
+  USUARIO: "usuario",
+  STARTUP: "startup",
+  STEERING_COMMITTEE: "steering_committee",
+  OBSERVER: "observer",
+  INNOVATION_TEAM: "innovation_team",
+  ORGANIZER: "organizer",
+  COLLABORATOR: "collaborator",
+};
 
-      setRole(mapped);
+setRole(roleMap[backendRole] ?? "usuario");
 
-      if (u.companyId || (u as any).enterpriseId) {
-        setCompanyIdFromToken(String(u.companyId ?? (u as any).enterpriseId));
-      }
-      const startupId = (u as any).startupId ?? (u as any).startup_id ?? null;
-      if (startupId) setStartupIdFromToken(String(startupId));
-    })();
-  }, []);
 
-  return { role, companyIdFromToken, startupIdFromToken };
+      if (u.companyId) setCompanyIdFromToken(String(u.companyId));
+      if (u.startupId) setStartupIdFromToken(String(u.startupId));
+    } catch (e) {
+      console.error("getCurrentUser failed:", e);
+    } finally {
+      setReady(true);
+    }
+  })();
+}, []);
+
+
+  return { role, companyIdFromToken, startupIdFromToken, ready };
 }
 
 // Sidebar é somente UX. Segurança real = middleware + backend.
 function buildNavItems(
-  role: Role,
+  role: RoleEn,
   pathname: string,
   companyIdFromToken: string | null,
   startupIdFromToken: string | null
 ): NavItem[] {
-  if (pathname.startsWith("/challenges-publicos")) {
-    const startupBase = startupIdFromToken ? `/startup/${startupIdFromToken}` : "/startup";
 
-    return [
-      { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/challenges-publicos" },
-      { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
-      { icon: <HistoryIcon />, name: "Histórico", path: "/startup/historico" },
-    ];
-  }
+  const effectiveCompanyId = companyIdFromToken ?? null;
 
-
-  const routeCompanyId = extractCompanyIdFromPath(pathname);
-  const effectiveCompanyId = companyIdFromToken ?? routeCompanyId ?? null;
-
-  const routeStartupId = pathname.startsWith("/startup/")
-    ? pathname.split("/").filter(Boolean)[1] ?? null
-    : null;
-  const effectiveStartupId = startupIdFromToken ?? routeStartupId ?? null;
-
+  // ================= ADMIN =================
   if (role === "admin") {
     return [
       { icon: <Grid2x2Icon />, name: "Dashboard", path: "/admin/dashboard" },
@@ -109,8 +104,8 @@ function buildNavItems(
     ];
   }
 
+  // ================= STARTUP =================
   if (role === "startup") {
-    const startupBase = effectiveStartupId ? `/startup/${effectiveStartupId}` : "/startup";
     return [
       { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: "/startup/desafios" },
       { icon: <RocketIcon />, name: "Startup", path: "/startup/my-startup" },
@@ -118,69 +113,68 @@ function buildNavItems(
     ];
   }
 
+  // ================= COLLABORATOR =================
+  if (role === "collaborator") {
+    return [
+      { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
+      { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
+    ];
+  }
+
+  // Se não tiver empresa vinculada ainda
   if (!effectiveCompanyId) {
-    if (
-      role === "gestor" ||
-      role === "avaliador" ||
-      role === "steering_committee" ||
-      role === "observer" ||
-      role === "innovation_office" ||
-      role === "organizer"
-    ) {
-      return [{ icon: <Building2Icon />, name: "Minha Empresa", path: "/company" }];
-    }
-
-    if (role === "usuario" || role === "collaborator") {
-      return [
-        { icon: <Grid2x2Icon />, name: "Meus Desafios", path: "/user/meus-desafios" },
-        { icon: <Building2Icon />, name: "Minha Empresa", path: "/user/empresa" },
-        { icon: <HistoryIcon />, name: "Histórico", path: "/user/historico" },
-      ];
-    }
-
-    return [{ icon: <Building2Icon />, name: "Minhas Empresas", path: "/admin/companies" }];
+    return [];
   }
 
   const base = `/company/${effectiveCompanyId}`;
 
-  if (role === "steering_committee" || role === "observer") {
-
+  // ================= STEERING =================
+  if (role === "steering_committee") {
     return [
       { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
       { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
       { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
       { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
-      
-      // Steering pode precisar aprovar startups/empresas
-      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
       { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
     ];
   }
 
-  if (role === "innovation_office" || role === "organizer") {
+  // ================= OBSERVER =================
+  if (role === "observer") {
     return [
+      { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
+      { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
+      { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
+      { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+    ];
+  }
+
+  // ================= INNOVATION OFFICE / ORGANIZER =================
+  if (role === "innovation_team" || role === "organizer") {
+    return [
+
       { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
       { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
       { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
-      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
       { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
       { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
       { icon: <Building2Icon />, name: "Usuários", path: `${base}/usuarios` },
     ];
   }
 
+  // ================= GESTOR =================
   if (role === "gestor") {
     return [
       { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
       { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
       { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
       { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
-      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
       { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
       { icon: <Building2Icon />, name: "Usuários", path: `${base}/usuarios` },
     ];
   }
 
+  // ================= AVALIADOR =================
   if (role === "avaliador") {
     return [
       { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
@@ -190,12 +184,10 @@ function buildNavItems(
     ];
   }
 
-
   return [
-    { icon: <Building2Icon />, name: "Minha Empresa", path: "/company" },
+    { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
   ];
 }
-
 
 function isBaseRoute(path: string) {
   return path.split("/").filter(Boolean).length === 1;
@@ -205,12 +197,13 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 
-  const { role, companyIdFromToken, startupIdFromToken } = useCurrentRole();
+  const { role, companyIdFromToken, startupIdFromToken, ready } = useCurrentRole();
 
-  const navItems = useMemo(
-    () => buildNavItems(role, pathname, companyIdFromToken, startupIdFromToken),
-    [role, pathname, companyIdFromToken, startupIdFromToken]
-  );
+  const navItems = useMemo(() => {
+    if (!ready) return [];
+      return buildNavItems(role, pathname, companyIdFromToken, startupIdFromToken);
+  }, [ready, role, pathname, companyIdFromToken, startupIdFromToken]);
+
 
   const isActive = useCallback(
     (path: string) => {
