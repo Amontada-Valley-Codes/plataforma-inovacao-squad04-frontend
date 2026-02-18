@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
+import { Building2Icon, ClipboardListIcon, Grid2x2Icon, GripHorizontalIcon, HandshakeIcon, HistoryIcon, RocketIcon, SquareKanban } from "lucide-react";
 import { extractCompanyIdFromPath } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/auth";
 
