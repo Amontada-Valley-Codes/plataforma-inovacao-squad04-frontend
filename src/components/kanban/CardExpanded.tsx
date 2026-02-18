@@ -348,7 +348,13 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     strategicAlignment={cardData.strategic_alignment}
                     problemDuration={cardData.problemDuration} 
                     currentSolution={cardData.currentSolution} 
-                    problemRelevance={cardData.problemRelevance} 
+                    problemRelevance={cardData.problemRelevance}
+                    currentIndicators={cardData.currentIndicators}
+                    expectedImpacts={cardData.expectedImpacts}
+                    initialConstraints={cardData.initialConstraints}
+                    involvedAreas={cardData.involvedAreas}
+                    proponentParticipation={cardData.proponentParticipation}
+                    challengeId={cardData.id}
                   />
                 }
                 commentsContent={(onChangeView) => (

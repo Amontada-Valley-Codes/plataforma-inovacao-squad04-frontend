@@ -100,6 +100,7 @@ export const ENDPOINTS = {
 
       return `/challenge/paginated?${query.toString()}`
     },
+    FULL: (challengeId: string) => `/challenge/${challengeId}/full`,
   },
 
   CHECKLIST: {
