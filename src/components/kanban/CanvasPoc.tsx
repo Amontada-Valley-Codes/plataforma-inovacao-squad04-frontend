@@ -1,7 +1,7 @@
 'use client'
 
 import { experimentationService } from "@/api/services/experimentation.service";
-import { Check, ChevronDown, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react"
 
 type CanvasPoCProps = {
@@ -106,6 +106,22 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
     )
   }
 
+  const handleSave = async () => {
+    try {
+      await experimentationService.updatePoc(poc.id, {
+        objective: objective,
+        scope: scope
+      });
+
+      updateObjective(objective);
+      updateScope(scope);
+
+      console.log("PoC atualizada com sucesso!");
+    } catch (err: any) {
+      console.error("Erro ao salvar PoC:", err.response?.data || err);
+    }
+  }
+
   useEffect(() => {
     setIndicators(poc.poCIndicators ?? [])
     setHypotheses(poc.pocHypotheses ?? [])
@@ -115,11 +131,22 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
 
   return (
     <div className="flex flex-col gap-1 mb-6">
-      <h1 className="text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">Canvas da PoC</h1>
+      <h1 className="text-[#0B2B72] flex items-center justify-between dark:text-white text-2xl font-semibold mb-4">
+        Canvas da PoC
+
+        <button
+          type="button"
+          onClick={handleSave}
+          className="flex items-center gap-1 px-4 py-2
+          bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white text-sm rounded-lg"
+        >
+          Salvar
+        </button>
+      </h1>
 
       <div className="flex flex-col mb-4">
-        <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
-        Objetivo da Poc
+        <h1 className="flex justify-between gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-3">
+          Objetivo da Poc
         </h1>
 
         <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
@@ -128,11 +155,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
             rows={5}
             maxLength={300}
             value={objective}
-            onChange={(e) => {
-              const value = e.target.value
-              setObjective(value)
-              updateObjective(value)
-            }}
+            onChange={(e) => setObjective(e.target.value)}
             placeholder="Defina o objetivo" 
             className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
           />
@@ -386,11 +409,7 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
               rows={5}
               maxLength={1500}
               value={scope}
-              onChange={(e) => {
-                const value = e.target.value
-                setScope(value)
-                updateScope(value)
-              }}
+              onChange={(e) => setScope(e.target.value)}
               placeholder="Defina o escopo" 
               className="w-full bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3] dark:placeholder:text-white resize-none"
             />
