@@ -1,45 +1,55 @@
 import { ChevronDown, Plus, Trash2, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RolloutTimeline from "./GanttChart";
+import { ScaleService } from "@/api/services/scale.service";
+
+type Props = {
+  challengeId: string
+}
 
 type Stakeholder = {
   id: string;
   name: string;
-  role: "RESPONSAVEL" | "APOIO" | "APROVADOR";
+  role: string
 };
 
-export default function RolloutPlan() {
-  const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
+export default function RolloutPlan({ challengeId }: Props) {
+  const [availableStakeholders, setAvailableStakeholders] = useState<Stakeholder[]>([]);
+  const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
+  const [rolloutScope, setRolloutScope] = useState("");
+
+
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [showGantt, setShowGantt] = useState(false);
 
   const [executiveSummary, setExecutiveSummary] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [cost, setCost] = useState<number | "">("");
+  const [totalCost, setTotalCost] = useState<number | "">("");
   const [benefitValue, setBenefitValue] = useState<number | "">("");
   const [benefitDescription, setBenefitDescription] = useState("");
   const [risks, setRisks] = useState<string[]>([""]);
 
  const roi = useMemo<number | null>(() => {
-  if (cost === "" || cost === 0 || benefitValue === "") return null;
-  return (benefitValue - cost) / cost;
-}, [cost, benefitValue]);
+    if (totalCost === "" || totalCost === 0 || benefitValue === "") return null;
+    return (benefitValue - totalCost) / totalCost;
+  }, [totalCost, benefitValue]);
 
 
   const roiExplanation = useMemo(() => {
-  if (roi === null) return "Informe custos e benefícios para calcular o ROI.";
+    if (roi === null) return "Informe custos e benefícios para calcular o ROI.";
 
-  if (roi > 0.5)
-    return "O retorno é significativamente superior ao custo, indicando forte viabilidade financeira.";
+    if (roi > 0.5)
+      return "O retorno é significativamente superior ao custo, indicando forte viabilidade financeira.";
 
-  if (roi > 0)
-    return "O retorno supera os custos, porém com margem moderada.";
+    if (roi > 0)
+      return "O retorno supera os custos, porém com margem moderada.";
 
-  if (roi === 0)
-    return "O retorno é equivalente ao custo, não gerando ganho financeiro.";
+    if (roi === 0)
+      return "O retorno é equivalente ao custo, não gerando ganho financeiro.";
 
-  return "Os custos superam os benefícios, indicando inviabilidade financeira no formato atual.";
-}, [roi]);
+    return "Os custos superam os benefícios, indicando inviabilidade financeira no formato atual.";
+  }, [roi]);
 
 
   function updateRisk(index: number, value: string) {
@@ -50,40 +60,138 @@ export default function RolloutPlan() {
     setRisks((prev) => [...prev, ""]);
   }  
 
-  
   function removeRisk(index: number) {
     setRisks((prev) => prev.filter((_, i) => i !== index));
   }
 
-
   function addStakeholder() {
     if (!selectedUserId) return;
 
-    if (stakeholders.length >= 20) {
-      alert("Limite máximo de 20 stakeholders");
-      return;
-    }
+    const user = availableStakeholders.find(
+      (u) => u.id === selectedUserId
+    );
 
-    const user = users.find((u) => u.id === selectedUserId);
     if (!user) return;
 
-    const alreadyAdded = stakeholders.some(
-      (s) => s.id === user.id
-    );
-    if (alreadyAdded) return;
-
-    setStakeholders((prev) => [...prev, user]);
+    setSelectedStakeholders((prev) => [...prev, user]);
+    setSelectedUserId("");
   }
 
-  const users: Stakeholder[] = [
-    { id: "1", name: "João", role: "RESPONSAVEL" },
-    { id: "2", name: "Maria", role: "APOIO" },
-    { id: "3", name: "Ana", role: "APROVADOR" },
-  ];
+  const fetchStakeholders = async () => {
+    try {
+      const response = await ScaleService.getStakeholders(challengeId);
+
+      const formatted: Stakeholder[] = response.map((item: any) => ({
+        id: item.user.id,
+        name: item.user.name,
+        role: item.user.type_user, 
+      }));
+
+      setAvailableStakeholders(formatted);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!challengeId) return;
+    fetchStakeholders();
+  }, [challengeId]);
+
+  const handleCreateScale = async (): Promise<string> => {
+    if (totalCost === "" || totalCost < 0)
+      throw new Error("Custo inválido");
+
+    if (benefitValue === "" || benefitValue < 0)
+      throw new Error("Benefício inválido");
+
+    if (!benefitDescription.trim())
+      throw new Error("Descrição obrigatória");
+
+    if (benefitDescription.length > 500)
+      throw new Error("Descrição muito longa");
+
+    const filteredRisks = risks.filter((r) => r.trim() !== "");
+    if (filteredRisks.length === 0)
+      throw new Error("Adicione ao menos um risco");
+
+    const payload = {
+      totalCost: Number(totalCost),
+      expectedFinancialBenefit: Number(benefitValue),
+      benefitDescription: benefitDescription.trim(),
+      risksAndMitigations: filteredRisks,
+    };
+
+    const response = await ScaleService.createScale(challengeId, payload);
+
+    return response.id; // 👈 agora sempre retorna string
+  };
+
+  const handleUpdateExecutiveSummary = async (scaleId: string) => {
+    if (!executiveSummary.trim())
+      throw new Error("Resumo executivo obrigatório");
+
+    if (executiveSummary.length > 1000)
+      throw new Error("Resumo muito longo");
+
+    await ScaleService.updateExecutiveSummary(scaleId, {
+      executiveSummary: executiveSummary.trim(),
+    });
+  };
+
+  const handleCreateRolloutPlan = async (scaleId: string) => {
+    if (!rolloutScope.trim()) throw new Error("Escopo obrigatório");
+    if (rolloutScope.length > 2000) throw new Error("Escopo muito longo");
+    if (selectedStakeholders.length === 0)
+      throw new Error("Selecione ao menos um stakeholder");
+
+    const payload = {
+      rolloutScope: rolloutScope.trim(),
+      stakeholderIds: selectedStakeholders.map((s) => s.id),
+    };
+
+    await ScaleService.updateRollOutPlan(scaleId, payload);
+  };
+
+const handleSubmit = async () => {
+  try {
+    setIsSubmitting(true);
+
+    const scaleId = await handleCreateScale();
+
+    console.log(scaleId)
+
+    await handleCreateRolloutPlan(scaleId);
+
+    await handleUpdateExecutiveSummary(scaleId);
+
+    console.log("Processo completo com sucesso 🚀");
+  } catch (error) {
+    console.error("Erro no submit:", error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const [page, setPage] = useState('1')
 
+  const roleTranslate: Record<string, string> = {
+    ORGANIZER: "Organizador",
+    COLLABORATOR: "Colaborador",
+    OBSERVER: "Observador",
+    TRANSFORMATION_OFFICE: "Escritório de Transformação",
+    INNOVATION_TEAM: "Equipe de Inovação",
+    STEERING_COMMITTEE: "Comitê Executivo",
+    ADMINISTRATOR: "Administrador",
+    MANAGER: "Gestor",
+    STARTUP: "Startup",
+  };
   
+function translateRole(role: string) {
+  return roleTranslate[role] ?? role;
+}
+
+
 return (
   <div>
     <div className="flex items-center justify-between mb-6">
@@ -148,8 +256,8 @@ return (
               type="number"
               min={0}
               required
-              value={cost}
-              onChange={(e) => setCost(Number(e.target.value))}
+              value={totalCost}
+              onChange={(e) => setTotalCost(Number(e.target.value))}
               placeholder="R$ 0,00"
               className="w-full rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white  px-3 py-2 text-s outline-none"
             />
@@ -201,7 +309,7 @@ return (
 
             {roi !== null && (
               <p className="text-xs text-[#667085] mt-1">
-                Cálculo: ({benefitValue} − {cost}) ÷ {cost}
+                Cálculo: ({benefitValue} − {totalCost}) ÷ {totalCost}
               </p>
             )}
 
@@ -225,8 +333,7 @@ return (
                   value={risk}
                   onChange={(e) => updateRisk(index, e.target.value)}
                   placeholder="Descreva o risco e mitigação"
-                  className="flex-1 h-24 resize-none rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 
-                  text-black/80 dark:text-white px-3 py-2 text-sm outline-none"
+                  className="flex-1 h-24 resize-none rounded-lg bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white px-3 py-2 text-sm outline-none"
                 />
 
                 {risks.length > 1 && (
@@ -243,6 +350,17 @@ return (
             >
               <Plus size={14} /> Adicionar risco
             </button>
+
+            <div className="flex justify-end mt-8">
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="px-6 py-3 bg-[#0B2B70] text-white rounded-lg disabled:opacity-50"
+              >
+                {isSubmitting ? "Salvando..." : "Finalizar Plano"}
+              </button>
+            </div>
+
           </div>
         </div>
       )}
@@ -255,13 +373,14 @@ return (
           </h1>
 
           <div className="flex rounded-lg border px-3 py-2 bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-            <textarea
-              required
-              rows={5}
-              maxLength={2000}
-              placeholder="Descreva o escopo detalhado"
-              className="w-full resize-none bg-transparent text-sm outline-none text-black/80 dark:text-white placeholder:text-[#98A2B3]"
-            />
+          <textarea
+            required
+            rows={5}
+            maxLength={2000}
+            value={rolloutScope}
+            onChange={(e) => setRolloutScope(e.target.value)}
+            placeholder="Descreva o escopo detalhado"
+          />
           </div>
         </div>
 
@@ -278,9 +397,11 @@ return (
                 className="w-full bg-transparent text-sm outline-none text-[#344054] dark:text-[#ced3db] dark:bg-black appearance-none cursor-pointer"
               >
                 <option value="">Selecionar stakeholders</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
+                {availableStakeholders
+                  .filter(user => !selectedStakeholders.some(s => s.id === user.id))
+                  .map((stakeholder) => (
+                  <option key={stakeholder.id} value={stakeholder.id}>
+                    {stakeholder.name} - {translateRole(stakeholder.role)}
                   </option>
                 ))}
               </select>
@@ -299,18 +420,18 @@ return (
           </div>
 
           <div className="flex flex-wrap gap-2 mt-3">
-            {stakeholders.map((item) => (
+            {selectedStakeholders.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-[#E7EEFF] text-[#0B2B70]"
               >
                 {item.name}
-                <span className="text-xs opacity-70">({item.role})</span>
+                <span className="text-xs opacity-70">({translateRole(item.role)})</span>
 
                 <button
                   type="button"
                   onClick={() =>
-                    setStakeholders((prev) =>
+                    setSelectedStakeholders((prev) =>
                       prev.filter((s) => s.id !== item.id)
                     )
                   }
@@ -366,7 +487,7 @@ return (
         </>
     )}
 
-    {page === "3" && (
+  {page === "3" && (
   <div className="grid grid-cols-1 gap-6">
 
     <div className="rounded-xl border p-4">
@@ -382,17 +503,7 @@ return (
         value={executiveSummary}
         onChange={(e) => setExecutiveSummary(e.target.value)}
         placeholder="Descreva a decisão final, justificativa, aprendizados e próximos passos para a escala da solução."
-        className="
-          w-full
-          h-48
-          resize-none
-          rounded-lg
-          px-3 py-2
-          text-sm 
-          bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white
-          outline-none
-          placeholder:text-[#98A2B3]
-        "
+        className="w-full h-48 resize-none rounded-lg px-3 py-2 text-sm bg-[#F9FAFB] border border-white/10 dark:bg-gray-900 text-black/80 dark:text-white outline-none placeholder:text-[#98A2B3]"
       />
 
       <div className="text-right text-xs text-[#98A2B3] mt-1">

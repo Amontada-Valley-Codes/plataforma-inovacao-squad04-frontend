@@ -295,5 +295,12 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/sponsors/${id}`,
     DELETE: (id: string) => `/sponsors/${id}`,
     EVALUATE: '/sponsors/evaluate-experimentation',
+  },
+
+  SCALE: {
+    CREATE_SCALE: (challengeId: string) => `/solution-scale/${challengeId}`,
+    UPDATE_ROLLOUT_PLAN: (scaleId: string) => `/solution-scale/${scaleId}/rollout`,
+    UPDATE_EXECUTIVE_SUMMARY: (scaleId: string) => `/solution-scale/${scaleId}/executive-summary`,
+    GET_STAKEHOLDERS: (challengeId: string) => `/solution-scale/stakeholders/${challengeId}`,
   }
 } 

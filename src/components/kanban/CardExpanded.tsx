@@ -521,7 +521,8 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "SCALE" && (
               <CardExpandedLayout
                 mainContent={
-                  <RolloutPlan />
+                  <RolloutPlan 
+                    challengeId={cardData.id}/>
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
