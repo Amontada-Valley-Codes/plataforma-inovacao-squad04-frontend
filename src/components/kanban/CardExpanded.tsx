@@ -14,7 +14,7 @@ import { Challenge } from "./Kanban"
 import { ChallengeService } from "@/api/services/challenge.service"
 import { startupService } from "@/api/services/startup.service"
 import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload"
-import { showCustomToast } from "./KanbanToaster"
+import { toast } from "sonner"
 import { ChallengeSection } from "./ChallengeSection"
 import { PreScreening } from "./PreScreening"
 import { DetailedScreening } from "./DetailedScreening"
@@ -262,7 +262,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
       if (currentColumnIndex < columns.length - 1) {
         const nextColumn = columns[currentColumnIndex + 1];
 
-        await ChallengeService.changeStatus(challengeId!, { status: nextColumn.id });
+        await ChallengeService.advanceStage(challengeId!, { status: nextColumn.id });
 
         const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
@@ -270,17 +270,14 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
         setChallenges([updatedChallenge, ...otherChallenges]);
         setExpandedCard(updatedChallenge);
 
-        showCustomToast("Desafio avançado com sucesso.", "success");
+        toast.success("Desafio avançado com sucesso.");
 
       } else {
         setExpandedCard(null);
       }
 
     } catch (error: any) {
-      showCustomToast(
-        error?.response?.data?.message || "Não foi possível avançar o desafio.",
-        "error"
-      );
+      toast.error(error?.response?.data?.message || "Não foi possível avançar o desafio.")
     } finally {
       setIsCardOpen(false);
     }
@@ -309,7 +306,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
       const prevColumn = columns[currentColumnIndex - 1];
 
       try {
-        await ChallengeService.changeStatus(challengeId!, { status: prevColumn.id });
+        await ChallengeService.returnStep(challengeId!, { status: prevColumn.id });
 
         const updatedChallenge = { ...challengeToMove, status: prevColumn.id };
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
@@ -317,13 +314,10 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
         setChallenges([updatedChallenge, ...otherChallenges]);
         setExpandedCard(updatedChallenge);
 
-        showCustomToast("Desafio retornado com sucesso.", "success");
+        toast.success("Desafio retornado com sucesso.");
 
       } catch (error: any) {
-        showCustomToast(
-          error?.response?.data?.message || "Não foi possível retornar o desafio.",
-          "error"
-        );
+        toast.error(error?.response?.data?.message || "Não foi possível retornar o desafio.");
       }
     }
   };

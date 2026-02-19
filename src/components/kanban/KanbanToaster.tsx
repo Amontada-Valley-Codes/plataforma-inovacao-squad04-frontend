@@ -21,5 +21,7 @@ export const showCustomToast = (message: string, type: "success" | "error") => {
         )}
         <span>{message}</span>
       </div>
-    ));
+    ), {
+      duration: 1000,
+    });
   };
