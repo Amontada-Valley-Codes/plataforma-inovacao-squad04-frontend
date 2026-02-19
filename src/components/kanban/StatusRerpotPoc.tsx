@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import StatusReportEmailSection from "./StatusReportEmail";
 import StatusReportSendHistory, { SendHistoryItem } from "./StatusReportSendHistory";
-import { StatusReportService } from "@/api/services/statusReport.service";
+import { statusReportService } from "@/api/services/statusReport.service";
 
 type StatusReportPoCProps = {
     challengeId: string;
@@ -26,14 +26,11 @@ type SectionProps = {
     placeholder: string;
 };
 
-function Section({ title, value, onChange, metaInfo, placeholder }: SectionProps) {
+function Section({ title, value, onChange, placeholder }: SectionProps) {
     return (
         <div className="flex flex-col mb-6">
             <div className="flex items-center justify-between mb-2">
                 <h2 className="text-[#0B2B70] dark:text-white font-semibold">{title}</h2>
-                <span className="text-xs text-[#98A2B3] dark:text-white/50">
-                    {value.length}/{MAX_CHARS}
-                </span>
             </div>
 
             <div className="flex-1 flex rounded-lg border px-3 py-2 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
@@ -47,15 +44,9 @@ function Section({ title, value, onChange, metaInfo, placeholder }: SectionProps
                 />
             </div>
 
-            <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-[#98A2B3] dark:text-white/50">
-                    Data: <span className="font-medium">{metaInfo.createdAtLabel}</span>
-                </p>
-                <p className="text-xs text-[#98A2B3] dark:text-white/50">
-                    Responsável:{" "}
-                    <span className="font-medium">{metaInfo.responsibleLabel}</span>
-                </p>
-            </div>
+            <span className="text-xs text-[#98A2B3] dark:text-white/50 self-end mt-2">
+                {value.length}/{MAX_CHARS}
+            </span>
         </div>
     );
 }
@@ -128,8 +119,25 @@ export default function StatusReportPoC({ challengeId, responsibleName }: Status
             };
 
 
-            const created = await StatusReportService.create(challengeId, payload);
-            setStatusReportId(created.id);
+            if (statusReportId) {
+
+                const updated = await statusReportService.updateStatus(
+                    statusReportId,
+                    payload
+                );
+
+                setStatusReportId(updated.id);
+
+            } else {
+
+                const created = await statusReportService.createStatus(
+                    challengeId,
+                    payload
+                );
+
+                setStatusReportId(created.id);
+
+            }
         } catch (err: any) {
             console.log("CREATE STATUS REPORT ERROR DATA:", err?.response?.data);
 
@@ -156,6 +164,47 @@ export default function StatusReportPoC({ challengeId, responsibleName }: Status
         !!proximosPassos.text.trim();
 
 
+    useEffect(() => {
+        async function loadStatusReport() {
+            try {
+                const allReports = await statusReportService.showStatus();
+
+                const report = allReports
+                    .filter(r => r.challengeId === challengeId)
+                    .sort((a, b) =>
+                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    )[0];
+
+                if (!report) return;
+
+                setStatusReportId(report.id);
+
+                setAvancosSemana({
+                    text: report.advances_of_the_Week ?? "",
+                    createdAt: report.createdAt,
+                    responsible: responsibleName ?? "",
+                });
+
+                setProblemasEncontrados({
+                    text: report.problemsFound ?? "",
+                    createdAt: report.createdAt,
+                    responsible: responsibleName ?? "",
+                });
+
+                setProximosPassos({
+                    text: report.nextSteps ?? "",
+                    createdAt: report.createdAt,
+                    responsible: responsibleName ?? "",
+                });
+
+            } catch (err) {
+                console.error("Erro ao carregar status report:", err);
+            }
+        }
+
+    loadStatusReport();
+}, [challengeId, responsibleName]);
+
     return (
         <div className="flex flex-col">
             <div className="flex items-center justify-between mb-4">
@@ -172,7 +221,7 @@ export default function StatusReportPoC({ challengeId, responsibleName }: Status
                         : "bg-[#0B2B70] hover:bg-[#09245e] text-white"
                         }`}
                 >
-                    {isSaving ? "Salvando..." : statusReportId ? "Salvar novamente" : "Salvar"}
+                    {isSaving ? "Salvando..." : statusReportId ? "Salvar" : "Salvar"}
                 </button>
             </div>
 
@@ -181,13 +230,6 @@ export default function StatusReportPoC({ challengeId, responsibleName }: Status
                     {saveError}
                 </p>
             )}
-
-            {statusReportId && !saveError && (
-                <p className="mb-4 text-xs text-[#98A2B3] dark:text-white/50">
-                    Status Report criado: <span className="font-medium">{statusReportId}</span>
-                </p>
-            )}
-
 
             <Section
                 title="Avanços da semana"

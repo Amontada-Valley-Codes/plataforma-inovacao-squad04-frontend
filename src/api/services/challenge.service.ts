@@ -1,5 +1,6 @@
 // src/api/services/challenge.service.ts
-import api from "../axios";
+
+import api from "@/api/axios";
 import { ENDPOINTS } from "../endpoints";
 import {
   ChangeStatusPayload,
@@ -22,6 +23,8 @@ import {
   PaginatedChallengesParams,
   PaginatedChallengesResponse,
   ChallengeFullResponse,
+  AdvanceStageResponse,
+  ReturnStepResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -139,6 +142,16 @@ export const ChallengeService = {
 
   async searchByStatus(status: string): Promise<ShowAllChallengeResponse[]> {
     const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.SEARCH_BY_STATUS(status))
+    return data
+  },
+
+  async advanceStage(challengeId: string, status: ChangeStatusPayload): Promise<AdvanceStageResponse> {
+    const { data } = await api.put(ENDPOINTS.CHALLENGE.ADVANCE(challengeId), status)
+    return data
+  },
+
+  async returnStep(challengeId: string, status: ChangeStatusPayload): Promise<ReturnStepResponse> {
+    const { data } = await api.patch(ENDPOINTS.CHALLENGE.RETURN(challengeId), status)
     return data
   },
 };

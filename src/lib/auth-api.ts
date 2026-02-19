@@ -1,6 +1,7 @@
 // src/lib/auth-api.ts
+import api from "@/api/axios";
 import { ENDPOINTS } from "@/api/endpoints";
-import api from "@/lib/axios";
+
 import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse } from "@/api/payloads/auth.payload";
 
 

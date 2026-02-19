@@ -106,6 +106,8 @@ export const ENDPOINTS = {
       return `/challenge/paginated?${query.toString()}`
     },
     FULL: (challengeId: string) => `/challenge/${challengeId}/full`,
+    ADVANCE: (challengeId: string) => `/challenge/${challengeId}/advance-stage`,
+    RETURN: (challengeId: string) => `/challenge/${challengeId}/return-step`,
   },
 
   CHECKLIST: {
@@ -148,9 +150,9 @@ export const ENDPOINTS = {
   MATERIALIZATION: {
     CREATE_MVP: (id: string) => `/mvp-canvas/${id}`,
     SHOW_ALL_MVP: `/mvp-canvas`,
-    SHOW_MVP_BY_ID: (id: string) => `mvp-canvas/${id}`,
-    UPDATE_MVP: (id: string) => `mvp-canvas/${id}`,
-    DELETE_MVP: (id: string) => `mvp-canvas/${id}`,
+    SHOW_MVP_BY_ID: (id: string) => `/mvp-canvas/${id}`,
+    UPDATE_MVP: (id: string) => `/mvp-canvas/${id}`,
+    DELETE_MVP: (id: string) => `/mvp-canvas/${id}`,
   },
 
   EXPERIMENTATION: {
@@ -160,23 +162,23 @@ export const ENDPOINTS = {
     SHOW_POC: (id: string) => `/experimentation/poc/${id}`,
     UPDATE_POC: (id: string) => `/experimentation/poc/${id}`,
     DELETE_POC: (id: string) => `/experimentation/poc/${id}`,
-    CREATE_HYPOTHESES: (id: string) => `experimentation/poc/${id}/hypotheses`,
-    UPDATE_HYPOTHESES: (id: string) => `experimentation/poc/${id}/hypotheses`,
-    DELETE_HYPOTHESES: (id: string) => `experimentation/poc/${id}/hypotheses`,
-    CREATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
-    UPDATE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
-    DELETE_INDICATORS: (id: string) => `experimentation/poc/${id}/indicators`,
-    CREATE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
-    SHOW_REPORT: (id: string) => `experimentation/poc/result/${id}`,
-    UPDATE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
-    DELETE_REPORT: (id: string) => `experimentation/poc/result/${id}`,
+    CREATE_HYPOTHESES: (id: string) => `/experimentation/poc/${id}/hypotheses`,
+    UPDATE_HYPOTHESES: (id: string) => `/experimentation/poc/${id}/hypotheses`,
+    DELETE_HYPOTHESES: (id: string) => `/experimentation/poc/${id}/hypotheses`,
+    CREATE_INDICATORS: (id: string) => `/experimentation/poc/${id}/indicators`,
+    UPDATE_INDICATORS: (id: string) => `/experimentation/poc/${id}/indicators`,
+    DELETE_INDICATORS: (id: string) => `/experimentation/poc/${id}/indicators`,
+    CREATE_REPORT: (id: string) => `/experimentation/poc/result/${id}`,
+    SHOW_REPORT: (id: string) => `/experimentation/poc/result/${id}`,
+    UPDATE_REPORT: (id: string) => `/experimentation/poc/result/${id}`,
+    DELETE_REPORT: (id: string) => `/experimentation/poc/result/${id}`,
   },
 
   KPIS: {
     CREATE_KPI: (id: string) => `/kp/${id}/KPIs`,
     SHOW_KPI: (id: string) => `/kp/${id}`,
-    UPDATE_KPI: (id: string) => `kp/${id}`,
-    DELETE_KPI: (id: string) => `kp/${id}`,
+    UPDATE_KPI: (id: string) => `/kp/${id}`,
+    DELETE_KPI: (id: string) => `/kp/${id}`,
   },
 
   TAGS: {
@@ -267,7 +269,8 @@ export const ENDPOINTS = {
 
   STATUS_REPORT: {
     CREATE: (challengeId: string) => `/status-report/${challengeId}`,
-    GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
+    GET: `/status-report`,
+    UPDATE: (id: string) => `/status-report/${id}`,
     SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
   },
 
@@ -295,5 +298,12 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/sponsors/${id}`,
     DELETE: (id: string) => `/sponsors/${id}`,
     EVALUATE: '/sponsors/evaluate-experimentation',
+  },
+
+  SCALE: {
+    CREATE_SCALE: (challengeId: string) => `/solution-scale/${challengeId}`,
+    UPDATE_ROLLOUT_PLAN: (scaleId: string) => `/solution-scale/${scaleId}/rollout`,
+    UPDATE_EXECUTIVE_SUMMARY: (scaleId: string) => `/solution-scale/${scaleId}/executive-summary`,
+    GET_STAKEHOLDERS: (challengeId: string) => `/solution-scale/stakeholders/${challengeId}`,
   }
 } 

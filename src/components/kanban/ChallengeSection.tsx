@@ -272,31 +272,74 @@ export const ChallengeSection = ({
             <h1 className="text-[20px] text-[#0B2B70] dark:text-white font-semibold my-4">
               Respostas do Formulário Personalizado
             </h1>
-            {extraData?.forms.map((form) => (
-              <div key={form.id} className="flex flex-col">
-                {form.version.questions
-                  .sort((a, b) => a.order - b.order)
-                  .map((q, index) => {  
-                    const lastResponse = form.responses[form.responses.length - 1];
-                    const answerValue = lastResponse?.answers[index]?.value;
 
-                    if (answerValue) {
-                      return (
-                        <div key={q.id} className="flex flex-col mb-6">
-                          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-                            <HelpCircle size={16} />
-                            {q.title}
-                          </h1>
-                          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-                            {answerValue}
-                          </p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-              </div>
-            ))}
+            {(() => {
+              const forms = extraData?.forms ?? [];
+
+              if (forms.length === 0) {
+                return (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Este desafio não possui formulário personalizado.
+                  </p>
+                );
+              }
+
+              const hasQuestions = forms.some(
+                form => form.version.questions.length > 0
+              );
+
+              if (!hasQuestions) {
+                return (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Este formulário não possui perguntas cadastradas.
+                  </p>
+                );
+              }
+
+              const hasAnswers = forms.some(form => {
+                const lastResponse = form.responses[form.responses.length - 1];
+
+                return form.version.questions.some((_, index) => {
+                  const answerValue = lastResponse?.answers[index]?.value;
+                  return Boolean(answerValue);
+                });
+              });
+
+              if (!hasAnswers) {
+                return (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Nenhuma resposta foi registrada para este formulário.
+                  </p>
+                );
+              }
+
+              return forms.map((form) => (
+                <div key={form.id} className="flex flex-col">
+                  {form.version.questions
+                    .sort((a, b) => a.order - b.order)
+                    .map((q, index) => {
+                      const lastResponse = form.responses[form.responses.length - 1];
+                      const answerValue = lastResponse?.answers[index]?.value;
+
+                      if (answerValue) {
+                        return (
+                          <div key={q.id} className="flex flex-col mb-6">
+                            <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
+                              <HelpCircle size={16} />
+                              {q.title}
+                            </h1>
+                            <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
+                              {answerValue}
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })}
+                </div>
+              ));
+            })()}
           </div>
         )}
         </div>

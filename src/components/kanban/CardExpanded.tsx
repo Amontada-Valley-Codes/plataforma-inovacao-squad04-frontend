@@ -6,15 +6,15 @@ import { Modal } from "../ui/modal"
 import ForwardButton from "./ForwardButton"
 import PreviousButton from "./PreviousButton"
 import { cn } from "@/lib/utils"
-import { Loader2, MoreVertical, X } from "lucide-react"
+import { Loader2, X } from "lucide-react"
 import { CommentsPanel } from "./CommentsPanel"
 import React, { useEffect, useState } from "react"
 import { useBreakpoints } from "@/hooks/useBreakpoints"
-import { Challenge, getCategoryLabel } from "./Kanban"
+import { Challenge } from "./Kanban"
 import { ChallengeService } from "@/api/services/challenge.service"
 import { startupService } from "@/api/services/startup.service"
 import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload"
-import Image from "next/image"
+import { toast } from "sonner"
 import { ChallengeSection } from "./ChallengeSection"
 import { PreScreening } from "./PreScreening"
 import { DetailedScreening } from "./DetailedScreening"
@@ -255,32 +255,31 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
         challengeWithUpdates.visibility = visibilityToSet;
         setVisibility(visibilityToSet);
 
-        if (challengeId) {
-          await ChallengeService.changeVisibility(challengeId, { visibility: visibilityToSet })
-          console.log("Visibilidade alterada com sucesso");
-        }
+        await ChallengeService.changeVisibility(challengeId, { visibility: visibilityToSet });
       }
 
       const currentColumnIndex = columns.findIndex(c => c.id === challengeWithUpdates.status);
 
       if (currentColumnIndex < columns.length - 1) {
         const nextColumn = columns[currentColumnIndex + 1];
+        
+        await ChallengeService.changeStatus(challengeId!, { status: nextColumn.id })
+        // await ChallengeService.advanceStage(challengeId!, { status: nextColumn.id });
+
         const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
-
-        if (challengeId) {
-          await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
-          console.log("Status atualizado com sucesso");
-        }
-
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
+
         setChallenges([updatedChallenge, ...otherChallenges]);
         setExpandedCard(updatedChallenge);
+
+        toast.success("Desafio avançado com sucesso.");
+
       } else {
         setExpandedCard(null);
       }
 
-    } catch (error) {
-      console.error("Erro ao atualizar desafio:", error);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Não foi possível avançar o desafio.")
     } finally {
       setIsCardOpen(false);
     }
@@ -307,19 +306,22 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
     if (currentColumnIndex > 0) {
       const prevColumn = columns[currentColumnIndex - 1];
-      const updatedChallenges = { ...challengeToMove, status: prevColumn.id };
 
-      if (challengeId) {
-        await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
-        console.log("Status atualizado com sucesso");
+      try {
+        await ChallengeService.changeStatus(challengeId!, { status: prevColumn.id })
+        // await ChallengeService.returnStep(challengeId!, { status: prevColumn.id });
+
+        const updatedChallenge = { ...challengeToMove, status: prevColumn.id };
+        const otherChallenges = challenges.filter(c => c.id !== challengeId);
+
+        setChallenges([updatedChallenge, ...otherChallenges]);
+        setExpandedCard(updatedChallenge);
+
+        toast.success("Desafio retornado com sucesso.");
+
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || "Não foi possível retornar o desafio.");
       }
-
-      const otherChallenges = challenges.filter(c => c.id !== challengeId);
-      setChallenges([updatedChallenges, ...otherChallenges]);
-
-      setExpandedCard(updatedChallenges);
-    } else {
-      setExpandedCard(null);
     }
   };
 
@@ -516,7 +518,13 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
             {cardData.status === "SCALE" && (
               <CardExpandedLayout
                 mainContent={
-                  <RolloutPlan />
+                  <RolloutPlan 
+                    challengeId={cardData.id}
+                    challengeTitle={cardData.name}
+                    creator={cardData.Users.name}
+                    startDate={cardData.createdAt}
+                    visibility={cardData.visibility}
+                  />
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel

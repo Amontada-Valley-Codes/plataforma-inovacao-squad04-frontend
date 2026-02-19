@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { enterpriseMatchService } from "@/api/services/enterpriseMatch.service";
 import { EnterpriseMatchResponse } from "@/api/payloads/match.payload";
-import { showCustomToast } from "@/components/kanban/KanbanToaster";
+import { toast } from "sonner";
 import AcceptedMatchesList from "./AcceptedMatchesList";
 import PendingMatchesList from "./PendingMatchesList";
 
@@ -54,7 +54,7 @@ export default function MatchesTab({ startupId, startupName }: MatchesTabProps) 
       setInvites(invitesData.filter(m => m.startupId === startupId));
     } catch (error) {
       console.error("Erro ao buscar matches:", error);
-      showCustomToast("Erro ao carregar matches", "error");
+      toast.error("Erro ao carregar matches");
     } finally {
       setLoading(false);
     }
@@ -63,35 +63,35 @@ export default function MatchesTab({ startupId, startupName }: MatchesTabProps) 
   const handleAccept = async (matchId: string) => {
     try {
       await enterpriseMatchService.acceptApplication(matchId);
-      showCustomToast("Candidatura aceita com sucesso!", "success");
+      toast.success("Candidatura aceita com sucesso!");
       fetchMatches();
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao aceitar candidatura", "error");
+      toast.error(error?.response?.data?.message || "Erro ao aceitar candidatura");
     }
   };
 
   const handleDeny = async (matchId: string) => {
     try {
       await enterpriseMatchService.denyMatch(matchId);
-      showCustomToast("Candidatura recusada", "success");
+      toast.success("Candidatura recusada");
       fetchMatches();
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao recusar candidatura", "error");
+      toast.error(error?.response?.data?.message || "Erro ao recusar candidatura");
     }
   };
 
   const handleCancel = async (matchId: string) => {
     try {
       await enterpriseMatchService.denyMatch(matchId);
-      showCustomToast("Convite cancelado", "success");
+      toast.success("Convite cancelado");
       fetchMatches();
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao cancelar convite", "error");
+      toast.error(error?.response?.data?.message || "Erro ao cancelar convite");
     }
   };
 
   const handleView = (matchId: string) => {
-    showCustomToast("Visualização de detalhes em desenvolvimento", "success");
+    toast.success("Visualização de detalhes em desenvolvimento");
   };
 
   if (loading) {

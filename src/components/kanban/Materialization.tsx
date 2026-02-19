@@ -17,17 +17,28 @@ type CardMaterializationContentProps = {
   startDate: string;
 }
 
-export function translateUserType(type: string): string {
-  switch (type) {
-    case "ORGANIZER": return "Organizador";
-    case "COLLABORATOR": return "Colaborador";
-    case "OBSERVER": return "Observador";
-    case "INNOVATION_OFFICE": return "Escritório de Inovação";
-    case "STEERING_COMMITTEE": return "Comitê de Direção";
-    case "ADMINISTRATOR": return "Administrador";
-    case "MANAGER": return "Gestor";
-    case "STARTUP": return "Startup";
-    default: return "Usuário";
+export function translateUserType(value?: string) {
+  switch (value) {
+    case "ORGANIZER":
+      return "Organizador";
+    case "COLLABORATOR":
+      return "Colaborador";
+    case "OBSERVER":
+      return "Observador";
+    case "TRANSFORMATION_OFFICE":
+      return "Escritório de Transformação";
+    case "INNOVATION_TEAM":
+      return "Time de Inovação";
+    case "STEERING_COMMITTEE":
+      return "Comitê Executivo";
+    case "ADMINISTRATOR":
+      return "Administrador";
+    case "MANAGER":
+      return "Gestor";
+    case "STARTUP":
+      return "Startup";
+    default:
+      return "Outro";
   }
 }
 

@@ -304,3 +304,39 @@ export type ChallengeFullResponse = {
     }[];
   }[];
 };
+
+export type AdvanceStageResponse = {
+  id: string;
+  ideaIdentifier: string;
+  name: string;
+  proponentName: string;
+  proponentEmail: string;
+  proponentArea: string;
+  problemDescription: string;
+  problemDuration: string;
+  currentSolution: string;
+  problemRelevance: string;
+  currentIndicators: string;
+  expectedImpacts: string;
+  involvedAreas: string[];
+  initialConstraints: string;
+  proponentParticipation: string;
+  strategic_alignment: string | number | null;
+  innovative_potential: string | number | null;
+  business_relevance: string | number | null;
+  visibility: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  endDate: string;
+  impactScore: string | number | null;
+  confidenceScore: string | number | null;
+  easeScore: string | number | null;
+  finalIceScore: string | number | null;
+  reportUrl: string | null;
+  reportDate: string | null;
+  enterpriseId: string;
+  usersId: string;
+};
+
+export type ReturnStepResponse = AdvanceStageResponse

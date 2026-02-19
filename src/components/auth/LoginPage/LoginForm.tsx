@@ -4,11 +4,11 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, LockKeyhole, EyeIcon, CheckCircle2, XCircle, Loader2, EyeClosedIcon } from "lucide-react";
+import { User, LockKeyhole, EyeIcon, Loader2, EyeClosedIcon } from "lucide-react";
 import Link from "next/link";
 import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import { toast, Toaster } from "sonner";
 
 function setFrontendCookie(name: string, value: string, maxAgeSeconds: number) {
   if (typeof document === "undefined") return;
@@ -35,23 +35,42 @@ function getJwtMaxAge(jwt: string, fallbackSeconds = 60 * 60 * 8) {
 }
 
 function decideDestinyFromToken(jwt: string) {
-  const p = parseJwt<{ type_user?: string; enterpriseId?: string | null }>(jwt) || {};
+  const p =
+  parseJwt<{
+    type_user?: string;
+    enterpriseId?: string | null;
+    startupId?: string | null;
+  }>(jwt) || {};
+
   const type = (p.type_user ?? "").toUpperCase();
   const companyId = p.enterpriseId ? String(p.enterpriseId) : null;
+  const startupId = p.startupId ? String(p.startupId) : null;
+
 
   switch (type) {
+    
     case "ADMINISTRATOR":
       return "/admin/dashboard";
+    
     case "MANAGER":
+    case "STEERING_COMMITTEE":
+    case "INNOVATION_TEAM": 
+    case "ORGANIZER":
       return companyId ? `/company/${companyId}/dashboard` : "/company";
+
     case "EVALUATOR":
+    case "OBSERVER":
       return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
+
+    case "COLLABORATOR":
     case "COMMON":
       return "/user/meus-desafios";
+
     case "STARTUP":
-      return "/startup/desafios";
+      return startupId ? `/startup/${startupId}` : "/startup/desafios";
+
     default:
-      return "/user/meus-desafios";
+      return "/company";
   }
 }
 
@@ -63,27 +82,6 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-
-  const showCustomToast = (message: string, type: "success" | "error") => {
-    toast.custom((t) => (
-      <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}
-          ${
-            type === "success"
-              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
-          }`}
-      >
-        {type === "success" ? (
-          <CheckCircle2 className="text-green-300" size={22} />
-        ) : (
-          <XCircle className="text-red-300" size={22} />
-        )}
-        <span>{message}</span>
-      </div>
-    ));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,13 +107,13 @@ export default function LoginForm() {
       const destiny = decideDestinyFromToken(access_token);
 
       setLoading(false);
-      showCustomToast("Login realizado com sucesso!", "success");
-      setTimeout(() => router.push(destiny), 300);
+      toast.success("Login realizado com sucesso!");
+      setTimeout(() => router.replace(destiny), 300);
     } catch (err: any) {
       setLoading(false);
       const msg = err?.response?.data?.message || "Erro ao entrar.";
       setError(msg);
-      showCustomToast(msg, "error");
+      toast.error(msg);
     }
   };
 
@@ -125,7 +123,7 @@ export default function LoginForm() {
       bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)]
       px-6 sm:px-10 py-8 md:border-l-2 border-[#C7E6FE]"
     >
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" richColors />
 
       {/* Logo */}
       <div className="relative w-[90px] h-[65px] sm:w-[110px] sm:h-[80px] mb-6 sm:mb-8">

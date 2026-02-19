@@ -6,7 +6,7 @@ import { ChallengeService } from "@/api/services/challenge.service";
 import { enterpriseService } from "@/api/services/enterprise.service";
 import { enterpriseMatchService } from "@/api/services/enterpriseMatch.service";
 import { Button } from "@/components/ui/button";
-import { showCustomToast } from "@/components/kanban/KanbanToaster";
+import { toast } from "sonner";
 import InviteStartupModal from "./InviteStartupModal";
 
 interface InviteTabProps {
@@ -75,7 +75,7 @@ export default function InviteTab({ startupId, startupName }: InviteTabProps) {
       setChallenges(mapped);
     } catch (error) {
       console.error("Erro ao buscar desafios:", error);
-      showCustomToast("Erro ao carregar desafios", "error");
+      toast.error("Erro ao carregar desafios");
     } finally {
       setLoading(false);
     }
@@ -86,10 +86,10 @@ export default function InviteTab({ startupId, startupName }: InviteTabProps) {
 
     try {
       await enterpriseMatchService.sendInvite(startupId, selectedChallenge.id);
-      showCustomToast("Convite enviado com sucesso!", "success");
+      toast.success("Convite enviado com sucesso!");
       setModalOpen(false);
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao enviar convite", "error");
+      toast.error(error?.response?.data?.message || "Erro ao enviar convite");
     }
   };
 
