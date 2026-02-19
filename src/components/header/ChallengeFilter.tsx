@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, ChevronDown, CircleCheckBig, ClipboardList } from "lucide-react";
+
 import { useState } from "react";
 import CreateChallengeButton from "./CreateChallengeButton";
 import RegisterStartupBtn from "../startup/RegisterStartupButton";
@@ -28,67 +28,7 @@ export default function ChallengeFilter({
       <div className="flex flex-nowrap items-center gap-2 overflow-x-auto px-2 py-1.5 md:flex-wrap md:justify-between md:px-3 md:py-2 hide-scrollbar">
         {/* Filtros (mobile compacto) */}
         <div className="flex flex-nowrap items-center gap-2">
-          {/* Data */}
-          <label className="relative flex h-9 items-center gap-2 rounded-[12px] border border-gray-200 bg-white pl-3 text-xs font-semibold text-zinc-500 dark:border-gray-800 dark:bg-gray-900 dark:text-[#ced3db] md:h-11 md:text-sm">
-            <Calendar size={16} className="md:hidden"/>
-            <Calendar size={16} className="hidden md:block"/>
-            <input
-              type="date"
-              className="h-full bg-transparent outline-none"
-            />
-          </label>
-
-          {/* Setor */}
-          <div className="relative">
-            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-[#ced3db]">
-              <ClipboardList size={16} className="md:hidden" />
-              <ClipboardList size={18} className="hidden md:block" />
-            </div>
-
-            <select
-              onClick={() => setSetorIsOpen(!isSetorOpen)}
-              onBlur={() => setSetorIsOpen(false)}
-              className="h-9 rounded-[12px] border border-gray-200 bg-white pl-9 pr-7 text-xs font-semibold text-zinc-500 appearance-none dark:border-gray-800 dark:bg-gray-900 dark:text-[#ced3db] md:h-11 md:text-sm md:pr-8"
-            >
-              <option disabled>Setor</option>
-              <option value="financeiro">Financeiro</option>
-              <option value="rh">RH</option>
-              <option value="ti">TI</option>
-            </select>
-
-            <ChevronDown
-              size={16}
-              className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform duration-300 dark:text-[#ced3db] ${
-                isSetorOpen ? "rotate-180" : ""
-              } md:size-5`}
-            />
-          </div>
-
-          {/* Status */}
-          <div className="relative">
-            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-[#ced3db]">
-              <CircleCheckBig size={16} className="md:hidden" />
-              <CircleCheckBig size={18} className="hidden md:block" />
-            </div>
-
-            <select
-              onClick={() => setStatusIsOpen(!isStatusOpen)}
-              onBlur={() => setStatusIsOpen(false)}
-              className="h-9 rounded-[12px] border border-gray-200 bg-white pl-9 pr-7 text-xs font-semibold text-zinc-500 appearance-none dark:border-gray-800 dark:bg-gray-900 dark:text-[#ced3db] md:h-11 md:text-sm md:pr-8"
-            >
-              <option disabled>Status</option>
-              <option value="pending">Pending</option>
-              <option value="in-progress">In progress</option>
-              <option value="completed">Completed</option>
-            </select>
-
-            <ChevronDown
-              size={16}
-              className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-transform duration-300 dark:text-[#ced3db] ${
-                isStatusOpen ? "rotate-180" : ""
-              } md:size-5`}
-            />
-          </div>
+         
         </div>
       </div>
       {/* Ações: compacta no mobile, normal no md+ */}
