@@ -2,9 +2,14 @@ import { ChevronDown, Plus, Trash2, DollarSign, TrendingUp, AlertTriangle } from
 import { useEffect, useMemo, useState } from "react";
 import RolloutTimeline from "./GanttChart";
 import { ScaleService } from "@/api/services/scale.service";
+import { CardContentsHeader } from "./CardsContents";
 
 type Props = {
   challengeId: string
+  challengeTitle: string
+  visibility: string
+  creator: string
+  startDate: string
 }
 
 type Stakeholder = {
@@ -13,7 +18,7 @@ type Stakeholder = {
   role: string
 };
 
-export default function RolloutPlan({ challengeId }: Props) {
+export default function RolloutPlan({ challengeId, challengeTitle, creator, startDate, visibility }: Props) {
   const [availableStakeholders, setAvailableStakeholders] = useState<Stakeholder[]>([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
   const [rolloutScope, setRolloutScope] = useState("");
@@ -195,10 +200,12 @@ function translateRole(role: string) {
 return (
   <div>
     <div className="flex items-center justify-between mb-6">
-      <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold">
-        Plano de Rollout
-      </h1>
-
+      <CardContentsHeader
+        challengeTitle={challengeTitle}
+        visibility={visibility}
+        creator={creator}
+        startDate={startDate}
+      />
       <div className="flex items-center gap-6">
         <div className="flex flex-col items-center">
           <button
@@ -242,7 +249,9 @@ return (
         </div>
       </div>
     </div>
-
+      <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold mb-4">
+        Plano de Rollout
+      </h1>
           {page === "1" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
