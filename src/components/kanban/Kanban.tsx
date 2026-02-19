@@ -15,7 +15,6 @@ import PreviousButton from './PreviousButton';
 import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
 import KanbanTable from './KanbanTable';
-import { showCustomToast } from './KanbanToaster';
 import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
 
