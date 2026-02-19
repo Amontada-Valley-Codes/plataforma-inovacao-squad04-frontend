@@ -14,7 +14,7 @@ import { ChallengeService } from "@/api/services/challenge.service";
 import { ShowAllChallengeResponse } from "@/api/payloads/challenge.payload";
 import { shortDateFormatter } from "../kanban/Kanban";
 
-type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup";
+type Role = "admin" | "gestor" | "avaliador" | "usuario" | "startup" | "collaborator";
 
 type Status = "APPROVE" | "DISAPPROVE" | string;
 
@@ -53,7 +53,7 @@ export default function CompanyHistoryHistoric({
             params.enterpriseId = companyId;
           }
 
-          if ((role === "gestor" || role === "avaliador") && viewerCompanyId) {
+          if ((role === "gestor" || role === "avaliador" || role === "collaborator") && viewerCompanyId) {
             params.enterpriseId = viewerCompanyId;
           }
 
@@ -67,7 +67,7 @@ export default function CompanyHistoryHistoric({
 
         let scoped = historicalOnly;
 
-        if ((role === "gestor" || role === "avaliador") && viewerCompanyId) {
+        if ((role === "gestor" || role === "avaliador" || role === "collaborator") && viewerCompanyId) {
           scoped = scoped.filter(
             (c) => String(c.enterpriseId) === String(viewerCompanyId)
           );

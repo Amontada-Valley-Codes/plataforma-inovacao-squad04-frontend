@@ -4,9 +4,9 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, CheckCircle2, XCircle, Loader2, Phone, LockKeyhole, EyeIcon, EyeClosedIcon } from "lucide-react";
+import { User, Loader2, Phone, LockKeyhole, EyeIcon, EyeClosedIcon } from "lucide-react";
 import Link from "next/link";
-import toast, { Toaster } from "react-hot-toast";
+import { toast, Toaster } from "sonner";
 import { inviteService } from "@/api/services/invite.service";
 import { authService } from "@/api/services/auth.service";
 import { useRouter } from "next/navigation";
@@ -24,27 +24,6 @@ export default function ForgotForm() {
   const [validationToken, setValidationToken] = useState("");
 
   const router = useRouter(); 
-
-  const showCustomToast = (message: string, type: "success" | "error") => {
-    toast.custom((t) => (
-      <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}
-          ${
-            type === "success"
-              ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-              : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
-          }`}
-      >
-        {type === "success" ? (
-          <CheckCircle2 className="text-green-300" size={22} />
-        ) : (
-          <XCircle className="text-red-300" size={22} />
-        )}
-        <span>{message}</span>
-      </div>
-    ));
-  };
 
   function maskPhoneNumber(value: string) {
     return value
@@ -76,7 +55,7 @@ export default function ForgotForm() {
       })
 
       if (!response.token) {
-        showCustomToast("Dados inválidos ou sem cadastro no sistema.", "error");
+        toast.error("Dados inválidos ou sem cadastro no sistema.");
         setLoading(false)
         return
       }
@@ -84,13 +63,13 @@ export default function ForgotForm() {
       setValidationToken(response.token)
 
       setLoading(false);
-      showCustomToast("Dados validados com sucesso!", "success");
+      toast.success("Dados validados com sucesso!");
     } catch(err: any) {
       console.log(phoneNumber)
       setLoading(false);
       const msg = err?.response?.data?.message || "Erro ao recuperar senha.";
       setValidationFormError(msg);
-      showCustomToast(msg, "error");
+      toast.error(msg);
     }
   };
 
@@ -114,7 +93,7 @@ export default function ForgotForm() {
       })
 
       setLoading(false);
-      showCustomToast("Senha redefinida com sucesso!", "success");
+      toast.success("Senha redefinida com sucesso!");
 
       router.push("/auth/login");
 
@@ -122,7 +101,7 @@ export default function ForgotForm() {
       setLoading(false);
       const msg = err?.response?.data?.message || "Erro ao recuperar senha.";
       setValidationFormError(msg);
-      showCustomToast(msg, "error");
+      toast.error(msg);
       console.log(phoneNumber)
     }
   }
@@ -135,7 +114,7 @@ export default function ForgotForm() {
           bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)]
           px-6 sm:px-10 py-8 md:border-l-2 border-[#C7E6FE]"
         >
-          <Toaster position="top-right" reverseOrder={false} />
+          <Toaster position="top-right" richColors />
 
           {/* Logo */}
           <div className="relative w-[90px] h-[65px] sm:w-[110px] sm:h-[80px] mb-6 sm:mb-8">
@@ -221,7 +200,7 @@ export default function ForgotForm() {
           bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)]
           px-6 sm:px-10 py-8 md:border-l-2 border-[#C7E6FE]"
         >
-          <Toaster position="top-right" reverseOrder={false} />
+          <Toaster position="top-right" richColors />
 
           {/* Logo */}
           <div className="relative w-[90px] h-[65px] sm:w-[110px] sm:h-[80px] mb-6 sm:mb-8">

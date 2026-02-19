@@ -5,7 +5,7 @@ import CompanyHistory from "@/components/history/CompanyHistory";
 import { getUserRole, getCurrentUser } from "@/lib/auth";
 
 export default function AdminHistoryPage() {
-  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
+  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario" | "collaborator">("usuario");
   const [viewerUserId, setViewerUserId] = useState<string | undefined>(undefined); 
   const [loaded, setLoaded] = useState(false);
 
@@ -13,7 +13,7 @@ export default function AdminHistoryPage() {
     (async () => {
       const r = await getUserRole();
       const u = await getCurrentUser();
-      setRole(r);
+      setRole(r as "startup" | "admin" | "gestor" | "avaliador" | "usuario" | "collaborator");
       setViewerUserId(u?.id != null ? String(u.id) : undefined);
       setLoaded(true);
     })();

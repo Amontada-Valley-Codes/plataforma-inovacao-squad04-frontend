@@ -12,7 +12,7 @@ import { useStore } from "../../../store";
 import ApplyChallengeModal from "../startup/ApplyChallengeModal";
 import { matchService } from "@/api/services/match.service";
 import { Button } from "../ui/button";
-import { showCustomToast } from "../kanban/KanbanToaster";
+import { toast } from "sonner";
 
 type Status = "Completed" | "In Progress" | "Pending" | string;
 
@@ -248,24 +248,23 @@ export default function ChallengeCard({
 
   const handleApply = async (challenge: Challenge) => {
     if (!challenge || !startupId) {
-      showCustomToast("Erro: Dados incompletos", "error");
+      toast.error("Erro: Dados incompletos");
       return;
     }
 
     if (!challenge.enterpriseId) {
-      showCustomToast(
-        "Erro: Este desafio não possui empresa associada. Entre em contato com o suporte.",
-        "error"
+      toast.error(
+        "Erro: Este desafio não possui empresa associada. Entre em contato com o suporte."
       );
       return;
     }
 
     try {
       await matchService.sendApplication(challenge.id, challenge.enterpriseId);
-      showCustomToast("Candidatura enviada com sucesso!", "success");
+      toast.success("Candidatura enviada com sucesso!");
       setModalOpen(false);
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao enviar candidatura", "error");
+      toast.error(error?.response?.data?.message || "Erro ao enviar candidatura");
     }
   };
 

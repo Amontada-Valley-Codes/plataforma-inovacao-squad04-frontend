@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react';
 
 import { Comment } from './Comment';
-import { ChevronDown, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { FilteredCommentReponse, CreateCommentPayload } from '@/api/payloads/commentsFunel.payload';
 import { commentsService } from '@/api/services/commentsFunnel.service';
-import { showCustomToast } from './KanbanToaster';
-import { Toaster } from 'react-hot-toast';
+import { toast, Toaster } from 'sonner';
 
 
 type CommentFeedProps = {
@@ -54,13 +53,13 @@ export const CommentFeed = ({ context, challengeId }: CommentFeedProps) => {
       fetchComments()
     } catch (err) {
       console.error('Erro ao criar comentário:', err)
-      showCustomToast('Erro ao enviar comentário.', "error")
+      toast.error('Erro ao enviar comentário.')
     }
   }
 
   return (
     <div className="border-b border-gray-200 last:border-b-0">
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" richColors />
         <div className="pl-7 pb-4">
           {isLoading && (
             <div className="flex items-center justify-center py-4">

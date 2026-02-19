@@ -71,7 +71,16 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
 
   return (
     <div className="flex flex-col gap-1 mb-6">
-      <h1 className="text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">Relatório de Resultados</h1>
+      <h1 className="flex items-center justify-between text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">
+        Relatório de Resultados
+
+        <button
+          onClick={saveReport}
+          className="w-fit px-4 py-2 rounded-lg text-sm font-semibold bg-[#0B2B70] text-white"
+        >
+          Salvar
+        </button>
+      </h1>
 
       <div className="flex flex-col mb-4">
         <h1 className="flex gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-1">
@@ -243,15 +252,6 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
           <p className={`text-sm mt-1 ${finalDecision === "CLOSE" ? "text-[#0b2b70]" : "text-gray-400"}`}>
             Levar a ideia para a próxima fase
           </p>
-        </button>
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          onClick={saveReport}
-          className="mt-6 w-fit px-4 py-2 rounded-lg text-sm font-semibold bg-[#0B2B70] text-white"
-        >
-          Salvar Relatório
         </button>
       </div>
     </div>

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { materializationService } from "@/api/services/materialization.service";
 import { CreateMvpPayload } from "@/api/payloads/materialization.payload";
 
-type TypeResource = "PEOPLE" | "TECH" | "FINANCIAL" | "INFRASTRUCTURE" | "PARTNERSHIPS" | undefined
+type TypeResource = "PEOPLE" | "TECHNOLOGY" | "FINANCIAL" | "OTHER" | undefined
 type Resource = {content: string; type: TypeResource}
 type Kpi = {
   id?: string
@@ -471,10 +471,9 @@ export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
               >
                 <option value="" disabled>Selecione o tipo</option>
                 <option value="PEOPLE">Pessoa</option>
-                <option value="TECH">Tecnologia</option>
+                <option value="TECHNOLOGY">Tecnologia</option>
                 <option value="FINANCIAL">Financeiro</option>
-                <option value="INFRASTRUCTURE">Infraestrutura</option>
-                <option value="PARTNERSHIPS">Parceiro</option>
+                <option value="OTHER">Outro</option>
               </select>
             </div>
 
@@ -531,7 +530,7 @@ export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
             </h1>
 
             <ul className="list-disc pl-4 space-y-2">
-              {resources.filter((v) => v.type === "TECH").map((resource, i) => (
+              {resources.filter((v) => v.type === "TECHNOLOGY").map((resource, i) => (
                 <li key={i}>
                   <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
                     {resource.content}
@@ -591,43 +590,11 @@ export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
 
           <div className="my-3 text-[#0B2B70] dark:text-white font-semibold">
             <h1>
-              Infraestruturas
+              Outros
             </h1>
 
             <ul className="list-disc pl-4 space-y-2">
-              {resources.filter((v) => v.type === "INFRASTRUCTURE").map((resource, i) => (
-                <li key={i}>
-                  <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
-                    {resource.content}
-
-                    {isEditingResource && (
-                      <button
-                        onClick={() => {
-                          removeResource(i)
-                          setIsEditingResource(false)
-                        }}
-                        className="flex w-fit justify-center p-1
-                        rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
-                        text-[12px] cursor-pointer"
-                      >
-                        <Trash2 size={14}/>
-                      </button>
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <hr className="border-gray-400"/>
-
-          <div className="my-3 text-[#0B2B70] dark:text-white font-semibold">
-            <h1>
-              Parcerias
-            </h1>
-
-            <ul className="list-disc pl-4 space-y-2">
-              {resources.filter((v) => v.type === "PARTNERSHIPS").map((resource, i) => (
+              {resources.filter((v) => v.type === "OTHER").map((resource, i) => (
                 <li key={i}>
                   <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
                     {resource.content}

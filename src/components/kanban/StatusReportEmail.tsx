@@ -1,6 +1,6 @@
 "use client";
 
-import { StatusReportService } from "@/api/services/statusReport.service";
+import { statusReportService } from "@/api/services/statusReport.service";
 import { useMemo, useState } from "react";
 import { SendHistoryItem } from "./StatusReportSendHistory";
 
@@ -95,7 +95,7 @@ export default function StatusReportEmailSection({
                 emails: emailConfig.emails,
             };
 
-            await StatusReportService.sendEmail(statusReportId, payload as any);
+            await statusReportService.sendEmail(statusReportId, payload as any);
 
             onSent?.({
                 id: sendId,

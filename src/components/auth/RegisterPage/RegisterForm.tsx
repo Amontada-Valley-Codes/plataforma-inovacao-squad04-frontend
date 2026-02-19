@@ -9,7 +9,7 @@ import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle, Loader2
 import Link from "next/link";
 import { authService } from "@/api/services/auth.service";
 import { useSearchParams, useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import { toast, Toaster } from "sonner";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -28,27 +28,6 @@ export default function RegisterForm() {
   const searchParams = useSearchParams();
   const [token, setToken] = useState<string>("");
   const router = useRouter();
-
-  const showCustomToast = (message: string, type: "success" | "error") => {
-    toast.custom((t) => (
-      <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-          text-white font-medium transition-all duration-300 transform ${t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
-          }
-          ${type === "success"
-            ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-            : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
-          }`}
-      >
-        {type === "success" ? (
-          <CheckCircle2 className="text-green-300" size={22} />
-        ) : (
-          <XCircle className="text-red-300" size={22} />
-        )}
-        <span>{message}</span>
-      </div>
-    ));
-  };
 
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
@@ -102,12 +81,12 @@ export default function RegisterForm() {
       localStorage.setItem("access_token", access_token);
 
       // 4) redireciona
-      showCustomToast("Conta criada com sucesso! Redirecionando…", "success");
+      toast.success("Conta criada com sucesso! Redirecionando…");
       router.push("/admin/dashboard"); 
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erro ao criar conta.";
       setError(msg);
-      showCustomToast(msg, "error");
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -121,7 +100,7 @@ export default function RegisterForm() {
       bg-[linear-gradient(134deg,#15358D_20%,#0C0869_70%,#66B132_100%)] 
       md:border-l-2 border-[#C7E6FE]"
     >
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" richColors />
 
       <div className="relative w-[140px] h-[90px] mb-6">
         <Image

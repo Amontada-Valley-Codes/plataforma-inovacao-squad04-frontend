@@ -269,7 +269,8 @@ export const ENDPOINTS = {
 
   STATUS_REPORT: {
     CREATE: (challengeId: string) => `/status-report/${challengeId}`,
-    GET_BY_CHALLENGE: (challengeId: string) => `/status-report/${challengeId}`, // opcional (se o back suportar GET)
+    GET: `/status-report`,
+    UPDATE: (id: string) => `/status-report/${id}`,
     SEND_EMAIL: (id: string) => `/status-report/${id}/send-email`,
   },
 

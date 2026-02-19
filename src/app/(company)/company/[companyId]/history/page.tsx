@@ -14,7 +14,7 @@ type PageProps = {
 export default function CompanyHistoryPage({ params }: PageProps) {
   const { companyId } = use(params);
 
-  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario">("usuario");
+  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario" | "collaborator">("usuario");
   const [viewerCompanyId, setViewerCompanyId] = useState<string | undefined>();
   const [viewerUserId, setViewerUserId] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ export default function CompanyHistoryPage({ params }: PageProps) {
       const u = await getCurrentUser();
       const c = await getUserCompanyId();
 
-      setRole(r);
+      setRole(r as "startup" | "admin" | "gestor" | "avaliador" | "usuario" | "collaborator");
       setViewerCompanyId(c ? String(c) : undefined);
       setViewerUserId(u?.id ? String(u.id) : undefined);
       setLoading(false); // ✅ corrigido: false quando termina de carregar

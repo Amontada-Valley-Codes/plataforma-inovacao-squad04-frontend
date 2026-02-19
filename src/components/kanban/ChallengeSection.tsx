@@ -342,7 +342,7 @@ export const ChallengeSection = ({
             })()}
           </div>
         )}
-      </div>
+        </div>
     </div>
   )
 }
