@@ -473,7 +473,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
               <button
                 type="button"
                 onClick={() => setCauses(prev => [...prev, createNode()])}
-                className="mb-2 text-sm text-[#0B2B70] border-[#cdcfd2] dark:text-white/80 border border-dashed dark:border-white/30 rounded px-3 py-1"
+                className="mb-2 text-sm text-[#0B2B70] border-[#cdcfd2] dark:text-white/80 border border-dashed dark:border-white/30 rounded-full px-3 py-1"
               >
                 + Adicionar causa
               </button>
@@ -499,7 +499,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
               <button
                 type="button"
                 onClick={() => setEffects(prev => [...prev, createNode()])}
-                className="mb-2 text-sm text-[#0B2B70]  border-[#cdcfd2] dark:text-white/80 border border-dashed dark:border-white/30 rounded px-3 py-1 mt-4"
+                className="mb-2 text-sm text-[#0B2B70]  border-[#cdcfd2] dark:text-white/80 border border-dashed dark:border-white/30 rounded-full px-3 py-1 mt-4"
               >
                 + Adicionar efeito
               </button>
@@ -876,7 +876,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
                 <button
                   key={op}
                   onClick={() => setMakeOrBuy(op as any)}
-                  className={`px-4 py-1 rounded ${makeOrBuy === op
+                  className={`px-4 py-1 rounded-full ${makeOrBuy === op
                       ? "bg-[#0B2B72] text-white"
                       : "border border-gray-400 text-[#0B2B70]"
                     }`}
