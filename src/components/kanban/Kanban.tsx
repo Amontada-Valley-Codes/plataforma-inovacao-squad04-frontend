@@ -100,12 +100,12 @@ const KanbanPage = () => {
       console.log(response)
     }
 
-    fetchChallanges()
+    fetchChallenges()
   }, [])
 
   const refetchChallenges = async () => {
     const response = await ChallengeService.showAllChallenges()
-    setChallanges(response)
+    setChallenges(response)
   }  
 
   useEffect(() => {
