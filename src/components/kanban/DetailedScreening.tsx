@@ -279,7 +279,11 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         FinancialCapacity: capacidadeFinanceira,
       }
   
-      await ConceptionDocumentsService.CreateConceptionDocument(detailedScreening?.id!, payload)
+      const screeningId = detailedScreening?.id
+      if (!screeningId) return
+
+      await ConceptionDocumentsService.CreateConceptionDocument(screeningId, payload)
+
     } catch (error) {
       console.error("Erro ao criar documento de concepção:", error)
     }
@@ -309,14 +313,8 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
   }
 
-  const handleCreateProblemTree = async () => {
+  const handleCreateProblemTree = async (immersionId: string) => {
     try {
-      if (!detailedScreening?.id) return;
-
-      const immersion = detailedScreening.immersionDocument?.[0];
-
-      if (!immersion) return; 
-
       if (!rootProblem.trim()) {
         console.warn("Problema raiz é obrigatório");
         return;
@@ -332,45 +330,37 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       };
 
       await immersionDocumentService.createProblemTree(
-        immersion.id,
+        immersionId,
         payload
       );
 
-      console.log("Árvore criada com sucesso!");
     } catch (error) {
       console.error("Erro ao criar árvore:", error);
     }
   };
 
-  const handleCreateEmpathyMap = async () => {
+  const handleCreateEmpathyMap = async (immersionId: string) => {
     try {
-
-      if (!detailedScreening?.id) return;
-
-      const immersion = detailedScreening.immersionDocument?.[0];
-
-      if (!immersion) return;
-
       if (mapasEmpatia.length === 0) return;
+      if (mapasEmpatia.length > 3) return;
 
-      if (mapasEmpatia.length > 3) return
+      await Promise.all(
+        mapasEmpatia.map(mapa => {
+          const payload: CreateMapEmpathyPayload = {
+            listen: mapa.pensa,
+            see: mapa.ve,
+            speakAndDo: mapa.fala,
+            pains: mapa.dores,
+            gains: mapa.ganhos
+          };
 
-      for (const mapa of mapasEmpatia) {
-        const payload: CreateMapEmpathyPayload = {
-          listen: mapa.pensa,
-          see: mapa.ve,
-          speakAndDo: mapa.fala,
-          pains: mapa.dores,
-          gains: mapa.ganhos
-        };
+          return immersionDocumentService.createEmpathyMap(
+            immersionId,
+            payload
+          );
+        })
+      );
 
-        await immersionDocumentService.createEmpathyMap(
-          immersion.id,
-          payload
-        );
-      }
-
-      console.log("Mapas criados com sucesso!");
     } catch (error) {
       console.error("Erro ao criar mapas:", error);
     }
@@ -385,21 +375,29 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         return
       }
 
-      // 1️⃣ Criar Immersion Document
+      // 1️⃣ Criar Immersion
       await handleCreateImmersionDocument()
 
-      // Atualiza o detailedScreening para pegar immersion criada
+      // 2️⃣ Buscar atualizado
       const updated = await detailedScreeningService.showDetailedScreeningById(challengeId)
-      setDetailedScreening(updated)
 
-      // 2️⃣ Criar Problem Tree
-      await handleCreateProblemTree()
+      const immersion = updated!.immersionDocument?.[0]
 
-      // 3️⃣ Criar Mapas de Empatia
-      await handleCreateEmpathyMap()
+      if (!immersion) {
+        console.warn("Immersion não encontrada após criação")
+        return
+      }
 
-      // 4️⃣ Criar Conception Document
+      // 3️⃣ Criar árvore usando ID direto
+      await handleCreateProblemTree(immersion.id)
+
+      // 4️⃣ Criar mapas usando ID direto
+      await handleCreateEmpathyMap(immersion.id)
+
+      // 5️⃣ Criar conception
       await handleCreateConception()
+
+      setDetailedScreening(updated)
 
       console.log("Tudo criado com sucesso 🚀")
 
