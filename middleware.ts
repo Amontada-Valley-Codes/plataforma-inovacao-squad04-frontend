@@ -20,7 +20,7 @@ type TokenWithScope = DecodedToken & {
 };
 
 const rules: Record<string, RoleEn[]> = {
-  "/admin": ["ADMINISTRATOR"],
+  "/admin": ["ADMINISTRATOR", "MANAGER"],
 
   "/company": [
     "ADMINISTRATOR",
