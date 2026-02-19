@@ -305,5 +305,9 @@ export const ENDPOINTS = {
     UPDATE_ROLLOUT_PLAN: (scaleId: string) => `/solution-scale/${scaleId}/rollout`,
     UPDATE_EXECUTIVE_SUMMARY: (scaleId: string) => `/solution-scale/${scaleId}/executive-summary`,
     GET_STAKEHOLDERS: (challengeId: string) => `/solution-scale/stakeholders/${challengeId}`,
+  },
+
+  REPORTS: {
+    DOWLOAD: (challengeId: string) => `/report/challenge/${challengeId}`
   }
 } 

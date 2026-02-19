@@ -279,7 +279,11 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         FinancialCapacity: capacidadeFinanceira,
       }
   
-      await ConceptionDocumentsService.CreateConceptionDocument(detailedScreening?.id!, payload)
+      const screeningId = detailedScreening?.id
+      if (!screeningId) return
+
+      await ConceptionDocumentsService.CreateConceptionDocument(screeningId, payload)
+
     } catch (error) {
       console.error("Erro ao criar documento de concepção:", error)
     }
@@ -309,14 +313,8 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
   }
 
-  const handleCreateProblemTree = async () => {
+  const handleCreateProblemTree = async (immersionId: string) => {
     try {
-      if (!detailedScreening?.id) return;
-
-      const immersion = detailedScreening.immersionDocument?.[0];
-
-      if (!immersion) return; 
-
       if (!rootProblem.trim()) {
         console.warn("Problema raiz é obrigatório");
         return;
@@ -332,49 +330,83 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       };
 
       await immersionDocumentService.createProblemTree(
-        immersion.id,
+        immersionId,
         payload
       );
 
-      console.log("Árvore criada com sucesso!");
     } catch (error) {
       console.error("Erro ao criar árvore:", error);
     }
   };
 
-  const handleCreateEmpathyMap = async () => {
+  const handleCreateEmpathyMap = async (immersionId: string) => {
     try {
-
-      if (!detailedScreening?.id) return;
-
-      const immersion = detailedScreening.immersionDocument?.[0];
-
-      if (!immersion) return;
-
       if (mapasEmpatia.length === 0) return;
+      if (mapasEmpatia.length > 3) return;
 
-      if (mapasEmpatia.length > 3) return
+      await Promise.all(
+        mapasEmpatia.map(mapa => {
+          const payload: CreateMapEmpathyPayload = {
+            listen: mapa.pensa,
+            see: mapa.ve,
+            speakAndDo: mapa.fala,
+            pains: mapa.dores,
+            gains: mapa.ganhos
+          };
 
-      for (const mapa of mapasEmpatia) {
-        const payload: CreateMapEmpathyPayload = {
-          listen: mapa.pensa,
-          see: mapa.ve,
-          speakAndDo: mapa.fala,
-          pains: mapa.dores,
-          gains: mapa.ganhos
-        };
+          return immersionDocumentService.createEmpathyMap(
+            immersionId,
+            payload
+          );
+        })
+      );
 
-        await immersionDocumentService.createEmpathyMap(
-          immersion.id,
-          payload
-        );
-      }
-
-      console.log("Mapas criados com sucesso!");
     } catch (error) {
       console.error("Erro ao criar mapas:", error);
     }
   };
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true)
+
+      if (!detailedScreening?.id) {
+        console.warn("Detailed Screening não encontrado")
+        return
+      }
+
+      // 1️⃣ Criar Immersion
+      await handleCreateImmersionDocument()
+
+      // 2️⃣ Buscar atualizado
+      const updated = await detailedScreeningService.showDetailedScreeningById(challengeId)
+
+      const immersion = updated!.immersionDocument?.[0]
+
+      if (!immersion) {
+        console.warn("Immersion não encontrada após criação")
+        return
+      }
+
+      // 3️⃣ Criar árvore usando ID direto
+      await handleCreateProblemTree(immersion.id)
+
+      // 4️⃣ Criar mapas usando ID direto
+      await handleCreateEmpathyMap(immersion.id)
+
+      // 5️⃣ Criar conception
+      await handleCreateConception()
+
+      setDetailedScreening(updated)
+
+      console.log("Tudo criado com sucesso 🚀")
+
+    } catch (error) {
+      console.error("Erro no submit geral:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -447,10 +479,20 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       {/* pagina 1 - resumo */}
       {page === '1' && (
         <div className="w-full flex flex-col gap-4">
-          <h1 className="text-[#0B2B70] dark:text-white text-2xl font-semibold">
-            Canvas Rápido
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-[#0B2B70] dark:text-white text-2xl font-semibold">
+              Canvas Rápido
+            </h1>
 
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+            >
+              {isLoading && <Loader2 className="animate-spin" size={16} />}
+              {isLoading ? "Salvando..." : "Finalizar"}
+            </button>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
             {/* PROBLEMA */}
             <div className="rounded-xl p-4 border border-[#E5E7EB] dark:border-[#737373]">
@@ -958,6 +1000,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
                 </p>
 
               </div>
+      
             </div>
           </div>
         </div>
