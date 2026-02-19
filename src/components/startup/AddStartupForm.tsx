@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   X,
   Building2,
@@ -16,12 +16,11 @@ import {
   Globe,
   Loader2,
   CheckCircle2,
-  XCircle,
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { startupService } from "@/api/services/startup.service";
 import { CreateStartupPayload } from "@/api/payloads/startup.payload";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useStore } from "../../../store";
 
 type Props = {
@@ -59,28 +58,6 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const showCustomToast = (message: string, type: "success" | "error") => {
-    toast.custom((t) => (
-      <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border border-white/20 
-        text-white font-medium transition-all duration-300 transform ${
-          t.visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
-        } ${
-          type === "success"
-            ? "bg-[linear-gradient(135deg,#0C0869_0%,#15358D_60%,#66B132_100%)]"
-            : "bg-[linear-gradient(135deg,#A00_0%,#C62828_60%,#EF5350_100%)]"
-        }`}
-      >
-        {type === "success" ? (
-          <CheckCircle2 className="text-green-300" size={22} />
-        ) : (
-          <XCircle className="text-red-300" size={22} />
-        )}
-        <span>{message}</span>
-      </div>
-    ));
-  };
-
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: "" });
@@ -111,7 +88,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
 
     const handleSubmit = async () => {
       if (!validateForm()) {
-        showCustomToast("Preencha todos os campos obrigatórios.", "error");
+        toast.error("Preencha todos os campos obrigatórios.");
         return;
       }
 
@@ -150,7 +127,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
         const whatsappURL = `https://wa.me/55${to}?text=${encodedMessage}`;
         window.open(whatsappURL, "_blank");
 
-        showCustomToast("Startup cadastrada com sucesso!", "success");
+        toast.success("Startup cadastrada com sucesso!");
         setSuccess(true);
 
         setTimeout(() => {
@@ -161,7 +138,7 @@ export default function AddStartupForm({ onClose, isOpen }: Props) {
         
       } catch (error: any) {
         console.error("❌ Erro ao criar startup:", error?.response?.data || error?.message || error);
-        showCustomToast("Erro ao cadastrar startup.", "error");
+        toast.error("Erro ao cadastrar startup.");
       } finally {
         setLoading(false);
       }

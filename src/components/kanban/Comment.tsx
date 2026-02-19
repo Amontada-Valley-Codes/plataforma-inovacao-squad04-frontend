@@ -3,8 +3,7 @@ import { commentsService } from "@/api/services/commentsFunnel.service";
 import { useState } from "react";
 import { toTitleCase } from "./CardsContents";
 import { shortDateFormatter } from "./Kanban";
-import { showCustomToast } from "./KanbanToaster";
-import { Toaster } from "react-hot-toast";
+import { toast, Toaster } from "sonner";
 import { Heart, Trash2 } from "lucide-react";
 
 type CommentProps = {
@@ -34,13 +33,13 @@ export const Comment = ({ commentData, onCommentDeleted }: CommentProps) => {
       onCommentDeleted();
     } catch (err) {
       console.error("Erro ao deletar:", err);
-      showCustomToast("Não foi possível excluir o comentário.", "error");
+      toast.error("Não foi possível excluir o comentário.");
     }
   };
 
   return (
     <div className="flex items-start gap-3 py-3">
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" richColors />
 
       {commentData.users.image ? (
         <img 

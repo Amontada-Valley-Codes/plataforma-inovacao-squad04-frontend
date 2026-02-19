@@ -5,7 +5,7 @@ import { matchService } from "@/api/services/match.service";
 import { StartupMatchResponse } from "@/api/payloads/match.payload";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MatchListItem } from "@/components/startup/MatchListItem";
-import { showCustomToast } from "@/components/kanban/KanbanToaster";
+import { toast } from "sonner";
 
 export default function MeusMatchesPage() {
   const [sentApplications, setSentApplications] = useState<StartupMatchResponse[]>([]);
@@ -40,20 +40,20 @@ export default function MeusMatchesPage() {
   const handleAccept = async (matchId: string) => {
     try {
       await matchService.acceptInvite(matchId);
-      showCustomToast("Convite aceito com sucesso!", "success");
+      toast.success("Convite aceito com sucesso!");
       fetchMatches();
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao aceitar convite", "error");
+      toast.error(error?.response?.data?.message || "Erro ao aceitar convite");
     }
   };
 
   const handleDeny = async (matchId: string) => {
     try {
       await matchService.denyMatch(matchId);
-      showCustomToast("Candidatura cancelada com sucesso!", "success");
+      toast.success("Candidatura cancelada com sucesso!");
       fetchMatches();
     } catch (error: any) {
-      showCustomToast(error?.response?.data?.message || "Erro ao cancelar candidatura", "error");
+      toast.error(error?.response?.data?.message || "Erro ao cancelar candidatura");
     }
   };
 
