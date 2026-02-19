@@ -261,8 +261,9 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
 
       if (currentColumnIndex < columns.length - 1) {
         const nextColumn = columns[currentColumnIndex + 1];
-
-        await ChallengeService.advanceStage(challengeId!, { status: nextColumn.id });
+        
+        await ChallengeService.changeStatus(challengeId!, { status: nextColumn.id })
+        // await ChallengeService.advanceStage(challengeId!, { status: nextColumn.id });
 
         const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
@@ -306,7 +307,8 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
       const prevColumn = columns[currentColumnIndex - 1];
 
       try {
-        await ChallengeService.returnStep(challengeId!, { status: prevColumn.id });
+        await ChallengeService.changeStatus(challengeId!, { status: prevColumn.id })
+        // await ChallengeService.returnStep(challengeId!, { status: prevColumn.id });
 
         const updatedChallenge = { ...challengeToMove, status: prevColumn.id };
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
@@ -516,7 +518,12 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
               <CardExpandedLayout
                 mainContent={
                   <RolloutPlan 
-                    challengeId={cardData.id}/>
+                    challengeId={cardData.id}
+                    challengeTitle={cardData.name}
+                    creator={cardData.Users.name}
+                    startDate={cardData.createdAt}
+                    visibility={cardData.visibility}
+                  />
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel
