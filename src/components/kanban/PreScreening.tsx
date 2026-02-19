@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client"
-import { useState, useEffect } from "react"
-import { CardContentsHeader } from "./CardsContents"
-import { Building2, Lightbulb, BriefcaseBusiness, Loader2 } from "lucide-react"
-import { Rating, ProgressBarActions } from "./CardsContents"
-import { ChallengeService } from "@/api/services/challenge.service"
-import { CreateVotePreScreeningPayload, ShowPercentageVoteResponse } from "@/api/payloads/challenge.payload"
-import { showCustomToast } from "./KanbanToaster"
-import { Toaster } from "react-hot-toast"
+
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
+import { PreScreeningService } from "@/api/services/preScreening.service";
+import { ObjectivesList } from "./prescreening/ObjectivesList";
+import { DecisionActions } from "./prescreening/DecisionActions";
 
 type CardPreScreeningContentProps = {
   challangeTitle: string;
@@ -19,147 +16,165 @@ type CardPreScreeningContentProps = {
   businessRelevance: string | null;
   startDate: string;
   creator: string;
+  onStatusChange?: () => void;
 }
 
-export const PreScreening = ({ challangeTitle, challengeId, category, startDate, creator, businessRelevance, innovativePotential, strategicAlignment }: CardPreScreeningContentProps) => {
-  const [votes, setVotes] = useState<CreateVotePreScreeningPayload>({
-    strategicAlignment: 0,
-    innovativePotential: 0,
-    businessRelevance: 0
-  });
-  const [results, setResults] = useState<ShowPercentageVoteResponse | null>(null);
-  const [isVoting, setIsVoting] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>()
+type StrategicObjective = {
+  id: string;
+  name: string;
+  description: string;
+};
 
-  async function fetchResults() {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const response = await ChallengeService.ShowPercentage(challengeId);
-      setResults(response);
-    } catch (error) {
-      console.error("Falha ao buscar resultados da votação:", error);
-      setError("Falha ao buscar resultados.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+type Justification = {
+  id: string;
+  status: string;
+  justification: string;
+  createdAt: string;
+  users: {
+    name: string;
+    email: string;
+  };
+};
+
+type ActionMode = "idle" | "reject" | "approve";
+
+export const PreScreening = ({ challengeId, onStatusChange }: CardPreScreeningContentProps) => {
+  const [actionMode, setActionMode] = useState<ActionMode>("idle");
+  const [justification, setJustification] = useState("");
+  const [alignmentJustification, setAlignmentJustification] = useState("");
+  const [notes, setNotes] = useState("");
+  const [selectedObjectives, setSelectedObjectives] = useState<Set<string>>(new Set());
+  const [strategicRelevance, setStrategicRelevance] = useState<"HIGH" | "MEDIUM" | "LOW">("HIGH");
+  const [loading, setLoading] = useState(false);
+  const [objectives, setObjectives] = useState<StrategicObjective[]>([]);
+  const [loadingObjectives, setLoadingObjectives] = useState(true);
 
   useEffect(() => {
-    if (challengeId) fetchResults()
-  }, [challengeId])
+    loadObjectives();
+  }, [challengeId]);
 
-  const handleRatingChange = (field: keyof CreateVotePreScreeningPayload, value: number) => {
-    setVotes(prev => ({
-      ...prev,
-      [field]: value
-    }));
+
+
+  const loadObjectives = async () => {
+    setLoadingObjectives(true);
+    try {
+      const response = await StrategicObjectivesService.getObjectivesByChallenge(challengeId);
+      console.log("Response:", response);
+      
+      if (response?.strategicObjective && Array.isArray(response.strategicObjective) && response.strategicObjective.length > 0) {
+        const mappedObjectives = response.strategicObjective
+          .filter(item => item?.strategicObjective)
+          .map(item => ({
+            id: item.strategicObjective.id,
+            name: item.strategicObjective.title,
+            description: item.strategicObjective.description
+          } as StrategicObjective));
+        
+        setObjectives(mappedObjectives);
+      } else {
+        setObjectives([]);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar objetivos:", error);
+      setObjectives([]);
+    } finally {
+      setLoadingObjectives(false);
+    }
   };
 
-  const handleVote = async () => {
-    if (votes.strategicAlignment === 0 || votes.innovativePotential === 0 || votes.businessRelevance === 0) {
-      showCustomToast("Por favor, preencha todas as três notas (de 1 a 5).", "error");
+  const toggleObjective = (id: string) => {
+    setSelectedObjectives((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleApprove = async () => {
+    if (!alignmentJustification.trim()) {
+      toast.error("Por favor, preencha a justificativa de alinhamento.");
       return;
     }
-
-    setIsVoting(true);
-    setError(null)
+    setLoading(true);
     try {
-      await ChallengeService.createVote(challengeId, votes);
-      
-      showCustomToast("Voto registrado com sucesso!", "success");
-      fetchResults();
-
-    } catch (error: any) {
-      console.error("Erro ao votar:", error.response?.data || error.message);
-      showCustomToast(`Erro ao votar: ${error.response?.data?.message || 'Tente novamente.'}`, "error");
+      await PreScreeningService.createPreScreening(challengeId, {
+        alignmentJustification,
+        strategicRelevance,
+        notes: notes.trim() || undefined
+      });
+      toast.success("Desafio aprovado e avançado para Triagem Detalhada!");
+      setActionMode("idle");
+      setAlignmentJustification("");
+      setNotes("");
+    } catch (error) {
+      console.error("Erro ao aprovar:", error);
+      toast.error("Erro ao aprovar desafio.");
     } finally {
-      setIsVoting(false);
+      setLoading(false);
     }
   };
 
-  if (error) {
-    return <div className="w-full justify-center items-center h-full">
-      {error}
-    </div>
-  }
-
-  if (isLoading) {
-    return <div className="justify-center items-center h-full">
-      <Loader2 size={24} className="animate-spin"/>
-    </div>
-  }
+  const handleReject = async () => {
+    if (!justification.trim()) {
+      toast.error("Justificativa é obrigatória para rejeição.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await PreScreeningService.registerDecision(challengeId, {
+        decision: "DISAPPROVE",
+        justification
+      });
+      toast.success("Desafio reprovado com sucesso!");
+      onStatusChange?.();
+    } catch (error: any) {
+      console.error("Erro ao reprovar:", error);
+      const errorMsg = error?.response?.data?.message || "Erro ao reprovar desafio.";
+      toast.error(errorMsg);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full flex flex-col overflow-y-auto">
-      <Toaster position="top-right" reverseOrder={false} />
-
-      {/* header */}
-      <CardContentsHeader
-        challengeTitle={challangeTitle}
-        category={category}
-        startDate={startDate}
-        creator={creator}
-      />
-
-      {/* conteudo */}
-      <div>
-        {/* alinhamento estrategico */}
-        <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-            <Building2 size={16}/>
-            Alinhamento Estratégico
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-            {strategicAlignment}
-          </p>
-          <Rating
-            value={votes.strategicAlignment}
-            onChange={(v) => handleRatingChange('strategicAlignment', v)}
-          />
-        </div>
-
-        {/* potencial inovador */}
-        <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-            <Lightbulb size={16}/>
-            Potência Inovador
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-            {innovativePotential}
-          </p>
-          <Rating
-            value={votes.innovativePotential}
-            onChange={(v) => handleRatingChange('innovativePotential', v)}
-          />
-        </div>
-
-        {/* relevancia do negocio */}
-        <div className="flex flex-col mb-6">
-          <h1 className="flex gap-1 items-center text-black dark:text-white text-lg">
-            <BriefcaseBusiness size={16}/>
-            Relevância para o negócio
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-white font-medium text-justify">
-            {businessRelevance}
-          </p>
-          <Rating
-            value={votes.businessRelevance}
-            onChange={(v) => handleRatingChange('businessRelevance', v)}
-          />
-        </div>
+      <div className="mb-4">
+        <h1 className="text-xl font-bold text-[#0B2B72] dark:text-white mb-2">
+          Match Desafio e Objetivos Estratégicos
+        </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Selecione os objetivos alinhados com este desafio e julgue a relevância para o avanço no funil.
+        </p>
       </div>
 
-      <ProgressBarActions percentage={results ? results.percentage : 0}/>
+      {loadingObjectives ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-6 h-6 border-2 border-[#0B2B72]/30 border-t-[#0B2B72] rounded-full animate-spin" />
+        </div>
+      ) : (
+        <ObjectivesList
+          objectives={objectives}
+          selectedObjectives={selectedObjectives}
+          onToggleObjective={toggleObjective}
+          showActions={false}
+        />
+      )}
 
-      <button
-        onClick={handleVote}
-        disabled={isVoting}
-        className="mt-2 mb-6 px-4 py-2 bg-[#0B2B72] text-white text-sm rounded-md self-end disabled:opacity-50 disabled:cursor-wait"
-      >
-        {isVoting ? "Votando..." : "Registrar Voto"}
-      </button>
+      <DecisionActions
+        actionMode={actionMode}
+        justification={justification}
+        alignmentJustification={alignmentJustification}
+        notes={notes}
+        strategicRelevance={strategicRelevance}
+        loading={loading}
+        onActionModeChange={setActionMode}
+        onJustificationChange={setJustification}
+        onAlignmentJustificationChange={setAlignmentJustification}
+        onNotesChange={setNotes}
+        onStrategicRelevanceChange={setStrategicRelevance}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
     </div>
-  )
-}
+  );
+};
