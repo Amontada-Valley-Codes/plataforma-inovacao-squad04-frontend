@@ -25,9 +25,25 @@ export type UpdateObjectiveResponse = {
 }
 
 export type StrategicObjectivesByChallengeResponse = {
-  strategicObjective: {
+  strategicObjective: Array<{
     id: string
-    name: string
-    description: string
-  }
-} 
+    challengeId: string
+    strategicObjectiveId: string
+    createdAt: string
+    strategicObjective: {
+      id: string
+      title: string
+      description: string
+      createdAt: string
+      updatedAt: string
+    }
+  }>
+}
+
+export type ShowAllObjectivesResponse = Array<{
+  id: string
+  title: string
+  description: string
+  createdAt: string
+  updatedAt: string
+}> 

@@ -17,6 +17,7 @@ import { ChallengeService } from '@/api/services/challenge.service';
 import KanbanTable from './KanbanTable';
 import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
+import next from 'next';
 
 const columns = [
   { id: 'GENERATION', name: 'Desafios' },
@@ -99,8 +100,13 @@ const KanbanPage = () => {
       console.log(response)
     }
 
-    fetchChallenges()
-  }, [])  
+    fetchChallanges()
+  }, [])
+
+  const refetchChallenges = async () => {
+    const response = await ChallengeService.showAllChallenges()
+    setChallanges(response)
+  }  
 
   useEffect(() => {
     const challengeId = searchParams.get('challengeId');
@@ -123,7 +129,8 @@ const KanbanPage = () => {
 
       try {
         if (challengeId) {
-          await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
+          await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
+          // await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
         }
 
         const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
@@ -149,7 +156,8 @@ const KanbanPage = () => {
 
       try {
         if (challengeId) {
-          await ChallengeService.returnStep(challengeId, { status: prevColumn.id });
+          await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
+          // await ChallengeService.returnStep(challengeId, { status: prevColumn.id });
         }
 
         const updatedChallenge = { ...cardToMove, status: prevColumn.id };
@@ -353,6 +361,7 @@ const KanbanPage = () => {
         challenges={challenges}
         setChallenges={setChallenges}
         setExpandedCard={setExpandedCard}
+        onStatusChange={refetchChallenges}
       />
     </div>
   );
