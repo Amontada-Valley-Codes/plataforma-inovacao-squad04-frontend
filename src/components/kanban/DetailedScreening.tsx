@@ -376,6 +376,40 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true)
+
+      if (!detailedScreening?.id) {
+        console.warn("Detailed Screening não encontrado")
+        return
+      }
+
+      // 1️⃣ Criar Immersion Document
+      await handleCreateImmersionDocument()
+
+      // Atualiza o detailedScreening para pegar immersion criada
+      const updated = await detailedScreeningService.showDetailedScreeningById(challengeId)
+      setDetailedScreening(updated)
+
+      // 2️⃣ Criar Problem Tree
+      await handleCreateProblemTree()
+
+      // 3️⃣ Criar Mapas de Empatia
+      await handleCreateEmpathyMap()
+
+      // 4️⃣ Criar Conception Document
+      await handleCreateConception()
+
+      console.log("Tudo criado com sucesso 🚀")
+
+    } catch (error) {
+      console.error("Erro no submit geral:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -447,10 +481,20 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       {/* pagina 1 - resumo */}
       {page === '1' && (
         <div className="w-full flex flex-col gap-4">
-          <h1 className="text-[#0B2B70] dark:text-white text-2xl font-semibold">
-            Canvas Rápido
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-[#0B2B70] dark:text-white text-2xl font-semibold">
+              Canvas Rápido
+            </h1>
 
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+            >
+              {isLoading && <Loader2 className="animate-spin" size={16} />}
+              {isLoading ? "Salvando..." : "Finalizar"}
+            </button>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
             {/* PROBLEMA */}
             <div className="rounded-xl p-4 border border-[#E5E7EB] dark:border-[#737373]">
@@ -958,6 +1002,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
                 </p>
 
               </div>
+      
             </div>
           </div>
         </div>
