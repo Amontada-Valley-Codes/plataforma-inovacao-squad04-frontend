@@ -5,7 +5,7 @@ import { getUserRole, getUserCompanyId, getCurrentUser } from "@/lib/auth";
 import CompanyHistory from "@/components/history/CompanyHistory";
 
 export default function UserHistoryPage() {
-  const [role, setRole] = React.useState<"startup" | "usuario" | "admin" | "gestor" | "avaliador">("usuario");
+  const [role, setRole] = React.useState<"startup" | "usuario" | "admin" | "gestor" | "avaliador" | "collaborator">("usuario");
   const [viewerCompanyId, setViewerCompanyId] = React.useState<string | undefined>(undefined);
   const [viewerUserId, setViewerUserId] = React.useState<string | undefined>(undefined);
   const [loaded, setLoaded] = React.useState(false);
@@ -16,7 +16,7 @@ export default function UserHistoryPage() {
       const c = await getUserCompanyId();
       const u = await getCurrentUser();
 
-      setRole(r);
+      setRole(r as "startup" | "usuario" | "admin" | "gestor" | "avaliador" | "collaborator");
       setViewerCompanyId(c ? String(c) : undefined);
       setViewerUserId(u?.id ? String(u.id) : undefined);
       setLoaded(true);
