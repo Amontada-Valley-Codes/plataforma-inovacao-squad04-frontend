@@ -126,6 +126,7 @@ type CardExpandedProps = {
     name: string;
     id: string;
   }[];
+  onStatusChange?: () => void;
 }
 
 type FormResolutionCardsProps = {
@@ -232,7 +233,7 @@ export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, perfo
   )
 }
 
-export default function CardExpanded({ isOpen, onClose, columns, cardData, challenges, setChallenges, setExpandedCard }: CardExpandedProps) {
+export default function CardExpanded({ isOpen, onClose, columns, cardData, challenges, setChallenges, setExpandedCard, onStatusChange }: CardExpandedProps) {
   const [visibility, setVisibility] = useState(cardData?.visibility)
   const [isCardOpen, setIsCardOpen] = useState(false)
   
@@ -389,7 +390,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     businessRelevance={cardData.business_relevance}
                     innovativePotential={cardData.innovative_potential}
                     strategicAlignment={cardData.strategic_alignment}
-                  />
+                  onStatusChange={onStatusChange}/>
                 }
                 commentsContent={(onChangeView) => (
                   <CommentsPanel

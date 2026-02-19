@@ -99,7 +99,12 @@ const KanbanPage = () => {
     }
 
     fetchChallanges()
-  }, [])  
+  }, [])
+
+  const refetchChallenges = async () => {
+    const response = await ChallengeService.showAllChallenges()
+    setChallanges(response)
+  }  
 
   useEffect(() => {
     const challengeId = searchParams.get('challengeId');
@@ -346,6 +351,7 @@ const KanbanPage = () => {
         challenges={challanges}
         setChallenges={setChallanges}
         setExpandedCard={setExpandedCard}
+        onStatusChange={refetchChallenges}
       />
     </div>
   );
