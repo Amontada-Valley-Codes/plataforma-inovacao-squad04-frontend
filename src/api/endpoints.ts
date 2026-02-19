@@ -65,6 +65,11 @@ export const ENDPOINTS = {
     CHALLENGES_BY_STAGE: "/challenge/enterprise/enterpriseId/challenges-by-stage",
     VOTE_PRE_SCREENING: (id: string) => `/challenge/vote/${id}/pre-screening`,
     SHOW_PRE_SCREENING_VOTES: (id: string) => `/challenge/result/${id}/pre-screening`,
+    FILTER_BY_AREA: (area: string) => `/challenge/filter/area?involvedAreas=${encodeURIComponent(area)}`,
+    FILTER_BY_DATE: (startDate: string, endDate: string) => `/challenge/filters/start-date?Start-Date=${startDate}&End-Date=${endDate}`,
+    FILTER_BY_KEYWORD: (keyword: string) => `/challenge/filter/search?keyword=${encodeURIComponent(keyword)}`,
+    FILTER_BY_STRATEGIC_OBJECTIVE: (ids: string) => `/challenge/filter/strategic-objective?ids=${ids}`,
+    SEARCH_BY_STATUS: (status: string) => `/challenge/search/${status}`,
     HISTORICAL: {
       MY_HISTORY: "/challenge/historical/myhistory",
     },
@@ -210,7 +215,17 @@ export const ENDPOINTS = {
     SHOW_ALL_OBJECTIVES: "/strategic-objectives",
     SHOW_ONE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
     UPDATE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
-    DELETE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`
+    DELETE_OBJECTIVE: (id: string) => `/strategic-objectives/${id}`,
+    GET_BY_CHALLENGE: (challengeId: string) => `/strategic-objectives/challenge/${challengeId}`
+  },
+
+  PRE_SCREENING: {
+    CREATE: (challengeId: string) => `/pre-screening/${challengeId}`,
+    GET_BY_CHALLENGE: (challengeId: string) => `/pre-screening/challenge/${challengeId}`,
+    UPDATE: (id: string) => `/pre-screening/${id}`,
+    DELETE: (id: string) => `/pre-screening/${id}`,
+    DECISION: (id: string) => `/pre-screening/${id}/pre-screening/decision`,
+    JUSTIFICATIONS: (id: string) => `/pre-screening/${id}/pre-screening/justifications`
   },
 
   FORM_RESPONSES: {

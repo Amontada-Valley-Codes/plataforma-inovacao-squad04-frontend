@@ -116,4 +116,29 @@ export const ChallengeService = {
     const { data } = await api.get<ChallengeFullResponse>(ENDPOINTS.CHALLENGE.FULL(challengeId))
     return data
   },
+
+  async filterByArea(area: string): Promise<ShowAllChallengeResponse[]> {
+    const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.FILTER_BY_AREA(area))
+    return data
+  },
+
+  async filterByDate(startDate: string, endDate: string): Promise<ShowAllChallengeResponse[]> {
+    const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.FILTER_BY_DATE(startDate, endDate))
+    return data
+  },
+
+  async filterByKeyword(keyword: string): Promise<ShowAllChallengeResponse[]> {
+    const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.FILTER_BY_KEYWORD(keyword))
+    return data
+  },
+
+  async filterByStrategicObjective(ids: string): Promise<ShowAllChallengeResponse[]> {
+    const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.FILTER_BY_STRATEGIC_OBJECTIVE(ids))
+    return data
+  },
+
+  async searchByStatus(status: string): Promise<ShowAllChallengeResponse[]> {
+    const { data } = await api.get<ShowAllChallengeResponse[]>(ENDPOINTS.CHALLENGE.SEARCH_BY_STATUS(status))
+    return data
+  },
 };

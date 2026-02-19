@@ -22,4 +22,12 @@ export type UpdateObjectiveResponse = {
   description: string
   createdAt: string
   updatedAt: string
+}
+
+export type StrategicObjectivesByChallengeResponse = {
+  strategicObjective: {
+    id: string
+    name: string
+    description: string
+  }
 } 
