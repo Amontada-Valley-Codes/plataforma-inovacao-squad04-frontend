@@ -1,6 +1,6 @@
 import api from "../axios"
 import { ENDPOINTS } from "../endpoints"
-import { CreateObjectivePayload, CreateObjectiveResponse, UpdateObjectivePayload, UpdateObjectiveResponse } from "../payloads/strategic-objectives.payload"
+import { CreateObjectivePayload, CreateObjectiveResponse, UpdateObjectivePayload, UpdateObjectiveResponse, StrategicObjectivesByChallengeResponse } from "../payloads/strategic-objectives.payload"
 
 export const StrategicObjectivesService = {
   async createObjective(createObjectivePayload: CreateObjectivePayload): Promise<CreateObjectiveResponse>{
@@ -31,7 +31,11 @@ export const StrategicObjectivesService = {
     const response = await api.delete(ENDPOINTS.STRATEGIC_OBJECTIVES.DELETE_OBJECTIVE(id))
     console.log(response.data)
     return response.data
-  }
+  },
 
-  
+  async getObjectivesByChallenge(challengeId: string): Promise<StrategicObjectivesByChallengeResponse> {
+    const response = await api.get(ENDPOINTS.STRATEGIC_OBJECTIVES.GET_BY_CHALLENGE(challengeId))
+    console.log(response.data)
+    return response.data
+  }
 }
