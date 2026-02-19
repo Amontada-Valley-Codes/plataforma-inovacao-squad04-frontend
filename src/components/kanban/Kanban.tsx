@@ -16,6 +16,7 @@ import { ShowAllChallengeResponse } from '@/api/payloads/challenge.payload';
 import { ChallengeService } from '@/api/services/challenge.service';
 import KanbanTable from './KanbanTable';
 import { showCustomToast } from './KanbanToaster';
+import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
 
 const columns = [
@@ -82,7 +83,7 @@ export const getCategoryLabel = (category: string) => {
 export type Challenge = ShowAllChallengeResponse
 
 const KanbanPage = () => {
-  const [challanges, setChallanges] = useState<Challenge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isKanban, setIsKanban] = useState(true)
   const [expandedCard, setExpandedCard] = useState<Challenge | null>(null)
   const [search, setSearch] = useState("")
@@ -93,27 +94,27 @@ const KanbanPage = () => {
   const [isOpenArea, setIsOpenArea] = useState(false)
 
   useEffect(() => {
-    async function fetchChallanges() {
+    async function fetchChallenges() {
       const response = await ChallengeService.showAllChallenges()
-      setChallanges(response)
+      setChallenges(response)
       console.log(response)
     }
 
-    fetchChallanges()
+    fetchChallenges()
   }, [])  
 
   useEffect(() => {
     const challengeId = searchParams.get('challengeId');
-    if (challengeId && challanges.length > 0) {
-      const challenge = challanges.find(c => c.id === challengeId);
+    if (challengeId && challenges.length > 0) {
+      const challenge = challenges.find(c => c.id === challengeId);
       if (challenge) {
         setExpandedCard(challenge);
       }
     }
-  }, [searchParams, challanges]);
+  }, [searchParams, challenges]);
 
   const handleApproveAndMove = async (challengeId: string | undefined) => {
-    const challengeToMove = challanges?.find(c => c.id === challengeId);
+    const challengeToMove = challenges?.find(c => c.id === challengeId);
     if (!challengeToMove) return;
 
     const currentColumnIndex = columns.findIndex(c => c.id === challengeToMove.status);
@@ -123,26 +124,23 @@ const KanbanPage = () => {
 
       try {
         if (challengeId) {
-          await ChallengeService.changeStatus(challengeId, { status: nextColumn.id });
+          await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
         }
 
         const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
-        const otherChallenges = challanges?.filter(c => c.id !== challengeId);
-        setChallanges([updatedChallenge, ...otherChallenges]);
+        const otherChallenges = challenges?.filter(c => c.id !== challengeId);
+        setChallenges([updatedChallenge, ...otherChallenges]);
 
-        showCustomToast("Desafio avançado com sucesso.", "success");
+        toast.success("Desafio avançado com sucesso.")
 
       } catch (error: any) {
-        showCustomToast(
-          error?.response?.data?.message || "Não foi possível avançar o desafio.",
-          "error"
-        );
+        toast.error(error?.response?.data?.message || "Não foi possível avançar o desafio.")
       }
     }
   };
 
   const handleMoveBack = async (challengeId: string | undefined) => {
-    const cardToMove = challanges?.find(c => c.id === challengeId);
+    const cardToMove = challenges?.find(c => c.id === challengeId);
     if (!cardToMove) return;
 
     const currentColumnIndex = columns.findIndex(c => c.id === cardToMove.status);
@@ -152,20 +150,17 @@ const KanbanPage = () => {
 
       try {
         if (challengeId) {
-          await ChallengeService.changeStatus(challengeId, { status: prevColumn.id });
+          await ChallengeService.returnStep(challengeId, { status: prevColumn.id });
         }
 
         const updatedChallenge = { ...cardToMove, status: prevColumn.id };
-        const otherChallenges = challanges?.filter(c => c.id !== challengeId);
-        setChallanges([updatedChallenge, ...otherChallenges]);
+        const otherChallenges = challenges?.filter(c => c.id !== challengeId);
+        setChallenges([updatedChallenge, ...otherChallenges]);
 
-        showCustomToast("Desafio retornado com sucesso.", "success");
+        toast.success("Desafio avançado com sucesso.")
 
       } catch (error: any) {
-        showCustomToast(
-          error?.response?.data?.message || "Não foi possível retornar o desafio.",
-          "error"
-        );
+        toast.error(error?.response?.data?.message || "Não foi possível avançar o desafio.")
       }
     }
   };
@@ -282,8 +277,8 @@ const KanbanPage = () => {
         <div>
           <KanbanProvider
             columns={columns}
-            data={challanges}
-            onDataChange={setChallanges}
+            data={challenges}
+            onDataChange={setChallenges}
             className='h-[calc(100vh-159px)]'
           >
             {(column) => {
@@ -356,12 +351,12 @@ const KanbanPage = () => {
         onClose={() => setExpandedCard(null)}
         cardData={expandedCard}
         columns={columns}
-        challenges={challanges}
-        setChallenges={setChallanges}
+        challenges={challenges}
+        setChallenges={setChallenges}
         setExpandedCard={setExpandedCard}
       />
     </div>
   );
 };
 
-export default KanbanPage;
+export default KanbanPage;  
