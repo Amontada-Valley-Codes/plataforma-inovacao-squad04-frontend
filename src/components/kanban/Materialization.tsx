@@ -14,7 +14,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+import { CreateMvpPayload } from "@/api/payloads/materialization.payload";
+import { materializationService } from "@/api/services/materialization.service";
+import { BuyMaterializationService } from "@/api/services/buy-materialization.service";
 
+export type TypeResource = "PEOPLE" | "TECHNOLOGY" | "FINANCIAL" | "OTHER" | undefined
+export type Resource = {content: string; type: TypeResource}
+export type Kpi = {
+  id?: string
+  name: string
+  metric: string
+  target: string
+}
 type CardMaterializationContentProps = {
   challengeTitle: string;
   challengeId: string;
@@ -49,8 +61,82 @@ export default function Materialization({
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [sponsorRelationId, setSponsorRelationId] = useState<string | null>(null);
   const [page, setPage] = useState<'1' | '2'>('1');
+  const [publicoAlvo, setPublicoAlvo] = useState("")
+  const [propostaValor, setPropostaValor] = useState("")
+  const [items, setItems] = useState<string[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
+  const [kpis, setKpis] = useState<Kpi[]>([])
+  const [mvpId, setMvpId] = useState<string | null>(null)
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [buyId, setBuyId] = useState<string>('')
+  const [hmwProblem, setHmwProblem] = useState<string>('');
+  const [rules, setRules] = useState<string>('');
+  const [criteria, setCriteria] = useState<string[]>([]);
 
+  const handleSaveMvp = async () => {
+    if (page === '2') return
 
+    try {
+      const payload: CreateMvpPayload = {
+        targetAudience: publicoAlvo,
+        valueProposal: propostaValor,
+        features: items,
+        resources: resources
+          .filter(r => r.type)
+          .map(r => ({
+            type: r.type as string,
+            description: r.content
+          })),
+        kpis: kpis.map(k => ({
+          name: k.name,
+          metric: k.metric,
+          target: k.target
+        }))
+      }
+
+      let response
+
+      if (mvpId) {
+        response = await materializationService.updateMvp(mvpId, payload)
+        toast.success("MVP atualizado com sucesso!")
+      } else {
+        response = await materializationService.createMvp(challengeId, payload)
+        toast.success("MVP criado com sucesso!")
+      }
+
+      setMvpId(response.id)
+
+    } catch (err) {
+      console.error(err)
+      toast.error("Não foi possível salvar o MVP.")
+    }
+  }
+
+  async function handleSaveMB() {
+    if (page === '1') return
+    if ((!pdfFile && !buyId) || !hmwProblem || !rules) return;
+  
+    try {
+      const payload = {
+        hmwProblem: hmwProblem,
+        challengeRules: rules,
+        selectionCriteria: criteria,
+        edital: pdfFile as File 
+      };
+  
+      if (buyId) {
+        await BuyMaterializationService.updateBuy(payload, buyId);
+        toast.success("Buy atualizado com sucesso!")
+      } else {
+        await BuyMaterializationService.createBuy(payload, challengeId);
+        toast.success("Buy criado com sucesso!")
+      }
+      
+    } catch (error) {
+      console.error(error);
+      toast.error("Não foi possível salvar o Buy.")
+    }
+  }
 
   const fetchSponsor = async () => {
     try {
@@ -72,16 +158,16 @@ export default function Materialization({
         setSelectedUserId("");
         setSponsorRelationId(null);
       }
+
     } catch (err) {
       console.error(err);
+      toast.error("Não foi possível carregar o Sponsor.");
     }
   };
 
   useEffect(() => {
     fetchSponsor();
   }, [challengeId]);
-
- 
 
   const handleSponsorChange = async (newUserId: string) => {
     try {
@@ -91,35 +177,43 @@ export default function Materialization({
           setSponsorRelationId(null);
           setSelectedUserId("");
         }
+
+        toast.success("Sponsor salvo com sucesso!");
         return;
       }
 
       if (sponsorRelationId) {
-        const response = await sponsorsService.UpdateSponsor(sponsorRelationId, {
-          challengeId,
-          userId: newUserId,
-        });
+        const response = await sponsorsService.UpdateSponsor(
+          sponsorRelationId,
+          {
+            challengeId,
+            userId: newUserId,
+          }
+        );
+
         setSelectedUserId(response.sponsorId);
+
       } else {
         const response = await sponsorsService.AddSponsor({
           challengeId,
           userId: newUserId,
         });
+
         setSponsorRelationId(response.id);
         setSelectedUserId(response.sponsor.id);
       }
+
+      toast.success("Sponsor atualizado com sucesso!");
+
     } catch (error) {
       console.error(error);
+      toast.error("Não foi possível definir o Sponsor.");
     }
   };
 
-  // ── Render ─────────────────────────────────
-
   return (
     <div className="w-full flex flex-col overflow-y-auto">
-
-      {/* Top bar */}
-      <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
+      <div className="flex items-center xl:flex-row xl:justify-between mb-6">
         <CardContentsHeader
           challengeTitle={challengeTitle}
           visibility={visibility}
@@ -127,8 +221,7 @@ export default function Materialization({
           startDate={startDate}
         />
 
-        {/* Page stepper */}
-        <div className="relative flex items-center">
+        <div className="relative flex flex-col items-center">
           <div className="flex gap-4 items-start xl:justify-center w-full max-w-md">
             <div className="flex flex-col items-center">
               <button
@@ -137,11 +230,17 @@ export default function Materialization({
                     ? "bg-[#0B2B72] text-white"
                     : "border-2 border-gray-400 text-gray-500"
                 }`}
-                onClick={() => setPage('1')}
+                onClick={() => {
+                  setPage('1')
+                  handleSaveMvp()
+                }}
               >
                 1
               </button>
-              <span className="text-sm mt-1 whitespace-nowrap">Canvas</span>
+              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                <span className="mt-0.5">Canvas</span>
+                <span>MVP</span>
+              </span>
             </div>
 
             <div className="flex flex-col items-center">
@@ -151,7 +250,10 @@ export default function Materialization({
                     ? "bg-[#0B2B72] text-white"
                     : "border-2 border-gray-400 text-gray-500"
                 }`}
-                onClick={() => setPage('2')}
+                onClick={() => {
+                  handleSaveMB()
+                  setPage('2')
+                }}
               >
                 2
               </button>
@@ -161,10 +263,12 @@ export default function Materialization({
               </span>
             </div>
           </div>
+          <span className="text-xs text-[#98A2B3] whitespace-nowrap dark:text-white/40 mt-4">
+            Clique na respectiva página para salvar.
+          </span>
         </div>
       </div>
 
-      {/* Content */}
       <div>
         {page === '1' && (
           <div className="flex justify-between items-center mb-4">
@@ -172,7 +276,6 @@ export default function Materialization({
               Canvas do MVP
             </h1>
 
-            {/* ── Radix Select ── */}
             <Select
               value={selectedUserId || "none"}
               onValueChange={handleSponsorChange}
@@ -196,9 +299,35 @@ export default function Materialization({
         )}
 
         {page === '1' ? (
-          <CanvasMVP challengeId={challengeId} />
+          <CanvasMVP 
+            challengeId={challengeId}
+            items={items}
+            kpis={kpis}
+            mvpId={mvpId}
+            propostaValor={propostaValor}
+            publicoAlvo={publicoAlvo}
+            resources={resources}
+            setItems={setItems}
+            setKpis={setKpis}
+            setMvpId={setMvpId}
+            setPropostaValor={setPropostaValor}
+            setPublicoAlvo={setPublicoAlvo}
+            setResources={setResources}
+          />
         ) : (
-          <MakeforBuy challengeId={challengeId} />
+          <MakeforBuy 
+            challengeId={challengeId}
+            buyId={buyId}
+            criteria={criteria}
+            hmwProblem={hmwProblem}
+            pdfFile={pdfFile}
+            rules={rules}
+            setBuyId={setBuyId}
+            setCriteria={setCriteria}
+            setHmwProblem={setHmwProblem}
+            setPdfFile={setPdfFile}
+            setRules={setRules} 
+          />
         )}
       </div>
     </div>

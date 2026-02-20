@@ -1,12 +1,11 @@
 'use client'
 
-import { Check, MoreHorizontal, PenSquare, Plus, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Check, PenSquare, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { materializationService } from "@/api/services/materialization.service";
-import { CreateMvpPayload } from "@/api/payloads/materialization.payload";
+import { Resource } from "./Materialization";
 
 type TypeResource = "PEOPLE" | "TECHNOLOGY" | "FINANCIAL" | "OTHER" | undefined
-type Resource = {content: string; type: TypeResource}
 type Kpi = {
   id?: string
   name: string
@@ -16,22 +15,42 @@ type Kpi = {
 
 type CanvasMvpProps = {
   challengeId: string;
+  mvpId: string | null;
+  setMvpId: Dispatch<SetStateAction<string | null>>;
+  publicoAlvo: string;
+  setPublicoAlvo: Dispatch<SetStateAction<string>>;
+  propostaValor: string;
+  setPropostaValor: Dispatch<SetStateAction<string>>;
+  items: string[];
+  setItems: Dispatch<SetStateAction<string[]>>;
+  resources: Resource[];
+  setResources: Dispatch<SetStateAction<Resource[]>>;
+  kpis: Kpi[];
+  setKpis: Dispatch<SetStateAction<Kpi[]>>;
 }
 
-export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
-  const [mvpId, setMvpId] = useState<string | null>(null)
-  const [items, setItems] = useState<string[]>([])
+export default function CanvasMVP({ 
+  challengeId,
+  mvpId,
+  setMvpId,
+  propostaValor,
+  publicoAlvo,
+  setPropostaValor,
+  setPublicoAlvo, 
+  items,
+  kpis,
+  resources,
+  setItems,
+  setKpis,
+  setResources,
+}: CanvasMvpProps) {
   const [newItem, setNewItem] = useState('')
   const [isAddingItem, setIsAddingItem] = useState(false)
   const [isEditingItem, setIsEditingItem] = useState(false)
-  const [resources, setResources] = useState<Resource[]>([])
   const [content, setContent] = useState('')
   const [type, setType] = useState<TypeResource>()
   const [isAddingResource, setIsAddingResource] = useState(false)
   const [isEditingResource, setIsEditingResource] = useState(false)
-  const [publicoAlvo, setPublicoAlvo] = useState("");
-  const [propostaValor, setPropostaValor] = useState("");
-  const [kpis, setKpis] = useState<Kpi[]>([])
   const [newKpiName, setNewKpiName] = useState("")
   const [newKpiMetric, setNewKpiMetric] = useState("")
   const [newKpiTarget, setNewKpiTarget] = useState("")
@@ -121,61 +140,12 @@ export default function CanvasMVP({ challengeId }: CanvasMvpProps) {
     setIsAddingKpi(false)
   }
 
-  const removeKpi = (index: number) => {
-    setKpis(prev => prev.filter((_, i) => i !== index))
-  }
-  
-  const handleSave = async () => {
-    try {
-      const payload: CreateMvpPayload = {
-        targetAudience: publicoAlvo,
-        valueProposal: propostaValor,
-        features: items,
-        resources: resources
-          .filter(r => r.type)
-          .map(r => ({
-            type: r.type as string,
-            description: r.content
-          })),
-        kpis: kpis.map(k => ({
-          name: k.name,
-          metric: k.metric,
-          target: k.target
-        }))
-      }
-
-      console.log("Payload enviado:", payload)
-
-      if (mvpId) {
-        console.log("Atualizando MVP:", mvpId)
-        const response = await materializationService.updateMvp(mvpId, payload)
-        setMvpId(response.id)
-      } else {
-        console.log("Criando MVP para challenge:", challengeId)
-        const response = await materializationService.createMvp(challengeId, payload)
-        setMvpId(response.id)
-      }
-
-    } catch (err: any) {
-      console.error("Erro detalhado:", err.response?.data || err)
-    }
-  }
-
   return (
     <div>
 
       <div className="flex flex-col mb-4">
         <h1 className="flex justify-between gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-3">
           Público-Alvo
-
-          <button
-            type="button"
-            onClick={handleSave}
-            className="flex items-center gap-1 px-4 py-2
-            bg-[#0B2B70] text-white text-sm rounded-lg"
-          >
-            Salvar
-          </button>
         </h1>
 
         <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">

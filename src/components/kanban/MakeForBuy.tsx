@@ -1,20 +1,36 @@
 import { BuyMaterializationService } from "@/api/services/buy-materialization.service";
-import { createBuyMaterializationPayload } from "@/api/payloads/buy-materialization.payload";
-import { Check, Plus, Trash2, Save } from "lucide-react";
-import React, { useState, useEffect } from "react"
+import { Check, Plus, Trash2 } from "lucide-react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react"
 
 type MakeForBuyProps = {
   challengeId: string
+  buyId: string
+  setBuyId: Dispatch<SetStateAction<string>>
+  criteria: string[]
+  setCriteria: Dispatch<SetStateAction<string[]>>
+  pdfFile: File | null
+  setPdfFile: Dispatch<SetStateAction<File | null>>
+  hmwProblem: string
+  setHmwProblem: Dispatch<SetStateAction<string>>
+  rules: string
+  setRules: Dispatch<SetStateAction<string>>
 }
 
-export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
-  const [buyId, setBuyId] = useState<string>('');
+export default function MakeforBuy({ 
+  challengeId,
+  buyId,
+  criteria,
+  hmwProblem,
+  pdfFile,
+  rules,
+  setBuyId,
+  setCriteria,
+  setHmwProblem,
+  setPdfFile,
+  setRules,
+}: MakeForBuyProps) {
   const [criterion, setCriterion] = useState<string>('');
-  const [criteria, setCriteria] = useState<string[]>([]);
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [existingFileUrl, setExistingFileUrl] = useState<string>('');
-  const [hmwProblem, setHmwProblem] = useState<string>('');
-  const [rules, setRules] = useState<string>('');
 
   useEffect(() => {
     async function fetchBuy() {
@@ -66,32 +82,8 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
   
   const Icon = (hasFile || hasExisting) ? Check : Plus
 
-  async function handleSubmit() {
-    // Se não tiver ID (Criação), o arquivo é obrigatório.
-    // Se tiver ID (Edição), o arquivo é opcional (mantém o antigo se pdfFile for null).
-    if ((!pdfFile && !buyId) || !hmwProblem || !rules) return;
-
-    try {
-      const payload = {
-        hmwProblem: hmwProblem,
-        challengeRules: rules,
-        selectionCriteria: criteria,
-        edital: pdfFile as File 
-      };
-
-      if (buyId) {
-        await BuyMaterializationService.updateBuy(payload, buyId);
-      } else {
-        await BuyMaterializationService.createBuy(payload, challengeId);
-      }
-      
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   return (
-    <div className="bg-white dark:bg-black p-4 rounded-lg">
+    <div className="bg-white dark:bg-black rounded-lg">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold">
           Materialização para Buy
@@ -119,15 +111,6 @@ export default function MakeforBuy({ challengeId }: MakeForBuyProps) {
       <div className="flex flex-col mb-6">
         <h1 className="flex gap-1 items-center justify-between text-[#0B2B70] dark:text-white font-semibold mb-2">
           <span>Problema do Edital</span>
-
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="flex items-center gap-1 px-4 py-2 self-end
-            bg-[#0B2B70] text-white text-sm rounded-lg"
-          >
-            Salvar
-          </button>
         </h1>
 
         <div className="flex-1 flex rounded-lg border px-3 py-2 min-h-[120px] transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900 focus-within:border-[#0B2B70]">
