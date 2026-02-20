@@ -56,7 +56,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
 
       const res = await ChallengeService.paginatedChallenges({
         page,
-        limit: 10,
+        limit: 8,
         sector,
         status,
         search: search || undefined,
@@ -241,41 +241,41 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                   border-b-2 border-[#15358D] border-r-2"
                 >
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-3 py-2 text-xs text-center text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-bl-[12px]" : ""}`}
                   >
                     {challenge.ideaIdentifier}
                   </td>
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-2 text-sm text-center text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {dateFormatter.format(new Date(challenge.createdAt))}
                   </td>
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-2 text-sm text-center text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {challenge.name}
                   </td>
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-2 text-sm text-center text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {challenge.proponentName}
                   </td>
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-2 text-sm text-center text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     {getCategoryLabel(challenge.proponentArea)}
                   </td>
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-2 py-2 text-sm whitespace-nowrap text-left text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""}`}
                   >
                     <span
-                      className={`pl-6 px-3 py-1 rounded-full text-white text-sm font-semibold
+                      className={`pl-6 px-3 py-1 inline-flex items-center whitespace-nowrap rounded-full text-white text-sm font-semibold
                       ${colors[challenge.status] ?? colors.DEFAULT} relative`}
                     >
                       <span className="absolute left-[10px] top-[10px]"><Circle fill="white" size={6}/></span>
@@ -283,7 +283,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                     </span>
                   </td>
                   <td 
-                    className={`px-6 py-3 text-sm text-left text-gray-600 dark:text-white font-medium
+                    className={`px-6 py-2 text-sm text-center text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-br-[12px]" : ""}`}
                   > 
                     <div

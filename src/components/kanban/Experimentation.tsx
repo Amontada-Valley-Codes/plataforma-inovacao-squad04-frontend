@@ -84,8 +84,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     if (experimentation.poc) return
 
     experimentationService.createPoc(experimentation.id, {
-      objective: "Defina o objetivo da PoC",
-      scope: "Defina o escopo da PoC"
+      objective: "",
+      scope: ""
     }).then(poc => {
       setExperimentation(prev => prev && { ...prev, poc })
     }).catch(err => {
