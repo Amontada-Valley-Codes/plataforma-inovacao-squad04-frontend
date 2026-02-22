@@ -1,6 +1,7 @@
 "use client"
 import { ChallengeService } from "@/api/services/challenge.service";
 import { cn } from "@/lib/utils"
+import { toast } from "sonner";
 
 type ApproveButtonProps = {
   className?: string;
@@ -11,8 +12,11 @@ export default function ApproveButton({ className, challengeId }: ApproveButtonP
   const approveChallenge = async (challengeId: string) => {
     try {
       await ChallengeService.changeStatus(challengeId, { status: "APPROVE" })
-    } catch (error) {
+      toast.success("Desafio aprovado!")
+      window.location.reload()
+    } catch (error: any) {
       console.error(error)
+      toast.error(error.response?.data?.message || "Erro ao aprovar desafio.")
     }
   }
 

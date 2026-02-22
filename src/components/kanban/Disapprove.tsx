@@ -1,6 +1,7 @@
 "use client"
 import { ChallengeService } from "@/api/services/challenge.service";
 import { cn } from "@/lib/utils"
+import { toast } from "sonner";
 
 type DisapproveButtonProps = {
   className?: string;
@@ -11,8 +12,11 @@ export default function DisapproveButton({ className, challengeId }: DisapproveB
   const disapproveChallenge = async (challengeId: string) => {
     try {
       await ChallengeService.changeStatus(challengeId, { status: "DISAPPROVE" })
-    } catch (error) {
+      toast.success("Desafio desaprovado!")
+      window.location.reload()
+    } catch (error: any) {
       console.error(error)
+      toast.error(error.response?.data?.message || "Erro ao desaprovar desafio.")
     }
   }
 
