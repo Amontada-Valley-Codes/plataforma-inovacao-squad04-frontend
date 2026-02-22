@@ -38,8 +38,8 @@ export function FieldsList({ fields, onEdit, onDelete, onReorder, typeLabels, ty
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6">
         <div className="relative mb-6">
-          <div className="w-20 h-20 bg-gradient-to-br from-brand-100 to-blue-light-100 dark:from-brand-900/30 dark:to-blue-light-900/30 rounded-2xl flex items-center justify-center">
-            <FileText className="w-10 h-10 text-brand-500 dark:text-brand-400" />
+          <div className="w-20 h-20 bg-[#15409c]/10 dark:bg-[#15409c]/20 rounded-2xl flex items-center justify-center">
+            <FileText className="w-10 h-10 text-[#15409c] dark:text-[#15409c]" />
           </div>
         </div>
         

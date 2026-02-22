@@ -11,9 +11,11 @@ type ObjectivesListProps = {
   selectedObjectives: Set<string>;
   onToggleObjective: (id: string) => void;
   showActions?: boolean;
+  onEdit?: (objective: StrategicObjective) => void;
+  onDelete?: (objective: StrategicObjective) => void;
 };
 
-export const ObjectivesList = ({ objectives, showActions = false }: ObjectivesListProps) => {
+export const ObjectivesList = ({ objectives, showActions = false, onEdit, onDelete }: ObjectivesListProps) => {
   return (
     <>
       <div className="mb-3">
@@ -32,13 +34,21 @@ export const ObjectivesList = ({ objectives, showActions = false }: ObjectivesLi
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{obj.name}</p>
+                    <p className="text-sm font-semibold text-[#0B2B70] dark:text-white">{obj.name}</p>
                     {showActions && (
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        <button className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" title="Editar">
+                        <button 
+                          onClick={() => onEdit?.(obj)}
+                          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" 
+                          title="Editar"
+                        >
                           <Pencil size={12} />
                         </button>
-                        <button className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Excluir">
+                        <button 
+                          onClick={() => onDelete?.(obj)}
+                          className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
+                          title="Excluir"
+                        >
                           <Trash2 size={12} />
                         </button>
                       </div>

@@ -129,7 +129,7 @@ export function FieldEditorForm({
         <Button type="button" variant="outline" onClick={onCancel} className="px-6">
           Cancelar
         </Button>
-        <Button type="submit" variant="default" className="px-6">
+        <Button type="submit" variant="default" className="px-6 bg-[#15409c] hover:bg-[#15409c]/90">
           {isEditing ? "Salvar Alterações" : "Adicionar Campo"}
         </Button>
       </div>

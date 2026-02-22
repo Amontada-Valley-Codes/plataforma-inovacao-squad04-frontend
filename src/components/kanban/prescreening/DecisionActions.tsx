@@ -1,7 +1,7 @@
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, Archive } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type ActionMode = "idle" | "reject" | "approve";
+type ActionMode = "idle" | "reject" | "approve" | "requestChanges";
 
 type DecisionActionsProps = {
   actionMode: ActionMode;
@@ -17,12 +17,14 @@ type DecisionActionsProps = {
   onStrategicRelevanceChange: (value: "HIGH" | "MEDIUM" | "LOW") => void;
   onApprove: () => void;
   onReject: () => void;
+  onRequestChanges: () => void;
+  onMoveToBacklog: () => void;
 };
 
 const relevanceOptions: { value: "HIGH" | "MEDIUM" | "LOW"; label: string; color: string }[] = [
-  { value: "HIGH", label: "Alta", color: "border-green-500 bg-green-50 text-green-700 data-[active=true]:bg-green-500 data-[active=true]:text-white dark:bg-green-900/30 dark:text-green-400 dark:border-green-700" },
-  { value: "MEDIUM", label: "Média", color: "border-yellow-500 bg-yellow-50 text-yellow-700 data-[active=true]:bg-yellow-500 data-[active=true]:text-white dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700" },
-  { value: "LOW", label: "Baixa", color: "border-gray-500 bg-gray-50 text-gray-700 data-[active=true]:bg-gray-500 data-[active=true]:text-white dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700" },
+  { value: "HIGH", label: "Alta", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white dark:bg-[#15409c]/20 dark:text-[#15409c] dark:border-[#15409c]/40" },
+  { value: "MEDIUM", label: "Média", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white dark:bg-[#15409c]/20 dark:text-[#15409c] dark:border-[#15409c]/40" },
+  { value: "LOW", label: "Baixa", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white dark:bg-[#15409c]/20 dark:text-[#15409c] dark:border-[#15409c]/40" },
 ];
 
 export const DecisionActions = ({
@@ -39,6 +41,8 @@ export const DecisionActions = ({
   onStrategicRelevanceChange,
   onApprove,
   onReject,
+  onRequestChanges,
+  onMoveToBacklog,
 }: DecisionActionsProps) => {
   return (
     <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
@@ -129,10 +133,51 @@ export const DecisionActions = ({
           <div className="flex gap-2">
             <button
               onClick={onReject}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+              disabled={loading}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-60"
             >
-              <XCircle size={15} />
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <XCircle size={15} />
+              )}
               Reprovar Desafio
+            </button>
+            <button
+              onClick={() => onActionModeChange("idle")}
+              className="px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {actionMode === "requestChanges" && (
+        <div className="mb-3 space-y-2">
+          <label className="text-xs font-medium text-gray-900 dark:text-white">
+            Justificativa dos ajustes solicitados <span className="text-red-600">*</span>
+          </label>
+          <textarea
+            value={justification}
+            onChange={(e) => onJustificationChange(e.target.value)}
+            placeholder="Descreva os ajustes necessários para este desafio..."
+            maxLength={1000}
+            className="w-full text-sm border border-yellow-400 rounded-xl p-3 resize-none h-24 focus:outline-none focus:ring-2 focus:ring-yellow-400/30 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400"
+          />
+          <p className="text-xs text-gray-500 dark:text-gray-400">{justification.length}/1000</p>
+          <div className="flex gap-2">
+            <button
+              onClick={onRequestChanges}
+              disabled={loading}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-yellow-600 text-white text-sm font-semibold hover:bg-yellow-700 transition-colors disabled:opacity-60"
+            >
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <AlertCircle size={15} />
+              )}
+              Solicitar Ajustes
             </button>
             <button
               onClick={() => onActionModeChange("idle")}
@@ -153,15 +198,35 @@ export const DecisionActions = ({
             <CheckCircle size={15} />
             Fazer Match do Desafio
           </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => {
+                onActionModeChange("reject");
+                onJustificationChange("");
+              }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-red-400 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+            >
+              <XCircle size={14} />
+              Reprovar Desafio
+            </button>
+            <button
+              onClick={() => {
+                onActionModeChange("requestChanges");
+                onJustificationChange("");
+              }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-sm font-medium hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
+            >
+              <AlertCircle size={14} />
+              Solicitar Ajustes
+            </button>
+          </div>
           <button
-            onClick={() => {
-              onActionModeChange("reject");
-              onJustificationChange("");
-            }}
-            className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-red-400 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+            onClick={onMoveToBacklog}
+            disabled={loading}
+            className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-gray-400 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-400 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-60"
           >
-            <XCircle size={14} />
-            Reprovar Desafio
+            <Archive size={14} />
+            Mover para Backlog
           </button>
         </div>
       )}
