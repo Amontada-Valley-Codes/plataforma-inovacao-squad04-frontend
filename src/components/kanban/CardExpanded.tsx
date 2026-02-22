@@ -138,40 +138,6 @@ type FormResolutionCardsProps = {
 }
 
 export const FormResolutionCard = ({ visibility, setVisibility, setIsOpen, performMove, challengeId }: FormResolutionCardsProps) => {
-  const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchStartups() {
-      try {
-        setIsLoading(true)
-        setError(null)
-        const response = await startupService.showAllStartups()
-        setStartups(response)
-      } catch (error: any) {
-        console.error(error)
-        setError("Erro ao carregar startups.")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchStartups()
-  }, [])
-
-  if (error) {
-    return <div className="w-full flex items-center justify-center h-full">
-      {error}
-    </div>
-  }
-
-  if (isLoading) {
-    return <div className="w-full justify-center items-center h-full">
-      <Loader2 size={24} className="animate-spin"/>
-    </div>
-  }
-
   return (
     <div className="relative flex flex-col dark:bg-gray-800 justify-between w-full h-full">
       <div className="w-full flex flex-col dark:bg-gray-800">
@@ -524,6 +490,7 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
                     creator={cardData.Users.name}
                     startDate={cardData.createdAt}
                     visibility={cardData.visibility}
+                    category={cardData.involvedAreas[0]}
                   />
                 }
                 commentsContent={(onChangeView) => (

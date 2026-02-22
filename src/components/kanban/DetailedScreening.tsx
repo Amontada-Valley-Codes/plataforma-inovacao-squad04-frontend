@@ -438,7 +438,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         />
 
         <div className="relative flex items-center">
-          <div className="flex gap-4 items-center xl:justify-center w-full max-w-md">
+          <div className="flex gap-8 xl:gap-4 items-center xl:justify-center w-full max-w-md">
             <div className="flex flex-col items-center">
               <button
                 className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${page === '1' ? "bg-[#0B2B72] text-white" : "border-gray-400 border-2 text-gray-500"

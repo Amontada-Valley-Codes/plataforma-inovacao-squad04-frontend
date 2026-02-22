@@ -21,6 +21,7 @@ type Props = {
   visibility: string;
   creator: string;
   startDate: string;
+  category: string;
 };
 
 type Stakeholder = {
@@ -57,6 +58,7 @@ export default function RolloutPlan({
   challengeId,
   challengeTitle,
   creator,
+  category,
   startDate,
   visibility,
 }: Props) {
@@ -216,30 +218,64 @@ export default function RolloutPlan({
   return (
     <div>
       {/* Header + Stepper */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col xl:flex-row xl:justify-between mb-6">
         <CardContentsHeader
           challengeTitle={challengeTitle}
-          visibility={visibility}
-          creator={creator}
+          category={category}
           startDate={startDate}
+          creator={creator}
+          visibility={visibility}
         />
-
-        <div className="flex items-center gap-6">
-          {steps.map((step) => (
-            <div key={step.id} className="flex flex-col items-center">
+        <div className="relative flex items-center">
+          <div className="flex gap-8 xl:gap-4 items-start xl:justify-center w-full max-w-md">
+            <div className="flex flex-col items-center">
               <button
-                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${
-                  page === step.id
-                    ? "bg-[#0B2B72] text-white"
-                    : "border-2 border-gray-400 text-gray-500"
-                }`}
-                onClick={() => setPage(step.id)}
+                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${page === '1' ? "bg-[#0B2B72] text-white" : "border-gray-400 border-2 text-gray-500"
+                  }`}
+                onClick={() => setPage('1')}
               >
-                {step.id}
+                1
               </button>
-              <span className="text-xs mt-1 whitespace-nowrap">{step.label}</span>
+              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                <span className="mt-0.5">Casos</span>
+                <span>de</span>
+                <span>Negócios</span>
+              </span>
             </div>
-          ))}
+
+            <div className="flex flex-col items-center">
+
+              <button
+                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${page === '2'
+                    ? "bg-[#0B2B72] text-white"
+                    : "border-gray-400 border-2 text-gray-500"
+                  }`}
+                onClick={() => setPage('2')}
+              >
+                2
+              </button>
+              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                <span className="mt-0.5">Plano</span>
+                <span>de</span>
+                <span>Rollout</span>
+              </span>
+            </div>
+
+
+            <div className="flex flex-col items-center">
+              <button
+                className={`w-8 h-8 rounded-full  font-semibold flex items-center justify-center ${page === '3' ? "bg-[#0B2B72] text-white" : "border-gray-400 dark:placeholder:text-white border-2 text-gray-500"
+                  }`}
+                onClick={() => setPage('3')}
+              >
+                3
+              </button>
+              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                <span className="mt-0.5">Relatório</span>
+                <span>Final</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
