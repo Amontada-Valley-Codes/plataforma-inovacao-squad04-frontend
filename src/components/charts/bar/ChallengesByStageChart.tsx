@@ -22,12 +22,12 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 const STAGE_COLORS: Record<string, string> = {
-  GENERATION: '#6366f1',      
-  PRE_SCREENING: '#8b5cf6',
-  DETAILED_SCREENING: '#ec4899', 
-  MATERIALIZATION: '#f59e0b', 
-  EXPERIMENTATION: '#10b981',
-  SCALE: '#06b6d4',
+  GENERATION: '#15409c',      
+  PRE_SCREENING: '#15409c',
+  DETAILED_SCREENING: '#15409c', 
+  MATERIALIZATION: '#15409c', 
+  EXPERIMENTATION: '#15409c',
+  SCALE: '#15409c',
 };
 
 export default function ChallengesByStageChart() {

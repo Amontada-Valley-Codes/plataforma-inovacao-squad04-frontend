@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
 import { PreScreeningService } from "@/api/services/preScreening.service";
+import { ChallengeService } from "@/api/services/challenge.service";
 import { ObjectivesList } from "./prescreening/ObjectivesList";
 import { DecisionActions } from "./prescreening/DecisionActions";
+import { CardContentsHeader } from "./CardsContents";
 
 type CardPreScreeningContentProps = {
   challangeTitle: string;
@@ -25,20 +27,9 @@ type StrategicObjective = {
   description: string;
 };
 
-type Justification = {
-  id: string;
-  status: string;
-  justification: string;
-  createdAt: string;
-  users: {
-    name: string;
-    email: string;
-  };
-};
+type ActionMode = "idle" | "reject" | "approve" | "requestChanges";
 
-type ActionMode = "idle" | "reject" | "approve";
-
-export const PreScreening = ({ challengeId, onStatusChange }: CardPreScreeningContentProps) => {
+export const PreScreening = ({ challangeTitle, challengeId, category, startDate, creator, onStatusChange }: CardPreScreeningContentProps) => {
   const [actionMode, setActionMode] = useState<ActionMode>("idle");
   const [justification, setJustification] = useState("");
   const [alignmentJustification, setAlignmentJustification] = useState("");
@@ -53,13 +44,10 @@ export const PreScreening = ({ challengeId, onStatusChange }: CardPreScreeningCo
     loadObjectives();
   }, [challengeId]);
 
-
-
   const loadObjectives = async () => {
     setLoadingObjectives(true);
     try {
       const response = await StrategicObjectivesService.getObjectivesByChallenge(challengeId);
-      console.log("Response:", response);
       
       if (response?.strategicObjective && Array.isArray(response.strategicObjective) && response.strategicObjective.length > 0) {
         const mappedObjectives = response.strategicObjective
@@ -128,22 +116,75 @@ export const PreScreening = ({ challengeId, onStatusChange }: CardPreScreeningCo
       });
       toast.success("Desafio reprovado com sucesso!");
       onStatusChange?.();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error: any) {
       console.error("Erro ao reprovar:", error);
       const errorMsg = error?.response?.data?.message || "Erro ao reprovar desafio.";
       toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequestChanges = async () => {
+    if (!justification.trim()) {
+      toast.error("Justificativa é obrigatória para solicitar ajustes.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await PreScreeningService.registerDecision(challengeId, {
+        decision: "CHANGES_REQUESTED",
+        justification
+      });
+      toast.success("Ajustes solicitados! Desafio retornou para Geração.");
+      onStatusChange?.();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error: any) {
+      console.error("Erro ao solicitar ajustes:", error);
+      const errorMsg = error?.response?.data?.message || "Erro ao solicitar ajustes.";
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMoveToBacklog = async () => {
+    setLoading(true);
+    try {
+      await ChallengeService.changeStatus(challengeId, {
+        status: "FUTURE_BACKLOG"
+      });
+      toast.success("Desafio movido para o backlog com sucesso!");
+      onStatusChange?.();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error: any) {
+      console.error("Erro ao mover para backlog:", error);
+      const errorMsg = error?.response?.data?.message || "Erro ao mover para backlog.";
+      toast.error(errorMsg);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="w-full flex flex-col overflow-y-auto">
+      <CardContentsHeader
+        challengeTitle={challangeTitle}
+        category={category}
+        startDate={startDate}
+        creator={creator}
+      />
+
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-[#0B2B72] dark:text-white mb-2">
-          Match Desafio e Objetivos Estratégicos
-        </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
-          Selecione os objetivos alinhados com este desafio e julgue a relevância para o avanço no funil.
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Avalie o alinhamento deste desafio com os objetivos estratégicos da organização e defina a relevância para prosseguir no funil de inovação.
         </p>
       </div>
 
@@ -174,6 +215,8 @@ export const PreScreening = ({ challengeId, onStatusChange }: CardPreScreeningCo
         onStrategicRelevanceChange={setStrategicRelevance}
         onApprove={handleApprove}
         onReject={handleReject}
+        onRequestChanges={handleRequestChanges}
+        onMoveToBacklog={handleMoveToBacklog}
       />
     </div>
   );

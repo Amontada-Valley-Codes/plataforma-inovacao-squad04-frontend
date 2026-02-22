@@ -25,6 +25,8 @@ import {
   ChallengeFullResponse,
   AdvanceStageResponse,
   ReturnStepResponse,
+  UpdateStrategicObjectivesPayload,
+  UpdateStrategicObjectivesResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -152,6 +154,11 @@ export const ChallengeService = {
 
   async returnStep(challengeId: string, status: ChangeStatusPayload): Promise<ReturnStepResponse> {
     const { data } = await api.patch(ENDPOINTS.CHALLENGE.RETURN(challengeId), status)
+    return data
+  },
+
+  async updateStrategicObjectives(challengeId: string, payload: UpdateStrategicObjectivesPayload): Promise<UpdateStrategicObjectivesResponse> {
+    const { data } = await api.patch<UpdateStrategicObjectivesResponse>(ENDPOINTS.CHALLENGE.UPDATE_STRATEGIC_OBJECTIVES(challengeId), payload)
     return data
   },
 };
