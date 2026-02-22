@@ -32,7 +32,7 @@ export default function MatchesTab({ startupId, startupName }: MatchesTabProps) 
       ]);
 
       // Processar matches aceitos - filtrar pela startup específica
-      const startupMatches = acceptedResponse.startups.find(s => s.startup.id === startupId);
+      const startupMatches = acceptedResponse?.startups?.find(s => s.startup.id === startupId);
       
       if (startupMatches) {
         const acceptedList = startupMatches.challenges.map(c => ({

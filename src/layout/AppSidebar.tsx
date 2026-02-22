@@ -64,6 +64,7 @@ function buildNavItems(
         { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
         { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
         { icon: <UsersIcon />, name: "Usuários", path: `${base}/usuarios` },
+         { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
       ];
     }
 
