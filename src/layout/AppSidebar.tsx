@@ -118,14 +118,11 @@ function buildNavItems(
   }
 }
 
-// ─── Componente ───────────────────────────────────────────────────────────────
+
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
-
-  // getCurrentUser lê document.cookie — só existe no cliente.
-  // Inicializamos como null e populamos após mount para evitar hydration mismatch.
   const [user, setUser] = useState<ReturnType<typeof getCurrentUser>>(null);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-// src/components/startup/StartupCard.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
@@ -16,10 +16,11 @@ import { startupService } from "@/api/services/startup.service";
 import { ShowAllStartupsResponse } from "@/api/payloads/startup.payload";
 import { useStore } from "../../../store";
 
-type Role = "admin" | "gestor" | "avaliador" | "usuario";
+import type { Role } from "@/lib/roles";
+import { hasPermission } from "@/lib/roles";
 
 type Props = {
-  role?: Role;
+  role?: Role | null;
   viewerCompanyId?: number;
   companyIdFilter?: string | number;
   title?: string;
@@ -27,7 +28,7 @@ type Props = {
 };
 
 export default function StartupCard({
-  role = "admin",
+  role = null,
   viewerCompanyId,
   companyIdFilter,
   title = "Startups",
@@ -35,13 +36,12 @@ export default function StartupCard({
 }: Props) {
   const router = useRouter();
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedStartup, setSelectedStartup] = useState<ShowAllStartupsResponse | null>(null);
+  const [selectedStartup, setSelectedStartup] =
+    useState<ShowAllStartupsResponse | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [startups, setStartups] = useState<ShowAllStartupsResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const { reload } = useStore();
-
-  // --- Carregar startups da API ---
 
   async function fetchStartups() {
     try {
@@ -57,24 +57,30 @@ export default function StartupCard({
 
   useEffect(() => {
     fetchStartups();
-  }, [reload])
+  }, [reload]);
 
-  // --- Filtrar startups conforme role e empresa ---
+  // 🔐 Permissões corretas
+  const canSeeAll =
+    role &&
+    hasPermission(role, ["ADMINISTRATOR", "MANAGER"]);
+
+  const canOpenModal = role === "ADMINISTRATOR";
+  const canNavigate = role === "MANAGER";
+
+  // 🔎 Filtro baseado na role
   const filtered = useMemo(() => {
-    const byCompany = startups;
+    if (canSeeAll) return startups;
 
-    const canSeeAll = role === "admin" || role === "gestor";
-    if (canSeeAll) return byCompany;
+    if (!viewerCompanyId) return [];
 
-    if (viewerCompanyId == null) return [];
-    return byCompany;
-  }, [startups, role, viewerCompanyId, companyIdFilter]);
+    return startups; // aqui você pode aplicar filtro por empresa se quiser
+  }, [startups, canSeeAll, viewerCompanyId, companyIdFilter]);
 
-  // --- Animação suave da altura ---
+  // --- Animação de altura ---
   const listRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
+  const [containerHeight, setContainerHeight] =
+    useState<number | undefined>(undefined);
 
   const recalcHeight = useCallback(() => {
     const activeEl = viewMode === "list" ? listRef.current : gridRef.current;
@@ -93,227 +99,127 @@ export default function StartupCard({
   }, [recalcHeight]);
 
   useEffect(() => {
-    if (autoOpen && filtered[0]) {
+    if (autoOpen && filtered[0] && canOpenModal) {
       setSelectedStartup(filtered[0]);
+      openModal();
     }
-  }, [autoOpen, filtered]);
+  }, [autoOpen, filtered, canOpenModal, openModal]);
 
- if (loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground dark:text-gray-400">Carregando </p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
       </div>
     );
   }
 
   if (!filtered.length) {
     return (
-      <div className="w-full p-6 text-sm text-gray-500 dark:text-[#ced3db]">
-        Nenhuma startup encontrada
-        {role === "admin" || role === "gestor" ? "" : " para sua empresa"}.
+      <div className="w-full p-6 text-sm text-gray-500">
+        Nenhuma startup encontrada.
       </div>
     );
   }
 
-  // --- Comportamento ao clicar ---
   const wrapIfNeeded = (
     startup: ShowAllStartupsResponse,
-    children: React.ReactNode,
+    children: React.ReactNode
   ) => {
-    if (role === "gestor") {
-      const handlers = {
-        onClick: () => {
-          router.push(`/user/startups/${startup.id}`);
-        },
-        onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter" || e.key === " ") {
-            router.push(`/user/startups/${startup.id}`);
+    if (canNavigate) {
+      return (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => router.push(`/user/startups/${startup.id}`)}
+          onKeyDown={(e) =>
+            (e.key === "Enter" || e.key === " ") &&
+            router.push(`/user/startups/${startup.id}`)
           }
-        },
-        role: "button" as const,
-        tabIndex: 0,
-      };
-      return <div {...handlers}>{children}</div>;
+        >
+          {children}
+        </div>
+      );
     }
-    if (role === "admin") {
-      const handlers = {
-        onClick: () => {
-          setSelectedStartup(startup);
-          openModal();
-        },
-        onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter" || e.key === " ") {
+
+    if (canOpenModal) {
+      return (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => {
             setSelectedStartup(startup);
             openModal();
-          }
-        },
-        role: "button" as const,
-        tabIndex: 0,
-      };
-      return <div {...handlers}>{children}</div>;
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              setSelectedStartup(startup);
+              openModal();
+            }
+          }}
+        >
+          {children}
+        </div>
+      );
     }
+
+    return <>{children}</>;
   };
 
   return (
     <div className="flex flex-col gap-6 w-full p-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-[20px] font-semibold text-slate-900 dark:text-gray-100">
-          {title}
-        </h2>
+        <h2 className="text-xl font-semibold">{title}</h2>
 
         <button
-          type="button"
-          onClick={() => setViewMode(viewMode === "list" ? "grid" : "list")}
-          className="inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 p-2 transition-all duration-200 ease-out"
-          aria-label="Alternar visualização"
-          title={viewMode === "list" ? "Ver em cards" : "Ver em lista"}
+          onClick={() =>
+            setViewMode(viewMode === "list" ? "grid" : "list")
+          }
+          className="p-2 border rounded-md"
         >
           {viewMode === "list" ? (
-            <LayoutGrid size={18} className="text-gray-700 dark:text-gray-300" />
+            <LayoutGrid size={18} />
           ) : (
-            <ListIcon size={18} className="text-gray-700 dark:text-gray-300" />
+            <ListIcon size={18} />
           )}
         </button>
       </div>
 
       <div
-        ref={containerRef}
         style={{ height: containerHeight }}
-        className="relative transition-[height] duration-300 ease-out"
+        className="relative transition-[height] duration-300"
       >
         <div
           ref={listRef}
-          aria-hidden={viewMode !== "list"}
-          className={[
-            "absolute inset-0 overflow-hidden transition duration-200",
-            viewMode === "list"
-              ? "opacity-100 scale-100 pointer-events-auto"
-              : "opacity-0 scale-[0.98] pointer-events-none",
-            "space-y-4",
-          ].join(" ")}
+          className={`space-y-4 ${
+            viewMode === "list" ? "block" : "hidden"
+          }`}
         >
-          {filtered.map((s) => {
-            const row = (
-              <div className="flex items-stretch gap-6 px-6 py-5 md:py-6">
-                <div className="flex w-full md:w-[32%] items-center gap-4">
-                  <div className="flex-shrink-0 size-16 rounded-xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                    <div className="size-16 grid place-items-center text-sm font-medium text-slate-600">
-                      {s.name?.[0]?.toUpperCase() ?? "?"}
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-slate-900 dark:text-gray-100 font-semibold truncate">
-                      {s.name}
-                    </div>
-                    <div className="mt-1 text-[13px] text-[#15358D]/90 truncate">
+          {filtered.map((s) => (
+            <div
+              key={s.id}
+              className="rounded-xl border p-4 hover:shadow transition"
+            >
+              {wrapIfNeeded(
+                s,
+                <div className="flex justify-between">
+                  <div>
+                    <p className="font-semibold">{s.name}</p>
+                    <p className="text-sm text-gray-500">
                       {s.industry_segment}
-                    </div>
+                    </p>
                   </div>
+
+                  {canOpenModal && (
+                    <MoreHorizontal className="text-gray-400" />
+                  )}
                 </div>
-
-                <div className="hidden md:flex w-[36%] flex-col gap-2 text-sm text-slate-700 dark:text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#15358D]" />
-                    <span className="truncate">{s.cnpj}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar size={14} className="text-slate-400" />
-                    <span className="truncate">{s.founders.join(", ")}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Settings size={14} className="text-slate-400" />
-                    <span className="truncate">{s.problems_solved.join(", ")}</span>
-                  </div>
-                </div>
-
-                {role === "admin" && (
-                  <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedStartup(s);
-                        openModal();
-                      }}
-                      aria-label={`Abrir menu de ${s.name}`}
-                      className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 transition"
-                    >
-                      <MoreHorizontal className="text-slate-600 dark:text-gray-300" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-
-            return (
-              <div
-                key={`list-${s.id}`}
-                className="group relative rounded-2xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition"
-              >
-                {wrapIfNeeded(s, row)}
-              </div>
-            );
-          })}
-        </div>
-
-        <div
-          ref={gridRef}
-          aria-hidden={viewMode !== "grid"}
-          className={[
-            "absolute inset-0 overflow-auto transition duration-200",
-            viewMode === "grid"
-              ? "opacity-100 scale-100 pointer-events-auto"
-              : "opacity-0 scale-[0.98] pointer-events-none",
-            "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1",
-          ].join(" ")}
-        >
-          {filtered.map((s) => {
-            const card = (
-              <article className="group relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-900 shadow-sm transition border-[#E5E7EB] dark:border-gray-800 hover:border-[#15358D]/40 hover:ring-1 hover:ring-[#15358D]/20 hover:scale-[1.01]">
-                <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
-                <div className="p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-xl bg-slate-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden ring-1 ring-[#15358D]/20">
-                      <div className="size-12 grid place-items-center text-sm font-semibold text-slate-700">
-                        {s.name?.[0]?.toUpperCase() ?? "?"}
-                      </div>
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-slate-900 dark:text-gray-100 truncate">
-                        {s.name}
-                      </h3>
-                      <div className="mt-1 text-[12px] text-[#15358D] truncate">
-                        {s.industry_segment}
-                      </div>
-                    </div>
-                  </div>
-
-                  <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-gray-300">
-                    <li className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#15358D]" />
-                      <span className="truncate">{s.cnpj}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Calendar size={14} className="text-slate-400" />
-                      <span className="truncate">{s.founders.join(", ")}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Settings size={14} className="text-slate-400" />
-                      <span className="truncate">{s.problems_solved.join(", ")}</span>
-                    </li>
-                  </ul>
-                </div>
-              </article>
-            );
-
-            return <div key={`grid-${s.id}`}>{wrapIfNeeded(s, card)}</div>;
-          })}
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
-      {role === "admin" && selectedStartup && (
+      {canOpenModal && selectedStartup && (
         <StartupProfile
           isOpen={isOpen}
           onClose={() => {

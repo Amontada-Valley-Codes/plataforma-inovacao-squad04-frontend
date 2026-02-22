@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import CustomForm from "../challenge/CustomForm";
 import { useModal } from "@/hooks/useModal";
@@ -8,6 +9,8 @@ import RegisterChallengeForm from "../challenge/RegisterChallengeForm";
 import Button from "../ui/button/Button";
 import RegisterStrategicObjectiveForm from "../strategic-objectives/RegisterStrategicObjectiveForm";
 import api from "@/api/axios";
+import { getUserRole } from "@/lib/auth"; 
+import type { Role } from "@/lib/roles";
 
 type ModalType = "OBJECTIVE" | "CHALLENGE" | null;
 
@@ -15,11 +18,12 @@ export default function CreateChallengeButton() {
   const router = useRouter();
   const { isOpen, openModal, closeModal } = useModal();
 
+  const role: Role | null = getUserRole();
+  const isAdmin = role === "ADMINISTRATOR";
+
   const [modalType, setModalType] = useState<ModalType>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
-
-  
 
   const handleCloseAll = () => {
     closeModal();
@@ -28,33 +32,32 @@ export default function CreateChallengeButton() {
     setShowCustomForm(false);
   };
 
- 
   const handleChallengeCreated = async (createdChallengeId: string) => {
     setChallengeId(createdChallengeId);
 
     try {
-      const response = await api.get(`/form-template-versions/${createdChallengeId}`);
+      const response = await api.get(
+        `/form-template-versions/${createdChallengeId}`
+      );
+
       const firstForm = response.data.forms?.[0];
       const questions = firstForm?.version?.questions ?? [];
 
       if (questions.length > 0) {
-      
         setShowCustomForm(true);
       } else {
-       
         handleCloseAll();
       }
     } catch {
-    
       handleCloseAll();
     }
   };
 
-  // ── Render ─────────────────────────────────
-
   return (
     <div className="flex gap-2">
-      <Button
+      {/* Sempre visível */}
+      {!isAdmin &&(
+         <Button
         size="sm"
         onClick={() => {
           setModalType("OBJECTIVE");
@@ -62,29 +65,36 @@ export default function CreateChallengeButton() {
         }}
       >
         <DiamondPlus />
-        Gerenciar Objectivo Estratégico
+        Gerenciar Objetivo Estratégico
       </Button>
 
-      <Button
-        size="sm"
-        onClick={() => {
-          setModalType("CHALLENGE");
-          openModal();
-        }}
-      >
-        <BookPlus />
-        Criar Desafio
-      </Button>
 
-      <Button
-        size="sm"
-        onClick={() => router.push("/admin/form-builder")}
-      >
-        <PlusCircle />
-        Criar Formulário
-      </Button>
+      )}
+     
+      {!isAdmin && (
+        <Button
+          size="sm"
+          onClick={() => {
+            setModalType("CHALLENGE");
+            openModal();
+          }}
+        >
+          <BookPlus />
+          Criar Desafio
+        </Button>
+      )}
 
-      
+      {/* ADMIN NÃO VÊ */}
+      {!isAdmin && (
+        <Button
+          size="sm"
+          onClick={() => router.push("/admin/form-builder")}
+        >
+          <PlusCircle />
+          Criar Formulário
+        </Button>
+      )}
+
       {isOpen && modalType === "OBJECTIVE" && (
         <RegisterStrategicObjectiveForm
           isOpen={isOpen}
@@ -92,7 +102,6 @@ export default function CreateChallengeButton() {
         />
       )}
 
-     
       {isOpen && modalType === "CHALLENGE" && !showCustomForm && (
         <RegisterChallengeForm
           isOpen={isOpen}
@@ -101,7 +110,6 @@ export default function CreateChallengeButton() {
         />
       )}
 
-      
       {isOpen && showCustomForm && challengeId && (
         <CustomForm
           challengeId={challengeId}
