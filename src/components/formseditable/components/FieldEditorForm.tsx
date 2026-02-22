@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { X, Plus } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface FieldEditorFormProps {
   formData: any
@@ -39,18 +40,18 @@ export function FieldEditorForm({
       <div className="space-y-5">
         <div className="space-y-3">
           <Label htmlFor="type">Tipo de Campo *</Label>
-          <select
-            id="type"
-            value={formData.type}
-            onChange={(e) => onFormDataChange("type", e.target.value)}
-            className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {fieldTypes.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label} - {type.description}
-              </option>
-            ))}
-          </select>
+          <Select value={formData.type} onValueChange={(value) => onFormDataChange("type", value)}>
+  <SelectTrigger id="type" className="w-full h-10">
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    {fieldTypes.map((type) => (
+      <SelectItem key={type.value} value={type.value}>
+        {type.label} - {type.description}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
         </div>
 
         <div className="space-y-3">
