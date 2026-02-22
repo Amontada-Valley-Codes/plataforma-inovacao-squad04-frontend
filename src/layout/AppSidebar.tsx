@@ -161,6 +161,7 @@ function buildNavItems(
       { icon: <Grid2x2Icon />, name: "Dashboard", path: `${base}/dashboard` },
       { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
       { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
+      { icon: <RocketIcon />, name: "Startups", path: `${base}/startups` },
       { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
       { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
       { icon: <Building2Icon />, name: "Usuários", path: `${base}/usuarios` },
