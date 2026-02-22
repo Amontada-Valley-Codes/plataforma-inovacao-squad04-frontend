@@ -1,11 +1,11 @@
-// src/app/(company)/company/[companyId]/history/page.tsx
 "use client";
 
-import { getUserRole, getCurrentUser, getUserCompanyId } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import CompanyHistoryHistoric from "@/components/history/CompanyHistory";
 import { use, useEffect, useState } from "react";
 import { ShowOneEnterpriseResponse } from "@/api/payloads/enterprise.payload";
 import { enterpriseService } from "@/api/services/enterprise.service";
+import type { Role } from "@/lib/roles";
 
 type PageProps = {
   params: Promise<{ companyId: string }>;
@@ -14,43 +14,26 @@ type PageProps = {
 export default function CompanyHistoryPage({ params }: PageProps) {
   const { companyId } = use(params);
 
-  const [role, setRole] = useState<"startup" | "admin" | "gestor" | "avaliador" | "usuario" | "collaborator">("usuario");
-  const [viewerCompanyId, setViewerCompanyId] = useState<string | undefined>();
-  const [viewerUserId, setViewerUserId] = useState<string | undefined>();
+  const user = getCurrentUser(); 
+
+  const [enterpriseName, setEnterpriseName] = useState<
+    ShowOneEnterpriseResponse["name"] | undefined
+  >();
   const [loading, setLoading] = useState(true);
-  const [enterpriseName, setEnterpriseName] = useState<ShowOneEnterpriseResponse["name"]>()
-
-  const fetchEnterprise = async () => {
-    try {
-      const response = await enterpriseService.getMyEnterprise()
-      setEnterpriseName(response?.name)
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   useEffect(() => {
-    fetchEnterprise()
-  }, [])
-
-  useEffect(() => {
-    (async () => {
-      const r = await getUserRole();
-      const u = await getCurrentUser();
-      const c = await getUserCompanyId();
-
-      setRole(r as "startup" | "admin" | "gestor" | "avaliador" | "usuario" | "collaborator");
-      setViewerCompanyId(c ? String(c) : undefined);
-      setViewerUserId(u?.id ? String(u.id) : undefined);
-      setLoading(false); // ✅ corrigido: false quando termina de carregar
-    })();
+    enterpriseService
+      .getMyEnterprise()
+      .then((res) => setEnterpriseName(res?.name))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-muted-foreground dark:text-gray-400">Carregando</p>
         </div>
       </div>
@@ -68,9 +51,9 @@ export default function CompanyHistoryPage({ params }: PageProps) {
       <div className="w-full overflow-x-auto">
         <CompanyHistoryHistoric
           companyId={companyId}
-          role={role}
-          viewerCompanyId={viewerCompanyId}
-          viewerUserId={viewerUserId}
+          role={user?.role as Role}
+          viewerCompanyId={user?.enterpriseId ?? undefined}
+          viewerUserId={user?.id}
         />
       </div>
     </div>

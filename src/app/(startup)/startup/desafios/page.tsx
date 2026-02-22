@@ -1,18 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Metadata } from "next";
+"use client";
+
 import ChallengeCard from "@/components/challenge/ChallengeCard";
 import { getCurrentUser } from "@/lib/auth";
 import { Suspense } from "react";
 
-export const metadata: Metadata = {
-  title: "Desafios Públicos",
-  description: "Desafios abertos do ecossistema para startups.",
-};
-
-export default async function StartupPublicChallengesPage() {
-  const me = await getCurrentUser();
-  const startupId = Number((me as any)?.startupId ?? 1);
+export default function StartupPublicChallengesPage() {
+  const user = getCurrentUser();
+  const startupId = user?.startupId ?? undefined;
 
   return (
     <div className="space-y-6">
