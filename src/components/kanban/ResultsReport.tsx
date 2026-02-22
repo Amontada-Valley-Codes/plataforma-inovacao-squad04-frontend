@@ -3,57 +3,40 @@
 import { ShowResultsReportResponse } from "@/api/payloads/experimentation.payload"
 import { experimentationService } from "@/api/services/experimentation.service"
 import { Check, CircleX, PenSquare, Plus, Rocket, Trash2, Wrench } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 type ResultsReportProps = {
-  pocId: string,
+  pocId: string
+  report: ShowResultsReportResponse | null
+  setReport: Dispatch<SetStateAction<ShowResultsReportResponse | null>>
+  executiveSummary: string
+  setExecutiveSummary: Dispatch<SetStateAction<string>>
+  recommendationTxt: string
+  setRecommendationTxt: Dispatch<SetStateAction<string>>
+  learnings: string[]
+  setLearnings: Dispatch<SetStateAction<string[]>>
+  finalDecision: "SCALE" | "ADJUST" | "CLOSE"
+  setFinalDecision: Dispatch<SetStateAction<"SCALE" | "ADJUST" | "CLOSE">>
 } 
-
-export default function ResultsReport({ pocId }: ResultsReportProps) {
-  const [report, setReport] = useState<ShowResultsReportResponse | null>(null)
-  const [executiveSummary, setExecutiveSummary] = useState("")
-  const [learnings, setLearnings] = useState<string[]>([])
-  const [recommendationTxt, setRecommendationTxt] = useState("")
+ 
+export default function ResultsReport({ 
+  pocId, 
+  executiveSummary,
+  finalDecision,
+  learnings,
+  recommendationTxt,
+  report,
+  setExecutiveSummary,
+  setFinalDecision,
+  setLearnings,
+  setRecommendationTxt,
+  setReport,
+}: ResultsReportProps) {
   const [newLearning, setNewLearning] = useState('')
   const [isAddingLearning, setIsAddingLearning] = useState(false)
   const [isEditingLearning, setIsEditingLearning] = useState(false)
-  const [finalDecision, setFinalDecision] = useState<"SCALE" | "ADJUST" | "CLOSE">("SCALE")
 
   const totalChars = learnings.reduce((acc, item) => acc + item.length, 0)
-
-  const loadReport = async () => {
-    const res = await experimentationService.showReport(pocId)
-    setReport(res)
-    setExecutiveSummary(res.executiveSummary)
-    setLearnings(res.learnings)
-    setRecommendationTxt(res.recommendationTxt)
-    setFinalDecision(res.recommendation as any)
-  }
-
-  useEffect(() => {
-    loadReport()
-  }, [pocId])
-
-  const saveReport = async () => {
-    const payload = {
-      executiveSummary,
-      learnings,
-      recommendation: finalDecision,
-      recommendationTxt,
-      kpis: []
-    }
-
-    if (report) {
-      const updated = await experimentationService.updateReport(report.id, payload)
-      setReport(updated)
-    } else {
-      const created = await experimentationService.createReport(pocId, payload)
-      setReport(created)
-    }
-
-    await loadReport()
-  }
-
 
   const addLearning = () => {
     if (!newLearning.trim()) return
@@ -73,13 +56,6 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
     <div className="flex flex-col gap-1 mb-6">
       <h1 className="flex items-center justify-between text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">
         Relatório de Resultados
-
-        <button
-          onClick={saveReport}
-          className="w-fit px-4 py-2 rounded-lg text-sm font-semibold bg-[#0B2B70] text-white"
-        >
-          Salvar
-        </button>
       </h1>
 
       <div className="flex flex-col mb-4">
@@ -128,29 +104,35 @@ export default function ResultsReport({ pocId }: ResultsReportProps) {
           </div>
         </h1>
 
-        <ul className="list-disc pl-4 space-y-2">
-          {learnings.map((learning, i) => (
-            <li key={i} className="text-sm">
-              <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
-                {learning}
+        {learnings.length !== 0 ? (
+          <ul className="list-disc pl-4 space-y-2">
+            {learnings.map((learning, i) => (
+              <li key={i} className="text-sm">
+                <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
+                  {learning}
 
-                {isEditingLearning && (
-                  <button
-                    onClick={() => {
-                      removeLearning(i)
-                      setIsEditingLearning(false)
-                    }}
-                    className="flex w-fit justify-center p-1
-                    rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
-                    text-[12px] cursor-pointer"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
+                  {isEditingLearning && (
+                    <button
+                      onClick={() => {
+                        removeLearning(i)
+                        setIsEditingLearning(false)
+                      }}
+                      className="flex w-fit justify-center p-1
+                      rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
+                      text-[12px] cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex flex-col mb-4">
+            <p className="text-sm text-[#98A2B3] dark:text-white/50 mt-1">Nenhum aprendizado adicionado.</p>
+          </div>
+        )}
 
         {isAddingLearning && (
           <div className="flex gap-4">

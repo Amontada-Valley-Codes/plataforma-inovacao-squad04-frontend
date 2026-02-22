@@ -2,7 +2,8 @@
 
 import { experimentationService } from "@/api/services/experimentation.service";
 import { Check, ChevronDown, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { pocHypotheses, poCIndicators } from "./Experimentation";
 
 type CanvasPoCProps = {
   poc: {
@@ -30,14 +31,28 @@ type CanvasPoCProps = {
   };
   updateObjective: (newObjective: string) => void;
   updateScope: (newScope: string) => void;
+  indicators: poCIndicators[]
+  setIndicators: Dispatch<SetStateAction<poCIndicators[]>>
+  hypotheses: pocHypotheses[]
+  setHypotheses: Dispatch<SetStateAction<pocHypotheses[]>>
+  objective: string
+  setObjective: Dispatch<SetStateAction<string>>
+  setScope: Dispatch<SetStateAction<string>>
+  scope: string
 }
 
-export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasPoCProps) {
-  const [objective, setObjective] = useState(poc.objective)
-  const [scope, setScope] = useState(poc.scope)
-  const [hypotheses, setHypotheses] = useState(poc.pocHypotheses ?? [])
+export default function CanvasPoC({ 
+  poc,
+  hypotheses,
+  indicators,
+  objective,
+  scope,
+  setHypotheses,
+  setIndicators,
+  setObjective,
+  setScope 
+}: CanvasPoCProps) {
   const [newHypothesis, setNewHypothesis] = useState('')
-  const [indicators, setIndicators] = useState(poc.poCIndicators ?? [])
   const [newIndicatorName, setNewIndicatorName] = useState("")
   const [newIndicatorMetric, setNewIndicatorMetric] = useState("")
   const [newIndicatorTarget, setNewIndicatorTarget] = useState("")
@@ -106,42 +121,10 @@ export default function CanvasPoC({ poc, updateObjective, updateScope }: CanvasP
     )
   }
 
-  const handleSave = async () => {
-    try {
-      await experimentationService.updatePoc(poc.id, {
-        objective: objective,
-        scope: scope
-      });
-
-      updateObjective(objective);
-      updateScope(scope);
-
-      console.log("PoC atualizada com sucesso!");
-    } catch (err: any) {
-      console.error("Erro ao salvar PoC:", err.response?.data || err);
-    }
-  }
-
-  useEffect(() => {
-    setIndicators(poc.poCIndicators ?? [])
-    setHypotheses(poc.pocHypotheses ?? [])
-    setObjective(poc.objective)
-    setScope(poc.scope)
-  }, [poc.id])
-
   return (
     <div className="flex flex-col gap-1 mb-6">
       <h1 className="text-[#0B2B72] flex items-center justify-between dark:text-white text-2xl font-semibold mb-4">
         Canvas da PoC
-
-        <button
-          type="button"
-          onClick={handleSave}
-          className="flex items-center gap-1 px-4 py-2
-          bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white text-sm rounded-lg"
-        >
-          Salvar
-        </button>
       </h1>
 
       <div className="flex flex-col mb-4">
