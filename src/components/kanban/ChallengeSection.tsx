@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CardContentsHeader } from "./CardsContents"
 import { 
   Menu, Clock, Wrench, TrendingUp, Hash, BarChart, 
-  Target, AlertTriangle, Users, CheckCircle, FileText, HelpCircle, Loader2 
+  Target, AlertTriangle, Users, CheckCircle, HelpCircle
 } from "lucide-react"
 import { ChallengeFullResponse } from "@/api/payloads/challenge.payload";
 import { ChallengeService } from "@/api/services/challenge.service";
@@ -93,7 +93,7 @@ export const ChallengeSection = ({
 
   return (
     <div className="w-full flex flex-col overflow-y-auto">
-      <div className="flex items-center xl:flex-row xl:justify-between mb-6">
+      <div className="flex xl:items-center flex-col xl:flex-row xl:justify-between mb-6">
         <CardContentsHeader
           challengeTitle={challangeTitle}
           category={category}
@@ -104,7 +104,7 @@ export const ChallengeSection = ({
         />
 
         <div className="relative flex flex-col items-center">
-          <div className="flex gap-4 items-start xl:justify-center w-full max-w-md">
+          <div className="flex gap-8 xl:gap-4 items-start xl:justify-center w-full max-w-md">
             <div className="flex flex-col items-center">
               <button
                 className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${

@@ -213,7 +213,7 @@ export default function Materialization({
 
   return (
     <div className="w-full flex flex-col overflow-y-auto">
-      <div className="flex items-center xl:flex-row xl:justify-between mb-6">
+      <div className="flex xl:items-center flex-col xl:flex-row xl:justify-between mb-6">
         <CardContentsHeader
           challengeTitle={challengeTitle}
           visibility={visibility}
@@ -221,8 +221,8 @@ export default function Materialization({
           startDate={startDate}
         />
 
-        <div className="relative flex flex-col items-center">
-          <div className="flex gap-4 items-start xl:justify-center w-full max-w-md">
+        <div className="relative flex flex-col xl:items-center">
+          <div className="flex gap-8 xl:gap-4 items-center xl:justify-center w-full max-w-md">
             <div className="flex flex-col items-center">
               <button
                 className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${
@@ -263,7 +263,7 @@ export default function Materialization({
               </span>
             </div>
           </div>
-          <span className="text-xs text-[#98A2B3] whitespace-nowrap dark:text-white/40 mt-4">
+          <span className="text-xs w-fit text-[#98A2B3] whitespace-nowrap dark:text-white/40 mt-4">
             Clique na respectiva página para salvar.
           </span>
         </div>

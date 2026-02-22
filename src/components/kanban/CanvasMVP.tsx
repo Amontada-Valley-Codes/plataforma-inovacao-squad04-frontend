@@ -209,32 +209,38 @@ export default function CanvasMVP({
           </div>
         </h1>
 
-        <ol className="list-decimal pl-4 space-y-2">
-          {items.map((item, i) => (
-            <li 
-              key={i}
-              className="text-sm"
-            >
-              <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
-                {item}
+        {items.length !== 0 ? (
+          <ol className="list-decimal pl-4 space-y-2">
+            {items.map((item, i) => (
+              <li 
+                key={i}
+                className="text-sm"
+              >
+                <span className="flex justify-between items-center text-gray-600 dark:text-white font-medium text-justify">
+                  {item}
 
-                {isEditingItem && (
-                  <button
-                    onClick={() => {
-                      removeItem(i)
-                      setIsEditingItem(false)
-                    }}
-                    className="flex w-fit justify-center p-1
-                    rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
-                    text-[12px] cursor-pointer"
-                  >
-                    <Trash2 size={14}/>
-                  </button>
-                )}
-              </span>
-            </li>
-          ))}
-        </ol>
+                  {isEditingItem && (
+                    <button
+                      onClick={() => {
+                        removeItem(i)
+                        setIsEditingItem(false)
+                      }}
+                      className="flex w-fit justify-center p-1
+                      rounded-[8px] bg-[#0B2B70] hover:bg-[#09245e] transition-colors text-white font-semibold
+                      text-[12px] cursor-pointer"
+                    >
+                      <Trash2 size={14}/>
+                    </button>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ol>
+        ) : (    
+          <div className="flex flex-col mb-4">
+            <p className="text-sm text-[#98A2B3] dark:text-white/50 mt-1">Nenhuma funcionalidade adicionada.</p>
+          </div>
+        )}
 
         {isAddingItem && (
           <div className="flex gap-4">
@@ -392,8 +398,7 @@ export default function CanvasMVP({
           </div>
         ) : (
           <div className="flex flex-col mb-4">
-            <p className="text-sm text-[#98A2B3] dark:text-white/50 mt-1">Nenhum indicador definido</p>
-            <p className="text-sm text-[#98A2B3] dark:text-white/50 mt-1">Adicione KPIs para definir como o sucesso da PoC será medido.</p>
+            <p className="text-sm text-[#98A2B3] dark:text-white/50 mt-1">Nenhum indicador definido.</p>
           </div>
         )}
       </div>
