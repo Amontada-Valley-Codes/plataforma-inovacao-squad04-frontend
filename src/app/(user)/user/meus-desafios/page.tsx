@@ -72,10 +72,9 @@ export default function MeusDesafiosPage() {
     return (
         <div className="p-2">
             <ChallengeCard
-                onlyMine
-                authorId={authorId}      
-                authorName={authorName}  
-                companyId={companyId}
+                onlyMine    
+                
+               
             />
         </div>
     );

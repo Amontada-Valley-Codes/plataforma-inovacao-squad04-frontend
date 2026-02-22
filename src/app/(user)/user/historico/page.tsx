@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { getUserRole, getUserCompanyId, getCurrentUser } from "@/lib/auth";
+// import { getUserRole, getUserCompanyId, getCurrentUser } from "@/lib/auth";
 import CompanyHistory from "@/components/history/CompanyHistory";
 
 export default function UserHistoryPage() {
@@ -10,18 +10,18 @@ export default function UserHistoryPage() {
   const [viewerUserId, setViewerUserId] = React.useState<string | undefined>(undefined);
   const [loaded, setLoaded] = React.useState(false);
 
-  React.useEffect(() => {
-    (async () => {
-      const r = await getUserRole();
-      const c = await getUserCompanyId();
-      const u = await getCurrentUser();
+  // React.useEffect(() => {
+  //   (async () => {
+  //     const r = await getUserRole();
+  //     const c = await getUserCompanyId();
+  //     const u = await getCurrentUser();
 
-      setRole(r as "startup" | "usuario" | "admin" | "gestor" | "avaliador" | "collaborator");
-      setViewerCompanyId(c ? String(c) : undefined);
-      setViewerUserId(u?.id ? String(u.id) : undefined);
-      setLoaded(true);
-    })();
-  }, []);
+  //     setRole(r as "startup" | "usuario" | "admin" | "gestor" | "avaliador" | "collaborator");
+  //     setViewerCompanyId(c ? String(c) : undefined);
+  //     setViewerUserId(u?.id ? String(u.id) : undefined);
+  //     setLoaded(true);
+  //   })();
+  // }, []);
 
   if (!loaded) {
     return <div className="w-full p-6 text-sm text-gray-500">Carregando histórico...</div>;
@@ -38,7 +38,6 @@ export default function UserHistoryPage() {
       {/* Conteúdo principal */}
       <div className="w-full">
         <CompanyHistory
-          role={role}
           viewerCompanyId={viewerCompanyId}
           viewerUserId={viewerUserId}
         />
