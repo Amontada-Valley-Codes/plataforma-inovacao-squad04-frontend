@@ -46,10 +46,10 @@ function buildNavItems(
     case "STARTUP": {
       const base = startupId ? `/startup/${startupId}` : "/startup";
       return [
-        { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: `${base}/desafios` },
-        { icon: <HandshakeIcon />, name: "Meus Matches", path: `${base}/meus-matches` },
-        { icon: <RocketIcon />, name: "Minha Startup", path: `${base}/my-startup` },
-        { icon: <HistoryIcon />, name: "Histórico", path: `${base}/historico` },
+        { icon: <Grid2x2Icon />, name: "Desafios Públicos", path: `/startup/desafios` },
+        { icon: <HandshakeIcon />, name: "Meus Matches", path: `/startup/meus-matches` },
+        { icon: <RocketIcon />, name: "Minha Startup", path: `/startup/my-startup` },
+        { icon: <HistoryIcon />, name: "Histórico", path: `/startup/historico` },
       ];
     }
 
