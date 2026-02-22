@@ -59,7 +59,7 @@ export default function StartupCard({
     fetchStartups();
   }, [reload]);
 
-  // 🔐 Permissões corretas
+
   const canSeeAll =
     role &&
     hasPermission(role, ["ADMINISTRATOR", "MANAGER"]);

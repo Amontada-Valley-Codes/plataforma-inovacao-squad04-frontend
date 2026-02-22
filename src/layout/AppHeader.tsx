@@ -35,7 +35,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-[9999] w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <header className="sticky top-0 w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <div className="flex w-full items-center justify-between px-3 py-1.5 lg:px-5 lg:py-2">
         {/* Esquerda: menu + busca (desktop) */}
         <div className="flex min-w-0 items-center gap-2">

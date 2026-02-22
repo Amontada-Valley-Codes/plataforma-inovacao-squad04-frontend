@@ -35,8 +35,7 @@ function getJwtMaxAge(jwt: string, fallbackSeconds = 60 * 60 * 8) {
 }
 
 function decideDestinyFromToken(jwt: string) {
-  const p =
-  parseJwt<{
+  const p = parseJwt<{
     type_user?: string;
     enterpriseId?: string | null;
     startupId?: string | null;
@@ -46,31 +45,27 @@ function decideDestinyFromToken(jwt: string) {
   const companyId = p.enterpriseId ? String(p.enterpriseId) : null;
   const startupId = p.startupId ? String(p.startupId) : null;
 
-
   switch (type) {
-    
     case "ADMINISTRATOR":
       return "/admin/dashboard";
-    
+
     case "MANAGER":
     case "STEERING_COMMITTEE":
-    case "INNOVATION_TEAM": 
-    case "ORGANIZER":
-      return companyId ? `/company/${companyId}/dashboard` : "/company";
+    case "INNOVATION_TEAM":
+    case "TRANSFORMATION_OFFICE":
+      return companyId ? `/company/${companyId}/dashboard` : "/sem-permissao";
 
-    case "EVALUATOR":
     case "OBSERVER":
-      return companyId ? `/company/${companyId}/desafios` : "/company/desafios";
+      return companyId ? `/company/${companyId}/desafios` : "/sem-permissao";
 
     case "COLLABORATOR":
-    case "COMMON":
-      return "/user/meus-desafios";
+      return companyId ? `/company/${companyId}/desafios` : "/sem-permissao";
 
     case "STARTUP":
-      return "/startup/desafios";
+      return startupId ? `/startup/${startupId}/desafios` : "/sem-permissao";
 
     default:
-      return "/company";
+      return "/sem-permissao";
   }
 }
 
@@ -90,7 +85,7 @@ export default function LoginForm() {
       return;
     }
     if (!email.includes("@")) {
-      setError("E-mail inválido.");
+      setError("E-mail invalido.");
       return;
     }
 
@@ -118,14 +113,9 @@ export default function LoginForm() {
   };
 
   return (
-    <div
-      className="flex flex-col justify-center items-center min-h-screen 
-      bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)]
-      px-6 sm:px-10 py-8 md:border-l-2 border-[#C7E6FE]"
-    >
+    <div className="flex flex-col justify-center items-center min-h-screen bg-[linear-gradient(134deg,#15358D_10%,#0C0869_70%,#66B132_100%)] px-6 sm:px-10 py-8 md:border-l-2 border-[#C7E6FE]">
       <Toaster position="top-right" richColors />
 
-      {/* Logo */}
       <div className="relative w-[90px] h-[65px] sm:w-[110px] sm:h-[80px] mb-6 sm:mb-8">
         <Image src="/images/logo/ninna-logo.svg" alt="ninna-logo" fill className="object-contain" priority />
       </div>
@@ -139,8 +129,7 @@ export default function LoginForm() {
             placeholder="E-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block bg-white text-black w-full rounded-full pl-11 pr-4 py-2.5 sm:py-3
-              placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
+            className="block bg-white text-black w-full rounded-full pl-11 pr-4 py-2.5 sm:py-3 placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
           />
           <User className="absolute left-4 top-1/2 -translate-y-1/2" color="#6B7280" size={18} />
         </div>
@@ -151,15 +140,10 @@ export default function LoginForm() {
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="block bg-white text-black w-full rounded-full pl-11 pr-10 py-2.5 sm:py-3
-              placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
+            className="block bg-white text-black w-full rounded-full pl-11 pr-10 py-2.5 sm:py-3 placeholder-gray-500 text-sm sm:text-base shadow-sm focus:outline-none"
           />
           <LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2" color="#6B7280" size={18} />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
-          >
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
             {showPassword ? <EyeIcon size={18} /> : <EyeClosedIcon size={18} />}
           </button>
         </div>
@@ -167,20 +151,12 @@ export default function LoginForm() {
         {error && <p className="text-red-400 text-sm text-center w-full">{error}</p>}
 
         <div className="text-center mt-1 space-y-1">
-          <Link href="/auth/forgot-password" className="relative text-white font-normal cursor-pointer
-              after:content-[''] after:absolute after:left-0 after:-bottom-0.5
-              after:h-[1.5px] after:w-full after:bg-white
-              after:origin-center after:scale-x-0 after:transition-transform 
-              after:duration-300 hover:after:scale-x-100">
+          <Link href="/auth/forgot-password" className="relative text-white font-normal cursor-pointer after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[1.5px] after:w-full after:bg-white after:origin-center after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100">
             Esqueceu a senha?
           </Link>
           <p className="text-xs sm:text-sm text-[#D2F5FB] font-light">
-            Não possui cadastro?{" "}
-            <Link href="/auth/register" className="relative text-white font-normal cursor-pointer
-              after:content-[''] after:absolute after:left-0 after:-bottom-0.5
-              after:h-[1.5px] after:w-full after:bg-white
-              after:origin-center after:scale-x-0 after:transition-transform 
-              after:duration-300 hover:after:scale-x-100">
+            Nao possui cadastro?{" "}
+            <Link href="/auth/register" className="relative text-white font-normal cursor-pointer after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-[1.5px] after:w-full after:bg-white after:origin-center after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100">
               Inscreva-se
             </Link>
           </p>
@@ -189,15 +165,9 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-3 w-5/6 py-2.5 sm:py-3 rounded-full text-white font-semibold text-sm sm:text-base
-          bg-[linear-gradient(90deg,#0C0869_0%,#15358D_100%)]
-          hover:scale-[1.03] transition-transform duration-300"
+          className="mt-3 w-5/6 py-2.5 sm:py-3 rounded-full text-white font-semibold text-sm sm:text-base bg-[linear-gradient(90deg,#0C0869_0%,#15358D_100%)] hover:scale-[1.03] transition-transform duration-300"
         >
-          {loading ? (
-            <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" />
-          ) : (
-            "Entrar"
-          )}
+          {loading ? <Loader2 className="animate-spin w-5 h-5 sm:w-6 sm:h-6 text-blue-300 mx-auto" /> : "Entrar"}
         </button>
       </form>
     </div>

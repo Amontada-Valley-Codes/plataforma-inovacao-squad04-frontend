@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Tag, Eye, EyeOff } from "lucide-react";
 import { getCurrentUser, type AuthUser } from "@/lib/auth";
 import { ChallengeService } from "@/api/services/challenge.service";
@@ -10,8 +10,6 @@ import ApplyChallengeModal from "../startup/ApplyChallengeModal";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
-
-// ─── Tipos ────────────────────────────────────────────────────────────────────
 
 type Challenge = {
   id: string;
@@ -31,14 +29,11 @@ type Challenge = {
 };
 
 type Props = {
-  /** Usado apenas pelo COLLABORATOR para filtrar os próprios desafios */
   onlyMine?: boolean;
-  /** Se a startup pode se candidatar aos desafios públicos */
   canApply?: boolean;
   startupId?: string;
 };
 
-// ─── Traduções ────────────────────────────────────────────────────────────────
 
 const STAGE_LABELS: Record<string, string> = {
   GENERATION: "Desafio",
@@ -59,12 +54,6 @@ function getStatusColor(status: string): string {
   }
 }
 
-// ─── Filtro por role ──────────────────────────────────────────────────────────
-
-/**
- * Aplica o filtro correto de desafios de acordo com o role do usuário.
- * Toda a lógica de "quem vê o quê" fica aqui, centralizada.
- */
 function filterChallengesByRole(
   challenges: Challenge[],
   role: Role,
@@ -73,42 +62,36 @@ function filterChallengesByRole(
 ): Challenge[] {
   switch (role) {
     case "ADMINISTRATOR":
-      // Vê tudo
-      return challenges;
 
+      return challenges;
     case "MANAGER":
     case "INNOVATION_TEAM":
     case "TRANSFORMATION_OFFICE":
     case "STEERING_COMMITTEE":
-      // Vê todos os desafios da própria empresa
+      
       return challenges.filter(
         (c) => c.enterpriseId === user.enterpriseId
       );
-
     case "OBSERVER":
-      // Vê os desafios da própria empresa (só leitura — restrição de ação fica na UI)
       return challenges.filter(
         (c) => c.enterpriseId === user.enterpriseId
       );
 
     case "COLLABORATOR":
-      // Vê apenas os desafios que ele mesmo criou
       return challenges.filter(
         (c) => c.usersId === user.id
       );
 
     case "STARTUP":
-      // Vê apenas desafios públicos
       return challenges.filter(
         (c) => c.visibility?.toLowerCase() === "public"
       );
-
     default:
       return [];
   }
 }
 
-// ─── Componente ───────────────────────────────────────────────────────────────
+
 
 export default function ChallengeCard({
   onlyMine = false,
@@ -116,7 +99,6 @@ export default function ChallengeCard({
   startupId,
 }: Props) {
   const { reload } = useStore();
-
   const [user, setUser] = useState<AuthUser | null>(null);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +106,7 @@ export default function ChallengeCard({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalChallenge, setModalChallenge] = useState<Challenge | null>(null);
 
-  // Carrega o usuário atual uma única vez
+
   useEffect(() => {
     setUser(getCurrentUser());
   }, []);
@@ -139,11 +121,8 @@ export default function ChallengeCard({
       let raw: Challenge[] = [];
 
       if (user.role === "STARTUP") {
-        // Startup só busca desafios públicos
         raw = await ChallengeService.showAllPublicChallenges();
       } else {
-        // Todos os outros roles buscam a lista completa
-        // O backend já filtra pelo token (via Bearer) o que o usuário pode ver
         raw = await ChallengeService.showAllChallenges();
       }
 
@@ -182,8 +161,6 @@ export default function ChallengeCard({
     }
   };
 
-  // ─── Estados de carregamento / erro ─────────────────────────────────────────
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -211,7 +188,6 @@ export default function ChallengeCard({
     );
   }
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
 
   const isStartup = user?.role === "STARTUP";
   const isObserver = user?.role === "OBSERVER";
@@ -266,7 +242,6 @@ export default function ChallengeCard({
                 </div>
               </div>
 
-              {/* Botão de candidatura — apenas STARTUP em desafios públicos */}
               {canApply && isStartup && isPublic && (
                 <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
                   <Button
@@ -281,7 +256,6 @@ export default function ChallengeCard({
                 </div>
               )}
 
-              {/* Badge de apenas leitura para OBSERVER */}
               {isObserver && (
                 <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
                   <span className="text-xs text-muted-foreground">Somente visualização</span>

@@ -20,6 +20,14 @@ export default function CreateChallengeButton() {
 
   const role: Role | null = getUserRole();
   const isAdmin = role === "ADMINISTRATOR";
+  const isManager = role === "MANAGER";
+  const isInnovation = role === "INNOVATION_TEAM";
+  const isCommittee = role === "STEERING_COMMITTEE";
+  const isTransformation = role === "TRANSFORMATION_OFFICE";
+  const isCollaborator = role === "COLLABORATOR";
+  const isObserver = role === "OBSERVER";
+  
+  
 
   const [modalType, setModalType] = useState<ModalType>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
@@ -55,45 +63,45 @@ export default function CreateChallengeButton() {
 
   return (
     <div className="flex gap-2">
-      {/* Sempre visível */}
-      {!isAdmin &&(
-         <Button
-        size="sm"
-        onClick={() => {
-          setModalType("OBJECTIVE");
-          openModal();
-        }}
-      >
-        <DiamondPlus />
-        Gerenciar Objetivo Estratégico
-      </Button>
-
-
-      )}
      
-      {!isAdmin && (
-        <Button
-          size="sm"
-          onClick={() => {
-            setModalType("CHALLENGE");
-            openModal();
-          }}
-        >
-          <BookPlus />
-          Criar Desafio
-        </Button>
-      )}
+      {/* Gerenciar Objetivo Estratégico → MANAGER e TRANSFORMATION */}
+  {(isManager || isTransformation) && (
+    <Button
+      size="sm"
+      onClick={() => {
+        setModalType("OBJECTIVE");
+        openModal();
+      }}
+    >
+      <DiamondPlus />
+      Gerenciar Objetivo Estratégico
+    </Button>
+  )}
 
-      {/* ADMIN NÃO VÊ */}
-      {!isAdmin && (
-        <Button
-          size="sm"
-          onClick={() => router.push("/admin/form-builder")}
-        >
-          <PlusCircle />
-          Criar Formulário
-        </Button>
-      )}
+  {/* Criar Desafio → todos exceto ADMIN e OBSERVER */}
+  {!isAdmin && !isObserver && (
+    <Button
+      size="sm"
+      onClick={() => {
+        setModalType("CHALLENGE");
+        openModal();
+      }}
+    >
+      <BookPlus />
+      Criar Desafio
+    </Button>
+  )}
+
+  {/* Criar / Editar Formulário → SOMENTE MANAGER e INNOVATION_TEAM */}
+  {(isManager || isInnovation) && (
+    <Button
+      size="sm"
+      onClick={() => router.push("/admin/form-builder")}
+    >
+      <PlusCircle />
+      Criar Formulário
+    </Button>
+  )}
 
       {isOpen && modalType === "OBJECTIVE" && (
         <RegisterStrategicObjectiveForm

@@ -27,7 +27,6 @@ type NavItem = {
   path: string;
 };
 
-// ─── Itens do menu por role ───────────────────────────────────────────────────
 
 function buildNavItems(
   role: Role,
@@ -77,8 +76,8 @@ function buildNavItems(
         { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
         { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
         { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
-        { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
-        { icon: <UsersIcon />, name: "Usuários", path: `${base}/usuarios` },
+        // { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+        // { icon: <UsersIcon />, name: "Usuários", path: `${base}/usuarios` },
       ];
     }
 
@@ -90,7 +89,7 @@ function buildNavItems(
         { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
         { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
         { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
-        { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+        // { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
       ];
     }
 
@@ -100,8 +99,8 @@ function buildNavItems(
       return [
         { icon: <ClipboardListIcon />, name: "Desafios", path: `${base}/desafios` },
         { icon: <SquareKanban />, name: "Funil", path: `${base}/kanban` },
-        { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
-        { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
+        // { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
+        // { icon: <Building2Icon />, name: "Minha Empresa", path: `${base}/empresa` },
       ];
     }
 
@@ -110,7 +109,7 @@ function buildNavItems(
       const base = `/company/${enterpriseId}`;
       return [
         { icon: <ClipboardListIcon />, name: "Meus Desafios", path: `${base}/desafios` },
-        { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
+        // { icon: <HistoryIcon />, name: "Histórico", path: `${base}/history` },
       ];
     }
 

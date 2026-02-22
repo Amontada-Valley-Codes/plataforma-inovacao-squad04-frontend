@@ -20,13 +20,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CompanyDashboardPage({ params }: PageProps) {
   const { companyId } = await params;
 
-  // Lê o token no servidor para decidir o layout da página
+
   const cookieStore = await cookies();
   const raw = cookieStore.get("access_token")?.value;
   const decoded = raw ? decodeJwtEdge(decodeURIComponent(raw)) : null;
   const role = decoded ? normalizeRole(decoded.type_user) : null;
 
-  // OBSERVER e COLLABORATOR — só veem desafios
+
   if (role === "OBSERVER" || role === "COLLABORATOR") {
     return (
       <div className="space-y-4 px-3 sm:px-4 md:px-6 lg:px-8 py-4 w-full max-w-screen-xl mx-auto overflow-x-hidden">
