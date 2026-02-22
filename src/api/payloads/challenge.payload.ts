@@ -340,3 +340,11 @@ export type AdvanceStageResponse = {
 };
 
 export type ReturnStepResponse = AdvanceStageResponse
+
+export type UpdateStrategicObjectivesPayload = {
+  strategicObjectiveIds: string[]
+}
+
+export type UpdateStrategicObjectivesResponse = {
+  message: string
+}

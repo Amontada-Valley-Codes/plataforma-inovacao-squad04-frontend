@@ -88,16 +88,16 @@ export function FormBuilder({ config, formTitle, formDescription, onAddField, on
         />
 
         <div className="p-6">
-          <div className="bg-gradient-to-r from-brand-50 to-blue-light-50 dark:from-brand-950/30 dark:to-blue-light-950/30 border border-brand-200 dark:border-brand-800 rounded-xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-[#15409c]/10 to-[#15409c]/5 dark:from-[#15409c]/3 dark:to-[#15409c]/20 border border-[#15409c]/30 dark:border-[#15409c]/40 rounded-xl p-4 mb-6">
             <div className="flex items-start gap-3">
-              <div className="w-5 h-5 bg-brand-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-5 h-5 bg-[#15409c] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-white text-xs font-bold">✓</span>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-brand-800 dark:text-brand-300">
+                <p className="text-sm font-semibold text-[#15409c] dark:text-[#15409c]">
                   Como usar o editor
                 </p>
-                <p className="text-xs text-brand-700 dark:text-brand-400 leading-relaxed">
+                <p className="text-xs text-[#15409c]/80 dark:text-[#15409c]/90 leading-relaxed">
                   Use as opções de reorganizar, editar e excluir para gerenciar os campos.
                 </p>
               </div>

@@ -61,6 +61,7 @@ export const ENDPOINTS = {
     UPDATE_STATUS: (id: string) => `/challenge/${id}/status`,
     UPDATE_VISIBILITY: (id: string) => `/challenge/${id}/visibility`,
     UPDATE_END_DATE: (id: string) => `/challenge/${id}/end-date`,
+    UPDATE_STRATEGIC_OBJECTIVES: (id: string) => `/challenge/${id}/strategic-objectives`,
     GANTT_CHART: "/challenge/graph/gantt",
     CHALLENGES_BY_STAGE: "/challenge/enterprise/enterpriseId/challenges-by-stage",
     VOTE_PRE_SCREENING: (id: string) => `/challenge/vote/${id}/pre-screening`,
@@ -105,7 +106,7 @@ export const ENDPOINTS = {
 
       return `/challenge/paginated?${query.toString()}`
     },
-    FULL: (challengeId: string) => `/challenge/${challengeId}/full`,
+    FULL: (challengeId: string) => `/challenge/${challengeId}/full-challenger`,
     ADVANCE: (challengeId: string) => `/challenge/${challengeId}/advance-stage`,
     RETURN: (challengeId: string) => `/challenge/${challengeId}/return-step`,
   },

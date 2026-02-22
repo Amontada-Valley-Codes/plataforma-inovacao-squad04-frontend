@@ -12,7 +12,7 @@ type Metric = {
 
 const MetricItem = ({ title, value, icon }: Metric) => (
   <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-white/[0.03] flex flex-col items-center text-center">
-    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-800">
+    <div className="flex items-center justify-center w-10 h-10 bg-[#15409c]/10 rounded-lg dark:bg-[#15409c]/20">
       {icon}
     </div>
     <span className="mt-2 text-lg text-gray-500 dark:text-gray-400">{title}</span>
@@ -46,10 +46,10 @@ export const GestorMetricsCards = () => {
   }
 
   const metrics: Metric[] = [
-  { title: "Desafios cadastrados", value: dashboardData?.totalDesafios || 0, icon: <LayoutDashboard className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Total de Pocs", value: dashboardData?.totalPocs || 0, icon: <Box className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Total de Ideias submetidas", value: dashboardData?.totalIdeas || 0, icon: <Box className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
-  { title: "Usuários Ativos", value: dashboardData?.totalUsers || 0, icon: <Box className="text-gray-800 w-6 h-6 dark:text-white/90" /> },
+  { title: "Desafios cadastrados", value: dashboardData?.totalDesafios || 0, icon: <LayoutDashboard className="text-[#15409c] w-6 h-6 dark:text-[#15409c]" /> },
+  { title: "Total de Pocs", value: dashboardData?.totalPocs || 0, icon: <Box className="text-[#15409c] w-6 h-6 dark:text-[#15409c]" /> },
+  { title: "Total de Ideias submetidas", value: dashboardData?.totalIdeas || 0, icon: <Box className="text-[#15409c] w-6 h-6 dark:text-[#15409c]" /> },
+  { title: "Usuários Ativos", value: dashboardData?.totalUsers || 0, icon: <Box className="text-[#15409c] w-6 h-6 dark:text-[#15409c]" /> },
 ];
 
   return (

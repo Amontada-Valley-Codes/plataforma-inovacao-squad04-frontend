@@ -7,6 +7,7 @@ import {
 import { ChallengeFullResponse } from "@/api/payloads/challenge.payload";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { getCategoryLabel } from "./Kanban";
+import { ChallengeAdjustments } from "./ChallengeAdjustments";
 
 type CardChallangeContentProps = {
   challengeId: string;
@@ -73,6 +74,7 @@ export const ChallengeSection = ({
 }: CardChallangeContentProps) => {
   const [extraData, setExtraData] = useState<ChallengeFullResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState<'1' | '2'>('1');
 
   useEffect(() => {
     async function loadData() {
@@ -91,16 +93,55 @@ export const ChallengeSection = ({
 
   return (
     <div className="w-full flex flex-col overflow-y-auto">
-      <CardContentsHeader
-        challengeTitle={challangeTitle}
-        category={category}
-        startDate={startDate}
-        endDate={endDate}
-        creator={creator}
-        visibility={visibility}
-      />
+      <div className="flex items-center xl:flex-row xl:justify-between mb-6">
+        <CardContentsHeader
+          challengeTitle={challangeTitle}
+          category={category}
+          startDate={startDate}
+          endDate={endDate}
+          creator={creator}
+          visibility={visibility}
+        />
 
-      <div>
+        <div className="relative flex flex-col items-center">
+          <div className="flex gap-4 items-start xl:justify-center w-full max-w-md">
+            <div className="flex flex-col items-center">
+              <button
+                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${
+                  page === '1'
+                    ? "bg-[#0B2B72] text-white"
+                    : "border-2 border-gray-400 text-gray-500"
+                }`}
+                onClick={() => setPage('1')}
+              >
+                1
+              </button>
+              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                <span className="mt-0.5">Informações</span>
+              </span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <button
+                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${
+                  page === '2'
+                    ? "bg-[#0B2B72] text-white"
+                    : "border-2 border-gray-400 text-gray-500"
+                }`}
+                onClick={() => setPage('2')}
+              >
+                2
+              </button>
+              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                <span className="mt-0.5">Ajustes</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {page === '1' ? (
+        <div>
         {ideaIdentifier && (
           <div className="flex items-center gap-2 mb-6">
             <Hash size={14} className="text-gray-400"/>
@@ -343,6 +384,9 @@ export const ChallengeSection = ({
           </div>
         )}
         </div>
+      ) : (
+        <ChallengeAdjustments challengeId={challengeId} />
+      )}
     </div>
   )
 }

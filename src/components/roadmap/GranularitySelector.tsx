@@ -26,12 +26,12 @@ export const GranularitySelector = ({ value, onChange }: GranularitySelectorProp
           flex items-center gap-2
           px-3 py-1.5
           text-xs font-medium
-          text-gray-600 dark:text-gray-300
+          dark:text-gray-300
           rounded-lg
           transition-all
           hover:bg-muted dark:hover:bg-gray-700
-          data-[state=on]:bg-primary
-          data-[state=on]:text-primary-foreground
+          data-[state=on]:bg-[#15409c]
+          data-[state=on]:text-white
           data-[state=on]:shadow-sm
         "
       >
@@ -46,12 +46,12 @@ export const GranularitySelector = ({ value, onChange }: GranularitySelectorProp
           flex items-center gap-2
           px-3 py-1.5
           text-xs font-medium
-          text-gray-600 dark:text-gray-300
+          text-gray-700 dark:text-gray-300
           rounded-lg
           transition-all
           hover:bg-muted dark:hover:bg-gray-700
-          data-[state=on]:bg-primary
-          data-[state=on]:text-primary-foreground
+          data-[state=on]:bg-[#15409c]
+          data-[state=on]:text-white
           data-[state=on]:shadow-sm
         "
       >
@@ -66,12 +66,12 @@ export const GranularitySelector = ({ value, onChange }: GranularitySelectorProp
           flex items-center gap-2
           px-3 py-1.5
           text-xs font-medium
-          text-gray-600 dark:text-gray-300
+          text-gray-700 dark:text-gray-300
           rounded-lg
           transition-all
           hover:bg-muted dark:hover:bg-gray-700
-          data-[state=on]:bg-primary
-          data-[state=on]:text-primary-foreground
+          data-[state=on]:bg-[#15409c]
+          data-[state=on]:text-white
           data-[state=on]:shadow-sm
         "
       >
