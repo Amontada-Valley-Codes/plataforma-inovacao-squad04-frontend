@@ -349,6 +349,27 @@ export type UpdateStrategicObjectivesResponse = {
   message: string
 }
 
+export type UpdateChallengePayload = {
+  name: string
+  problemDescription: string
+  problemDuration: string
+  currentSolution: string
+  problemRelevance: string
+  strategicObjectiveIds: string[]
+  currentIndicators: string
+  expectedImpacts: string
+  involvedAreas: string[]
+  initialConstraints: string
+  proponentParticipation: string
+}
+
+export type UpdateChallengeResponse = {
+  id: string
+  name: string
+  problemDescription: string
+  status: string
+  updatedAt: string
+}
 export type DeleteChallengeResponse = {
   id: string;
   ideaIdentifier: string;
@@ -368,8 +389,8 @@ export type DeleteChallengeResponse = {
   strategic_alignment: string | null;
   innovative_potential: string | null;
   business_relevance: string | null;
-  visibility: string
-  status: string
+  visibility: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
   endDate: string;
@@ -377,7 +398,7 @@ export type DeleteChallengeResponse = {
   confidenceScore: number | null | string;
   easeScore: number | null | string;
   finalIceScore: number | null | string;
-  reportUrl: string | null ;
+  reportUrl: string | null;
   reportDate: string | null;
   enterpriseId: string;
   usersId: string;

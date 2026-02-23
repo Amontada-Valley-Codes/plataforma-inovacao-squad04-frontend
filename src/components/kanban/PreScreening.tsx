@@ -8,6 +8,8 @@ import { ChallengeService } from "@/api/services/challenge.service";
 import { ObjectivesList } from "./prescreening/ObjectivesList";
 import { DecisionActions } from "./prescreening/DecisionActions";
 import { CardContentsHeader } from "./CardsContents";
+import { EditObjectiveModal } from "./prescreening/EditObjectiveModal";
+import { DeleteObjectiveModal } from "./prescreening/DeleteObjectiveModal";
 
 type CardPreScreeningContentProps = {
   challangeTitle: string;
@@ -39,6 +41,8 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
   const [loading, setLoading] = useState(false);
   const [objectives, setObjectives] = useState<StrategicObjective[]>([]);
   const [loadingObjectives, setLoadingObjectives] = useState(true);
+  const [editingObjective, setEditingObjective] = useState<StrategicObjective | null>(null);
+  const [deletingObjective, setDeletingObjective] = useState<StrategicObjective | null>(null);
 
   useEffect(() => {
     loadObjectives();
@@ -173,6 +177,42 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
     }
   };
 
+  const handleEditObjective = (objective: StrategicObjective) => {
+    setEditingObjective(objective);
+  };
+
+  const handleDeleteObjective = (objective: StrategicObjective) => {
+    setDeletingObjective(objective);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingObjective) return;
+    try {
+      await StrategicObjectivesService.DeleteObjective(deletingObjective.id);
+      toast.success("Objetivo estratégico excluído com sucesso!");
+      setDeletingObjective(null);
+      loadObjectives();
+    } catch (error) {
+      console.error("Erro ao excluir objetivo:", error);
+      toast.error("Erro ao excluir objetivo estratégico.");
+    }
+  };
+
+  const handleSaveEdit = async (id: string, title: string, description: string) => {
+    try {
+      await StrategicObjectivesService.UpdateObjective(id, {
+        title,
+        description
+      });
+      toast.success("Objetivo estratégico atualizado com sucesso!");
+      setEditingObjective(null);
+      loadObjectives();
+    } catch (error) {
+      console.error("Erro ao atualizar objetivo:", error);
+      toast.error("Erro ao atualizar objetivo estratégico.");
+    }
+  };
+
   return (
     <div className="w-full flex flex-col overflow-y-auto">
       <CardContentsHeader
@@ -197,7 +237,8 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
           objectives={objectives}
           selectedObjectives={selectedObjectives}
           onToggleObjective={toggleObjective}
-          showActions={false}
+          showActions={true}
+          onEdit={handleEditObjective}
         />
       )}
 
@@ -218,6 +259,14 @@ export const PreScreening = ({ challangeTitle, challengeId, category, startDate,
         onRequestChanges={handleRequestChanges}
         onMoveToBacklog={handleMoveToBacklog}
       />
+
+      {editingObjective && (
+        <EditObjectiveModal
+          objective={editingObjective}
+          onClose={() => setEditingObjective(null)}
+          onSave={handleSaveEdit}
+        />
+      )}
     </div>
   );
 };

@@ -2,18 +2,19 @@
 
 import { UserPlus } from "lucide-react"
 import AddColaboratorForm from "./AddColaboratorForm"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Role } from "@/lib/roles";
 import { getUserRole } from "@/lib/auth";
 
 export default function AddUsersButton() {
-
   const [isOpen, setIsOpen] = useState(false);
+  const [isManager, setIsManager] = useState(false);
 
-  const role: Role | null = getUserRole();
-  const isManager = role === "MANAGER";
+  useEffect(() => {
+    const role: Role | null = getUserRole();
+    setIsManager(role === "MANAGER");
+  }, []);
 
-  
   if (!isManager) return null;
 
   return (

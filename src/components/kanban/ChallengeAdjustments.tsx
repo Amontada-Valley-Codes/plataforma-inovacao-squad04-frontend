@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { Lightbulb, ChevronUp, ChevronDown } from "lucide-react";
+import { Lightbulb, ChevronUp, ChevronDown, Edit } from "lucide-react";
 import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
 import { PreScreeningService } from "@/api/services/preScreening.service";
+import { ChallengeService } from "@/api/services/challenge.service";
 import { ObjectivesList } from "./prescreening/ObjectivesList";
 import { EditObjectiveModal } from "./prescreening/EditObjectiveModal";
 import { DeleteObjectiveModal } from "./prescreening/DeleteObjectiveModal";
+import EditChallengeModal from "../challenge/EditChallengeModal";
 import { toast } from "sonner";
 
 type ChallengeAdjustmentsProps = {
@@ -39,11 +41,40 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
   const [selectedObjectives, setSelectedObjectives] = useState<Set<string>>(new Set());
   const [editingObjective, setEditingObjective] = useState<StrategicObjective | null>(null);
   const [deletingObjective, setDeletingObjective] = useState<StrategicObjective | null>(null);
+  const [editingChallenge, setEditingChallenge] = useState(false);
+  const [challengeData, setChallengeData] = useState<any>(null);
 
   useEffect(() => {
     loadObjectives();
     loadSuggestions();
+    loadChallengeData();
   }, [challengeId]);
+
+  const loadChallengeData = async () => {
+    try {
+      const response = await ChallengeService.showOneChallenge(challengeId);
+      const objectivesResponse = await StrategicObjectivesService.getObjectivesByChallenge(challengeId);
+      
+      const strategicObjectiveIds = objectivesResponse?.strategicObjective
+        ?.map(item => item.strategicObjective.id) || [];
+
+      setChallengeData({
+        name: response.name,
+        problemDescription: response.problemDescription,
+        problemDuration: response.problemDuration,
+        currentSolution: response.currentSolution,
+        problemRelevance: response.problemRelevance,
+        strategicObjectiveIds,
+        currentIndicators: response.currentIndicators,
+        expectedImpacts: response.expectedImpacts,
+        involvedAreas: response.involvedAreas,
+        initialConstraints: response.initialConstraints,
+        proponentParticipation: response.proponentParticipation,
+      });
+    } catch (error) {
+      console.error("Erro ao carregar dados do desafio:", error);
+    }
+  };
 
   const loadObjectives = async () => {
     setLoadingObjectives(true);
@@ -72,12 +103,12 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
     setLoadingSuggestions(true);
     try {
       const response = await PreScreeningService.getJustifications(challengeId);
-      if (response && response.users) {
-        setSuggestions([response]);
+      if (Array.isArray(response) && response.length > 0) {
+        setSuggestions(response);
       } else {
         setSuggestions([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar sugestões:", error);
       setSuggestions([]);
     } finally {
@@ -113,10 +144,17 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
 
   return (
     <div className="w-full flex flex-col">
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Revise e ajuste os objetivos estratégicos vinculados a este desafio e visualize as sugestões de melhoria.
         </p>
+        <button
+          onClick={() => setEditingChallenge(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-[#0B2B72] hover:bg-[#09245e] text-white rounded-lg transition-colors shadow-sm"
+        >
+          <Edit size={14} />
+          <span className="text-sm font-medium">Editar Desafio</span>
+        </button>
       </div>
 
       {loadingObjectives ? (
@@ -128,9 +166,7 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
           objectives={objectives}
           selectedObjectives={selectedObjectives}
           onToggleObjective={toggleObjective}
-          showActions={true}
-          onEdit={setEditingObjective}
-          onDelete={setDeletingObjective}
+          showActions={false}
         />
       )}
 
@@ -174,18 +210,18 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <p className="text-sm font-medium text-[#0B2B70] dark:text-[#5B8DEE]">
+                          {s.users.name}
+                        </p>
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
                           s.status === 'DISAPPROVE' 
                             ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                            : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            : 'bg-blue-100 text-[#0B2B70] dark:bg-blue-900/30 dark:text-[#5B8DEE]'
                         }`}>
                           {s.status === 'DISAPPROVE' ? 'Reprovado' : 'Ajustes Solicitados'}
                         </span>
                       </div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                        {s.users.name}
-                      </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3">
                         {s.justification}
                       </p>
@@ -221,6 +257,19 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
           objective={deletingObjective}
           onClose={() => setDeletingObjective(null)}
           onConfirm={handleDeleteObjective}
+        />
+      )}
+
+      {editingChallenge && challengeData && (
+        <EditChallengeModal
+          isOpen={editingChallenge}
+          onClose={() => setEditingChallenge(false)}
+          challengeId={challengeId}
+          initialData={challengeData}
+          onSuccess={() => {
+            loadChallengeData();
+            loadObjectives();
+          }}
         />
       )}
     </div>
