@@ -130,7 +130,7 @@ const KanbanPage = () => {
       try {
         if (challengeId) {
           await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
-          // await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
+          //  await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
         }
 
         const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
