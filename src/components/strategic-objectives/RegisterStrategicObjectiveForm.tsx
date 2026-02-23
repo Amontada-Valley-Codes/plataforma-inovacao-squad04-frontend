@@ -156,7 +156,7 @@ export default function RegisterObjectiveForm({ isOpen, onClose }: Props) {
                     <Button
                       size="sm"
                       onClick={() => handleEdit(objective)}
-                      className=" bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                      className="bg-blue text-blue-700 hover:bg-blue/20 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     >
                       <Pencil size={16} />
                     </Button>
@@ -164,7 +164,7 @@ export default function RegisterObjectiveForm({ isOpen, onClose }: Props) {
                     <Button
                       size="sm"
                       onClick={() => handleDelete(objective.id)}
-                      className="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+                      className="bg-red-500 text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
                     >
                       <Trash2 size={16} />
                     </Button>

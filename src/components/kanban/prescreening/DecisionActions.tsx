@@ -22,9 +22,9 @@ type DecisionActionsProps = {
 };
 
 const relevanceOptions: { value: "HIGH" | "MEDIUM" | "LOW"; label: string; color: string }[] = [
-  { value: "HIGH", label: "Alta", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white dark:bg-[#15409c]/20 dark:text-[#15409c] dark:border-[#15409c]/40" },
-  { value: "MEDIUM", label: "Média", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white dark:bg-[#15409c]/20 dark:text-[#15409c] dark:border-[#15409c]/40" },
-  { value: "LOW", label: "Baixa", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white dark:bg-[#15409c]/20 dark:text-[#15409c] dark:border-[#15409c]/40" },
+  { value: "HIGH", label: "Alta", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white data-[active=true]:border-[#15409c] dark:bg-[#15409c]/20 dark:text-[#7aa3f2] dark:border-[#15409c]/40 dark:data-[active=true]:bg-[#15409c] dark:data-[active=true]:text-white dark:data-[active=true]:border-[#15409c]" },
+  { value: "MEDIUM", label: "Média", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white data-[active=true]:border-[#15409c] dark:bg-[#15409c]/20 dark:text-[#7aa3f2] dark:border-[#15409c]/40 dark:data-[active=true]:bg-[#15409c] dark:data-[active=true]:text-white dark:data-[active=true]:border-[#15409c]" },
+  { value: "LOW", label: "Baixa", color: "border-[#15409c]/30 bg-[#15409c]/10 text-[#15409c] data-[active=true]:bg-[#15409c] data-[active=true]:text-white data-[active=true]:border-[#15409c] dark:bg-[#15409c]/20 dark:text-[#7aa3f2] dark:border-[#15409c]/40 dark:data-[active=true]:bg-[#15409c] dark:data-[active=true]:text-white dark:data-[active=true]:border-[#15409c]" },
 ];
 
 export const DecisionActions = ({
@@ -47,7 +47,7 @@ export const DecisionActions = ({
   return (
     <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
       <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
-        Decisão do Gestor
+        Decisão do Escritório de Transformação
       </h4>
 
       {actionMode === "approve" && (
