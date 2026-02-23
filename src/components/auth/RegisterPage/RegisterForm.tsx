@@ -5,11 +5,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { User, Mail, LockKeyhole, Phone, EyeIcon, CheckCircle2, XCircle, Loader2, EyeClosedIcon } from "lucide-react";
+import { User, Mail, LockKeyhole, Phone, EyeIcon, Loader2, EyeClosedIcon, Building2 } from "lucide-react";
 import Link from "next/link";
 import { authService } from "@/api/services/auth.service";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ export default function RegisterForm() {
     email: "",
     password: "",
     repeatPassword: "",
+    sector: "",
   });
 
   const [error, setError] = useState("");
@@ -45,7 +47,7 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.phone || !formData.email || !formData.password || !formData.repeatPassword) {
+    if (!formData.name || !formData.phone || !formData.email || !formData.password || !formData.repeatPassword || !formData.sector) {
       setError("Preencha todos os campos.");
       return;
     }
@@ -93,6 +95,12 @@ export default function RegisterForm() {
 
   };
 
+  const handleSectorChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      sector: value,
+    }));
+  };
   return (
     <div
       className="flex flex-col justify-center items-center 
@@ -155,6 +163,48 @@ export default function RegisterForm() {
             className="w-full bg-white text-black rounded-full pl-12 pr-4 py-3 shadow-sm"
           />
           <Mail className="absolute top-3 left-4" color="#6B7280" size={20} />
+        </div>
+
+        <div className="relative w-full mb-4">
+          <Select
+            value={formData.sector}
+            onValueChange={(value) =>
+              setFormData((prev) => ({ ...prev, sector: value }))
+            }
+          >
+            <SelectTrigger 
+              className="w-full bg-white text-base text-black rounded-full pl-12 pr-4 py-[23.2px] shadow-sm"
+            >
+              <SelectValue 
+                placeholder="Selecione o setor" 
+                className="text-base data-[placeholder]:text-base placeholder:text-[#98A2B3]"
+              />
+            </SelectTrigger>
+
+            <SelectContent className="z-[100000]">
+              <SelectItem value="ADMINISTRATIVE">Administrativo</SelectItem>
+              <SelectItem value="FINANCIAL">Financeiro</SelectItem>
+              <SelectItem value="ACCOUNTING">Contábil</SelectItem>
+              <SelectItem value="LEGAL">Jurídico</SelectItem>
+              <SelectItem value="HUMAN_RESOURCES">Recursos Humanos</SelectItem>
+              <SelectItem value="MARKETING">Marketing</SelectItem>
+              <SelectItem value="SALES">Vendas</SelectItem>
+              <SelectItem value="COMMERCIAL">Comercial</SelectItem>
+              <SelectItem value="SUPPLY">Suprimentos</SelectItem>
+              <SelectItem value="LOGISTICS">Logística</SelectItem>
+              <SelectItem value="PRODUCTION">Produção</SelectItem>
+              <SelectItem value="TECHNOLOGY">Tecnologia</SelectItem>
+              <SelectItem value="ENGINEERING">Engenharia</SelectItem>
+              <SelectItem value="CUSTOMER_SERVICE">Atendimento ao Cliente</SelectItem>
+              <SelectItem value="QUALITY">Qualidade</SelectItem>
+              <SelectItem value="RESEARCH_DEVELOPMENT">
+                Pesquisa e Desenvolvimento
+              </SelectItem>
+              <SelectItem value="HEALTH_SAFETY">Saúde e Segurança</SelectItem>
+              <SelectItem value="OTHER">Outro</SelectItem>
+            </SelectContent>
+          </Select>
+          <Building2 className="absolute top-3 left-4" color="#6B7280" size={20}/>
         </div>
 
         {/* Password */}
@@ -234,9 +284,7 @@ export default function RegisterForm() {
 
         <button
           type="submit"
-          className="w-full flex items-center justify-center bg-gradient-to-r hover:scale-[102.5%]
-          from-[#0C0869] to-[#15358D] rounded-3xl p-[10px] shadow text-2xl font-semibold
-          text-white transition-all duration-300 ease-in-out"
+          className="mt-3 w-full  py-2.5 sm:py-3 rounded-full text-white font-semibold text-sm sm:text-base bg-[linear-gradient(90deg,#0C0869_0%,#15358D_100%)] hover:scale-[1.03] transition-transform duration-300"
         >
           {loading ? <Loader2 className="animate-spin w-8 h-8 text-blue-600" /> : 'Cadastrar'}
         </button>

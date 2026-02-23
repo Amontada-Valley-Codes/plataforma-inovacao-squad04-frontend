@@ -39,10 +39,13 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
 
       console.log("Convite enviado:", response);
 
-      const to = phone;
-      const message = `Olá! Você foi convidado para a empresa.\nConclua seu cadastro aqui: ${response.zap}\n`;
+      const cleanedPhone = phone.replace(/\D/g, "");
+      const finalPhone = cleanedPhone.startsWith("55")
+        ? cleanedPhone
+        : `55${cleanedPhone}`;
+      const message = `Olá! Você foi convidado para a empresa.\nConclua seu cadastro aqui: ${response.zap}`;
       const encodedMessage = encodeURIComponent(message);
-      const whatsappURL = `https://wa.me/55${to}?text=${encodedMessage}`;
+      const whatsappURL = `https://wa.me/${finalPhone}?text=${encodedMessage}`;
       window.open(whatsappURL, "_blank");
 
       onClose();
@@ -108,8 +111,13 @@ export default function AddColaboratorForm({ isOpen, onClose }: Props) {
                 <SelectValue placeholder="Função" />
               </SelectTrigger>
               <SelectContent className="z-[100000]">
-                <SelectItem value="EVALUATOR">Avaliador</SelectItem>
-                <SelectItem value="COMMON">Usuário</SelectItem>
+                <SelectItem value="ORGANIZER">Organizador</SelectItem>
+                <SelectItem value="COLLABORATOR">Colaborador</SelectItem>
+                <SelectItem value="OBSERVER">Observador</SelectItem>
+                <SelectItem value="TRANSFORMATION_OFFICE">Escritório de Transformação</SelectItem>
+                <SelectItem value="INNOVATION_TEAM">Time de Inovação</SelectItem>
+                <SelectItem value="STEERING_COMMITTEE">Comitê Estratégico</SelectItem>
+                <SelectItem value="MANAGER">Gestor</SelectItem>
               </SelectContent>
             </Select>
           </div>
