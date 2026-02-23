@@ -144,16 +144,16 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
 
   return (
     <div className="w-full flex flex-col">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Revise e ajuste os objetivos estratégicos vinculados a este desafio e visualize as sugestões de melhoria.
         </p>
         <button
           onClick={() => setEditingChallenge(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#0B2B72] hover:bg-[#09245e] text-white rounded-lg transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#15358D] hover:bg-[#0B2B72] text-white rounded-md transition-all duration-200 shadow-md hover:shadow-lg font-medium text-sm whitespace-nowrap"
         >
-          <Edit size={14} />
-          <span className="text-sm font-medium">Editar Desafio</span>
+          <Edit size={16} />
+          Editar Desafio
         </button>
       </div>
 
@@ -170,23 +170,24 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
         />
       )}
 
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-        <button 
-          onClick={() => setShowSuggestions(!showSuggestions)} 
-          className="flex items-center justify-between w-full"
-        >
-          <div className="flex items-center gap-2">
-            <Lightbulb size={14} className="text-yellow-600 dark:text-yellow-500" />
-            <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-              Sugestões de Ajustes ({suggestions.length})
-            </h4>
-          </div>
-          {showSuggestions ? (
-            <ChevronUp size={14} className="text-gray-600 dark:text-gray-400" />
-          ) : (
-            <ChevronDown size={14} className="text-gray-600 dark:text-gray-400" />
-          )}
-        </button>
+      {suggestions.length > 0 && (
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+          <button 
+            onClick={() => setShowSuggestions(!showSuggestions)} 
+            className="flex items-center justify-between w-full"
+          >
+            <div className="flex items-center gap-2">
+              <Lightbulb size={14} className="text-yellow-600 dark:text-yellow-500" />
+              <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                Sugestões de Ajustes ({suggestions.length})
+              </h4>
+            </div>
+            {showSuggestions ? (
+              <ChevronUp size={14} className="text-gray-600 dark:text-gray-400" />
+            ) : (
+              <ChevronDown size={14} className="text-gray-600 dark:text-gray-400" />
+            )}
+          </button>
 
         {showSuggestions && (
           <div className="mt-2 space-y-2">
@@ -242,7 +243,8 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
             )}
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {editingObjective && (
         <EditObjectiveModal

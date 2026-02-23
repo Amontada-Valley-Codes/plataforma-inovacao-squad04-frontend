@@ -1,6 +1,6 @@
 import { DesafioWithRow } from '@/types/roadmap';
 import { ExternalLink } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
 
 interface TaskBarProps {
   desafio: DesafioWithRow;
