@@ -10,6 +10,7 @@ import ApplyChallengeModal from "../startup/ApplyChallengeModal";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type Challenge = {
   id: string;
@@ -253,41 +254,49 @@ export default function ChallengeCard({
           </div>
 
           <div className="flex items-center gap-2">
-            <select
-              value={status || ""}
-              onChange={(e) => {
-                setPage(1);
-                setStatus(e.target.value || undefined);
-              }}
-              className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-900"
-            >
-              <option value="">Todos Status</option>
-              <option value="GENERATION">Desafio</option>
-              <option value="PRE_SCREENING">Pré-Triagem</option>
-              <option value="DETAILED_SCREENING">Triagem Detalhada</option>
-              <option value="MATERIALIZATION">Materialização</option>
-              <option value="EXPERIMENTATION">Experimentação</option>
-              <option value="SCALE">Escala</option>
-              <option value="APPROVE">Aprovado</option>
-              <option value="DISAPPROVE">Reprovado</option>
-            </select>
+         <Select
+            value={status || "ALL"}
+            onValueChange={(value) => {
+              setPage(1);
+              setStatus(value === "ALL" ? undefined : value);
+            }}
+          >
+            <SelectTrigger className="bg-white dark:bg-gray-900">
+              <SelectValue placeholder="Todos Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos Status</SelectItem>
+              <SelectItem value="GENERATION">Desafio</SelectItem>
+              <SelectItem value="PRE_SCREENING">Pré-Triagem</SelectItem>
+              <SelectItem value="DETAILED_SCREENING">Triagem Detalhada</SelectItem>
+              <SelectItem value="MATERIALIZATION">Materialização</SelectItem>
+              <SelectItem value="EXPERIMENTATION">Experimentação</SelectItem>
+              <SelectItem value="SCALE">Escala</SelectItem>
+              <SelectItem value="APPROVE">Aprovado</SelectItem>
+              <SelectItem value="DISAPPROVE">Reprovado</SelectItem>
+            </SelectContent>
+          </Select>
 
-            <select
-              value={`${orderBy}-${orderDirection}`}
-              onChange={(e) => {
-                const [field, direction] = e.target.value.split("-");
-                setOrderBy(field as any);
-                setOrderDirection(direction as any);
-              }}
-              className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-900"
-            >
-              <option value="createdAt-desc">Mais recentes</option>
-              <option value="createdAt-asc">Mais antigos</option>
-              <option value="name-asc">Nome A-Z</option>
-              <option value="name-desc">Nome Z-A</option>
-              <option value="status-asc">Status A-Z</option>
-              <option value="status-desc">Status Z-A</option>
-            </select>
+      <Select
+        value={`${orderBy}-${orderDirection}`}
+        onValueChange={(value) => {
+          const [field, direction] = value.split("-");
+          setOrderBy(field as any);
+          setOrderDirection(direction as any);
+        }}
+      >
+        <SelectTrigger className="bg-white dark:bg-gray-900">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="createdAt-desc">Mais recentes</SelectItem>
+          <SelectItem value="createdAt-asc">Mais antigos</SelectItem>
+          <SelectItem value="name-asc">Nome A-Z</SelectItem>
+          <SelectItem value="name-desc">Nome Z-A</SelectItem>
+          <SelectItem value="status-asc">Status A-Z</SelectItem>
+          <SelectItem value="status-desc">Status Z-A</SelectItem>
+        </SelectContent>
+      </Select>
           </div>
         </div>
       </div>

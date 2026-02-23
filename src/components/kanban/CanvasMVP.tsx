@@ -4,6 +4,7 @@ import { Check, PenSquare, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { materializationService } from "@/api/services/materialization.service";
 import { Resource } from "./Materialization";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type TypeResource = "PEOPLE" | "TECHNOLOGY" | "FINANCIAL" | "OTHER" | undefined
 type Kpi = {
@@ -439,17 +440,18 @@ export default function CanvasMVP({
               />
             </div>
 
-            <div className="flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">
-              <select
-                value={type ?? ""}
-                onChange={(e) => setType(e.target.value as TypeResource)}
-              >
-                <option value="" disabled>Selecione o tipo</option>
-                <option value="PEOPLE">Pessoa</option>
-                <option value="TECHNOLOGY">Tecnologia</option>
-                <option value="FINANCIAL">Financeiro</option>
-                <option value="OTHER">Outro</option>
-              </select>
+            <div  >
+              <Select  value={type ?? ""} onValueChange={(value) => setType(value as TypeResource)}>
+              <SelectTrigger className="py-5">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PEOPLE">Pessoa</SelectItem>
+                <SelectItem value="TECHNOLOGY">Tecnologia</SelectItem>
+                <SelectItem value="FINANCIAL">Financeiro</SelectItem>
+                <SelectItem value="OTHER">Outro</SelectItem>
+              </SelectContent>
+            </Select>
             </div>
 
             <button
@@ -457,7 +459,7 @@ export default function CanvasMVP({
                 addResource()
                 setIsAddingResource(false)
               }}
-              className="flex w-10 justify-center items-center p-1
+              className="flex w-10 justify-center items-center 
               rounded-[8px] bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-black/80 dark:text-white font-semibold
               text-[14px] cursor-pointer"
             >
