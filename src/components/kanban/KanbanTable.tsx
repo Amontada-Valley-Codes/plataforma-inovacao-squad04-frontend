@@ -16,19 +16,27 @@ type KanbanTableProps = {
 export function getStatusLabel(status: string) {
   switch (status) {
     case "GENERATION":
-      return "Desafios"
+      return "Desafios";
     case "PRE_SCREENING":
-      return "Pré-Triagem"
+      return "Pré-Triagem";
     case "DETAILED_SCREENING":
-      return "Triagem Detalhada"
+      return "Triagem Detalhada";
     case "MATERIALIZATION":
-      return "Materialização"
+      return "Materialização";
     case "EXPERIMENTATION":
-      return "Experimentação"
+      return "Experimentação";
     case "SCALE":
-      return "Escala"
+      return "Escala";
+    case "FUTURE_BACKLOG":
+      return "Backlog Futuro";
+    case "PENDING":
+      return "Pendente";
+    case "APPROVE":
+      return "Aprovado";
+    case "DISAPPROVE":
+      return "Reprovado";
     default:
-      return "Outro"
+      return "Outro";
   }
 }
 
@@ -41,14 +49,18 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [loading, setLoading] = useState(false)
   const colors: Record<string, string> = {
-    GENERATION: "bg-violet-500",          
-    PRE_SCREENING: "bg-amber-500",       
-    DETAILED_SCREENING: "bg-orange-500", 
-    MATERIALIZATION: "bg-blue-500",      
-    EXPERIMENTATION: "bg-teal-500",      
-    SCALE: "bg-green-500",               
-    DEFAULT: "bg-gray-500",              
-  }
+    GENERATION: "bg-violet-500",      
+    PRE_SCREENING: "bg-amber-500",     
+    DETAILED_SCREENING: "bg-orange-500",
+    MATERIALIZATION: "bg-blue-500",     
+    EXPERIMENTATION: "bg-teal-500", 
+    SCALE: "bg-green-600",              
+    FUTURE_BACKLOG: "bg-rose-600",    
+    PENDING: "bg-yellow-500",          
+    APPROVE: "bg-emerald-600",          
+    DISAPPROVE: "bg-red-600",         
+    DEFAULT: "bg-gray-500",             
+  };
 
   async function fetchChallenges() {
     try {

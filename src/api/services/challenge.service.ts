@@ -27,6 +27,7 @@ import {
   ReturnStepResponse,
   UpdateStrategicObjectivesPayload,
   UpdateStrategicObjectivesResponse,
+  DeleteChallengeResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -161,4 +162,9 @@ export const ChallengeService = {
     const { data } = await api.patch<UpdateStrategicObjectivesResponse>(ENDPOINTS.CHALLENGE.UPDATE_STRATEGIC_OBJECTIVES(challengeId), payload)
     return data
   },
+
+  async deleteChallenge(challengeId: string): Promise<DeleteChallengeResponse> {
+    const { data } = await api.delete(ENDPOINTS.CHALLENGE.DELETE(challengeId))
+    return data
+  }
 };

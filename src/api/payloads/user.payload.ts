@@ -42,17 +42,17 @@ export type ShowLoggedUserResponse = {
   name: string,
   email: string,
   phone: string,
-  googleId: null,
-  lastAccessAt: null,
+  googleId: null | string,
+  lastAccessAt: null | string,
   type_user: string,
   createdAt: string,
   enterpriseId: string,
-  image: null,
-  startupId: null,
+  image: null | string,
+  startupId: null | string,
   Enterprise: {
     name: string,
   },
-  Startup: null
+  Startup: null | string
 }
 
 export type UpdatesUserResponse = {
