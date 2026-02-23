@@ -146,7 +146,7 @@ export const ChallengeAdjustments = ({ challengeId }: ChallengeAdjustmentsProps)
     <div className="w-full flex flex-col">
       <div className="mb-6 flex items-center justify-between gap-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Revise e ajuste os objetivos estratégicos vinculados a este desafio e visualize as sugestões de melhoria.
+        Revise os objetivos estratégicos vinculados a este desafio, visualize as sugestões de melhoria e edite o desafio conforme solicitações de ajuste.
         </p>
         <button
           onClick={() => setEditingChallenge(true)}

@@ -139,7 +139,7 @@ export default function EditChallengeModal({ onClose, isOpen, challengeId, initi
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="lg:w-250 sm:w-150 md:w-200 bg-white z-50 shadow rounded-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="lg:w-250 sm:w-150 md:w-200 bg-white dark:bg-gray-900 z-50 shadow rounded-2xl max-h-[90vh] flex flex-col overflow-hidden">
         <div className="p-6 overflow-y-auto">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-3">
@@ -218,7 +218,7 @@ export default function EditChallengeModal({ onClose, isOpen, challengeId, initi
                   <Label>Objetivos estratégicos associados ao desafio</Label>
                   <select
                     multiple
-                    className="w-full border rounded-lg p-2 min-h-[180px]"
+                    className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg p-2 min-h-[180px]"
                     value={watch("strategicObjectiveIds")}
                     onChange={(e) => {
                       const values = Array.from(e.target.selectedOptions).map((option) => option.value);
@@ -231,7 +231,7 @@ export default function EditChallengeModal({ onClose, isOpen, challengeId, initi
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Segure <b>Ctrl</b> (ou <b>Cmd</b>) para selecionar mais de um
                   </p>
                   {errors.strategicObjectiveIds && <p className="text-red-500 text-sm mt-1">{errors.strategicObjectiveIds.message}</p>}
@@ -260,7 +260,11 @@ export default function EditChallengeModal({ onClose, isOpen, challengeId, initi
                             { shouldValidate: true }
                           );
                         }}
-                        className={`px-3 py-1 rounded-full border text-sm transition ${active ? "bg-blue-600 text-white" : "bg-gray-100"}`}
+                        className={`px-3 py-1 rounded-full border text-sm transition ${
+                          active 
+                            ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-600 dark:text-white dark:border-blue-600" 
+                            : "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+                        }`}
                       >
                         {area.label}
                       </button>
