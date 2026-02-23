@@ -8,6 +8,7 @@ import { ChallengeFullResponse } from "@/api/payloads/challenge.payload";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { getCategoryLabel } from "./Kanban";
 import { ChallengeAdjustments } from "./ChallengeAdjustments";
+import { PreScreeningService } from "@/api/services/preScreening.service";
 
 type CardChallangeContentProps = {
   challengeId: string;
@@ -75,6 +76,7 @@ export const ChallengeSection = ({
   const [extraData, setExtraData] = useState<ChallengeFullResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState<'1' | '2'>('1');
+  const [hasSuggestions, setHasSuggestions] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -88,7 +90,20 @@ export const ChallengeSection = ({
         setLoading(false);
       }
     }
-    if (challengeId) loadData();
+    
+    async function checkSuggestions() {
+      try {
+        const suggestions = await PreScreeningService.getJustifications(challengeId);
+        setHasSuggestions(Array.isArray(suggestions) && suggestions.length > 0);
+      } catch (error) {
+        setHasSuggestions(false);
+      }
+    }
+    
+    if (challengeId) {
+      loadData();
+      checkSuggestions();
+    }
   }, [challengeId]);
 
   return (
@@ -121,21 +136,23 @@ export const ChallengeSection = ({
               </span>
             </div>
 
-            <div className="flex flex-col items-center">
-              <button
-                className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${
-                  page === '2'
-                    ? "bg-[#0B2B72] text-white"
-                    : "border-2 border-gray-400 text-gray-500"
-                }`}
-                onClick={() => setPage('2')}
-              >
-                2
-              </button>
-              <span className="text-sm mt-1 text-center flex flex-col leading-tight">
-                <span className="mt-0.5">Ajustes</span>
-              </span>
-            </div>
+            {hasSuggestions && (
+              <div className="flex flex-col items-center">
+                <button
+                  className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center transition-colors ${
+                    page === '2'
+                      ? "bg-[#0B2B72] text-white"
+                      : "border-2 border-gray-400 text-gray-500"
+                  }`}
+                  onClick={() => setPage('2')}
+                >
+                  2
+                </button>
+                <span className="text-sm mt-1 text-center flex flex-col leading-tight">
+                  <span className="mt-0.5">Ajustes</span>
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -9,8 +9,16 @@ import { UpdateEndDateModal } from './UpdateEndDateModal';
 import ChallengesByStageChart from '@/components/charts/bar/ChallengesByStageChart';
 
 const COLORS = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981',
-  '#06b6d4', '#3b82f6', '#f43f5e', '#84cc16', '#a855f7'
+  '#0f2e73', // mais escuro
+  '#123684',
+  '#15409c', // seu azul base
+  '#1c4fb8',
+  '#2a61d1',
+  '#3f74e0',
+  '#5b8bea',
+  '#7aa3f2',
+  '#9bbcf7',
+  '#c2d7fc'  // mais claro
 ];
 
 const STATUS_LABELS: Record<string, string> = {
