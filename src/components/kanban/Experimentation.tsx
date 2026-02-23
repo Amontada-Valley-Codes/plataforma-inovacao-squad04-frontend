@@ -82,8 +82,9 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   }
   
   useEffect(() => {
+    if (!experimentation?.poc?.id) return
     loadReport()
-  }, [experimentation?.poc.id])
+  }, [experimentation?.poc?.id])
 
   const handleSaveReport = async () => {
     if (page !== "3") return
@@ -175,11 +176,13 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   }
   
   useEffect(() => {
-    setIndicators(experimentation?.poc.poCIndicators ?? [])
-    setHypotheses(experimentation?.poc.pocHypotheses ?? [])
-    setObjective(experimentation?.poc.objective)
-    setScope(experimentation?.poc.scope)
-  }, [experimentation?.poc.id])
+    if (!experimentation?.poc?.id) return
+
+    setIndicators(experimentation?.poc?.poCIndicators ?? [])
+    setHypotheses(experimentation?.poc?.pocHypotheses ?? [])
+    setObjective(experimentation?.poc?.objective ?? "")
+    setScope(experimentation?.poc?.scope ?? "")
+  }, [experimentation?.poc?.id])
 
   const initExperimentation = useCallback(async () => {
     try {
