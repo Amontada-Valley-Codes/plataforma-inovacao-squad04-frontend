@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Tag, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Trash2, Search, X } from "lucide-react";
 import { getCurrentUser, type AuthUser } from "@/lib/auth";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { matchService } from "@/api/services/match.service";
@@ -10,7 +10,6 @@ import ApplyChallengeModal from "../startup/ApplyChallengeModal";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
-import { ShowLoggedUserResponse } from "@/api/payloads/user.payload";
 
 type Challenge = {
   id: string;
@@ -100,8 +99,6 @@ function filterChallengesByRole(
   }
 }
 
-
-
 export default function ChallengeCard({
   onlyMine = false,
   canApply = false,
@@ -114,7 +111,15 @@ export default function ChallengeCard({
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalChallenge, setModalChallenge] = useState<Challenge | null>(null);
-  const [loggedUser, setLoggedUser] = useState<ShowLoggedUserResponse | null>(null)
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<string | undefined>();
+  const [orderBy, setOrderBy] = useState<"createdAt" | "name" | "proponentName" | "proponentArea" | "status">("createdAt");
+  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
+  const [debouncedSearch, setDebouncedSearch] = useState(search); 
+
+  const limit = 16;
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -127,31 +132,44 @@ export default function ChallengeCard({
       setLoading(true);
       setError(null);
 
-      let raw: Challenge[] = [];
+      const response = await ChallengeService.paginatedChallenges({
+        page,
+        limit,
+        search: debouncedSearch || undefined,
+        status,
+        orderBy,
+        orderDirection,
+      });
 
-      if (user.role === "STARTUP") {
-        raw = await ChallengeService.showAllPublicChallenges();
-      } else {
-        raw = await ChallengeService.showAllChallenges();
-      }
+      const raw = response.data ?? [];
+      const total = response.meta?.lastPage ?? 1;
 
       const filtered = filterChallengesByRole(raw, user.role, user, onlyMine);
+
       setChallenges(filtered);
-    } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } }; message?: string })
-          ?.response?.data?.message ??
-        (err as { message?: string })?.message ??
-        "Não foi possível carregar os desafios.";
-      setError(message);
+      setTotalPages(total);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ??
+        err?.message ??
+        "Erro ao carregar desafios."
+      );
     } finally {
       setLoading(false);
     }
-  }, [user, onlyMine]);
+  }, [user, page, debouncedSearch, status, orderBy, orderDirection, onlyMine]);
 
   useEffect(() => {
     fetchChallenges();
   }, [fetchChallenges, reload]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500); 
+
+    return () => clearTimeout(timer);
+  }, [search])
 
   const handleApply = async (challenge: Challenge) => {
     if (!startupId || !challenge.enterpriseId) {
@@ -200,100 +218,190 @@ export default function ChallengeCard({
     );
   }
 
-  if (challenges.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-muted-foreground text-sm">Nenhum desafio encontrado.</p>
-      </div>
-    );
-  }
-
-
   const isStartup = user?.role === "STARTUP";
   const isObserver = user?.role === "OBSERVER";
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
-        {challenges.map((challenge) => {
-          const isPublic = challenge.visibility?.toLowerCase() === "public";
 
-          return (
-            <div
-              key={challenge.id}
-              className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl overflow-hidden hover:scale-[1.01] transition-transform shadow-sm hover:shadow-md"
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between w-full">
+        <div className="flex-1 flex flex-col md:flex-row gap-4 w-full">
+          <div className="flex items-center gap-2 flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 shadow-sm">
+            <Search size={16} className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nome..."
+              value={search}
+              onChange={(e) => {
+                setPage(1);
+                setSearch(e.target.value);
+              }}
+              className="flex-1 bg-transparent outline-none text-sm"
+            />
+            {search && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setPage(1);
+                }}
+                aria-label="Limpar busca"
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={status || ""}
+              onChange={(e) => {
+                setPage(1);
+                setStatus(e.target.value || undefined);
+              }}
+              className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-900"
             >
-              <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
+              <option value="">Todos Status</option>
+              <option value="GENERATION">Desafio</option>
+              <option value="PRE_SCREENING">Pré-Triagem</option>
+              <option value="DETAILED_SCREENING">Triagem Detalhada</option>
+              <option value="MATERIALIZATION">Materialização</option>
+              <option value="EXPERIMENTATION">Experimentação</option>
+              <option value="SCALE">Escala</option>
+              <option value="APPROVE">Aprovado</option>
+              <option value="DISAPPROVE">Reprovado</option>
+            </select>
 
-              <div className="p-4 flex flex-col gap-2.5">
-                <div className="flex justify-between items-start">
-                  <div className="min-w-0">
-                    <h2
-                      title={challenge.name}
-                      className="text-[15px] font-semibold text-[#15358D] dark:text-blue-800 leading-snug truncate"
-                    >
-                      {challenge.name}
-                    </h2>
-                    <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
-                      {challenge.enterpriseName || "Empresa desconhecida"}
-                    </p>
-                    <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
-                      {challenge.Users?.name || "Autor desconhecido"}
-                    </p>
-                  </div>
-                </div>
+            <select
+              value={`${orderBy}-${orderDirection}`}
+              onChange={(e) => {
+                const [field, direction] = e.target.value.split("-");
+                setOrderBy(field as any);
+                setOrderDirection(direction as any);
+              }}
+              className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-900"
+            >
+              <option value="createdAt-desc">Mais recentes</option>
+              <option value="createdAt-asc">Mais antigos</option>
+              <option value="name-asc">Nome A-Z</option>
+              <option value="name-desc">Nome Z-A</option>
+              <option value="status-asc">Status A-Z</option>
+              <option value="status-desc">Status Z-A</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                    <span className={`w-3 h-3 rounded-full ${colors[challenge.status ?? colors.DEFAULT]}`} />
-                    {STAGE_LABELS[challenge.status] || challenge.status}
-                  </div>
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
+        {challenges.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-12">
+            <p className="text-muted-foreground text-sm">
+              Nenhum desafio encontrado.
+            </p>
+          </div>
+        ) : (
+          challenges.map((challenge) => {
+            const isPublic = challenge.visibility?.toLowerCase() === "public";
 
-                <div className="text-gray-600 dark:text-[#ced3db] text-[13px] flex justify-between items-center gap-1">
-                  {isPublic ? (
-                    <div className="flex items-center gap-2">
-                      <Eye size={16} /> Público
+            return (
+              <div
+                key={challenge.id}
+                className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl overflow-hidden hover:scale-[1.01] transition-transform shadow-sm hover:shadow-md"
+              >
+                <div className="h-1.5 w-full bg-gradient-to-r from-[#15358D]/85 via-[#15358D]/35 to-[#15358D]/10" />
+
+                <div className="p-4 flex flex-col gap-2.5">
+                  <div className="flex justify-between items-start">
+                    <div className="min-w-0">
+                      <h2
+                        title={challenge.name}
+                        className="text-[15px] font-semibold text-[#15358D] dark:text-blue-800 leading-snug truncate"
+                      >
+                        {challenge.name}
+                      </h2>
+                      <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
+                        {challenge.enterpriseName || "Empresa desconhecida"}
+                      </p>
+                      <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
+                        {challenge.Users?.name || "Autor desconhecido"}
+                      </p>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <EyeOff size={16} /> Privado
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
+                      <span className={`w-3 h-3 rounded-full ${colors[challenge.status ?? colors.DEFAULT]}`} />
+                      {STAGE_LABELS[challenge.status] || challenge.status}
                     </div>
-                  )}
-                  <div>
-                    {user?.role === "MANAGER" && (
-                      <Trash2
-                        size={16}
-                        className="cursor-pointer hover:scale-110 hover:text-gray-800 transition-all"
-                        onClick={() => deleteChallenge(challenge.id)}
-                      />
+                  </div>
+
+                  <div className="text-gray-600 dark:text-[#ced3db] text-[13px] flex justify-between items-center gap-1">
+                    {isPublic ? (
+                      <div className="flex items-center gap-2">
+                        <Eye size={16} /> Público
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <EyeOff size={16} /> Privado
+                      </div>
                     )}
+                    <div>
+                      {user?.role === "MANAGER" && (
+                        <Trash2
+                          size={16}
+                          className="cursor-pointer hover:scale-110 hover:text-gray-800 transition-all"
+                          onClick={() => deleteChallenge(challenge.id)}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {canApply && isStartup && isPublic && (
+                  <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
+                    <Button
+                      onClick={() => {
+                        setModalChallenge(challenge);
+                        setModalOpen(true);
+                      }}
+                      className="w-full bg-[#15358D] hover:bg-[#112c75] text-white"
+                    >
+                      Candidatar-se
+                    </Button>
+                  </div>
+                )}
+
+                {isObserver && (
+                  <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
+                    <span className="text-xs text-muted-foreground">Somente visualização</span>
+                  </div>
+                )}
               </div>
+            );
+            })
+          )}
+      </div>
 
-              {canApply && isStartup && isPublic && (
-                <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
-                  <Button
-                    onClick={() => {
-                      setModalChallenge(challenge);
-                      setModalOpen(true);
-                    }}
-                    className="w-full bg-[#15358D] hover:bg-[#112c75] text-white"
-                  >
-                    Candidatar-se
-                  </Button>
-                </div>
-              )}
+      <div className="flex justify-center items-center gap-4 mt-8">
+        <Button
+          disabled={page === 1}
+          onClick={() => setPage((prev) => prev - 1)}
+          variant="outline"
+        >
+          Anterior
+        </Button>
 
-              {isObserver && (
-                <div className="border-t border-slate-100/80 dark:border-gray-800 px-4 pt-1 pb-2">
-                  <span className="text-xs text-muted-foreground">Somente visualização</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
+        <span className="text-sm">
+          Página {page} de {totalPages}
+        </span>
+
+        <Button
+          disabled={page === totalPages}
+          onClick={() => setPage((prev) => prev + 1)}
+          variant="outline"
+        >
+          Próxima
+        </Button>
       </div>
 
       {modalChallenge && (
