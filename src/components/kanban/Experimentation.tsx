@@ -155,15 +155,20 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
   const handleSavePoc = async () => {
     if (page !== "1") return
+    if (!experimentation?.poc?.id) return
 
     try {
-      await experimentationService.updatePoc(experimentation?.poc.id, {
-        objective: objective,
-        scope: scope
-      });
-  
-      updateObjective(objective);
-      updateScope(scope);
+      const updatedPoc = await experimentationService.updatePoc(
+        experimentation.poc.id,
+        {
+          objective,
+          scope
+        }
+      );
+
+      setExperimentation(prev =>
+        prev ? { ...prev, poc: updatedPoc } : prev
+      );
 
       toast.success("PoC atualizada com sucesso!")
     } catch (err: any) {
