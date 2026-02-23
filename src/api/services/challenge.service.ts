@@ -27,6 +27,8 @@ import {
   ReturnStepResponse,
   UpdateStrategicObjectivesPayload,
   UpdateStrategicObjectivesResponse,
+  UpdateChallengePayload,
+  UpdateChallengeResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -159,6 +161,11 @@ export const ChallengeService = {
 
   async updateStrategicObjectives(challengeId: string, payload: UpdateStrategicObjectivesPayload): Promise<UpdateStrategicObjectivesResponse> {
     const { data } = await api.patch<UpdateStrategicObjectivesResponse>(ENDPOINTS.CHALLENGE.UPDATE_STRATEGIC_OBJECTIVES(challengeId), payload)
+    return data
+  },
+
+  async updateChallenge(challengeId: string, payload: UpdateChallengePayload): Promise<UpdateChallengeResponse> {
+    const { data } = await api.put<UpdateChallengeResponse>(ENDPOINTS.CHALLENGE.UPDATE_CHALLENGE(challengeId), payload)
     return data
   },
 };

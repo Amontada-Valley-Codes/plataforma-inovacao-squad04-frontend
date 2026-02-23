@@ -43,8 +43,8 @@ export const PreScreeningService = {
     await api.post(ENDPOINTS.PRE_SCREENING.DECISION(id), payload)
   },
 
-  async getJustifications(id: string): Promise<PreScreeningJustificationResponse> {
-    const { data } = await api.get<PreScreeningJustificationResponse>(
+  async getJustifications(id: string): Promise<PreScreeningJustificationResponse[]> {
+    const { data } = await api.get<PreScreeningJustificationResponse[]>(
       ENDPOINTS.PRE_SCREENING.JUSTIFICATIONS(id)
     )
     return data

@@ -35,21 +35,14 @@ export const ObjectivesList = ({ objectives, showActions = false, onEdit, onDele
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-[#0B2B70] dark:text-white">{obj.name}</p>
-                    {showActions && (
+                    {showActions && onEdit && (
                       <div className="flex items-center gap-1 flex-shrink-0">
                         <button 
                           onClick={() => onEdit?.(obj)}
-                          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" 
+                          className="p-1.5 rounded-md bg-[#0B2B72] hover:bg-[#09245e] text-white transition-colors shadow-sm" 
                           title="Editar"
                         >
-                          <Pencil size={12} />
-                        </button>
-                        <button 
-                          onClick={() => onDelete?.(obj)}
-                          className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" 
-                          title="Excluir"
-                        >
-                          <Trash2 size={12} />
+                          <Pencil size={14} />
                         </button>
                       </div>
                     )}

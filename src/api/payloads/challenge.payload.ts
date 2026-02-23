@@ -348,3 +348,25 @@ export type UpdateStrategicObjectivesPayload = {
 export type UpdateStrategicObjectivesResponse = {
   message: string
 }
+
+export type UpdateChallengePayload = {
+  name: string
+  problemDescription: string
+  problemDuration: string
+  currentSolution: string
+  problemRelevance: string
+  strategicObjectiveIds: string[]
+  currentIndicators: string
+  expectedImpacts: string
+  involvedAreas: string[]
+  initialConstraints: string
+  proponentParticipation: string
+}
+
+export type UpdateChallengeResponse = {
+  id: string
+  name: string
+  problemDescription: string
+  status: string
+  updatedAt: string
+}
