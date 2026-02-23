@@ -370,3 +370,36 @@ export type UpdateChallengeResponse = {
   status: string
   updatedAt: string
 }
+export type DeleteChallengeResponse = {
+  id: string;
+  ideaIdentifier: string;
+  name: string;
+  proponentName: string;
+  proponentEmail: string;
+  proponentArea: string;
+  problemDescription: string;
+  problemDuration: string;
+  currentSolution: string;
+  problemRelevance: string;
+  currentIndicators: string;
+  expectedImpacts: string;
+  involvedAreas: string[];
+  initialConstraints: string;
+  proponentParticipation: string;
+  strategic_alignment: string | null;
+  innovative_potential: string | null;
+  business_relevance: string | null;
+  visibility: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  endDate: string;
+  impactScore: number | null | string;
+  confidenceScore: number | null | string;
+  easeScore: number | null | string;
+  finalIceScore: number | null | string;
+  reportUrl: string | null;
+  reportDate: string | null;
+  enterpriseId: string;
+  usersId: string;
+};

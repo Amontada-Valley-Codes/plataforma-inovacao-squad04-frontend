@@ -109,6 +109,7 @@ export const ENDPOINTS = {
     FULL: (challengeId: string) => `/challenge/${challengeId}/full-challenger`,
     ADVANCE: (challengeId: string) => `/challenge/${challengeId}/advance-stage`,
     RETURN: (challengeId: string) => `/challenge/${challengeId}/return-step`,
+    DELETE: (challengeId: string) => `/challenge/${challengeId}`
   },
 
   CHECKLIST: {

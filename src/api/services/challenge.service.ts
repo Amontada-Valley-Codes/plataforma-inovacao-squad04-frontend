@@ -29,6 +29,7 @@ import {
   UpdateStrategicObjectivesResponse,
   UpdateChallengePayload,
   UpdateChallengeResponse,
+  DeleteChallengeResponse,
 } from "../payloads/challenge.payload";
 
 type HistoricalParams = {
@@ -168,4 +169,9 @@ export const ChallengeService = {
     const { data } = await api.put<UpdateChallengeResponse>(ENDPOINTS.CHALLENGE.UPDATE_CHALLENGE(challengeId), payload)
     return data
   },
+
+  async deleteChallenge(challengeId: string): Promise<DeleteChallengeResponse> {
+    const { data } = await api.delete(ENDPOINTS.CHALLENGE.DELETE(challengeId))
+    return data
+  }
 };

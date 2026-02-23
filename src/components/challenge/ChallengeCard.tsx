@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Tag, Eye, EyeOff } from "lucide-react";
+import { Tag, Eye, EyeOff, Trash2 } from "lucide-react";
 import { getCurrentUser, type AuthUser } from "@/lib/auth";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { matchService } from "@/api/services/match.service";
@@ -10,6 +10,7 @@ import ApplyChallengeModal from "../startup/ApplyChallengeModal";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
+import { ShowLoggedUserResponse } from "@/api/payloads/user.payload";
 
 type Challenge = {
   id: string;
@@ -38,21 +39,29 @@ type Props = {
 const STAGE_LABELS: Record<string, string> = {
   GENERATION: "Desafio",
   PRE_SCREENING: "Pré-Triagem",
-  IDEATION: "Ideação",
-  DETAILED_SCREENING: "Triagem detalhada",
+  DETAILED_SCREENING: "Triagem Detalhada",
+  MATERIALIZATION: "Materialização",
   EXPERIMENTATION: "Experimentação",
+  SCALE: "Escala",
+  FUTURE_BACKLOG: "Backlog do Futuro",
+  PENDING: "Pendente",
   APPROVE: "Aprovado",
   DISAPPROVE: "Reprovado",
 };
 
-function getStatusColor(status: string): string {
-  switch (status) {
-    case "Completed": return "bg-emerald-400";
-    case "In Progress": return "bg-yellow-400";
-    case "Pending": return "bg-red-400";
-    default: return "bg-gray-400";
-  }
-}
+const colors: Record<string, string> = {
+    GENERATION: "bg-violet-500",      
+    PRE_SCREENING: "bg-amber-500",     
+    DETAILED_SCREENING: "bg-orange-500",
+    MATERIALIZATION: "bg-blue-500",     
+    EXPERIMENTATION: "bg-teal-500", 
+    SCALE: "bg-green-600",              
+    FUTURE_BACKLOG: "bg-rose-600",    
+    PENDING: "bg-yellow-500",          
+    APPROVE: "bg-emerald-600",          
+    DISAPPROVE: "bg-red-600",         
+    DEFAULT: "bg-gray-500",             
+  };
 
 function filterChallengesByRole(
   challenges: Challenge[],
@@ -105,7 +114,7 @@ export default function ChallengeCard({
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalChallenge, setModalChallenge] = useState<Challenge | null>(null);
-
+  const [loggedUser, setLoggedUser] = useState<ShowLoggedUserResponse | null>(null)
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -160,6 +169,17 @@ export default function ChallengeCard({
       toast.error(message);
     }
   };
+
+  const deleteChallenge = async (challengeId: string) => {
+    try {
+      await ChallengeService.deleteChallenge(challengeId)
+      toast.success("Desafio deletado com sucesso!")
+      window.location.reload()
+    } catch (err: any) {
+      console.error(err)
+      toast.error("Erro ao deletar desafio.")
+    }
+  }
 
   if (loading) {
     return (
@@ -225,20 +245,30 @@ export default function ChallengeCard({
 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                    <Tag size={15} /> Sem categoria
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                    <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.status)}`} />
+                    <span className={`w-3 h-3 rounded-full ${colors[challenge.status ?? colors.DEFAULT]}`} />
                     {STAGE_LABELS[challenge.status] || challenge.status}
                   </div>
                 </div>
 
-                <div className="text-gray-600 dark:text-[#ced3db] text-[13px] flex items-center gap-1">
+                <div className="text-gray-600 dark:text-[#ced3db] text-[13px] flex justify-between items-center gap-1">
                   {isPublic ? (
-                    <><Eye size={16} /> Público</>
+                    <div className="flex items-center gap-2">
+                      <Eye size={16} /> Público
+                    </div>
                   ) : (
-                    <><EyeOff size={16} /> Privado</>
+                    <div className="flex items-center gap-2">
+                      <EyeOff size={16} /> Privado
+                    </div>
                   )}
+                  <div>
+                    {user?.role === "MANAGER" && (
+                      <Trash2
+                        size={16}
+                        className="cursor-pointer hover:scale-110 hover:text-gray-800 transition-all"
+                        onClick={() => deleteChallenge(challenge.id)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
 

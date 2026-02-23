@@ -493,7 +493,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
               {isLoading ? "Salvando..." : "Finalizar"}
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* PROBLEMA */}
             <div className="rounded-xl p-4 border border-[#E5E7EB] dark:border-[#737373]">
               <div className="flex items-center justify-between mb-3">
