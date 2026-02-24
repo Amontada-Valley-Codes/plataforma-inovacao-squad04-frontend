@@ -26,7 +26,7 @@ function isPublicPath(pathname: string): boolean {
 
 
 const ROUTE_RULES: Record<string, Role[]> = {
-  "/admin": ["ADMINISTRATOR"],
+  "/admin": ["ADMINISTRATOR", "MANAGER",  "INNOVATION_TEAM"],
 
   "/company": [
     "ADMINISTRATOR",
@@ -34,7 +34,7 @@ const ROUTE_RULES: Record<string, Role[]> = {
     "INNOVATION_TEAM",
     "TRANSFORMATION_OFFICE",
     "STEERING_COMMITTEE",
-    "COLLABORATOR",
+    "COLLABORATOR", 
     "OBSERVER",
   ],
 
