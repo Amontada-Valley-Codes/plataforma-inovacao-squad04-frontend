@@ -13,7 +13,8 @@ import { toast, Toaster } from "sonner";
 function setFrontendCookie(name: string, value: string, maxAgeSeconds: number) {
   if (typeof document === "undefined") return;
   const secure = typeof window !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${name}=${value}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax${secure}`;
+  const sameSite = location.protocol === "https:" ? "None" : "Lax";
+  document.cookie = `${name}=${value}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=${sameSite}${secure}`;
 }
 
 function parseJwt<T = any>(token: string): T | null {
