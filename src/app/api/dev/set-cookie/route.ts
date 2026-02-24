@@ -12,7 +12,7 @@ export async function POST(req: Request) {
             value: "",
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             path: "/",
             expires: new Date(0),
         });
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         value: access_token,
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
         maxAge: 60 * 60 * 2, // 2h
     });
