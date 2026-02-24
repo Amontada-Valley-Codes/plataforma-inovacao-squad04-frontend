@@ -60,7 +60,8 @@ export function isAuthenticated(): boolean {
 export function setAccessTokenCookie(token: string, maxAgeSeconds = 86400): void {
   if (typeof document === "undefined") return;
   const secure = location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `access_token=${encodeURIComponent(token)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax${secure}`;
+  const sameSite = location.protocol === "https:" ? "None" : "Lax";
+  document.cookie = `access_token=${encodeURIComponent(token)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=${sameSite}${secure}`;
 }
 
 export function clearAccessTokenCookie(): void {

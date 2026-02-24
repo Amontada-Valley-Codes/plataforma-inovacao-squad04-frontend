@@ -18,8 +18,7 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith("/register") ||
     pathname.startsWith("/public") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname.startsWith("/api/dev/set-cookie")
+    pathname.startsWith("/favicon")
   );
 }
 
