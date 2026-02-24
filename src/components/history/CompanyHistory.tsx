@@ -44,7 +44,7 @@ export default function CompanyHistoryHistoric({
         // Filtra apenas aprovados/reprovados
         let scoped = (data ?? []).filter((c: any) => {
           const s = String(c.status ?? "").toUpperCase();
-          return s === "APPROVE" || s === "DISAPPROVE";
+          return s === "APPROVE" || s === "DISAPPROVE" || s === "FUTURE_BACKLOG";
         });
 
         // COLLABORATOR — só vê os próprios
@@ -66,8 +66,9 @@ export default function CompanyHistoryHistoric({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "APPROVE": return "bg-emerald-500";
-      case "DISAPPROVE": return "bg-red-500";
+      case "APPROVE": return "bg-emerald-600";
+      case "DISAPPROVE": return "bg-red-600";
+      case "FUTURE_BACKLOG": return "bg-rose-600";
       default: return "bg-slate-400";
     }
   };
@@ -76,6 +77,7 @@ export default function CompanyHistoryHistoric({
     switch (status) {
       case "APPROVE": return "Aprovado";
       case "DISAPPROVE": return "Recusado";
+      case "FUTURE_BACKLOG": return "Backlog Futuro";
       default: return status;
     }
   };
@@ -105,7 +107,7 @@ export default function CompanyHistoryHistoric({
         return (
           <div
             key={challenge.id}
-            className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl p-5 flex flex-col justify-between hover:scale-[1.02] transition-transform"
+            className="border border-gray-200 dark:border-gray-800 dark:bg-gray-900 bg-white rounded-xl p-5 gap-2 flex flex-col hover:scale-[1.02] transition-transform"
           >
             <div className="flex justify-between items-start">
               <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-300">
@@ -113,21 +115,21 @@ export default function CompanyHistoryHistoric({
               </h2>
             </div>
 
-            <div className="mt-4 space-y-2">
+            <div className="">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 text-sm">
                 <span className={`w-3 h-3 rounded-full ${getStatusColor(challenge.status)}`} />
                 {getStatusLabel(challenge.status)}
               </div>
 
               {when && (
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 text-sm">
+                <div className="flex items-center gap-2 mt-2 text-gray-600 dark:text-gray-300 text-sm">
                   <Calendar size={16} />
                   {shortDateFormatter.format(new Date(when))}
                 </div>
               )}
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="text-gray-600 dark:text-gray-300">
                 {isPublic ? (
                   <span className="inline-flex items-center gap-1 text-sm">

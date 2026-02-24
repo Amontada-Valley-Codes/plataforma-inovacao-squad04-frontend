@@ -69,6 +69,10 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
   const [learnings, setLearnings] = useState<string[]>([])
   const [recommendationTxt, setRecommendationTxt] = useState("")
   const [finalDecision, setFinalDecision] = useState<"SCALE" | "ADJUST" | "CLOSE">("SCALE")
+  const [savingPoc, setSavingPoc] = useState(false)
+  const [savingStatus, setSavingStatus] = useState(false)
+  const [savingReport, setSavingReport] = useState(false)
+
 
   const loadReport = async () => {
     if (!experimentation?.poc) return 
@@ -91,6 +95,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     if (!experimentation?.poc) return;
 
     try {
+      setSavingReport(true)
+      
       const payload = {
         executiveSummary,
         learnings,
@@ -117,6 +123,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     } catch (err: any) {
       console.error("SAVE REPORT ERROR:", err?.response?.data);
       toast.error(err.response?.data?.message || "Erro ao salvar o Relatório.")
+    } finally {
+      setSavingReport(false)
     }
   };
 
@@ -124,6 +132,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     if (page !== "2") return
 
     try {
+      setSavingStatus(true)
+      
       const payload = {
         advances_of_the_Week: avancosSemana.text.trim(),
         problemsFound: problemasEncontrados.text.trim(),
@@ -150,6 +160,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Erro ao salvar o Report.")
       console.log("CREATE STATUS REPORT ERROR DATA:", err?.response?.data);
+    } finally {
+      setSavingStatus(false)
     }
   };
 
@@ -158,6 +170,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
     if (!experimentation?.poc?.id) return
 
     try {
+      setSavingPoc(true)
+
       const updatedPoc = await experimentationService.updatePoc(
         experimentation.poc.id,
         {
@@ -177,6 +191,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
         err.response?.data?.message ||
         "Não foi possível salvar a PoC."
       )
+    } finally {
+      setSavingPoc(false)
     }
   }
   
@@ -276,7 +292,6 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
                 className={`w-8 h-8 rounded-full font-semibold flex items-center justify-center ${page === '1' ? "bg-[#0B2B72] text-white" : "border-gray-400 border-2 text-gray-500"
                   }`}
                 onClick={() => {
-                  handleSavePoc()
                   setPage('1')
                 }}
               >
@@ -293,7 +308,6 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
                     : "border-gray-400 border-2 text-gray-500"
                   }`}
                 onClick={() => {
-                  handleSaveStatus()
                   setPage('2')
                 }}
               >
@@ -310,7 +324,6 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
                 className={`w-8 h-8 rounded-full  font-semibold flex items-center justify-center ${page === '3' ? "bg-[#0B2B72] text-white" : "border-gray-400 dark:placeholder:text-white border-2 text-gray-500"
                   }`}
                 onClick={() => {
-                  handleSaveReport()
                   setPage('3')
                 }}
               >
@@ -321,15 +334,14 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
               </span>
             </div>
           </div>
-          <span className="text-xs w-fit text-[#98A2B3] whitespace-nowrap dark:text-white/40 mt-4">
-            Clique na respectiva página para salvar.
-          </span>
         </div>
       </div>
 
       <div>
         {page === '1' && experimentation?.poc &&
           <CanvasPoC
+            handleSave={handleSavePoc}
+            saving={savingPoc}
             poc={experimentation.poc}
             updateObjective={updateObjective}
             updateScope={updateScope}
@@ -346,6 +358,8 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
 
         {page === '2' && (
           <StatusReportPoC
+            handleSave={handleSaveStatus}
+            saving={savingStatus}
             challengeId={challengeId}
             responsibleName={creator}
             avancosSemana={avancosSemana}
@@ -360,7 +374,9 @@ export const Experimentation = ({ challangeTitle, challengeId, category, startDa
         )}
 
         {page === '3' && experimentation?.poc &&
-          <ResultsReport 
+          <ResultsReport  
+            handleSave={handleSaveReport}
+            saving={savingReport}
             pocId={experimentation.poc.id}
             executiveSummary={executiveSummary}
             finalDecision={finalDecision}

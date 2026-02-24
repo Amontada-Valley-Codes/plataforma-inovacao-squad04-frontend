@@ -1,9 +1,10 @@
 'use client'
 
 import { experimentationService } from "@/api/services/experimentation.service";
-import { Check, ChevronDown, Plus, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Loader2, Plus, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { pocHypotheses, poCIndicators } from "./Experimentation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type CanvasPoCProps = {
   poc: {
@@ -39,10 +40,14 @@ type CanvasPoCProps = {
   setObjective: Dispatch<SetStateAction<string>>
   setScope: Dispatch<SetStateAction<string>>
   scope: string
+  handleSave: () => void
+  saving: boolean
 }
 
 export default function CanvasPoC({ 
   poc,
+  handleSave,
+  saving,
   hypotheses,
   indicators,
   objective,
@@ -125,6 +130,15 @@ export default function CanvasPoC({
     <div className="flex flex-col gap-1 mb-6">
       <h1 className="text-[#0B2B72] flex items-center justify-between dark:text-white text-2xl font-semibold mb-4">
         Canvas da PoC
+
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+        >
+          {saving && <Loader2 className="animate-spin" size={16}/>}
+          {saving ? "Salvando..." : "Salvar"}
+        </button>
       </h1>
 
       <div className="flex flex-col mb-4">
@@ -200,31 +214,32 @@ export default function CanvasPoC({
                       title="Deletar hipótese"
                       onClick={() => deleteHypothesis(hyp.id)} 
                       className="flex w-fit justify-center p-1
-                      rounded-[8px] transition-colors text-red-700 font-semibold
+                      rounded-[8px] transition-colors text-[#0b2b72] font-semibold
                       text-[12px] cursor-pointer"
                     >
                       <Trash2 size={16}/>
                     </button>
-                    <div className="flex items-center bg-[#E7EEFF] hover:bg-[#dee2ec] transition-colors text-[#0B2B70] font-semibold
-                    text-[12px] rounded-[8px] pr-6 relative">
-                      <select
+                    <div className="flex items-center bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] px-3 dark:border-gray-800 dark:bg-gray-900">
+                      <Select
                         value={hyp.status}
-                        onChange={(e) => updateStatus(hyp.id, e.target.value)}
-                        onFocus={() => setIsOpen(true)}
-                        onBlur={() => setIsOpen(false)}
-                        className="flex justify-center px-2 py-1 appearance-none
-                        cursor-pointer rounded-[8px] outline-none"
+                        onValueChange={(value) => updateStatus(hyp.id, value)}
                       >
-                        <option value="PENDING">PENDENTE</option>
-                        <option value="VALIDATED">VÁLIDADA</option>
-                        <option value="INVALIDATED">INVALIDADA</option>
-                      </select>
+                        <SelectTrigger
+                          className="flex justify-center px-2 py-1 rounded-[8px] outline-none
+                          bg-transparent text-sm font-semibold border-none shadow-none
+                          focus:ring-0 focus-visible:ring-0 text-[#0b2b72]"
+                          onFocus={() => setIsOpen(true)}
+                          onBlur={() => setIsOpen(false)}
+                        >
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
 
-                      <ChevronDown
-                        size={20}
-                        className={`text-[#0B2B70] absolute right-2 pointer-events-none
-                                  transition-transform duration-200
-                                  ${isOpen ? "rotate-180" : "rotate-0"}`}/>
+                        <SelectContent className="z-[100000]">
+                          <SelectItem value="PENDING">PENDENTE</SelectItem>
+                          <SelectItem value="VALIDATED">VÁLIDADA</SelectItem>
+                          <SelectItem value="INVALIDATED">INVALIDADA</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>

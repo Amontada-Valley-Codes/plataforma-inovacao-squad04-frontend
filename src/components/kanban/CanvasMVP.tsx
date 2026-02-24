@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, PenSquare, Plus, Trash2 } from "lucide-react";
+import { Check, Loader2, PenSquare, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { materializationService } from "@/api/services/materialization.service";
 import { Resource } from "./Materialization";
@@ -28,11 +28,15 @@ type CanvasMvpProps = {
   setResources: Dispatch<SetStateAction<Resource[]>>;
   kpis: Kpi[];
   setKpis: Dispatch<SetStateAction<Kpi[]>>;
+  handleSave: () => void;
+  saving: boolean
 }
 
 export default function CanvasMVP({ 
   challengeId,
   mvpId,
+  saving,
+  handleSave,
   setMvpId,
   propostaValor,
   publicoAlvo,
@@ -147,6 +151,15 @@ export default function CanvasMVP({
       <div className="flex flex-col mb-4">
         <h1 className="flex justify-between gap-1 items-center text-[#0B2B70] dark:text-white font-semibold mb-3">
           Público-Alvo
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+          >
+            {saving && <Loader2 className="animate-spin" size={16}/>}
+            {saving ? "Salvando..." : "Salvar"}
+          </button>
         </h1>
 
         <div className="flex-1 flex items-center rounded-lg border px-3 py-2 h-10 transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900">

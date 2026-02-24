@@ -164,10 +164,10 @@ const KanbanPage = () => {
         const otherChallenges = challenges?.filter(c => c.id !== challengeId);
         setChallenges([updatedChallenge, ...otherChallenges]);
 
-        toast.success("Desafio avançado com sucesso.")
+        toast.success("Desafio retornado com sucesso.")
 
       } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Não foi possível avançar o desafio.")
+        toast.error(error?.response?.data?.message || "Não foi possível retornar o desafio.")
       }
     }
   };
