@@ -129,8 +129,8 @@ const KanbanPage = () => {
 
       try {
         if (challengeId) {
-          await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
-          //  await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
+          // await ChallengeService.changeStatus(challengeId, { status: nextColumn.id })
+          await ChallengeService.advanceStage(challengeId, { status: nextColumn.id });
         }
 
         const updatedChallenge = { ...challengeToMove, status: nextColumn.id };
@@ -156,8 +156,8 @@ const KanbanPage = () => {
 
       try {
         if (challengeId) {
-          await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
-          // await ChallengeService.returnStep(challengeId, { status: prevColumn.id });
+          // await ChallengeService.changeStatus(challengeId, { status: prevColumn.id })
+          await ChallengeService.returnStep(challengeId, { status: prevColumn.id });
         }
 
         const updatedChallenge = { ...cardToMove, status: prevColumn.id };

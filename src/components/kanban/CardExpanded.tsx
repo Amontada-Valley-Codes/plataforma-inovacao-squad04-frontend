@@ -274,8 +274,8 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
       const prevColumn = columns[currentColumnIndex - 1];
 
       try {
-        await ChallengeService.changeStatus(challengeId!, { status: prevColumn.id })
-        // await ChallengeService.returnStep(challengeId!, { status: prevColumn.id });
+        // await ChallengeService.changeStatus(challengeId!, { status: prevColumn.id })
+        await ChallengeService.returnStep(challengeId!, { status: prevColumn.id });
 
         const updatedChallenge = { ...challengeToMove, status: prevColumn.id };
         const otherChallenges = challenges.filter(c => c.id !== challengeId);
