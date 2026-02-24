@@ -72,9 +72,12 @@ export default function Materialization({
   const [hmwProblem, setHmwProblem] = useState<string>('');
   const [rules, setRules] = useState<string>('');
   const [criteria, setCriteria] = useState<string[]>([]);
+  const [savingMvp, setSavingMvp] = useState(false);
+  const [savingBuy, setSavingBuy] = useState(false);
 
   const handleSaveMvp = async () => {
     if (page === '2') return
+    setSavingMvp(true);
 
     try {
       const payload: CreateMvpPayload = {
@@ -109,14 +112,30 @@ export default function Materialization({
     } catch (err) {
       console.error(err)
       toast.error("Não foi possível salvar o MVP.")
+    } finally {
+      setSavingMvp(false);
     }
   }
 
   async function handleSaveMB() {
-    if (page === '1') return
-    if ((!pdfFile && !buyId) || !hmwProblem || !rules) return;
+    if (!hmwProblem) {
+      toast.error("O problema do edital é obrigatório.");
+      return;
+    }
+
+    if (!rules) {
+      toast.error("As regras do desafio são obrigatórias.");
+      return;
+    }
+
+    if (!pdfFile && !buyId) {
+      toast.error("O arquivo do edital é obrigatório.");
+      return;
+    }
   
     try {
+      setSavingMvp(true);
+
       const payload = {
         hmwProblem: hmwProblem,
         challengeRules: rules,
@@ -135,6 +154,8 @@ export default function Materialization({
     } catch (error) {
       console.error(error);
       toast.error("Não foi possível salvar o Buy.")
+    } finally {
+      setSavingMvp(false);
     }
   }
 
@@ -232,7 +253,6 @@ export default function Materialization({
                 }`}
                 onClick={() => {
                   setPage('1')
-                  handleSaveMvp()
                 }}
               >
                 1
@@ -251,7 +271,6 @@ export default function Materialization({
                     : "border-2 border-gray-400 text-gray-500"
                 }`}
                 onClick={() => {
-                  handleSaveMB()
                   setPage('2')
                 }}
               >
@@ -263,9 +282,6 @@ export default function Materialization({
               </span>
             </div>
           </div>
-          <span className="text-xs w-fit text-[#98A2B3] whitespace-nowrap dark:text-white/40 mt-4">
-            Clique na respectiva página para salvar.
-          </span>
         </div>
       </div>
 
@@ -301,6 +317,7 @@ export default function Materialization({
         {page === '1' ? (
           <CanvasMVP 
             challengeId={challengeId}
+            saving={savingMvp}
             items={items}
             kpis={kpis}
             mvpId={mvpId}
@@ -313,9 +330,12 @@ export default function Materialization({
             setPropostaValor={setPropostaValor}
             setPublicoAlvo={setPublicoAlvo}
             setResources={setResources}
+            handleSave={handleSaveMvp}
           />
         ) : (
           <MakeforBuy 
+            saving={savingBuy}
+            handleSave={handleSaveMB}
             challengeId={challengeId}
             buyId={buyId}
             criteria={criteria}

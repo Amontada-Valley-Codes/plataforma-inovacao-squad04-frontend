@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, Dispatch, SetStateAction } from "react";
 import StatusReportEmailSection from "./StatusReportEmail";
 import StatusReportSendHistory, { SendHistoryItem } from "./StatusReportSendHistory";
 import { statusReportService } from "@/api/services/statusReport.service";
+import { Loader2 } from "lucide-react";
 
 type StatusReportPoCProps = {
   challengeId: string;
@@ -16,6 +17,8 @@ type StatusReportPoCProps = {
   setProblemasEncontrados: Dispatch<SetStateAction<Entry>>
   statusReportId: string | null
   setStatusReportId: Dispatch<SetStateAction<string | null>>
+  handleSave: () => void
+  saving: boolean
 };
 
 export type Entry = {
@@ -63,6 +66,8 @@ export default function StatusReportPoC({
   challengeId, 
   responsibleName,
   avancosSemana,
+  handleSave,
+  saving,
   problemasEncontrados,
   proximosPassos,
   setAvancosSemana,
@@ -159,6 +164,15 @@ export default function StatusReportPoC({
         <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold">
           Relatório de Progresso
         </h1>
+
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+        >
+          {saving && <Loader2 className="animate-spin" size={16}/>}
+          {saving ? "Salvando..." : "Salvar"}
+        </button>
       </div>
 
       {saveError && (

@@ -2,7 +2,7 @@
 
 import { ShowResultsReportResponse } from "@/api/payloads/experimentation.payload"
 import { experimentationService } from "@/api/services/experimentation.service"
-import { Check, CircleX, PenSquare, Plus, Rocket, Trash2, Wrench } from "lucide-react"
+import { Check, CircleX, Loader2, PenSquare, Plus, Rocket, Trash2, Wrench } from "lucide-react"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 type ResultsReportProps = {
@@ -17,10 +17,14 @@ type ResultsReportProps = {
   setLearnings: Dispatch<SetStateAction<string[]>>
   finalDecision: "SCALE" | "ADJUST" | "CLOSE"
   setFinalDecision: Dispatch<SetStateAction<"SCALE" | "ADJUST" | "CLOSE">>
+  handleSave: () => void
+  saving: boolean
 } 
  
 export default function ResultsReport({ 
   pocId, 
+  handleSave,
+  saving,
   executiveSummary,
   finalDecision,
   learnings,
@@ -56,6 +60,15 @@ export default function ResultsReport({
     <div className="flex flex-col gap-1 mb-6">
       <h1 className="flex items-center justify-between text-[#0B2B72] dark:text-white text-2xl font-semibold mb-4">
         Relatório de Resultados
+
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+        >
+          {saving && <Loader2 className="animate-spin" size={16}/>}
+          {saving ? "Salvando..." : "Salvar"}
+        </button>
       </h1>
 
       <div className="flex flex-col mb-4">

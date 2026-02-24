@@ -1,5 +1,5 @@
 import { BuyMaterializationService } from "@/api/services/buy-materialization.service";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Loader2, Plus, Trash2 } from "lucide-react";
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react"
 
 type MakeForBuyProps = {
@@ -14,11 +14,15 @@ type MakeForBuyProps = {
   setHmwProblem: Dispatch<SetStateAction<string>>
   rules: string
   setRules: Dispatch<SetStateAction<string>>
+  handleSave: () => void
+  saving: boolean
 }
 
 export default function MakeforBuy({ 
   challengeId,
   buyId,
+  saving,
+  handleSave,
   criteria,
   hmwProblem,
   pdfFile,
@@ -111,6 +115,14 @@ export default function MakeforBuy({
       <div className="flex flex-col mb-6">
         <h1 className="flex gap-1 items-center justify-between text-[#0B2B70] dark:text-white font-semibold mb-2">
           <span>Problema do Edital</span>
+
+          <button
+            onClick={handleSave}
+            className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+          >
+            {saving && <Loader2 className="animate-spin" size={16}/>}
+            {saving ? "Salvando..." : "Salvar"}
+          </button>
         </h1>
 
         <div className="flex-1 flex rounded-lg border px-3 py-2 min-h-[120px] transition-colors bg-[#F9FAFB] border-[#E5E7EB] dark:border-gray-800 dark:bg-gray-900 focus-within:border-[#0B2B70]">

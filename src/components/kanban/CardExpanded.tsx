@@ -229,8 +229,8 @@ export default function CardExpanded({ isOpen, onClose, columns, cardData, chall
       if (currentColumnIndex < columns.length - 1) {
         const nextColumn = columns[currentColumnIndex + 1];
         
-        await ChallengeService.changeStatus(challengeId!, { status: nextColumn.id })
-        // await ChallengeService.advanceStage(challengeId!, { status: nextColumn.id });
+        // await ChallengeService.changeStatus(challengeId!, { status: nextColumn.id })
+        await ChallengeService.advanceStage(challengeId!, { status: nextColumn.id });
 
         const updatedChallenge = { ...challengeWithUpdates, status: nextColumn.id };
         const otherChallenges = challenges.filter(c => c.id !== challengeId);

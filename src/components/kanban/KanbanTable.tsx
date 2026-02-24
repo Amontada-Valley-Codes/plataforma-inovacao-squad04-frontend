@@ -5,6 +5,7 @@ import { dateFormatter, getCategoryLabel } from "./Kanban"
 import { useEffect, useState } from "react";
 import { ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Circle, MoveVertical, Scaling, X } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
+import { toast } from "sonner";
 
 type KanbanTableProps = {
   status: string | undefined;
@@ -48,6 +49,14 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
   const [sortKey, setSortKey] = useState<SortKey>("createdAt")
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [loading, setLoading] = useState(false)
+  const expandableStatuses = [
+    "GENERATION",
+    "PRE_SCREENING",
+    "DETAILED_SCREENING",
+    "MATERIALIZATION",
+    "EXPERIMENTATION",
+    "SCALE",
+  ];
   const colors: Record<string, string> = {
     GENERATION: "bg-violet-500",      
     PRE_SCREENING: "bg-amber-500",     
@@ -60,6 +69,13 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
     APPROVE: "bg-emerald-600",          
     DISAPPROVE: "bg-red-600",         
     DEFAULT: "bg-gray-500",             
+  };
+  const statusMessages: Record<string, string> = {
+    FUTURE_BACKLOG: "Este desafio está no BACKLOG FUTURO e não pode ser expandido.",
+    PENDING: "Este desafio ainda está PENDENTE e não pode ser expandido.",
+    APPROVE: "Este desafio foi APROVADO e não pode ser expandido.",
+    DISAPPROVE: "Este desafio foi REPROVADO e não pode ser expandido.",
+    DEFAULT: "Este desafio não pode ser expandido no status atual."
   };
 
   async function fetchChallenges() {
@@ -100,6 +116,16 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
       setSortDirection('asc')
     }
   }
+
+  const handleRowClick = (challenge: ShowAllChallengeResponse) => {
+    if (!expandableStatuses.includes(challenge.status)) {
+      toast.error(statusMessages[challenge.status] ?? statusMessages.DEFAULT);
+      return;
+    }
+
+    onRowClick(challenge);
+  };
+
   return (  
     <div className="relative h-[calc(100vh-175px)]">
       <div className="rounded-[12px] overflow-x-auto w-full border-x-2 border-b-2 border-[#15358D]">
@@ -107,7 +133,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
           <thead className="bg-[#15358D]">
             <tr>
               <th 
-                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer"
+                className="pl-3 py-2 text-sm font-semibold text-white bg-[#15358D] cursor-pointer"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   <span className="mr-4">Identificador</span>
@@ -117,7 +143,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('createdAt')}
-                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
+                className="pl-3 py-2 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   {sortKey === 'createdAt' ? (
@@ -136,7 +162,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort("name")}
-                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
+                className="pl-3 py-2 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   {sortKey === 'name' ? (
@@ -155,7 +181,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('proponentName')}
-                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
+                className="pl-3 py-2 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   {sortKey === 'proponentName' ? (
@@ -174,7 +200,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('proponentArea')}
-                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
+                className="pl-3 py-2 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   {sortKey === 'proponentArea' ? (
@@ -193,7 +219,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
               </th>
               <th 
                 onClick={() => handleSort('status')}
-                className="pl-3 py-3 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
+                className="pl-3 py-2 text-sm font-semibold text-white bg-[#15358D] cursor-pointer hover:bg-[#0f2f7a] transition-all"
               >
                 <div className="flex items-center justify-center gap-2 relative">
                   {sortKey === 'status' ? (
@@ -211,7 +237,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                 </div>
               </th>
               <th
-                className="px-3 py-3 text-sm font-semibold bg-[#15358D] text-white"
+                className="px-3 py-2 text-sm font-semibold bg-[#15358D] text-white"
               >
                 Ações
               </th>
@@ -253,7 +279,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                   border-b-2 border-[#15358D] border-r-2"
                 >
                   <td 
-                    className={`px-3 py-2 text-xs text-center text-gray-600 dark:text-white font-medium
+                    className={`px-3 py-2 text-xs text-center whitespace-nowrap text-gray-600 dark:text-white font-medium
                     border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-bl-[12px]" : ""}`}
                   >
                     {challenge.ideaIdentifier}
@@ -299,7 +325,7 @@ export default function KanbanTable({ onRowClick, search, sector, status }: Kanb
                     border-[#15358D] ${!isLast ? "border-b-2" : ""} ${isLast ? "rounded-br-[12px]" : ""}`}
                   > 
                     <div
-                      onClick={() => onRowClick(challenge)}
+                      onClick={() => handleRowClick(challenge)}
                       className="flex cursor-pointer items-center justify-center"
                       title="Clique para ver mais">
                       <Scaling size={18}/>
