@@ -11,7 +11,7 @@ type ApproveButtonProps = {
 export default function ApproveButton({ className, challengeId }: ApproveButtonProps) {
   const approveChallenge = async (challengeId: string) => {
     try {
-      await ChallengeService.changeStatus(challengeId, { status: "APPROVE" })
+      await ChallengeService.advanceStage(challengeId, { status: "APPROVE" })
       toast.success("Desafio aprovado!")
       window.location.reload()
     } catch (error: any) {
