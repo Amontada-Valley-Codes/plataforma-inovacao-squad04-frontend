@@ -7,6 +7,7 @@ import { Bug, Lightbulb, Trophy, X, Loader2, Trash } from "lucide-react";
 import { ShowDetailedScreeningByIdResponse } from "@/api/payloads/detailedScreening.payload";
 import { detailedScreeningService } from "@/api/services/detailedScreening.service";
 import { Toaster } from "react-hot-toast";
+import { toast } from "sonner";
 import { ConceptionDocumentsService } from "@/api/services/conception-documents.service";
 import { immersionDocumentService } from "@/api/services/immersion-document.service";
 import { CreateMapEmpathyPayload } from "@/api/payloads/immersionDocument.payload";
@@ -181,6 +182,10 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [detailedScreening, setDetailedScreening] = useState<ShowDetailedScreeningByIdResponse | null>(null);
   const [page, setPage] = useState('1')
   const [isLoading, setIsLoading] = useState(false)
+  // individual page saving states
+  const [savingPage1, setSavingPage1] = useState(false);
+  const [savingPage2, setSavingPage2] = useState(false);
+  const [savingPage3, setSavingPage3] = useState(false);
 
   const [pov, setPov] = useState("");
   const [hmw, setHmw] = useState("");
@@ -366,6 +371,7 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     }
   };
 
+  // --- existing full submit helper (still available if you need it) ---
   const handleSubmit = async () => {
     try {
       setIsLoading(true)
@@ -407,6 +413,63 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       setIsLoading(false)
     }
   }
+
+  // --- new per-page save handlers replicating Experimentation.tsx pattern ---
+  const handleSaveContext = async () => {
+    if (page !== '1') return;
+    try {
+      setSavingPage1(true);
+      await handleCreateImmersionDocument();
+      const updated = await detailedScreeningService.showDetailedScreeningById(challengeId);
+      const immersion = updated!.immersionDocument?.[0];
+      if (immersion) {
+        await handleCreateProblemTree(immersion.id);
+      }
+      setDetailedScreening(updated);
+      toast.success("Contexto salvo com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar contexto:", err);
+      toast.error("Erro ao salvar contexto");
+    } finally {
+      setSavingPage1(false);
+    }
+  };
+
+  const handleSaveTriagem = async () => {
+    if (page !== '2') return;
+    try {
+      setSavingPage2(true);
+      if (!detailedScreening?.id) return;
+      await handleCreateImmersionDocument();
+      const updated = await detailedScreeningService.showDetailedScreeningById(challengeId);
+      const immersion = updated!.immersionDocument?.[0];
+      if (immersion) {
+        await handleCreateEmpathyMap(immersion.id);
+      }
+      setDetailedScreening(updated);
+      toast.success("Triagem salva com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar triagem:", err);
+      toast.error("Erro ao salvar triagem");
+    } finally {
+      setSavingPage2(false);
+    }
+  };
+
+  const handleSaveConception = async () => {
+    if (page !== '3') return;
+    try {
+      setSavingPage3(true);
+      await handleCreateConception();
+      toast.success("Conception salva com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar conception:", err);
+      toast.error("Erro ao salvar conception");
+    } finally {
+      setSavingPage3(false);
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -485,12 +548,12 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
             </h1>
 
             <button
-              onClick={handleSubmit}
-              disabled={isLoading}
+              onClick={handleSaveContext}
+              disabled={savingPage1}
               className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
             >
-              {isLoading && <Loader2 className="animate-spin" size={16} />}
-              {isLoading ? "Salvando..." : "Finalizar"}
+              {savingPage1 && <Loader2 className="animate-spin" size={16} />}
+              {savingPage1 ? "Salvando..." : "Salvar"}
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -626,6 +689,17 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       {/* pagina 2 - triagem */}
       {page === '2' && (
         <div className="flex flex-col gap-6 w-full">
+          {/* save button for triagem */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleSaveTriagem}
+              disabled={savingPage2}
+              className="px-4 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+            >
+              {savingPage2 && <Loader2 className="animate-spin" size={16} />}
+              {savingPage2 ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
 
           {/* Stakeholders */}
           <div className="rounded-2xl border bg-[#F9FAFB] border-[#E5E7EB] dark:border-white/10 p-6 dark:bg-[#0B1220]">
@@ -854,6 +928,17 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
 
       {page === '3' && (
         <div className="flex flex-col gap-6 w-full">
+          {/* save button for conception */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleSaveConception}
+              disabled={savingPage3}
+              className="px-4 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+            >
+              {savingPage3 && <Loader2 className="animate-spin" size={16} />}
+              {savingPage3 ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
 
           {/* Visão do Produto */}
           <div className="rounded-xl border border-[#E5E7EB] dark:border-[#737373] p-4">
