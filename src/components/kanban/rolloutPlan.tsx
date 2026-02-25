@@ -1,5 +1,6 @@
-import { Plus, Trash2, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, DollarSign, TrendingUp, AlertTriangle, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import RolloutTimeline from "./GanttChart";
 import { ScaleService } from "@/api/services/scale.service";
 import { CardContentsHeader } from "./CardsContents";
@@ -67,6 +68,12 @@ export default function RolloutPlan({
   const [page, setPage] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGantt, setShowGantt] = useState(false);
+
+  // save states
+  const [scaleId, setScaleId] = useState<string | null>(null);
+  const [savingPage1, setSavingPage1] = useState(false);
+  const [savingPage2, setSavingPage2] = useState(false);
+  const [savingPage3, setSavingPage3] = useState(false);
 
   // Caso de Negócios
   const [totalCost, setTotalCost] = useState<number | "">("");
@@ -182,6 +189,7 @@ export default function RolloutPlan({
     });
   };
 
+  // full submit sequence kept for backward compatibility
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -196,6 +204,58 @@ export default function RolloutPlan({
     }
   };
 
+  // per-page save handlers
+  const handleSaveCase = async () => {
+    if (page !== '1') return;
+    try {
+      setSavingPage1(true);
+      const id = await handleCreateScale();
+      setScaleId(id);
+      toast.success("Caso de negócios salvo com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar caso:", err);
+      toast.error("Erro ao salvar caso");
+    } finally {
+      setSavingPage1(false);
+    }
+  };
+
+  const handleSaveRollout = async () => {
+    if (page !== '2') return;
+    if (!scaleId) {
+      toast.error("Salve o caso de negócios primeiro");
+      return;
+    }
+    try {
+      setSavingPage2(true);
+      await handleCreateRolloutPlan(scaleId);
+      toast.success("Plano de rollout salvo com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar rollout:", err);
+      toast.error("Erro ao salvar rollout");
+    } finally {
+      setSavingPage2(false);
+    }
+  };
+
+  const handleSaveFinal = async () => {
+    if (page !== '3') return;
+    if (!scaleId) {
+      toast.error("Salve o caso de negócios primeiro");
+      return;
+    }
+    try {
+      setSavingPage3(true);
+      await handleUpdateExecutiveSummary(scaleId);
+      toast.success("Resumo executivo salvo!");
+    } catch (err) {
+      console.error("Erro ao salvar resumo:", err);
+      toast.error("Erro ao salvar resumo");
+    } finally {
+      setSavingPage3(false);
+    }
+  };
+
   // ── Shared styles ──────────────────────────
 
   const inputBase = `
@@ -204,14 +264,6 @@ export default function RolloutPlan({
     px-3 py-2 text-sm outline-none
     placeholder:text-[#98A2B3]
   `;
-
-  // ── Stepper ────────────────────────────────
-
-  const steps = [
-    { id: '1', label: 'Caso de Negócios' },
-    { id: '2', label: 'Plano de Rollout' },
-    { id: '3', label: 'Relatório Final' },
-  ];
 
   // ── Render ─────────────────────────────────
 
@@ -279,9 +331,26 @@ export default function RolloutPlan({
         </div>
       </div>
 
-      <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold mb-4">
-        Plano de Rollout
-      </h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-[24px] text-[#0B2B70] dark:text-white font-semibold">
+          Plano de Rollout
+        </h1>
+        {(page === "1" || page === "2" || page === "3") && (
+          <button
+            onClick={page === "1" ? handleSaveCase : page === "2" ? handleSaveRollout : handleSaveFinal}
+            disabled={page === "1" ? savingPage1 : page === "2" ? savingPage2 : savingPage3}
+            className="px-5 py-2 bg-[#0B2B72] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+          >
+            {page === "1" && savingPage1 && <Loader2 className="animate-spin" size={16} />}
+            {page === "2" && savingPage2 && <Loader2 className="animate-spin" size={16} />}
+            {page === "3" && savingPage3 && <Loader2 className="animate-spin" size={16} />}
+            {page === "1" ? (savingPage1 ? "Salvando..." : "Salvar")
+              : page === "2" ? (savingPage2 ? "Salvando..." : "Salvar")
+              : (savingPage3 ? "Salvando..." : "Salvar")
+            }
+          </button>
+        )}
+      </div>
 
       {/* ── Page 1: Caso de Negócios ─────────── */}
       {page === "1" && (
@@ -387,15 +456,7 @@ export default function RolloutPlan({
               <Plus size={14} /> Adicionar risco
             </button>
 
-            <div className="flex justify-end mt-8">
-              <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="px-6 py-3 bg-[#0B2B70] text-white rounded-lg disabled:opacity-50"
-              >
-                {isSubmitting ? "Salvando..." : "Finalizar Plano"}
-              </button>
-            </div>
+            {/* bottom button removed in favor of header button */}
           </div>
         </div>
       )}
