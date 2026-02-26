@@ -2,7 +2,7 @@
 
 "use client";
 
-import ChallengeCard from "@/components/challenge/ChallengeCard";
+import PublicChallengeCard from "@/components/challenge/PublicChallengeCard";
 import { getCurrentUser } from "@/lib/auth";
 import { Suspense } from "react";
 
@@ -13,7 +13,7 @@ export default function StartupPublicChallengesPage() {
   return (
     <div className="space-y-6">
       <Suspense fallback={<p>Carregando...</p>}>
-        <ChallengeCard canApply startupId={startupId} />
+        <PublicChallengeCard startupId={startupId} />
       </Suspense>
     </div>
   );
