@@ -5,10 +5,8 @@ import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   LayoutGrid,
-  List as ListIcon,
-  MoreHorizontal,
-  Settings,
-  FileText,
+  List as ListIcon, Settings,
+  FileText
 } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
 import StartupProfile from "./StartupProfile";
@@ -224,17 +222,6 @@ export default function StartupCard({
                     <span className="truncate">{s.industry_segment}</span>
                   </div>
                 </div>
-                {canOpenModal && (
-                  <div className="ml-auto self-center" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      aria-label={`Abrir menu de ${s.name}`}
-                      className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 transition"
-                    >
-                      <MoreHorizontal className="text-slate-600 dark:text-gray-300" />
-                    </button>
-                  </div>
-                )}
               </div>
             );
             return (
