@@ -42,7 +42,7 @@ export function translateUserType(value?: string) {
     case "OBSERVER":              return "Observador";
     case "TRANSFORMATION_OFFICE": return "Escritório de Transformação";
     case "INNOVATION_TEAM":       return "Time de Inovação";
-    case "STEERING_COMMITTEE":    return "Comitê Executivo";
+    case "STEERING_COMMITTEE":    return "Comitê de Direção";
     case "ADMINISTRATOR":         return "Administrador";
     case "MANAGER":               return "Gestor";
     case "STARTUP":               return "Startup";

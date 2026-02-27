@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { userService } from "@/api/services/user.service";
+import { translateUserType } from "../kanban/Materialization";
 
 type User = {
   id: string;
@@ -60,37 +61,6 @@ if (loading) {
     );
   }
 
-  function translateUserRole(role: string) {
-    switch (role) {
-      case "ORGANIZER":
-        return "Organizador";
-
-      case "COLLABORATOR":
-        return "Colaborador";
-
-      case "OBSERVER":
-        return "Observador";
-
-      case "INNOVATION_OFFICE":
-        return "Escritório de Inovação";
-
-      case "STEERING_COMMITTEE":
-        return "Comitê Gestor";
-
-      case "ADMINISTRATOR":
-        return "Administrador";
-
-      case "MANAGER":
-        return "Gestor";
-
-      case "STARTUP":
-        return "Startup";
-
-      default:
-        return "Perfil desconhecido";
-    }
-  }
-
   return (
     <div className="w-full p-6 space-y-6">
       <h2 className="text-xl font-semibold text-slate-900 dark:text-gray-100">
@@ -118,7 +88,7 @@ if (loading) {
                 <td className="px-4 py-3 font-medium text-slate-900 dark:text-gray-100">
                   {user.name}
                 </td>
-                <td className="px-4 py-3 capitalize">{translateUserRole(user.type_user)}</td>
+                <td className="px-4 py-3 capitalize">{translateUserType(user.type_user)}</td>
                 <td className="px-4 py-3">{user.email}</td>
                 <td className="px-4 py-3">{user.phone}</td>
                 <td className="px-4 py-3">
