@@ -23,17 +23,11 @@ interface FormBuilderProps {
 const FIELD_TYPE_LABELS: Record<string, string> = {
   TEXT: "Texto",
   NUMBER: "Número",
-  SELECT: "Seleção",
-  OPTION: "Múltipla Escolha",
-  CHECKBOX: "Checkbox",
 }
 
 const FIELD_TYPE_COLORS: Record<string, string> = {
   TEXT: "bg-blue-light-100 text-blue-light-700 dark:bg-blue-light-900/30 dark:text-blue-light-400",
   NUMBER: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  SELECT: "bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400",
-  OPTION: "bg-theme-pink-100 text-theme-pink-700 dark:bg-theme-pink-900/30 dark:text-theme-pink-400",
-  CHECKBOX: "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400",
 }
 
 export function FormBuilder({ config, formTitle, formDescription, onAddField, onUpdateField, onRemoveField, onReorderFields, onSaveForm }: FormBuilderProps) {

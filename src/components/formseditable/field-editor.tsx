@@ -7,7 +7,7 @@ import { FieldEditorForm } from "./components/FieldEditorForm"
 interface QuestionForm {
   id: string
   title: string
-  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'OPTION' | 'CHECKBOX'
+  type: 'TEXT' | 'NUMBER'
   required: boolean
   options?: {
     options?: string[]
@@ -25,14 +25,11 @@ interface FieldEditorProps {
   onSave: (field: any) => void
 }
 
-type FieldType = 'TEXT' | 'NUMBER' | 'SELECT' | 'OPTION' | 'CHECKBOX'
+type FieldType = 'TEXT' | 'NUMBER'
 
 const FIELD_TYPES: { value: FieldType; label: string; description: string }[] = [
   { value: "TEXT", label: "Texto", description: "Campo de texto simples" },
   { value: "NUMBER", label: "Número", description: "Apenas valores numéricos" },
-  { value: "SELECT", label: "Seleção Única", description: "Dropdown com uma opção" },
-  { value: "OPTION", label: "Múltipla Escolha", description: "Checkbox com várias opções" },
-  { value: "CHECKBOX", label: "Checkbox", description: "Campo de checkbox" },
 ]
 
 function getInitialFormData(field: QuestionForm | null): any {
