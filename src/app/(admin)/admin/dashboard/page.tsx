@@ -19,11 +19,6 @@ const IdeiasPerfomance = dynamic(
   { ssr: false, loading: () => <p>Carregando gráfico...</p> }
 );
 
-const EvolutionChart = dynamic(
-  () => import("@/components/ecommerce/StatisticsChart"),
-  { ssr: false, loading: () => <p>Carregando gráfico...</p> }
-);
-
 export default function Ecommerce() {
   const [dashboardData, setDashboardData] = useState<adminDasboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,11 +71,6 @@ export default function Ecommerce() {
         <DistributionBySector
           distribuicaoPorSetor={dashboardData?.distribuicaoPorSetor ?? {}}
         />
-      </div>
-
-      {/* Participation Evolution */}
-      <div className="col-span-1 sm:col-span-2 xl:col-span-6">
-        <EvolutionChart />
       </div>
 
       {/* Active Companies Ranking */}
