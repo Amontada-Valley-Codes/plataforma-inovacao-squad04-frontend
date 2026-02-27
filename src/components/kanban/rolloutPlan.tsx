@@ -148,6 +148,37 @@ export default function RolloutPlan({
     fetchStakeholders();
   }, [challengeId]);
 
+  const populateScale = (scale: any) => {
+    if (!scale) return;
+    setScaleId(scale.id);
+    setTotalCost(scale.totalCost || "");
+    setBenefitValue(scale.expectedFinancialBenefit || "");
+    setBenefitDescription(scale.benefitDescription || "");
+    setRisks(scale.risksAndMitigations?.length ? scale.risksAndMitigations : [""]);
+    setRolloutScope(scale.rolloutScope || "");
+    setExecutiveSummary(scale.executiveSummary || "");
+    if (scale.stakeholderIds?.length) {
+      const stakeholders = availableStakeholders.filter((s) => scale.stakeholderIds.includes(s.id));
+      setSelectedStakeholders(stakeholders);
+    }
+  };
+
+  const loadScale = async () => {
+    try {
+      const existingScale = await ScaleService.getScaleByChallenge(challengeId);
+      if (existingScale) {
+        populateScale(existingScale);
+      }
+    } catch (err) {
+      console.warn("Nenhuma scale previamente gravada", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!challengeId || availableStakeholders.length === 0) return;
+    loadScale();
+  }, [challengeId, availableStakeholders]);
+
   // ── Submit handlers ────────────────────────
 
   const handleCreateScale = async (): Promise<string> => {
@@ -159,14 +190,27 @@ export default function RolloutPlan({
     const filteredRisks = risks.filter((r) => r.trim() !== "");
     if (filteredRisks.length === 0) throw new Error("Adicione ao menos um risco");
 
-    const response = await ScaleService.createScale(challengeId, {
+    const payload = {
       totalCost: Number(totalCost),
       expectedFinancialBenefit: Number(benefitValue),
       benefitDescription: benefitDescription.trim(),
       risksAndMitigations: filteredRisks,
-    });
+    };
 
-    return response.id;
+    try {
+      const response = await ScaleService.createScale(challengeId, payload);
+      return response.id;
+    } catch (err: any) {
+      // Se retorna 409, scale já existe, fazer UPDATE com os novos dados
+      if (err?.response?.status === 409) {
+        const existing = await ScaleService.getScaleByChallenge(challengeId);
+        if (existing?.id) {
+          await ScaleService.updateScale(existing.id, payload);
+          return existing.id;
+        }
+      }
+      throw err;
+    }
   };
 
   const handleUpdateExecutiveSummary = async (scaleId: string) => {
@@ -209,9 +253,10 @@ export default function RolloutPlan({
     if (page !== '1') return;
     try {
       setSavingPage1(true);
+      const creating = !scaleId;
       const id = await handleCreateScale();
       setScaleId(id);
-      toast.success("Caso de negócios salvo com sucesso!");
+      toast.success(creating ? "Caso de negócios salvo com sucesso!" : "Caso de negócios atualizado com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar caso:", err);
       toast.error("Erro ao salvar caso");
@@ -229,7 +274,7 @@ export default function RolloutPlan({
     try {
       setSavingPage2(true);
       await handleCreateRolloutPlan(scaleId);
-      toast.success("Plano de rollout salvo com sucesso!");
+      toast.success("Plano de rollout atualizado com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar rollout:", err);
       toast.error("Erro ao salvar rollout");
@@ -247,7 +292,7 @@ export default function RolloutPlan({
     try {
       setSavingPage3(true);
       await handleUpdateExecutiveSummary(scaleId);
-      toast.success("Resumo executivo salvo!");
+      toast.success("Resumo executivo atualizado!");
     } catch (err) {
       console.error("Erro ao salvar resumo:", err);
       toast.error("Erro ao salvar resumo");
