@@ -182,10 +182,14 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
   const [detailedScreening, setDetailedScreening] = useState<ShowDetailedScreeningByIdResponse | null>(null);
   const [page, setPage] = useState('1')
   const [isLoading, setIsLoading] = useState(false)
-  // individual page saving states
   const [savingPage1, setSavingPage1] = useState(false);
   const [savingPage2, setSavingPage2] = useState(false);
   const [savingPage3, setSavingPage3] = useState(false);
+
+  const [immersionId, setImmersionId] = useState<string | null>(null);
+  const [conceptionId, setConceptionId] = useState<string | null>(null);
+  const [problemTreeId, setProblemTreeId] = useState<string | null>(null);
+  const [mapasEmpatiaIds, setMapasEmpatiaIds] = useState<(string | null)[]>([]);
 
   const [pov, setPov] = useState("");
   const [hmw, setHmw] = useState("");
@@ -246,21 +250,79 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       }));
   };
 
+  const deserializeTree = (nodes: any[]): TreeNode[] => {
+    return nodes.map(node => ({
+      id: crypto.randomUUID(),
+      text: node.description || "",
+      children: node.children ? deserializeTree(node.children) : []
+    }));
+  };
+
+  const populateScreening = (screening: ShowDetailedScreeningByIdResponse | null) => {
+    if (!screening) return;
+    setDetailedScreening(screening);
+
+    if (screening.immersionDocument?.length) {
+      const immersion = screening.immersionDocument[0];
+      setImmersionId(immersion.id);
+      setPov(immersion.POV || "");
+      setHmw(immersion.HMW || "");
+      setStakeholders(immersion.stakeholder || []);
+      loadProblemTree(immersion.id);
+    }
+
+    if (screening.conceptionDocument?.length) {
+      const doc = screening.conceptionDocument[0];
+      setConceptionId(doc.id);
+      setVisaoProduto({
+        descricao: doc.ProductOverview?.summary || "",
+        publicoAlvo: doc.ProductOverview?.targetAudience || "",
+        propostaValor: doc.ProductOverview?.valueProposition || "",
+      });
+      setAlternativa(doc.SolutionAlternatives || "");
+      setMakeOrBuy((doc.MakeorBuy?.type as "MAKE" | "BUY") ?? null);
+      setJustificativaMakeBuy(doc.MakeorBuy?.justification || "");
+      setRiscosIniciais(doc.InitialRisks || "");
+      setCapacidadeTecnica(doc.TechnicalCapability || "");
+      setCapacidadeFinanceira(doc.FinancialCapacity || "");
+    }
+  };
+
+  const loadProblemTree = async (immersionId: string) => {
+    try {
+      const treeData = await immersionDocumentService.showProblemTree(immersionId);
+      if (treeData) {
+        setProblemTreeId(treeData.id);
+        if (treeData.description) {
+          setRootProblem(treeData.description);
+        }
+        if (treeData.children && Array.isArray(treeData.children)) {
+          const causesData = treeData.children.filter((c: any) => c.type === "CAUSE");
+          const effectsData = treeData.children.filter((c: any) => c.type === "EFFECT");
+          setCauses(deserializeTree(causesData));
+          setEffects(deserializeTree(effectsData));
+        }
+      }
+    } catch (err) {
+      console.warn("Não há árvore de problemas previamente gravada", err);
+    }
+  };
+
   const initDetailedScreening = useCallback(async () => {
     try {
-      const newDetailedScreening = await detailedScreeningService.startDetailedScreening(challengeId)
-      console.log(newDetailedScreening)
-      setDetailedScreening(newDetailedScreening)
+      const newDetailedScreening = await detailedScreeningService.startDetailedScreening(challengeId);
+      console.log(newDetailedScreening);
+      populateScreening(newDetailedScreening);
     } catch (err: any) {
       if (err?.response?.status === 409) {
-        const res = await detailedScreeningService.showDetailedScreeningById(challengeId)
-        setDetailedScreening(res)
-        return
+        const res = await detailedScreeningService.showDetailedScreeningById(challengeId);
+        populateScreening(res);
+        return;
       }
 
-      console.error("Erro ao inicializar a triagem detalhada:", err)
+      console.error("Erro ao inicializar a triagem detalhada:", err);
     }
-  }, [challengeId])
+  }, [challengeId]);
 
   useEffect(() => {
     initDetailedScreening()
@@ -287,10 +349,31 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       const screeningId = detailedScreening?.id
       if (!screeningId) return
 
-      await ConceptionDocumentsService.CreateConceptionDocument(screeningId, payload)
+      if (conceptionId) {
+        await ConceptionDocumentsService.updateConceptionDocument(conceptionId, payload)
+      } else {
+        try {
+          const resp = await ConceptionDocumentsService.CreateConceptionDocument(screeningId, payload)
+          setConceptionId(resp.id)
+        } catch (err: any) {
+          if (err?.response?.status === 409) {
+            const updated = await detailedScreeningService.showDetailedScreeningById(challengeId);
+            if (updated?.conceptionDocument?.length) {
+              const doc = updated.conceptionDocument[0];
+              setConceptionId(doc.id);
+              await ConceptionDocumentsService.updateConceptionDocument(doc.id, payload);
+            } else {
+              throw err;
+            }
+          } else {
+            throw err;
+          }
+        }
+      }
 
     } catch (error) {
-      console.error("Erro ao criar documento de concepção:", error)
+      console.error("Erro ao criar/atualizar documento de concepção:", error)
+      throw error;
     }
   }
 
@@ -311,7 +394,14 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       
       if (!detailedScreening?.id) return
 
-      await immersionDocumentService.createImmersionDocument(detailedScreening.id, formData)
+      if (immersionId) {
+        await immersionDocumentService.updateImmersionDocument(immersionId, formData)
+      } else {
+        const resp = await immersionDocumentService.createImmersionDocument(detailedScreening.id, formData)
+        setImmersionId(resp.id)
+        setProblemTreeId(null);
+        setMapasEmpatiaIds([]);
+      }
     } catch (error) {
       console.error("Erro ao criar documento de imersão:", error)
     }
@@ -334,13 +424,21 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         ]
       };
 
-      await immersionDocumentService.createProblemTree(
-        immersionId,
-        payload
-      );
+      if (problemTreeId) {
+        await immersionDocumentService.updateProblemTreeNode(
+          problemTreeId,
+          payload
+        );
+      } else {
+        const resp = await immersionDocumentService.createProblemTree(
+          immersionId,
+          payload
+        );
+        setProblemTreeId(resp.id);
+      }
 
     } catch (error) {
-      console.error("Erro ao criar árvore:", error);
+      console.error("Erro ao criar/atualizar árvore:", error);
     }
   };
 
@@ -349,8 +447,10 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
       if (mapasEmpatia.length === 0) return;
       if (mapasEmpatia.length > 3) return;
 
+      const newIds: (string | null)[] = [...(mapasEmpatiaIds.length ? mapasEmpatiaIds : mapasEmpatia.map(() => null))];
+
       await Promise.all(
-        mapasEmpatia.map(mapa => {
+        mapasEmpatia.map(async (mapa, idx) => {
           const payload: CreateMapEmpathyPayload = {
             listen: mapa.pensa,
             see: mapa.ve,
@@ -359,19 +459,28 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
             gains: mapa.ganhos
           };
 
-          return immersionDocumentService.createEmpathyMap(
-            immersionId,
-            payload
-          );
+          if (newIds[idx]) {
+            await immersionDocumentService.updateEmpathyMap(
+              newIds[idx]!,
+              payload
+            );
+          } else {
+            const resp = await immersionDocumentService.createEmpathyMap(
+              immersionId,
+              payload
+            );
+            newIds[idx] = resp.id;
+          }
         })
       );
 
+      setMapasEmpatiaIds(newIds);
+
     } catch (error) {
-      console.error("Erro ao criar mapas:", error);
+      console.error("Erro ao criar/atualizar mapas:", error);
     }
   };
 
-  // --- existing full submit helper (still available if you need it) ---
   const handleSubmit = async () => {
     try {
       setIsLoading(true)
@@ -381,10 +490,8 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         return
       }
 
-      // 1️⃣ Criar Immersion
       await handleCreateImmersionDocument()
 
-      // 2️⃣ Buscar atualizado
       const updated = await detailedScreeningService.showDetailedScreeningById(challengeId)
 
       const immersion = updated!.immersionDocument?.[0]
@@ -394,13 +501,10 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
         return
       }
 
-      // 3️⃣ Criar árvore usando ID direto
       await handleCreateProblemTree(immersion.id)
 
-      // 4️⃣ Criar mapas usando ID direto
       await handleCreateEmpathyMap(immersion.id)
 
-      // 5️⃣ Criar conception
       await handleCreateConception()
 
       setDetailedScreening(updated)
@@ -414,19 +518,19 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     }
   }
 
-  // --- new per-page save handlers replicating Experimentation.tsx pattern ---
   const handleSaveContext = async () => {
     if (page !== '1') return;
     try {
       setSavingPage1(true);
+      const creating = !immersionId;
       await handleCreateImmersionDocument();
       const updated = await detailedScreeningService.showDetailedScreeningById(challengeId);
+      populateScreening(updated);
       const immersion = updated!.immersionDocument?.[0];
       if (immersion) {
         await handleCreateProblemTree(immersion.id);
       }
-      setDetailedScreening(updated);
-      toast.success("Contexto salvo com sucesso!");
+      toast.success(creating ? "Contexto salvo com sucesso!" : "Contexto atualizado com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar contexto:", err);
       toast.error("Erro ao salvar contexto");
@@ -440,14 +544,15 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     try {
       setSavingPage2(true);
       if (!detailedScreening?.id) return;
+      const creating = !immersionId;
       await handleCreateImmersionDocument();
       const updated = await detailedScreeningService.showDetailedScreeningById(challengeId);
+      populateScreening(updated);
       const immersion = updated!.immersionDocument?.[0];
       if (immersion) {
         await handleCreateEmpathyMap(immersion.id);
       }
-      setDetailedScreening(updated);
-      toast.success("Triagem salva com sucesso!");
+      toast.success(creating ? "Triagem salva com sucesso!" : "Triagem atualizada com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar triagem:", err);
       toast.error("Erro ao salvar triagem");
@@ -460,8 +565,9 @@ export const DetailedScreening = ({ challangeTitle, challengeId, category, start
     if (page !== '3') return;
     try {
       setSavingPage3(true);
+      const creating = !conceptionId;
       await handleCreateConception();
-      toast.success("Conception salva com sucesso!");
+      toast.success(creating ? "Conception salva com sucesso!" : "Conception atualizada com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar conception:", err);
       toast.error("Erro ao salvar conception");

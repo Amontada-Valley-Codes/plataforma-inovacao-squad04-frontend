@@ -26,4 +26,22 @@ export const ScaleService = {
     console.log(response.data);
     return response.data;
   },
+
+  async getScaleByChallenge(challengeId: string) {
+    try {
+      const response = await api.get(ENDPOINTS.SCALE.GET_SCALE_BY_CHALLENGE_ID(challengeId));
+      return response.data;
+    } catch (err: any) {
+      if (err?.response?.status === 404) {
+        return null;
+      }
+      throw err;
+    }
+  },
+
+  async updateScale(solutionId: string, payload: createScalePayload) {
+    const response = await api.patch(ENDPOINTS.SCALE.PATCH_ALL_SCALE(solutionId), payload);
+    console.log(response.data);
+    return response.data;
+  },
 }
