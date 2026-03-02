@@ -296,13 +296,13 @@ export default function Materialization({
               value={selectedUserId || "none"}
               onValueChange={handleSponsorChange}
             >
-              <SelectTrigger className="w-[220px] bg-[#E7EEFF] hover:bg-[#dee2ec] text-[#0B2B70] font-semibold border-none rounded-[8px] transition-colors dark:bg-[#1a2f6e] dark:text-white dark:hover:bg-[#1e3580]">
-                <SelectValue placeholder="Definir Sponsor" />
+              <SelectTrigger className="w-64 bg-[#E7EEFF] hover:bg-[#dee2ec] text-[#0B2B70] font-semibold border-none rounded-[8px] transition-colors dark:bg-[#1a2f6e] dark:text-white dark:hover:bg-[#1e3580]">
+                <SelectValue placeholder="Clique para selecionar Sponsor" />
               </SelectTrigger>
 
               <SelectContent>
                 <SelectItem value="none">
-                  Definir Sponsor
+                  Clique para selecionar Sponsor
                 </SelectItem>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
