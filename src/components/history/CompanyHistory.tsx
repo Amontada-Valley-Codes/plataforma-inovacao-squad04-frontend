@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { Calendar, Eye, EyeOff } from "lucide-react";
+import { Calendar, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { ChallengeService } from "@/api/services/challenge.service";
 import { ShowAllChallengeResponse } from "@/api/payloads/challenge.payload";
 import { shortDateFormatter } from "../kanban/Kanban";
+import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
 
 type Challenge = ShowAllChallengeResponse;
@@ -24,6 +25,23 @@ export default function CompanyHistoryHistoric({
   const [items, setItems] = React.useState<Challenge[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [actionLoading, setActionLoading] = React.useState<string | null>(null);
+
+  const handleReturnToKanban = async (challengeId: string) => {
+    try {
+      setActionLoading(challengeId);
+      await ChallengeService.changeStatus(challengeId, { status: "GENERATION" });
+      
+      // Remove o desafio da lista após retornar ao kanban
+      setItems((prev) => prev.filter((c) => c.id !== challengeId));
+      toast.success("Desafio retornado ao kanban com sucesso.");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message ?? "Erro ao retornar desafio ao kanban.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   React.useEffect(() => {
     (async () => {
@@ -141,6 +159,17 @@ export default function CompanyHistoryHistoric({
                   </span>
                 )}
               </div>
+
+              {challenge.status === "FUTURE_BACKLOG" && (
+                <button
+                  onClick={() => handleReturnToKanban(challenge.id)}
+                  disabled={actionLoading === challenge.id}
+                  className="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-white bg-[#15358c] hover:bg-[#0f2557] disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors"
+                >
+                  <ArrowLeft size={14} />
+                  {actionLoading === challenge.id ? "Retornando..." : "Voltar para o kanban"}
+                </button>
+              )}
             </div>
           </div>
         );
