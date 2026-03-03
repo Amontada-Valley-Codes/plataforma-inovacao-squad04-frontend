@@ -30,6 +30,9 @@ export type CreateChallengeResponse = {
   updatedAt: string
   enterpriseId: string
   usersId: string
+  Enterprise: {
+    name: string
+  }
 }
 
 export type ShowAllChallengeResponse = {
@@ -65,6 +68,9 @@ export type ShowAllChallengeResponse = {
   Users: {
     name: string
     image: string | null
+  }
+  Enterprise: {
+    name: string
   }
   strategicObjective: {
     id: string

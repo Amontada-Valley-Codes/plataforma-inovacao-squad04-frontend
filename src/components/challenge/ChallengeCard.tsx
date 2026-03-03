@@ -20,7 +20,9 @@ type Challenge = {
   visibility: string;
   status: string;
   enterpriseId?: string;
-  enterpriseName?: string;
+  Enterprise?: {
+    name: string;
+  };
   usersId?: string;
   Users?: { name: string };
   strategic_alignment?: string | null;
@@ -71,7 +73,7 @@ function filterChallengesByRole(
 ): Challenge[] {
   switch (role) {
     case "ADMINISTRATOR":
-
+    
       return challenges;
     case "MANAGER":
     case "INNOVATION_TEAM":
@@ -141,12 +143,12 @@ export default function ChallengeCard({
         orderBy,
         orderDirection,
       });
+      console.log("Resposta da API:", response.data);
 
       const raw = response.data ?? [];
       const total = response.meta?.lastPage ?? 1;
 
       const filtered = filterChallengesByRole(raw, user.role, user, onlyMine);
-
       setChallenges(filtered);
       setTotalPages(total);
     } catch (err: any) {
@@ -329,7 +331,7 @@ export default function ChallengeCard({
                         {challenge.name}
                       </h2>
                       <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
-                        {challenge.enterpriseName || "Empresa desconhecida"}
+                        {challenge.Enterprise?.name || "Empresa desconhecida"}
                       </p>
                       <p className="text-gray-500 dark:text-[#ced3db] text-sm truncate">
                         {challenge.Users?.name || "Autor desconhecido"}
@@ -418,7 +420,7 @@ export default function ChallengeCard({
           open={modalOpen}
           onOpenChange={setModalOpen}
           challengeName={modalChallenge.name}
-          enterpriseName={modalChallenge.enterpriseName || "Empresa"}
+          enterpriseName={modalChallenge.Enterprise?.name || "Empresa"}
           deadline={modalChallenge.endDate}
           onConfirm={() => handleApply(modalChallenge)}
         />
