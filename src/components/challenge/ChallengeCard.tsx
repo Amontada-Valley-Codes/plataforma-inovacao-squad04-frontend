@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Eye, EyeOff, Trash2, Search, X } from "lucide-react";
+import { Eye, EyeOff, Trash2, Search, X, Pencil } from "lucide-react";
 import { getCurrentUser, type AuthUser } from "@/lib/auth";
 import { ChallengeService } from "@/api/services/challenge.service";
+import { StrategicObjectivesService } from "@/api/services/strategic-objectives.service";
+import { PreScreeningService } from "@/api/services/preScreening.service";
 import { matchService } from "@/api/services/match.service";
 import { useStore } from "../../../store";
 import ApplyChallengeModal from "../startup/ApplyChallengeModal";
+import EditChallengeModal from "../challenge/EditChallengeModal";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
@@ -20,9 +23,7 @@ type Challenge = {
   visibility: string;
   status: string;
   enterpriseId?: string;
-  Enterprise?: {
-    name: string;
-  };
+  Enterprise?: { name: string };
   usersId?: string;
   Users?: { name: string };
   strategic_alignment?: string | null;
@@ -36,7 +37,6 @@ type Props = {
   canApply?: boolean;
   startupId?: string;
 };
-
 
 const STAGE_LABELS: Record<string, string> = {
   GENERATION: "Desafio",
@@ -52,18 +52,18 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 const colors: Record<string, string> = {
-    GENERATION: "bg-violet-500",      
-    PRE_SCREENING: "bg-amber-500",     
-    DETAILED_SCREENING: "bg-orange-500",
-    MATERIALIZATION: "bg-blue-500",     
-    EXPERIMENTATION: "bg-teal-500", 
-    SCALE: "bg-green-600",              
-    FUTURE_BACKLOG: "bg-rose-600",    
-    PENDING: "bg-yellow-500",          
-    APPROVE: "bg-emerald-600",          
-    DISAPPROVE: "bg-red-600",         
-    DEFAULT: "bg-gray-500",             
-  };
+  GENERATION: "bg-violet-500",
+  PRE_SCREENING: "bg-amber-500",
+  DETAILED_SCREENING: "bg-orange-500",
+  MATERIALIZATION: "bg-blue-500",
+  EXPERIMENTATION: "bg-teal-500",
+  SCALE: "bg-green-600",
+  FUTURE_BACKLOG: "bg-rose-600",
+  PENDING: "bg-yellow-500",
+  APPROVE: "bg-emerald-600",
+  DISAPPROVE: "bg-red-600",
+  DEFAULT: "bg-gray-500",
+};
 
 function filterChallengesByRole(
   challenges: Challenge[],
@@ -73,30 +73,18 @@ function filterChallengesByRole(
 ): Challenge[] {
   switch (role) {
     case "ADMINISTRATOR":
-    
       return challenges;
     case "MANAGER":
     case "INNOVATION_TEAM":
     case "TRANSFORMATION_OFFICE":
     case "STEERING_COMMITTEE":
-      
-      return challenges.filter(
-        (c) => c.enterpriseId === user.enterpriseId
-      );
+      return challenges.filter((c) => c.enterpriseId === user.enterpriseId);
     case "OBSERVER":
-      return challenges.filter(
-        (c) => c.enterpriseId === user.enterpriseId
-      );
-
+      return challenges.filter((c) => c.enterpriseId === user.enterpriseId);
     case "COLLABORATOR":
-      return challenges.filter(
-        (c) => c.usersId === user.id
-      );
-
+      return challenges.filter((c) => c.usersId === user.id);
     case "STARTUP":
-      return challenges.filter(
-        (c) => c.visibility?.toLowerCase() === "public"
-      );
+      return challenges.filter((c) => c.visibility?.toLowerCase() === "public");
     default:
       return [];
   }
@@ -120,7 +108,12 @@ export default function ChallengeCard({
   const [status, setStatus] = useState<string | undefined>();
   const [orderBy, setOrderBy] = useState<"createdAt" | "name" | "proponentName" | "proponentArea" | "status">("createdAt");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
-  const [debouncedSearch, setDebouncedSearch] = useState(search); 
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [challengesWithSuggestions, setChallengesWithSuggestions] = useState<Set<string>>(new Set());
+  const [editingChallenge, setEditingChallenge] = useState(false);
+  const [editChallengeData, setEditChallengeData] = useState<any>(null);
+  const [editChallengeId, setEditChallengeId] = useState<string | null>(null);
+  const [loadingEdit, setLoadingEdit] = useState<string | null>(null);
 
   const limit = 16;
 
@@ -143,19 +136,39 @@ export default function ChallengeCard({
         orderBy,
         orderDirection,
       });
-      console.log("Resposta da API:", response.data);
 
       const raw = response.data ?? [];
       const total = response.meta?.lastPage ?? 1;
-
       const filtered = filterChallengesByRole(raw, user.role, user, onlyMine);
+
       setChallenges(filtered);
       setTotalPages(total);
+
+     
+      if (user.role === "COLLABORATOR") {
+        const generationChallenges = filtered.filter((c) => c.status === "GENERATION");
+
+        const results = await Promise.allSettled(
+          generationChallenges.map((c) =>
+            PreScreeningService.getJustifications(c.id).then((res) => ({
+              id: c.id,
+              hasSuggestions: Array.isArray(res) && res.length > 0,
+            }))
+          )
+        );
+
+        const withSuggestions = new Set<string>();
+        results.forEach((result) => {
+          if (result.status === "fulfilled" && result.value.hasSuggestions) {
+            withSuggestions.add(result.value.id);
+          }
+        });
+
+        setChallengesWithSuggestions(withSuggestions);
+      }
     } catch (err: any) {
       setError(
-        err?.response?.data?.message ??
-        err?.message ??
-        "Erro ao carregar desafios."
+        err?.response?.data?.message ?? err?.message ?? "Erro ao carregar desafios."
       );
     } finally {
       setLoading(false);
@@ -169,10 +182,40 @@ export default function ChallengeCard({
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-    }, 500); 
-
+    }, 500);
     return () => clearTimeout(timer);
-  }, [search])
+  }, [search]);
+
+  const handleOpenEdit = async (challengeId: string) => {
+    setLoadingEdit(challengeId);
+    try {
+      const response = await ChallengeService.showOneChallenge(challengeId);
+      const objectivesResponse = await StrategicObjectivesService.getObjectivesByChallenge(challengeId);
+
+      const strategicObjectiveIds =
+        objectivesResponse?.strategicObjective?.map((item: any) => item.strategicObjective.id) || [];
+
+      setEditChallengeData({
+        name: response.name,
+        problemDescription: response.problemDescription,
+        problemDuration: response.problemDuration,
+        currentSolution: response.currentSolution,
+        problemRelevance: response.problemRelevance,
+        strategicObjectiveIds,
+        currentIndicators: response.currentIndicators,
+        expectedImpacts: response.expectedImpacts,
+        involvedAreas: response.involvedAreas,
+        initialConstraints: response.initialConstraints,
+        proponentParticipation: response.proponentParticipation,
+      });
+      setEditChallengeId(challengeId);
+      setEditingChallenge(true);
+    } catch (err) {
+      toast.error("Erro ao carregar dados do desafio.");
+    } finally {
+      setLoadingEdit(null);
+    }
+  };
 
   const handleApply = async (challenge: Challenge) => {
     if (!startupId || !challenge.enterpriseId) {
@@ -185,22 +228,22 @@ export default function ChallengeCard({
       setModalOpen(false);
     } catch (err: unknown) {
       const message =
-        (err as { response?: { data?: { message?: string } } })
-          ?.response?.data?.message ?? "Erro ao enviar candidatura.";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        "Erro ao enviar candidatura.";
       toast.error(message);
     }
   };
 
   const deleteChallenge = async (challengeId: string) => {
     try {
-      await ChallengeService.deleteChallenge(challengeId)
-      toast.success("Desafio deletado com sucesso!")
-      window.location.reload()
+      await ChallengeService.deleteChallenge(challengeId);
+      toast.success("Desafio deletado com sucesso!");
+      window.location.reload();
     } catch (err: any) {
-      console.error(err)
-      toast.error("Erro ao deletar desafio.")
+      console.error(err);
+      toast.error("Erro ao deletar desafio.");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -223,10 +266,10 @@ export default function ChallengeCard({
 
   const isStartup = user?.role === "STARTUP";
   const isObserver = user?.role === "OBSERVER";
+  const isCollaborator = user?.role === "COLLABORATOR";
 
   return (
     <>
-
       <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between w-full">
         <div className="flex-1 flex flex-col md:flex-row gap-4 w-full">
           <div className="flex items-center gap-2 flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-2 shadow-sm">
@@ -256,49 +299,49 @@ export default function ChallengeCard({
           </div>
 
           <div className="flex items-center gap-2">
-         <Select
-            value={status || "ALL"}
-            onValueChange={(value) => {
-              setPage(1);
-              setStatus(value === "ALL" ? undefined : value);
-            }}
-          >
-            <SelectTrigger className="bg-white dark:bg-gray-900">
-              <SelectValue placeholder="Todos Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Todos Status</SelectItem>
-              <SelectItem value="GENERATION">Desafio</SelectItem>
-              <SelectItem value="PRE_SCREENING">Pré-Triagem</SelectItem>
-              <SelectItem value="DETAILED_SCREENING">Triagem Detalhada</SelectItem>
-              <SelectItem value="MATERIALIZATION">Materialização</SelectItem>
-              <SelectItem value="EXPERIMENTATION">Experimentação</SelectItem>
-              <SelectItem value="SCALE">Escala</SelectItem>
-              <SelectItem value="APPROVE">Aprovado</SelectItem>
-              <SelectItem value="DISAPPROVE">Reprovado</SelectItem>
-            </SelectContent>
-          </Select>
+            <Select
+              value={status || "ALL"}
+              onValueChange={(value) => {
+                setPage(1);
+                setStatus(value === "ALL" ? undefined : value);
+              }}
+            >
+              <SelectTrigger className="bg-white dark:bg-gray-900">
+                <SelectValue placeholder="Todos Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Todos Status</SelectItem>
+                <SelectItem value="GENERATION">Desafio</SelectItem>
+                <SelectItem value="PRE_SCREENING">Pré-Triagem</SelectItem>
+                <SelectItem value="DETAILED_SCREENING">Triagem Detalhada</SelectItem>
+                <SelectItem value="MATERIALIZATION">Materialização</SelectItem>
+                <SelectItem value="EXPERIMENTATION">Experimentação</SelectItem>
+                <SelectItem value="SCALE">Escala</SelectItem>
+                <SelectItem value="APPROVE">Aprovado</SelectItem>
+                <SelectItem value="DISAPPROVE">Reprovado</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <Select
-        value={`${orderBy}-${orderDirection}`}
-        onValueChange={(value) => {
-          const [field, direction] = value.split("-");
-          setOrderBy(field as any);
-          setOrderDirection(direction as any);
-        }}
-      >
-        <SelectTrigger className="bg-white dark:bg-gray-900">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="createdAt-desc">Mais recentes</SelectItem>
-          <SelectItem value="createdAt-asc">Mais antigos</SelectItem>
-          <SelectItem value="name-asc">Nome A-Z</SelectItem>
-          <SelectItem value="name-desc">Nome Z-A</SelectItem>
-          <SelectItem value="status-asc">Status A-Z</SelectItem>
-          <SelectItem value="status-desc">Status Z-A</SelectItem>
-        </SelectContent>
-      </Select>
+            <Select
+              value={`${orderBy}-${orderDirection}`}
+              onValueChange={(value) => {
+                const [field, direction] = value.split("-");
+                setOrderBy(field as any);
+                setOrderDirection(direction as any);
+              }}
+            >
+              <SelectTrigger className="bg-white dark:bg-gray-900">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt-desc">Mais recentes</SelectItem>
+                <SelectItem value="createdAt-asc">Mais antigos</SelectItem>
+                <SelectItem value="name-asc">Nome A-Z</SelectItem>
+                <SelectItem value="name-desc">Nome Z-A</SelectItem>
+                <SelectItem value="status-asc">Status A-Z</SelectItem>
+                <SelectItem value="status-desc">Status Z-A</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
@@ -306,13 +349,15 @@ export default function ChallengeCard({
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full p-2">
         {challenges.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground text-sm">
-              Nenhum desafio encontrado.
-            </p>
+            <p className="text-muted-foreground text-sm">Nenhum desafio encontrado.</p>
           </div>
         ) : (
           challenges.map((challenge) => {
             const isPublic = challenge.visibility?.toLowerCase() === "public";
+            const canEdit =
+              isCollaborator &&
+              challenge.status === "GENERATION" &&
+              challengesWithSuggestions.has(challenge.id);
 
             return (
               <div
@@ -341,7 +386,7 @@ export default function ChallengeCard({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-[#ced3db] text-[13px]">
-                      <span className={`w-3 h-3 rounded-full ${colors[challenge.status ?? colors.DEFAULT]}`} />
+                      <span className={`w-3 h-3 rounded-full ${colors[challenge.status] ?? colors.DEFAULT}`} />
                       {STAGE_LABELS[challenge.status] || challenge.status}
                     </div>
                   </div>
@@ -356,13 +401,29 @@ export default function ChallengeCard({
                         <EyeOff size={16} /> Privado
                       </div>
                     )}
-                    <div>
+
+                    <div className="flex items-center gap-2">
                       {user?.role === "MANAGER" && (
                         <Trash2
                           size={16}
                           className="cursor-pointer hover:scale-110 hover:text-gray-800 transition-all"
                           onClick={() => deleteChallenge(challenge.id)}
                         />
+                      )}
+
+                      {canEdit && (
+                        <button
+                          onClick={() => handleOpenEdit(challenge.id)}
+                          disabled={loadingEdit === challenge.id}
+                          title="Editar desafio"
+                          className="cursor-pointer hover:scale-110 hover:text-[#15358D] transition-all disabled:opacity-50"
+                        >
+                          {loadingEdit === challenge.id ? (
+                            <div className="w-4 h-4 border-2 border-gray-400 border-t-[#15358D] rounded-full animate-spin" />
+                          ) : (
+                            <Pencil size={16} />
+                          )}
+                        </button>
                       )}
                     </div>
                   </div>
@@ -389,8 +450,8 @@ export default function ChallengeCard({
                 )}
               </div>
             );
-            })
-          )}
+          })
+        )}
       </div>
 
       <div className="flex justify-center items-center gap-4 mt-8">
@@ -401,11 +462,9 @@ export default function ChallengeCard({
         >
           Anterior
         </Button>
-
         <span className="text-sm">
           Página {page} de {totalPages}
         </span>
-
         <Button
           disabled={page === totalPages}
           onClick={() => setPage((prev) => prev + 1)}
@@ -423,6 +482,25 @@ export default function ChallengeCard({
           enterpriseName={modalChallenge.Enterprise?.name || "Empresa"}
           deadline={modalChallenge.endDate}
           onConfirm={() => handleApply(modalChallenge)}
+        />
+      )}
+
+      {editingChallenge && editChallengeData && editChallengeId && (
+        <EditChallengeModal
+          isOpen={editingChallenge}
+          onClose={() => {
+            setEditingChallenge(false);
+            setEditChallengeData(null);
+            setEditChallengeId(null);
+          }}
+          challengeId={editChallengeId}
+          initialData={editChallengeData}
+          onSuccess={() => {
+            setEditingChallenge(false);
+            setEditChallengeData(null);
+            setEditChallengeId(null);
+            fetchChallenges();
+          }}
         />
       )}
     </>
