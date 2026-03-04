@@ -7,6 +7,7 @@ import { ShowAllChallengeResponse } from "@/api/payloads/challenge.payload";
 import { shortDateFormatter } from "../kanban/Kanban";
 import { toast } from "sonner";
 import type { Role } from "@/lib/roles";
+import { Button } from "../ui/button";
 
 type Challenge = ShowAllChallengeResponse;
 
@@ -159,16 +160,18 @@ export default function CompanyHistoryHistoric({
                   </span>
                 )}
               </div>
+            </div>
+            <div className="">
 
               {challenge.status === "FUTURE_BACKLOG" && (
-                <button
+                <Button
                   onClick={() => handleReturnToKanban(challenge.id)}
                   disabled={actionLoading === challenge.id}
-                  className="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-white bg-[#15358c] hover:bg-[#0f2557] disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors"
+                  className=" text-white bg-[#15358c] hover:bg-[#0f2557] transition-colors w-full "
                 >
-                  <ArrowLeft size={14} />
+                  
                   {actionLoading === challenge.id ? "Retornando..." : "Voltar para o kanban"}
-                </button>
+                </Button>
               )}
             </div>
           </div>
