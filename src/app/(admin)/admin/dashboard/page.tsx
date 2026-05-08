@@ -82,7 +82,7 @@ export default function Ecommerce() {
 
       {/* Gantt Chart */}
       <div className="col-span-1 sm:col-span-2 xl:col-span-12">
-        <GanttChart />
+        {/* <GanttChart /> */}
       </div>
     </div>
   );
